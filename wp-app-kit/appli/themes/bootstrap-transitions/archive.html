@@ -1,0 +1,51 @@
+<div id="archive">
+	
+	<ol class="breadcrumb">
+		<li><%= title %><% total > 0 ? print(' - ' + total) : print(' - Aucun') %> article<% total > 1 ? print('s') : '' %></li>
+	</ol>
+	
+	<% if(posts.length){ %>
+	
+		<ul class="media-list">
+		
+			<% _.each( posts, function( post ){ %>
+			
+		  		<%
+		  			  var date = new Date(post.date*1000);
+		  			  var month = date.getUTCMonth() + 1;
+			    	  month = month < 10 ? '0' + month : month;
+			    	  var day = date.getUTCDate();
+			    	  var year = date.getUTCFullYear();
+		  		%>
+									
+				<li class="media"> 
+						
+					<% if( post.featured_img.src && post.featured_img.src.length ){ %>
+						<img class="media-object pull-left" style="width: 87px; height: 58px;" src="<%= post.featured_img.src %>">
+					<% } %>						
+												
+					<div class="media-body">
+						<h4 class="media-heading">
+							<a href="<%= TemplateTags.getPostLink(post.id) %>" class="pull-left"><%= post.title %></a>
+							&nbsp;<small class="small">Le <%= day +'/'+ month +'/'+ year %></small>
+						</h4>
+						<% if( post.nb_comments > 0 ){ %>
+							<span class="comments"><%= post.nb_comments %> commentaire<% post.nb_comments > 1 ? print('s') : '' %></span><br/>
+						<% } %>
+						<p><%= post.excerpt %></p>
+					</div>
+					
+				</li>
+				
+			<% }); %>
+									
+		</ul>
+		
+		<% if( TemplateTags.displayGetMoreLink() ){ %>
+			<a class="get-more" href="#">Get more! (<%= TemplateTags.getMoreLinkNbLeft() %> left)</a>
+		<% } %>
+		
+	<% }else{ %>
+		<p>Aucun article trouvé!</p>
+	<% } %>
+</div>

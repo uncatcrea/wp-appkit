@@ -1,0 +1,41 @@
+<div id="content" class="container content full list-template">
+
+	<div id="list-title"><%= title %><hr/></div>
+
+	<!-- TODO : change for list-title ? as title is also used for app title -->
+
+	<!-- TODO : change archive.html for list.html -->
+
+	<% if(posts.length){ %>
+
+		<% _.each( posts, function( post ){ %>
+
+	  		<% 
+				var date = new Date(post.date*1000);
+				var month = date.getUTCMonth() + 1;
+				month = month < 10 ? '0' + month : month;
+				var day = date.getUTCDate();
+				day = day < 10 ? '0' + day : day;
+				var year = date.getUTCFullYear();
+	  		%>
+
+			<% if( post.featured_img.src && post.featured_img.src.length ){ %>
+				<div class="content-item-with-thumbnail" style="background:url(<%= post.featured_img.src %>);background-size:100% auto;">				
+			<% }else{ %>
+				<div class="content-item">
+			<% } %>
+
+					<a href="<%= TemplateTags.getPostLink(post.id) %>">
+						<div class="content-date"><%= day +'/'+ month +'/'+ year %></div>
+						<h2><span><%= post.title %></span></h2>
+						<div class="content-excerpt"><%= post.excerpt %></div>
+					</a>
+				</div>
+
+		<% }); %>
+
+	<% }else{ %>
+		<div class='content-message'>No post found</div>
+	<% } %>
+
+</div>

@@ -1,0 +1,23 @@
+<div class="topcoat-list">
+  <h3 class="topcoat-list__header">Commentaires sur "<a href="<%= TemplateTags.getPostLink(post.id) %>"><%= post.title %>"</a></h3>
+  <% if(comments.length){ %>
+	  <ul class="topcoat-list__container">
+	  	<% _.each( comments, function( comment ){ %>
+	  		<% 
+	  			  var date = new Date(comment.date*1000);
+	  			  var month = date.getUTCMonth() + 1;
+		    	  month = month < 10 ? '0' + month : month;
+		    	  var day = date.getUTCDate();
+		    	  var year = date.getUTCFullYear();
+	  		%>
+			<li class="topcoat-list__item" style="padding-left:<% print((comment.depth)*2) %>em">
+				<%= comment.author %>,&nbsp;<span class="date">le <%= day +'/'+ month +'/'+ year %></span>
+				<p><%= comment.content %></p>
+				<div style="clear:both"></div>
+			</li>
+		<% }) %>
+	  </ul>
+	<% }else{ %>
+		<p>Aucun Commentaire!</p>
+	<% } %>
+</div>

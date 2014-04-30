@@ -1,0 +1,13 @@
+<div id="custom-page">
+	<h1><%= data.title %></h1>
+	<div id="custom-page-content">
+		<%= data.content %>
+		<br/>
+		<strong><%= data.any_data_i_want %></strong>
+		<ul>
+			<% _.each( data.my_list, function(value,key){ %>
+				<li><%= key %> : <%= value %></li>
+			<% }); %>
+		</ul>
+	</div>
+</div>

@@ -1,0 +1,170 @@
+@font-face {
+	font-family : "Roboto-Regular";
+	src : url('../fonts/Roboto-Regular.ttf');
+}
+
+@font-face {
+	font-family : "Roboto-Medium";
+	src : url('../fonts/Roboto-Medium.ttf');
+}
+
+@font-face{
+	font-family : "Roboto-Bold";
+	src : url('../fonts/Roboto-Bold.ttf');
+}
+
+@font-face{
+	font-family : "Roboto-BoldItalic";
+	src : url('../fonts/Roboto-BoldItalic.ttf');
+}
+
+@font-face {
+	font-family : "Roboto-Light";
+	src : url('../fonts/Roboto-Light.ttf');
+}
+
+@font-face {
+	font-family : "Roboto-Black";
+	src : url('../fonts/Roboto-Black.ttf');
+}
+
+@font-face {
+	font-family : "Roboto-Thin";
+	src : url('../fonts/Roboto-Thin.ttf');
+}
+
+@font-face{
+	font-family : "Roboto-ThinItalic";
+	src : url('../fonts/Roboto-ThinItalic.ttf');
+}
+
+body {
+	background-color:#182C36;
+	font-family:Roboto-Regular, sans-serif;
+}
+
+.header {
+	height:51px;
+	background-color:#666666;
+	border-bottom:2px #585858 solid;
+	box-shadow:0px 1px 1px #666666 ;
+}
+
+/* /!\ SVG not displayed by Android 2x */
+.burger {
+	background-image:url('../img/menu-icon.svg');	
+	width:45px;
+	height:51px;
+}
+
+.button-touch-on {
+	background-color:#33B5E5;
+}
+
+.button-touch-off {
+	background-color:transparent;
+}
+
+h1 {
+	color:#ffffff;
+}
+
+.refresh {
+	width:51px;
+	height:51px;
+}
+
+/* /!\ SVG not displayed by Android 2x */
+.refresh-off {
+	background-image:url('../img/refresh-off-icon.svg');
+}
+
+/* /!\ SVG not displayed by Android 2x */
+.refresh-on {
+	background-image:url('../img/refresh-off-icon.svg');
+}
+
+.message {
+	background-color:#c74b46;
+	color:#ffffff;
+	border-bottom:1px #666666 solid;
+	box-shadow:0px 1px 1px #666666;
+	line-height:15px;
+}
+
+.list-template #list-title {
+	font-family:Roboto-ThinItalic,sans-serif;
+}
+
+.list-template .content-date {
+	font-family:Roboto-Light,sans-serif;
+}
+
+.list-template h2 {
+	font-family:Roboto-Medium,sans-serif;
+}
+
+.drawer {
+	background-color:#333333; /* Same as body background to prevent flickering during transition */	
+}
+
+.single-content {
+	font-family:Roboto-Light,sans-serif;
+}
+
+#single-meta {
+	font-family:Roboto-ThinItalic,sans-serif;
+}
+
+.single-template h1 {
+	font-family:Roboto-Black,sans-serif;
+}
+
+.single-content h2 {
+	font-family:Roboto-Medium,sans-serif;
+}
+
+.single-content h3 {
+	font-family:Roboto-Medium,sans-serif;
+}
+
+.single-content h4 {
+	font-family:Roboto-Medium,sans-serif;
+}
+
+.single-content h5, .single-content h6 {
+	font-family:Roboto-Bold,sans-serif;
+}
+
+.single-content h5:after, .single-content h6:after {
+	font-family:Roboto-Bold,sans-serif;
+}
+
+.single-content strong {
+	font-family:Roboto-Bold,sans-serif;
+}
+
+.single-content em {
+	font-family:Roboto-ThinItalic,sans-serif;
+}
+
+.single-content em strong, .single-content strong em {
+	font-family:Roboto-BoldItalic,sans-serif;
+}
+
+.single-content a:link {
+	font-family:Roboto-Medium,sans-serif;
+}
+
+.single-content blockquote p {
+	font-family:Roboto-Thin,sans-serif;
+}
+
+.content-message {
+	font-family:Roboto-Medium,sans-serif;
+	background-color:#c74b46;
+}
+
+.drawer {
+	overflow-y:auto; /* fix the menu scrollbar bug */
+}

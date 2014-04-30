@@ -1,0 +1,59 @@
+.list-template #list-title {
+	text-align:center;
+	font-size:24px;
+	padding:10px 0 0 0;
+	margin:0 0 15px 0;
+}
+
+.list-template #list-title hr {
+	display: block;
+	width:30%;
+	max-width:150px;
+	height:1px;
+    border:0;
+    border-top:1px solid #ff5555;
+}
+
+.list-template .content-item-with-thumbnail {
+	background-repeat:no-repeat;
+	background-position:center center;
+	/* set background-size in style attr. as it won't be apply otherwise */
+}
+
+.list-template .content-date {
+	margin:0px 0px 0px 0px;
+	padding:0px 0px 0px 0px;
+	font-size:12px;
+	color:#202636;
+}
+
+.list-template h2 {
+	margin:0px 0px 10px 0px;
+	padding:0;
+	font-size:24px;
+	font-weight:normal;
+	color:#000000;
+	line-height:29px;
+}
+
+.list-template h2 span, .list-template .content-excerpt {
+	background-color:rgba(255,255,255,0.8);
+}
+
+.list-template .content-excerpt {
+	font-size:14px;
+	line-height:21px;
+}
+
+.list-template a {
+	color:#000;
+	margin:0;
+	padding:10px 10px 6px 10px;
+	border-bottom:1px #AC98BA solid;
+	display:block;
+	text-decoration:none;
+	-webkit-tap-highlight-color:rgba(255,255,255,0.5);
+	-webkit-user-select:none;
+	-webkit-touch-callout:none; /* Work on iOS only to block hyperlink menu */
+	background-color:rgba(255,255,255,0.2);
+}

@@ -1,0 +1,141 @@
+body {
+	background-color:#182C36;
+	font-family:"HelveticaNeue", sans-serif;
+}
+
+.header {
+	height:51px;
+	background-color:#F8F8F8;
+	border-bottom:1px #B2B2B2 solid;	
+}
+
+/* TODO : create with left button common features */
+
+/* /!\ SVG not displayed by Android 2x */
+.burger {
+	background-image:url('../img/menu-icon.svg');	
+	width:30px;
+	height:30px;
+	margin:12px 0px 0px 13px;
+}
+
+.back-button {
+	position:absolute;
+	float: left;
+	background-repeat:no-repeat;
+	background-position:center;
+	background-image:url('../img/back-icon.svg');	
+	width:30px;
+	height:30px;
+	margin:12px 0px 0px 5px;
+}
+
+.button-touch-on {
+	opacity:0.1;
+	-webkit-transition:opacity 0.1s linear;
+}
+
+.button-touch-off {
+	opacity:1;
+	-webkit-transition:opacity 0.1s linear;
+}
+
+h1 {
+	font-family:HelveticaNeue-Medium,sans-serif;
+}
+
+.refresh {
+	width:30px;
+	height:30px;
+	margin:12px 10px 0px 0px;	
+}
+
+/* /!\ SVG not displayed by Android 2x */
+.refresh-off {
+	background-image:url('../img/refresh-off-icon.svg');
+}
+
+/* /!\ SVG not displayed by Android 2x */
+.refresh-on {
+	background-image:url('../img/refresh-on-icon.svg');
+}
+
+.message {
+	background-color:#ff5555;
+	color:#3D1414;
+	border-top:1px #A13636 solid;
+	border-bottom:1px #A13636 solid;
+}
+
+.list-template #list-title {
+	font-family:HelveticaNeue-LightItalic,sans-serif;
+}
+
+.list-template .content-date {
+	font-family:HelveticaNeue-Thin,sans-serif;	
+}
+
+.list-template h2 {
+	font-family:HelveticaNeue-Medium,sans-serif;	
+}
+
+.drawer {
+	background-color:#182C36; /* Same as body background to prevent flickering during transition */	
+}
+
+.single-content {
+	font-family:HelveticaNeue-Light,sans-serif;
+}
+
+#single-meta {
+	font-family:HelveticaNeue-Thin_Italic;
+}
+
+.single-template h1 {
+	font-family:HelveticaNeue-Bold,sans-serif;
+}
+
+.single-content h2 {
+	font-family:HelveticaNeue-Medium,sans-serif;
+}
+
+.single-content h3 {
+	font-family:HelveticaNeue-Medium,sans-serif;
+}
+
+.single-content h4 {
+	font-family:HelveticaNeue-Medium,sans-serif;
+}
+
+.single-content h5, .single-content h6 {
+	font-family:HelveticaNeue-Bold,sans-serif;
+}
+
+.single-content h5:after, .single-content h6:after {
+	font-family:HelveticaNeue-Bold,sans-serif;
+}
+
+.single-content strong {
+	font-family:HelveticaNeue-Bold,sans-serif;
+}
+
+.single-content em {
+	font-family:HelveticaNeue-Thin_Italic;
+}
+
+.single-content em strong, .single-content strong em {
+	font-family:HelveticaNeue-BoldItalic;
+}
+
+.single-content a:link {
+	font-family:HelveticaNeue-Medium;
+}
+
+.single-content blockquote p {
+	font-family:HelveticaNeue-Thin;
+}
+
+.content-message {
+	font-family:HelveticaNeue-Medium;	
+	background-color:#ff5555;
+}

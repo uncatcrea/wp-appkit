@@ -1,0 +1,120 @@
+#waiting{ 
+	z-index:1000;
+	background-color: #ddd;
+    background-image: url('../img/ajax-loader.gif');
+    background-position:  center center;
+    background-repeat: no-repeat;
+    opacity: 1;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0; 
+}
+
+body:not(.snapjs-left) .snap-drawer-left{ 
+	display:none;
+}
+
+img{
+	max-width:327px;
+}
+
+.menu-button{
+	margin-top: 0.6rem;
+}
+
+#container{
+	overflow:auto;
+}
+
+.topcoat-list__item{
+	clear:both;
+}
+
+.topcoat-list__item a {
+    text-decoration: none;
+    color:inherit;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: rgb(0, 0, 0);
+}
+
+.topcoat-list__item span.date,
+.topcoat-list__item span.comments{
+	padding-right:0.5em;
+	font-size:80%;
+}
+
+.topcoat-list__item span.title{
+	padding-right:0.5em;
+	font-size:100%;
+	font-weight:bold;
+}
+
+.topcoat-list__item img{
+    height: 96px;
+    float: left;
+    margin-top: 0px;
+    margin-right: 8px;
+}
+
+.topcoat-list__header{
+	font-size:1.3em;
+}
+
+#single{
+	padding: 1em;
+	background-color: #dfe2e2;
+}
+
+#single a.comments{
+	display: block;
+	margin: 1em 0 1.5em;
+	text-align: right;
+}
+
+#single-content img{
+    height: 218px;
+    margin:0 auto 1em;
+    display:block;
+}
+
+.topcoat-icon--refresh {
+  background: url("../img/refresh.svg") no-repeat;
+  background-size: cover;
+}
+
+@-webkit-keyframes rotating {
+    from{
+        -webkit-transform: rotate(0deg);
+    }
+    to{
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+.refreshing {
+    -webkit-animation: rotating 2s linear infinite;
+}
+
+#feedback{
+	padding:1em;
+	background:#ffffe0;
+	text-align:center;
+}
+
+#feedback.error{
+	background:#ffebe8;	
+}
+
+/*
+//Fixed nav test : 
+//(layout.html must change too : get topcoat-navigation-bar out of id="content" because it conflicts with snap.css)
+.topcoat-navigation-bar {
+	position: fixed;
+	width: 100%;
+	top:0;
+	right: 0;
+	left: 0;
+	z-index: 1000;
+}*/

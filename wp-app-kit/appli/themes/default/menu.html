@@ -1,0 +1,13 @@
+<nav class=" snap-drawer snap-drawer-left">
+       <div class="topcoat-list__container">
+           <ul class="topcoat-list side-nav__list">
+           	<% if(menu_items.length){ %>
+				<% _.each( menu_items, function( menu_item ){ %>
+	                 <li class="topcoat-list__item">
+	                     <a href="<%= menu_item.link %>" class="side-nav__button"><%= menu_item.label %></a>
+	                 </li>
+				<% }) %>
+			<% } %>
+           </ul>
+       </div>
+</nav>

@@ -1,0 +1,21 @@
+<div class="snap-drawers"><%= menu %></div>
+<div class="snap-content" id="content">
+	<div class="topcoat-navigation-bar">
+		<div class="topcoat-navigation-bar__item left quarter">
+			<a id="slide-menu-button" class="topcoat-icon-button--quiet menu-button">
+				<span class="topcoat-icon topcoat-icon--menu-stack"></span>
+			</a>
+		</div>
+		<div class="topcoat-navigation-bar__item center half">
+			<h1 class="topcoat-navigation-bar__title"><%= title %></h1>
+		</div>
+		<div class="topcoat-navigation-bar__item right quarter">
+			<a id="refresh-button" class="topcoat-icon-button--quiet menu-button">
+				<span class="topcoat-icon topcoat-icon--refresh rotating"></span>
+			</a>
+		</div>
+	</div>
+	<div id="feedback" style="display:none"></div>
+	<%= content %>
+</div>
+<div id="waiting" style="display:none"></div>

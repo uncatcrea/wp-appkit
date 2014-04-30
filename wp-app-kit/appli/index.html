@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript">
+			var require = {
+				urlArgs : "bust="+ new Date().getTime()
+			};
+		</script>
+		
+		<script type="text/javascript">
+			/* Only for use inside WP plugin : to pass the app id to our app js core.
+			   Can be removed from the PhoneGap export, but won't do any arm if it stays.
+			*/
+			var query = window.location.search.substring(1);
+		  	if( query.length ){
+		  		require.urlArgs = query +'&'+ require.urlArgs;
+		  	}
+		</script>
+		
+		<script data-main="core/launch.js" src="vendor/require.js"></script>
+	</head>
+	<body>
+		<div id="app-layout"></div>
+	</body>
+</html>

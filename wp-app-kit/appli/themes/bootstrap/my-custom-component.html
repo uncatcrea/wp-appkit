@@ -1,0 +1,31 @@
+<div id="archive">
+	
+	<ol class="breadcrumb">
+		<li><%= title %><% total > 0 ? print(' - ' + total) : print(' - Aucun') %> élément<% total > 1 ? print('s') : '' %></li>
+	</ol>
+	
+	<% if(items.length){ %>
+	
+		<ul class="media-list">
+		
+			<% _.each( items, function( item ){ %>
+			
+				<li class="media"> 
+						
+					<div class="media-body">
+						<h4 class="media-heading">
+							<a href="<%= TemplateTags.getPostLink(item.id) %>"><%= item.prenom %> <%= item.nom %></a>
+						</h4>
+						<p><%= item.desc %></p>
+					</div>
+					
+				</li>
+				
+			<% }); %>
+									
+		</ul>
+		
+	<% }else{ %>
+		<p>Aucun élément trouvé!</p>
+	<% } %>
+</div>

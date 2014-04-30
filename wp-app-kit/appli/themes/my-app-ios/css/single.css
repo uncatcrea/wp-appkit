@@ -1,0 +1,170 @@
+.single-template {padding-top:0;}
+
+.single-content {
+	text-align:left;
+	padding:10px 10px 0px 10px;
+}
+
+.single-title {
+	padding:10px 5px 0px 5px;
+}
+
+#single-meta {
+	font-size:12px;
+	text-align:center;
+}
+
+#single-meta hr {
+	display: block;
+	width:30%;
+	max-width:150px;
+	height:1px;
+    border:0;
+    border-top:1px solid #ff5555;}
+
+
+.single-title-with-thumbnail {
+	background-repeat:no-repeat;
+	background-position:center center;
+	/* set background-size in style attr. as it won't be apply otherwise */
+	height:250px;
+	display:table-cell;
+	vertical-align:bottom;
+	border-bottom:1px #B2B2B2 solid;
+}
+
+.single-template h1 {
+	color:#2E2E2E;
+	margin:0;
+	padding:0px 5px 0px 5px;
+	font-size:32px;
+	left:0;
+	background-color:rgba(255,255,255,0.5);
+}
+
+.single-content h2 {
+	color:#2E2E2E;
+	margin:10px 0px 10px 0px;
+	font-size:24px;
+}
+
+.single-content h3 {
+	color:#2E2E2E;
+	margin:5px 0px 5px 0px;
+	font-size:18px;
+}
+
+.single-content h4 {
+	color:#2E2E2E;
+	margin:5px 0px 5px 0px;
+	font-size:16px;
+}
+
+.single-content h5, .single-content h6 {
+	color:#2E2E2E;
+	margin:3px 0px 0px 0px;
+	padding:0;
+	display:inline;
+	font-size:16px;
+	line-height:16px;
+	float:left;
+}
+
+.single-content h5:after, .single-content h6:after {
+	color:#2E2E2E;
+	font-size:16px;
+	line-height:16px;
+	content:"-";
+	margin:0px 3px 0px 3px;
+}
+
+.single-content p {
+	font-size:16px;
+	line-height:22px;
+	margin:0px 0px 20px 0px;
+}
+
+.single-content strong {
+	font-size:16px;
+	line-height:22px;
+	color:#2E2E2E;
+}
+
+.single-content em {
+	font-size:16px;
+	line-height:22px;
+	color:#2E2E2E;
+}
+
+.single-content em strong, .single-content strong em {
+	font-size:16px;
+	line-height:22px;
+	color:#2E2E2E;	
+}
+
+.single-content a {
+	-webkit-touch-callout:none; /* Work on iOS only to block hyperlink menu */
+	font-size:16px;
+	line-height:22px;	
+}
+
+.single-content a:link {
+	color:#1C5396;
+}
+
+.single-content a:visited {
+	color:#A5BDFF;
+}
+
+.single-content ul, .single-content ol {
+	font-size:14px;
+	margin:-5px 0px 20px 0px;
+	padding:0px 20px 0px 40px;
+}
+
+.single-content ul li {
+	margin:0px 0px 10px 0px;
+}
+
+.single-content ol li {
+	margin:0px 0px 10px 0px;
+}
+
+.single-content blockquote {
+	border-top:1px #ff5555 solid;
+	border-bottom:1px #ff5555 solid;
+	padding:10px 0px 10px 0px;
+	margin:5px 20% 25px 20%;
+}
+
+.single-content blockquote p {
+	font-size:32px;
+	line-height:40px;
+	text-align:center;
+	margin:0px -20% 0px -20%;
+	padding:0px;
+}
+
+.single-content sup, .single-content sub {
+	font-size:10px;
+}
+
+.single-content .content-image a {
+	display:block;
+	border:1px #B2B2B2 solid;
+	padding:1px;
+}
+
+.single-content .content-image img {
+	width:100%;
+	height:auto;
+	display:block; /* Done to fix the padding bottom bug */
+}
+
+.single-content .content-image .wp-caption-text {
+	font-size:12px;
+	line-height:14px;
+	color:#808080;
+	margin:5px 2px 20px 2px;
+	text-align:justify;
+}

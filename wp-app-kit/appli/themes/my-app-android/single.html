@@ -1,0 +1,28 @@
+<div id="content" class="container content full single-template">
+
+	<% if(  post.featured_img && post.featured_img.src && post.featured_img.src.length ){ %>
+		<div class="single-title-with-thumbnail" style="background:url(<%= post.featured_img.src %>);-webkit-background-size:cover;">
+	<% }else{ %>
+		<div class="single-title">
+	<% } %>
+			<h1><%= post.title %></h1>
+		</div>
+	
+		<div class="single-content">
+
+	  		<% 
+				var date = new Date(post.date*1000);
+				var month = date.getUTCMonth() + 1;
+				month = month < 10 ? '0' + month : month;
+				var day = date.getUTCDate();
+				day = day < 10 ? '0' + day : day;
+				var year = date.getUTCFullYear();
+	  		%>
+
+
+			<%= post.content %>
+		</div>
+		
+		<div id="single-meta"><%= post.author + " - " + day +'/'+ month +'/'+ year %><hr/></div>
+
+</div>
