@@ -75,7 +75,7 @@ class WpakComponentTypePage extends WpakComponentType{
 	
 	public function get_options_to_display($component){
 		$page = get_post($component->options['page']);
-		$page_title = !empty($page) ? $page->post_title .' (ID='. $page->ID .')' : __('Page not found');
+		$page_title = !empty($page) ? $page->post_title .' (ID='. $page->ID .')' : __('Page not found',WpAppKit::i18n_domain);
 		$options = array(
 				'page' => array('label'=>__('Page'),'value'=>$page_title),
 		);
@@ -93,7 +93,7 @@ class WpakComponentTypePage extends WpakComponentType{
 		}
 		?>
 		<div>
-			<label><?php _e('Page') ?> : </label>
+			<label><?php _e('Page',WpAppKit::i18n_domain) ?> : </label>
 			<select name="page_id" class="page-pages">
 				<?php foreach($pages as $page): ?>
 					<?php $selected = $page->ID == $current_page ? 'selected="selected"' : '' ?>
@@ -118,4 +118,4 @@ class WpakComponentTypePage extends WpakComponentType{
 	
 }
 
-WpakComponentsTypes::register_component_type('page', array('label'=> __('Wordpress page')));
+WpakComponentsTypes::register_component_type('page', array('label'=> __('Wordpress page',WpAppKit::i18n_domain)));

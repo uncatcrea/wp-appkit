@@ -20,7 +20,7 @@ class WpakApps{
 	
 		register_post_type(
 			'wpak_apps', array(
-			'label' => __('Applications'),
+			'label' => __('Applications',WpAppKit::i18n_domain),
 			'description' => '',
 			'public' => false,
 			'show_ui' => true,
@@ -35,15 +35,15 @@ class WpakApps{
 			'has_archive' => false,
 			'supports' => array('title'),
 			'labels' => array (
-					'name' => __('Applications'),
-					'singular_name' => __('Application'),
-					'menu_name' => __('Applications'),
-					'add_new' => __('Add'),
-					'add_new_item' => __('Add an application'),
-					'edit' => __('Edit'),
-					'edit_item' => __('Edit application'),
-					'new_item' => __('New application'),
-					'not_found' => __('No application found'),
+					'name' => __('Applications',WpAppKit::i18n_domain),
+					'singular_name' => __('Application',WpAppKit::i18n_domain),
+					'menu_name' => __('Applications',WpAppKit::i18n_domain),
+					'add_new' => __('Add',WpAppKit::i18n_domain),
+					'add_new_item' => __('Add an application',WpAppKit::i18n_domain),
+					'edit' => __('Edit',WpAppKit::i18n_domain),
+					'edit_item' => __('Edit application',WpAppKit::i18n_domain),
+					'new_item' => __('New application',WpAppKit::i18n_domain),
+					'not_found' => __('No application found',WpAppKit::i18n_domain),
 				)
 			)
 		);
@@ -67,14 +67,14 @@ class WpakApps{
 	}
 	
 	public static function add_settings_panels(){
-		add_menu_page(__('WP App Kit'), __('WP App Kit'), 'manage_options', self::menu_item, array(__CLASS__,'settings_panel'));
+		add_menu_page(__('WP App Kit',WpAppKit::i18n_domain), __('WP App Kit',WpAppKit::i18n_domain), 'manage_options', self::menu_item, array(__CLASS__,'settings_panel'));
 	}
 	
 	public static function add_main_meta_box(){
 		
 		add_meta_box(
 			'wpak_app_main_infos',
-			__('Main infos'),
+			__('Main infos',WpAppKit::i18n_domain),
 			array(__CLASS__,'inner_main_infos_box'),
 			'wpak_apps',
 			'normal',
@@ -87,7 +87,7 @@ class WpakApps{
 
 		add_meta_box(
 			'wpak_app_phonegap_data',
-			__('Phonegap config.xml data'),
+			__('Phonegap config.xml data',WpAppKit::i18n_domain),
 			array(__CLASS__,'inner_phonegap_infos_box'),
 			'wpak_apps',
 			'normal',
@@ -96,7 +96,7 @@ class WpakApps{
 		
 		add_meta_box(
 			'wpak_app_security',
-			__('Security'),
+			__('Security',WpAppKit::i18n_domain),
 			array(__CLASS__,'inner_security_box'),
 			'wpak_apps',
 			'side',
@@ -109,10 +109,10 @@ class WpakApps{
 		$main_infos = self::get_app_main_infos($post->ID);
 		?>
 		<div class="wpak_settings">
-			<label><?php _e('Application title (displayed in app top bar)') ?></label> : <br/> 
+			<label><?php _e('Application title (displayed in app top bar)',WpAppKit::i18n_domain) ?></label> : <br/> 
 			<input type="text" name="wpak_app_title" value="<?php echo $main_infos['title'] ?>" />
 			<br/><br/>
-			<label><?php _e('Platform') ?></label> : <br/>
+			<label><?php _e('Platform',WpAppKit::i18n_domain) ?></label> : <br/>
 			<select name="wpak_app_platform">
 				<?php foreach(self::get_platforms() as $value => $label): ?>
 					<?php $selected = $value == $main_infos['platform'] ? 'selected="selected"' : '' ?>
@@ -132,43 +132,40 @@ class WpakApps{
 		$main_infos = self::get_app_main_infos($post->ID);
 		?>
 		<div class="wpak_settings">
-			<span class="description"><?php _e('PhoneGap config.xml informations that are going to be displayed on App Stores.<br/> 
-			They are required when exporting the App to Phonegap, but are not used for App debug and simulation in browsers.') ?></span>
+			<span class="description"><?php _e('PhoneGap config.xml informations that are going to be displayed on App Stores.<br/>They are required when exporting the App to Phonegap, but are not used for App debug and simulation in browsers.',WpAppKit::i18n_domain) ?></span>
 			<br/><br/>
-			<label><?php _e('Application name') ?></label> : <br/> 
+			<label><?php _e('Application name',WpAppKit::i18n_domain) ?></label> : <br/> 
 			<input type="text" name="wpak_app_name" value="<?php echo $main_infos['name'] ?>" />
 			<br/><br/>
-			<label><?php _e('Application description') ?></label> : <br/>
+			<label><?php _e('Application description',WpAppKit::i18n_domain) ?></label> : <br/>
 			<textarea name="wpak_app_desc"><?php echo $main_infos['desc'] ?></textarea>
 			<br/><br/>
-			<label><?php _e('Application id') ?></label> : <br/> 
+			<label><?php _e('Application id',WpAppKit::i18n_domain) ?></label> : <br/> 
 			<input type="text" name="wpak_app_phonegap_id" value="<?php echo $main_infos['app_phonegap_id'] ?>" />
 			<br/><br/>
-			<label><?php _e('Version') ?></label> : <br/>
+			<label><?php _e('Version',WpAppKit::i18n_domain) ?></label> : <br/>
 			<input type="text" name="wpak_app_version" value="<?php echo $main_infos['version'] ?>" />
 			<br/><br/>
-			<label><?php _e('Application versionCode (Android only)') ?></label> : <br/> 
+			<label><?php _e('Application versionCode (Android only)',WpAppKit::i18n_domain) ?></label> : <br/> 
 			<input type="text" name="wpak_app_version_code" value="<?php echo $main_infos['version_code'] ?>" />
 			<br/><br/>
-			<label><?php _e('Phonegap version') ?></label> : <br/> 
+			<label><?php _e('Phonegap version',WpAppKit::i18n_domain) ?></label> : <br/> 
 			<input type="text" name="wpak_app_phonegap_version" value="<?php echo $main_infos['phonegap_version'] ?>" />
 			<br/><br/>
-			<label><?php _e('Application author') ?></label> : <br/> 
+			<label><?php _e('Application author',WpAppKit::i18n_domain) ?></label> : <br/> 
 			<input type="text" name="wpak_app_author" value="<?php echo $main_infos['author'] ?>" />
 			<br/><br/>
-			<label><?php _e('Application author website') ?></label> : <br/> 
+			<label><?php _e('Application author website',WpAppKit::i18n_domain) ?></label> : <br/> 
 			<input type="text" name="wpak_app_author_website" value="<?php echo $main_infos['author_website'] ?>" />
 			<br/><br/>
-			<label><?php _e('Application author email') ?></label> : <br/> 
+			<label><?php _e('Application author email',WpAppKit::i18n_domain) ?></label> : <br/> 
 			<input type="text" name="wpak_app_author_email" value="<?php echo $main_infos['author_email'] ?>" />
 			<br/><br/>
-			<label><?php _e('Phonegap plugins') ?></label> : <br/> 
+			<label><?php _e('Phonegap plugins',WpAppKit::i18n_domain) ?></label> : <br/> 
 			<textarea name="wpak_app_phonegap_plugins"><?php echo $main_infos['phonegap_plugins'] ?></textarea>
-			<span class="description"><?php _e('Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>
-				Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; 
-				directly in the textarea.') ?></span>
+			<span class="description"><?php _e('Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; directly in the textarea.',WpAppKit::i18n_domain) ?></span>
 			<br/><br/>
-			<a href="<?php echo WpakBuild::get_appli_dir_url() .'/config.xml?wpak_app_id='. self::get_app_slug($post->ID) ?>"><?php _e('View config.xml') ?></a>
+			<a href="<?php echo WpakBuild::get_appli_dir_url() .'/config.xml?wpak_app_id='. self::get_app_slug($post->ID) ?>"><?php _e('View config.xml',WpAppKit::i18n_domain) ?></a>
 			<?php wp_nonce_field('wpak-phonegap-infos-'. $post->ID,'wpak-nonce-phonegap-infos') ?>
 		</div>
 		<?php
@@ -178,20 +175,19 @@ class WpakApps{
 		$secured = self::get_app_is_secured($post->ID);
 		$simulation_secured = self::get_app_simulation_is_secured($post->ID);
 		?>
-		<label><?php _e('Secured web services') ?></label> : <br/>
-		<span class="description"><?php _e("If activated, adds a security token to web services urls.") ?></span><br/>
+		<label><?php _e('Secured web services',WpAppKit::i18n_domain) ?></label> : <br/>
+		<span class="description"><?php _e("If activated, adds a security token to web services urls.",WpAppKit::i18n_domain) ?></span><br/>
 		<select name="wpak_app_secured">
-			<option value="1" <?php echo $secured ? 'selected="selected"' : '' ?>><?php _e('Yes') ?></option>
-			<option value="0" <?php echo !$secured ? 'selected="selected"' : '' ?>><?php _e('No') ?></option>
+			<option value="1" <?php echo $secured ? 'selected="selected"' : '' ?>><?php _e('Yes',WpAppKit::i18n_domain) ?></option>
+			<option value="0" <?php echo !$secured ? 'selected="selected"' : '' ?>><?php _e('No',WpAppKit::i18n_domain) ?></option>
 		</select>
 		<br/><br/>
-		<label><?php _e('Private App simulation') ?></label> : <br/>
-		<span class="description"><?php _e('If activated, only connected users with right permissions can access the app simulation in web browser.<br/>
-		If deactivated, the app simulation is publicly available in any browser, including the config.js and config.xml files, that can contain sensitive data.') ?></span>
+		<label><?php _e('Private App simulation',WpAppKit::i18n_domain) ?></label> : <br/>
+		<span class="description"><?php _e('If activated, only connected users with right permissions can access the app simulation in web browser.<br/>If deactivated, the app simulation is publicly available in any browser, including the config.js and config.xml files, that can contain sensitive data.',WpAppKit::i18n_domain) ?></span>
 		<br/>
 		<select name="wpak_app_simulation_secured">
-			<option value="1" <?php echo $simulation_secured ? 'selected="selected"' : '' ?>><?php _e('Private') ?></option>
-			<option value="0" <?php echo !$simulation_secured ? 'selected="selected"' : '' ?>><?php _e('Public') ?></option>
+			<option value="1" <?php echo $simulation_secured ? 'selected="selected"' : '' ?>><?php _e('Private',WpAppKit::i18n_domain) ?></option>
+			<option value="0" <?php echo !$simulation_secured ? 'selected="selected"' : '' ?>><?php _e('Public',WpAppKit::i18n_domain) ?></option>
 		</select>
 		<?php wp_nonce_field('wpak-security-infos-'. $post->ID,'wpak-nonce-security-infos') ?>
 		<?php
@@ -211,18 +207,18 @@ class WpakApps{
 			return;
 		}
 	
-		if( !check_admin_referer('wpak-main-infos-'. $post_id, 'wpak-nonce-main-infos')
- 			|| !check_admin_referer('wpak-phonegap-infos-'. $post_id, 'wpak-nonce-phonegap-infos')
-			|| !check_admin_referer('wpak-security-infos-'. $post_id, 'wpak-nonce-security-infos')
-			){
-			return;
-		}
-		
 		if( empty($_POST['post_type']) || $_POST['post_type'] != 'wpak_apps' ){
 			return;
 		}
 		
 		if( !current_user_can('edit_post', $post_id) ){
+			return;
+		}
+		
+		if( !check_admin_referer('wpak-main-infos-'. $post_id, 'wpak-nonce-main-infos')
+				|| !check_admin_referer('wpak-phonegap-infos-'. $post_id, 'wpak-nonce-phonegap-infos')
+				|| !check_admin_referer('wpak-security-infos-'. $post_id, 'wpak-nonce-security-infos')
+		){
 			return;
 		}
 	
@@ -288,8 +284,8 @@ class WpakApps{
 	
 	private static function get_platforms(){
 		return array(
-			'ios' => __('iOS'),
-			'android' => __('Android')
+			'ios' => __('iOS',WpAppKit::i18n_domain),
+			'android' => __('Android',WpAppKit::i18n_domain)
 		);
 	}
 	

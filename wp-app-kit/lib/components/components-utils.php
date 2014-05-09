@@ -54,7 +54,7 @@ class WpakComponentsUtils{
 		
 		$params = apply_filters('wpak_unavailable_media_img',$params);
 		
-		$img = '<img class="unavailable" alt="'. __('Unavailable content') .'" src="'. $params['src'] .'" width="'. $params['width'] .'" height="'. $params['height'] .'" />';
+		$img = '<img class="unavailable" alt="'. __('Unavailable content',WpAppKit::i18n_domain) .'" src="'. $params['src'] .'" width="'. $params['width'] .'" height="'. $params['height'] .'" />';
 		
 		return $img;
 	}

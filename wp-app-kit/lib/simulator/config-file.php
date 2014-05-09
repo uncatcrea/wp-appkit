@@ -48,12 +48,12 @@ class WpakConfigFile{
 							exit();
 					}
 				}else{
-					echo __('App not found') .' : ['. $app_id .']';
+					echo __('App not found',WpAppKit::i18n_domain) .' : ['. $app_id .']';
 					exit();
 				}
 				
 			}else{
-				_e('App id not found in _GET parmeters');
+				_e('App id not found in _GET parmeters',WpAppKit::i18n_domain);
 				exit();
 			}
 		}

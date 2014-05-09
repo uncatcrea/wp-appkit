@@ -39,7 +39,7 @@ class WpakWebServices{
 								$id = isset($wp_query->query_vars['wpak_id']) ? $wp_query->query_vars['wpak_id'] : 0;
 								self::exit_handle_request($wp_query->query_vars['wpak_app_id'],$web_service_slug,$wp_query->query_vars['wpak_action'],$id);
 							}else{
-								self::exit_sending_error(__('Wrong security token'),$wp_query->query_vars['wpak_app_id'],$web_service_slug);
+								self::exit_sending_error(__('Wrong security token',WpAppKit::i18n_domain),$wp_query->query_vars['wpak_app_id'],$web_service_slug);
 							}
 							break;
 						}
@@ -196,7 +196,7 @@ class WpakWebServices{
 			self::exit_sending_answer($service_answer,$app_id,$service_slug);
 		}
 	
-		exit(__('Error : Web service not recognised'));
+		exit(__('Error : Web service not recognised',WpAppKit::i18n_domain));
 	}
 	
 	public function build_result_info($status=1,$message='',$app_id='',$service_slug=''){

@@ -30,7 +30,7 @@ class WpakComponentTypeHooks extends WpakComponentType{
 	public function get_options_to_display($component){
 
 		$options = array(
-			'hook' => array('label'=>__('Hook'),'value'=>$component->options['hook']),
+			'hook' => array('label'=>__('Hook',WpAppKit::i18n_domain),'value'=>$component->options['hook']),
 		);
 
 		return $options;
@@ -45,7 +45,7 @@ class WpakComponentTypeHooks extends WpakComponentType{
 		}
 		?>
 		<div class="component-params">
-			<label><?php _e('Hook name') ?> : </label>
+			<label><?php _e('Hook name',WpAppKit::i18n_domain) ?> : </label>
 			<input type="text" name="hook" value="<?php echo $current_hook ?>" />
 		</div>
 		<?php
@@ -65,4 +65,4 @@ class WpakComponentTypeHooks extends WpakComponentType{
 	
 }
 
-WpakComponentsTypes::register_component_type('hooks', array('label'=> __('Custom component, using hooks')));
+WpakComponentsTypes::register_component_type('hooks', array('label'=> __('Custom component, using hooks',WpAppKit::i18n_domain)));

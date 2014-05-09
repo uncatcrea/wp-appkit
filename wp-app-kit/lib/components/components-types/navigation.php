@@ -31,5 +31,5 @@ class WpakComponentTypeNavigation extends WpakComponentType{
 	
 }
 
-WpakComponentsTypes::register_component_type('navigation', array('label'=> __('Navigation')));
+WpakComponentsTypes::register_component_type('navigation', array('label'=> __('Navigation',WpAppKit::i18n_domain)));
 */
