@@ -119,6 +119,7 @@ class WpakApps{
 					<option value="<?php echo $value ?>" <?php echo $selected ?>><?php echo $label ?></option>
 				<?php endforeach ?>
 			</select>
+			<?php wp_nonce_field('wpak-main-infos-'. $post->ID,'wpak-nonce-main-infos') ?>
 		</div>
 		<style>
 			.wpak_settings input[type=text]{ width:100% }
@@ -168,6 +169,7 @@ class WpakApps{
 				directly in the textarea.') ?></span>
 			<br/><br/>
 			<a href="<?php echo WpakBuild::get_appli_dir_url() .'/config.xml?wpak_app_id='. self::get_app_slug($post->ID) ?>"><?php _e('View config.xml') ?></a>
+			<?php wp_nonce_field('wpak-phonegap-infos-'. $post->ID,'wpak-nonce-phonegap-infos') ?>
 		</div>
 		<?php
 	}
@@ -191,6 +193,7 @@ class WpakApps{
 			<option value="1" <?php echo $simulation_secured ? 'selected="selected"' : '' ?>><?php _e('Private') ?></option>
 			<option value="0" <?php echo !$simulation_secured ? 'selected="selected"' : '' ?>><?php _e('Public') ?></option>
 		</select>
+		<?php wp_nonce_field('wpak-security-infos-'. $post->ID,'wpak-nonce-security-infos') ?>
 		<?php
 	}
 		
@@ -208,6 +211,13 @@ class WpakApps{
 			return;
 		}
 	
+		if( !check_admin_referer('wpak-main-infos-'. $post_id, 'wpak-nonce-main-infos')
+ 			|| !check_admin_referer('wpak-phonegap-infos-'. $post_id, 'wpak-nonce-phonegap-infos')
+			|| !check_admin_referer('wpak-security-infos-'. $post_id, 'wpak-nonce-security-infos')
+			){
+			return;
+		}
+		
 		if( empty($_POST['post_type']) || $_POST['post_type'] != 'wpak_apps' ){
 			return;
 		}

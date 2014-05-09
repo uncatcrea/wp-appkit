@@ -60,6 +60,7 @@ class WpakBuild{
 			<label><?php _e('Web services') ?> :</label><br/>
 			<?php _e('Synchronization') ?> : <a href="<?php echo $wp_ws_url ?>"><?php echo $wp_ws_url ?></a>
 		</div>
+		<?php wp_nonce_field('wpak-simulation-data-'. $post->ID,'wpak-nonce-simulation-data') ?>
 		<?php 
 	}
 	
@@ -92,6 +93,9 @@ class WpakBuild{
 			</select>
 			<a id="wpak_download_existing_link" href="#" class="button button-large"><?php _e('Download') ?>!</a>
 		<?php endif ?>
+		
+		<?php wp_nonce_field('wpak-export-data-'. $post->ID,'wpak-nonce-export-data') ?>
+		
 		<script>
 			jQuery("#wpak_export_link").click(function(e) {
 				e.preventDefault();
@@ -102,17 +106,22 @@ class WpakBuild{
 				    var data = {
 						action: 'wpak_build_app_sources',
 				    	app_id: '<?php echo $app_id ?>',
-						nonce: '<?php echo wp_create_nonce('wpak_build_app_sources') ?>',
+						nonce: '<?php echo wp_create_nonce('wpak_build_app_sources_'. $app_id) ?>',
 						themes: themes
 				    }
 					jQuery.post(ajaxurl, data, function(response) {
 						if( response.ok == 1 || response.ok == 2 ){
-							$feedback = jQuery('#wpak_export_feedback');
-							$feedback.addClass('updated').html('<?php echo addslashes(__("Zip export created successfully")) ?>');
+							var $feedback = jQuery('#wpak_export_feedback');
+							var message = '<?php echo addslashes(__("Zip export created successfully.")) ?>';
+							var download = jQuery('#wpak_download_after_build')[0].checked;
+							if( download ){
+								message += ' ' + '<?php echo addslashes(__("Download should start automatically.")) ?>';
+							}
+							$feedback.addClass('updated').html(message);
 							if( response.ok == 2 ){
 								$feedback.append('<br/><br/><strong><?php _e("Warning!") ?></strong> : '+ response.msg);
 							}
-							if( jQuery('#wpak_download_after_build')[0].checked ){
+							if( download ){
 								window.location.href = '<?php echo add_query_arg(array('action'=>'wpak_download_app_sources'),wp_nonce_url(admin_url(),'wpak_download_app_sources')) ?>&export='+ response['export'];
 							}
 						}else{
@@ -155,6 +164,12 @@ class WpakBuild{
 		}
 	
 		if( !current_user_can('edit_post', $post_id) ){
+			return;
+		}
+		
+		if( !check_admin_referer('wpak-simulation-data-'. $post_id, 'wpak-nonce-simulation-data')
+			|| !check_admin_referer('wpak-export-data-'. $post_id, 'wpak-nonce-export-data')
+		){
 			return;
 		}
 	
@@ -215,7 +230,15 @@ class WpakBuild{
 	public static function build_app_sources(){
 		$answer = array('ok'=>1, 'msg'=>'');
 		
-		if( empty($_POST) || !check_admin_referer('wpak_build_app_sources','nonce') ){
+		if( empty($_POST) || empty($_POST['app_id']) || !is_numeric($_POST['app_id']) ){
+			$answer['ok'] = 0;
+			$answer['msg'] = __('Wrong application ID');
+			self::exit_sending_json($answer);
+		}
+		
+		$app_id = addslashes($_POST['app_id']);
+		
+		if( !check_admin_referer('wpak_build_app_sources_'. $app_id,'nonce') ){
 			return;
 		}
 		
@@ -231,8 +254,6 @@ class WpakBuild{
 			$answer['msg'] = sprintf(__('The export directory [%s] could not be created. Please check that you have the right permissions to create this directory.'),$export_directory);
 			self::exit_sending_json($answer);
 		}
-		
-		$app_id = addslashes($_POST['app_id']); 
 		
 		$themes = !empty($_POST['themes']) && is_array($_POST['themes']) ? $_POST['themes'] : null;
 		if( $themes == null ){

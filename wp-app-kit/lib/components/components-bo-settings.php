@@ -14,7 +14,12 @@ class WpakComponentsBoSettings{
 	public static function admin_enqueue_scripts(){
 		global $pagenow, $typenow;
 		if( ($pagenow == 'post.php' || $pagenow == 'post-new.php') && $typenow == 'wpak_apps' ){
+			global $post;
 			wp_enqueue_script('wpak_components_bo_settings_js',plugins_url('lib/components/components-bo-settings.js', dirname(dirname(__FILE__))),array('jquery'),WpakAppKit::resources_version);
+			wp_localize_script('wpak_components_bo_settings_js', 'wpak_components', array(
+				'post_id'=>$post->ID,
+				'nonce'=>wp_create_nonce('wpak-component-data-'. $post->ID)
+			));
 		}
 	}
 	
@@ -73,7 +78,7 @@ class WpakComponentsBoSettings{
 			#components-wrapper{ margin-top:1em }
 			#components-table{ margin-top:5px }
 			#new-component-form{ margin-bottom: 4em }
-			#components-wrapper #components-feedback{ padding:1em; margin:5px }
+			#components-wrapper #components-feedback{ margin-top:15px; margin-bottom:17px; padding-top:12px; padding-bottom:12px; }
 		</style>
 		
 		<?php
@@ -164,7 +169,12 @@ class WpakComponentsBoSettings{
 	
 	public static function ajax_update_component_options(){
 		
-		//TODO : nonce!
+		if( empty($_POST['post_id'])
+			|| empty($_POST['nonce'])
+			|| !check_admin_referer('wpak-component-data-'. $_POST['post_id'],'nonce') ){
+			exit();
+		}
+		
 		$component_type = $_POST['component_type'];
 		$action = $_POST['wpak_action'];
 		$params = $_POST['params'];
@@ -175,8 +185,13 @@ class WpakComponentsBoSettings{
 	
 	public static function ajax_update_component_type(){
 	
-		//TODO : nonce!
 		$component_type = $_POST['component_type'];
+		
+		if( empty($_POST['post_id'])
+			|| empty($_POST['nonce']) 
+			|| !check_admin_referer('wpak-component-data-'. $_POST['post_id'],'nonce') ){
+			exit();
+		}
 		
 		WpakComponentsTypes::echo_form_fields($component_type);
 		exit();
@@ -186,7 +201,12 @@ class WpakComponentsBoSettings{
 	
 		$answer = array('ok' => 0, 'message' => '', 'type' => 'error', 'html' => '');
 
-		//TODO : nonce!
+		if( empty($_POST['post_id'])
+			|| empty($_POST['nonce']) 
+			|| !check_admin_referer('wpak-component-data-'. $_POST['post_id'],'nonce') ){
+			exit();
+		}
+		
 		$action = $_POST['wpak_action'];
 		$data = $_POST['data'];
 		

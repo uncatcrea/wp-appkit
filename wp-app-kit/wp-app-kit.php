@@ -17,7 +17,7 @@ require_once(dirname(__FILE__) .'/lib/simulator/simulator.php');
 
 class WpakAppKit{
 	
-	const resources_version = '0.1';
+	const resources_version = '0.3';
 	
 	public static function hooks(){
 		register_activation_hook( __FILE__, array(__CLASS__,'on_activation') );

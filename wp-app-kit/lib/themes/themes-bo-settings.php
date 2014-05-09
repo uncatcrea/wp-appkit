@@ -30,6 +30,8 @@ class WpakThemesBoSettings{
 			<?php endforeach ?>
 		</select>
 		
+		<?php wp_nonce_field('wpak-theme-data-'. $post->ID,'wpak-nonce-theme-data') ?>
+		
 		<?php
 	}
 	
@@ -47,6 +49,10 @@ class WpakThemesBoSettings{
 			return;
 		}
 	
+		if( !check_admin_referer('wpak-theme-data-'. $post_id, 'wpak-nonce-theme-data') ){
+			return;
+		}
+		
 		if ( isset( $_POST['wpak_app_theme_choice'] ) ) {
 			WpakThemesStorage::set_current_theme($post_id,$_POST['wpak_app_theme_choice']);
 		}

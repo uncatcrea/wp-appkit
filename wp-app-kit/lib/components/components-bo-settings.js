@@ -8,12 +8,13 @@ var WpakComponents = (function ($){
 		
 		wpak.ajax_update_component_options = function(element,component_type,action,params){
 			var form_id = get_parent_form_id(element);
-			//TODO : add nonce (via wp_localize_script...)
 			var data = {
 				action: 'wpak_update_component_options',
 				component_type: component_type,
 				wpak_action: action,
-				params: params
+				params: params,
+				post_id: wpak_components.post_id,
+				nonce: wpak_components.nonce
 			};
 			jQuery.post(ajaxurl, data, function(response) {
 				$('.ajax-target',$('#'+form_id)).html(response);
@@ -22,10 +23,11 @@ var WpakComponents = (function ($){
 		
 		wpak.ajax_update_component_type = function(element,component_type){
 			var form_id = get_parent_form_id(element);
-			//TODO : add nonce (via wp_localize_script...)
 			var data = {
 				action: 'wpak_update_component_type',
-				component_type: component_type
+				component_type: component_type,
+				post_id: wpak_components.post_id,
+				nonce: wpak_components.nonce
 			};
 			jQuery.post(ajaxurl, data, function(response) {
 				$('.component-options-target',$('#'+form_id)).html(response);
@@ -33,11 +35,12 @@ var WpakComponents = (function ($){
 		};
 		
 		wpak.ajax_add_or_edit_component_row = function(data,callback){
-			//TODO : add nonce (via wp_localize_script...)
 			var data = {
 				action: 'wpak_edit_component',
 				wpak_action: 'add_or_update',
-				data: data
+				data: data,
+				post_id: wpak_components.post_id,
+				nonce: wpak_components.nonce
 			};
 			
 			jQuery.ajax({
@@ -48,7 +51,7 @@ var WpakComponents = (function ($){
 				  callback(answer);
 			  },
 			  error: function(jqXHR, textStatus, errorThrown){
-				  callback({'ok':0,'message':'Error submitting data'}); //TODO translate js messages
+				  callback({'ok':0,'type':'error','message':'Error submitting data'}); //TODO translate js messages
 			  },
 			  dataType: 'json'
 			});
@@ -60,7 +63,9 @@ var WpakComponents = (function ($){
 			var data = {
 				action: 'wpak_edit_component',
 				wpak_action: 'delete',
-				data:  {'component_id': component_id, 'post_id': post_id}
+				data:  {'component_id': component_id, 'post_id': post_id},
+				post_id: post_id,
+				nonce: wpak_components.nonce
 			};
 			
 			jQuery.ajax({

@@ -15,7 +15,12 @@ class WpakNavigationBoSettings{
 	public static function admin_enqueue_scripts(){
 		global $pagenow, $typenow;
 		if( ($pagenow == 'post.php' || $pagenow == 'post-new.php') && $typenow == 'wpak_apps' ){
+			global $post;
 			wp_enqueue_script('wpak_navigation_bo_settings_js',plugins_url('lib/navigation/navigation-bo-settings.js', dirname(dirname(__FILE__))),array('jquery','jquery-ui-sortable'),WpakAppKit::resources_version);
+			wp_localize_script('wpak_navigation_bo_settings_js', 'wpak_navigation', array(
+				'post_id'=>$post->ID,
+				'nonce'=>wp_create_nonce('wpak-navigation-data-'. $post->ID)
+			));
 		}
 	}
 	
@@ -69,6 +74,7 @@ class WpakNavigationBoSettings{
 				.ui-sortable-helper{ width:100%; background:#fff; }
 				.ui-state-default{ cursor:move }
 				#navigation-wrapper #components-feedback{ padding:1em; margin:5px }
+				#navigation-feedback { margin-top:15px; margin-bottom:17px; padding-top:12px; padding-bottom:12px; }
 			</style>
 		</div>
 		<?php 
@@ -152,11 +158,15 @@ class WpakNavigationBoSettings{
 	}
 	
 	public static function ajax_wpak_edit_navigation(){
-		//TODO : add nonce!
 		
 		$answer = array('ok' => 0, 'message' => '', 'type' => 'error', 'html' => '');
 		
-		//TODO : nonce!
+		if( empty($_POST['post_id'])
+				|| empty($_POST['nonce'])
+				|| !check_admin_referer('wpak-navigation-data-'. $_POST['post_id'],'nonce') ){
+			exit();
+		}
+		
 		$action = $_POST['wpak_action'];
 		$data = $_POST['data'];
 		

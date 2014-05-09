@@ -7,11 +7,13 @@ var WpakNavigation = (function ($){
 		};
 		
 		wpak.ajax_add_or_edit_navigation_row = function(data,callback){
-			//TODO : add nonce (via wp_localize_script...)
+
 			var data = {
 				action: 'wpak_edit_navigation',
 				wpak_action: 'add_or_update',
-				data: data
+				data: data,
+				post_id: wpak_navigation.post_id,
+				nonce: wpak_navigation.nonce
 			};
 			
 			jQuery.ajax({
@@ -22,7 +24,7 @@ var WpakNavigation = (function ($){
 				  callback(answer);
 			  },
 			  error: function(jqXHR, textStatus, errorThrown){
-				  callback({'ok':0,'message':'Error submitting data'}); //TODO translate js messages
+				  callback({'ok':0,'type':'error','message':'Error submitting data'}); //TODO translate js messages
 			  },
 			  dataType: 'json'
 			});
@@ -30,11 +32,13 @@ var WpakNavigation = (function ($){
 		};
 		
 		wpak.ajax_delete_navigation_row = function(post_id,navigation_item_id,callback){
-			//TODO : add nonce (via wp_localize_script...)
+
 			var data = {
 				action: 'wpak_edit_navigation',
 				wpak_action: 'delete',
-				data:  {'navigation_item_id': navigation_item_id, 'post_id': post_id}
+				data:  {'navigation_item_id': navigation_item_id, 'post_id': post_id},
+				post_id: wpak_navigation.post_id,
+				nonce: wpak_navigation.nonce
 			};
 			
 			jQuery.ajax({
@@ -52,11 +56,13 @@ var WpakNavigation = (function ($){
 		};
 		
 		wpak.ajax_move_navigation_row = function(post_id,positions,callback){
-			//TODO : add nonce (via wp_localize_script...)
+
 			var data = {
 				action: 'wpak_edit_navigation',
 				wpak_action: 'move',
-				data:  {'positions': positions, 'post_id': post_id}
+				data:  {'positions': positions, 'post_id': post_id},
+				post_id: wpak_navigation.post_id,
+				nonce: wpak_navigation.nonce
 			};
 			
 			jQuery.ajax({
