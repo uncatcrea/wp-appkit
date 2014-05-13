@@ -113,11 +113,12 @@ class WpakComponentTypePostsList extends WpakComponentType{
 			'excerpt' => '',
 			'featured_img' => '',
 			'author' => get_the_author_meta('nickname'), 
-			'url' => get_permalink(),
 			'nb_comments' => (int)get_comments_number()
 		);
 		
 		//Use the "wpak_posts_list_post_content" filter to format app posts content your own way :
+		//(To apply the default App Kit formating to the content and add only minor modifications to it, 
+		//use the "wpak_post_content_format" filter instead.)
 		$content = apply_filters('wpak_posts_list_post_content','',$post);
 		if( empty($content) ){
 			$content = WpakComponentsUtils::get_formated_content();
@@ -134,7 +135,9 @@ class WpakComponentTypePostsList extends WpakComponentType{
 			$post_data['featured_img']['height'] = $featured_img_src[2];
 		}
 		
-		$post_data = apply_filters('wpak_posts_list_post_data',$post_data,$post);
+		//To customize post data sent to the app (for example add a post meta to the default post data), 
+		//use this "wpak_post_data" filter :
+		$post_data = apply_filters('wpak_post_data',$post_data,$post);
 		
 		return (object)$post_data;
 	}

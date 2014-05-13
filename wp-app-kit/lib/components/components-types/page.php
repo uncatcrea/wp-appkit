@@ -21,17 +21,19 @@ class WpakComponentTypePage extends WpakComponentType{
 	
 		$post_data = array(
 				'id' => $post->ID,
+				'post_type' => $post->post_type,
 				'date' => strtotime($post->post_date),
 				'title' => $post->post_title,
 				'content' => '',
 				'excerpt' => '',
 				'featured-img' => '',
-				'author' => '',
-				'url' => get_permalink(),
+				'author' => get_the_author_meta('nickname'),
 				'nb_comments' => (int)get_comments_number()
 		);
 	
 		//Use the "wpak_posts_list_post_content" filter to format app pages content your own way :
+		//(To apply the default App Kit formating to the content and add only minor modifications to it, 
+		//use the "wpak_post_content_format" filter instead.)
 		$content = apply_filters('wpak_page_content','',$post);
 		if( empty($content) ){
 			$content = WpakComponentsUtils::get_formated_content();
@@ -46,6 +48,8 @@ class WpakComponentTypePage extends WpakComponentType{
 			$post_data['featured_img']['src'] = $featured_img_src[0];
 		}
 	
+		//To customize page data sent to the app (for example add a page meta to the default page data),
+		//use this "wpak_page_data" filter :
 		$post_data = apply_filters('wpak_page_data',$post_data,$post);
 	
 		return (object)$post_data;
