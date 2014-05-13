@@ -142,6 +142,26 @@ define(function (require,exports) {
 		  var get_more_link_display = ThemeApp.getGetMoreLinkDisplay();
 		  return get_more_link_display.nb_left;
 	  };
+	  
+	  themeTplTags.formatDate = function(date_timestamp,format){
+		
+		  //TODO : this is really really basic, incomplete and not robust date formating... improve this!
+		  
+		  if( format == undefined ){
+    		  format = "d/m/Y";
+    	  }
+		  var date = new Date(date_timestamp*1000);
+		  var month = date.getUTCMonth() + 1;
+    	  month = month < 10 ? '0' + month : month;
+    	  var day = date.getUTCDate();
+    	  var year = date.getUTCFullYear();
+    	  
+    	  format = format.replace('d',day);
+    	  format = format.replace('m',month);
+    	  format = format.replace('Y',year);
+    	  
+    	  return format;
+	  };
       
 	  //Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
 	  //a circular dependency for requirejs) can both be required at the same time 
