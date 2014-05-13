@@ -1,6 +1,6 @@
 <div class="wrap">
 	<div class="topcoat-list">
-	  <h3 class="topcoat-list__header"><%= title %><% total > 0 ? print(' - ' + total) : print(' - Aucun') %> article<% total > 1 ? print('s') : '' %></h3>
+	  <h3 class="topcoat-list__header"><%= list_title %><% total > 0 ? print(' - ' + total) : print(' - Aucun') %> article<% total > 1 ? print('s') : '' %></h3>
 	  <% if(posts.length){ %>
 		  <ul class="topcoat-list__container">
 		  	<% _.each( posts, function( post ){ %>

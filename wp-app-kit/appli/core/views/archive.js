@@ -24,7 +24,7 @@ define(function (require) {
         },
 
         render : function() {
-        	var renderedContent = this.template({ posts : this.posts.toJSON(), title: this.title, total:this.total, TemplateTags : ThemeTplTags });
+        	var renderedContent = this.template({ posts : this.posts.toJSON(), list_title: this.title, total:this.total, TemplateTags : ThemeTplTags });
             $(this.el).html(renderedContent); 
             return this;
         },

@@ -1,26 +1,19 @@
 <div id="post-comments-list">
 	<ol class="breadcrumb">
-		<li>Commentaires sur <a href="<%= TemplateTags.getPostLink(post.id) %>"><%= post.title %></a></li>
+		<li>Comments on <a href="<%= TemplateTags.getPostLink(post.id) %>"><%= post.title %></a></li>
 	</ol>
 	<% if(comments.length){ %>
 		  <ul class="media-list">
 		  	<% _.each( comments, function( comment ){ %>
-		  		<% 
-		  			  var date = new Date(comment.date*1000);
-		  			  var month = date.getUTCMonth() + 1;
-			    	  month = month < 10 ? '0' + month : month;
-			    	  var day = date.getUTCDate();
-			    	  var year = date.getUTCFullYear();
-		  		%>
 				<li class="media" style="padding-left:<% print((comment.depth)*2) %>em">
 					<div class="media-body">
-						<h4 class="media-heading"><%= comment.author %>,&nbsp;<small>le <%= day +'/'+ month +'/'+ year %></small></h4>
+						<h4 class="media-heading"><%= comment.author %>&nbsp;<small> <%= TemplateTags.formatDate(comment.date,'d/m/Y') %></small></h4>
 						<p><%= comment.content %></p>
 					</div>
 				</li>
 			<% }) %>
 		  </ul>
 	<% }else{ %>
-		<p>Aucun Commentaire!</p>
+		<p>No comment!</p>
 	<% } %>
 </div>

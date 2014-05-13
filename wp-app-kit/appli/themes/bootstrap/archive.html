@@ -1,7 +1,7 @@
 <div id="archive">
 	
 	<ol class="breadcrumb">
-		<li><%= title %><% total > 0 ? print(' - ' + total) : print(' - Aucun') %> article<% total > 1 ? print('s') : '' %></li>
+		<li><%= list_title %><% total > 0 ? print(' - ' + total) : print(' - No') %> post<% total > 1 ? print('s') : '' %></li>
 	</ol>
 	
 	<% if(posts.length){ %>
@@ -10,14 +10,6 @@
 		
 			<% _.each( posts, function( post ){ %>
 			
-		  		<%
-		  			  var date = new Date(post.date*1000);
-		  			  var month = date.getUTCMonth() + 1;
-			    	  month = month < 10 ? '0' + month : month;
-			    	  var day = date.getUTCDate();
-			    	  var year = date.getUTCFullYear();
-		  		%>
-									
 				<li class="media"> 
 						
 					<% if( post.featured_img.src && post.featured_img.src.length ){ %>
@@ -27,10 +19,10 @@
 					<div class="media-body">
 						<h4 class="media-heading">
 							<a href="<%= TemplateTags.getPostLink(post.id) %>" class="pull-left"><%= post.title %></a>
-							&nbsp;<small class="small">Le <%= day +'/'+ month +'/'+ year %></small>
+							&nbsp;<small class="small"><%= TemplateTags.formatDate(post.date,'d/m/Y') %></small>
 						</h4>
 						<% if( post.nb_comments > 0 ){ %>
-							<span class="comments"><%= post.nb_comments %> commentaire<% post.nb_comments > 1 ? print('s') : '' %></span><br/>
+							<span class="comments"><%= post.nb_comments %> comment<% post.nb_comments > 1 ? print('s') : '' %></span><br/>
 						<% } %>
 						<p><%= post.excerpt %></p>
 					</div>
@@ -46,6 +38,6 @@
 		<% } %>
 		
 	<% }else{ %>
-		<p>Aucun article trouvé!</p>
+		<p>No post found!</p>
 	<% } %>
 </div>

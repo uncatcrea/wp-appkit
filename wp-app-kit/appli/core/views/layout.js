@@ -19,7 +19,7 @@ define(function (require) {
         
         render : function() {
         	var renderedContent = this.template({ 
-        		title : Config.app_title, 
+        		app_title : Config.app_title, 
         		header : '<div id="app-header"></div>', 
         		menu : '<div id="app-menu"></div>', 
         		content : '<div id="app-content-wrapper"></div>' 

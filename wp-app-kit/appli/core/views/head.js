@@ -15,7 +15,7 @@ define(function (require) {
         },
 
         render : function() {
-        	var renderedContent = this.template({title:Config.app_title, theme:'themes/'+ Config.theme});
+        	var renderedContent = this.template({app_title:Config.app_title, theme:'themes/'+ Config.theme});
             $('head').prepend(renderedContent); 
             return this;
         }
