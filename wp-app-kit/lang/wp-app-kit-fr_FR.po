@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP App Kit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-09 17:05+0100\n"
-"PO-Revision-Date: 2014-05-09 17:06+0100\n"
+"POT-Creation-Date: 2014-05-13 15:43+0100\n"
+"PO-Revision-Date: 2014-05-13 15:46+0100\n"
 "Last-Translator: uncatcrea <uncategorized.creations@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -553,18 +553,26 @@ msgstr "Composant \"%s\" enregistré"
 msgid "Component \"%s\" created successfuly"
 msgstr "Composant \"%s\" créé"
 
-# @ wp-app-kit
 #: ../lib/components/components-bo-settings.php:276
+msgid ""
+"The component to delete is in the app navigation. Please remove the "
+"component from app navigation before deleting it."
+msgstr ""
+"Le composant à effacer est présent dans la navigation de l'application. "
+"Supprimez le composant de la navigation pour pouvoir l'effacer."
+
+# @ wp-app-kit
+#: ../lib/components/components-bo-settings.php:279
 msgid "Could not delete component"
 msgstr "Impossible d'effacer le composant"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:280
+#: ../lib/components/components-bo-settings.php:283
 msgid "Component deleted successfuly"
 msgstr "Composant effacé"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:283
+#: ../lib/components/components-bo-settings.php:287
 msgid "Component to delete not found"
 msgstr "Le composant à effacer est introuvable"
 
@@ -575,13 +583,13 @@ msgstr "Contenu non disponible"
 
 # @ wp-app-kit
 #: ../lib/components/components-types/hooks.php:33
-#: ../lib/components/components-types/posts-list.php:157
+#: ../lib/components/components-types/posts-list.php:160
 msgid "Hook"
 msgstr "Hook"
 
 # @ wp-app-kit
 #: ../lib/components/components-types/hooks.php:48
-#: ../lib/components/components-types/posts-list.php:274
+#: ../lib/components/components-types/posts-list.php:277
 msgid "Hook name"
 msgstr "Nom du hook"
 
@@ -591,60 +599,60 @@ msgid "Custom component, using hooks"
 msgstr "Composant personnalisé, en utilisant les hooks"
 
 # @ wp-app-kit
-#: ../lib/components/components-types/page.php:78
+#: ../lib/components/components-types/page.php:82
 msgid "Page not found"
 msgstr "Page introuvable"
 
 # @ default
 # @ wp-app-kit
-#: ../lib/components/components-types/page.php:80
-#: ../lib/components/components-types/page.php:96
+#: ../lib/components/components-types/page.php:84
+#: ../lib/components/components-types/page.php:100
 msgid "Page"
 msgstr "Page"
 
 # @ wp-app-kit
-#: ../lib/components/components-types/page.php:121
+#: ../lib/components/components-types/page.php:125
 msgid "Wordpress page"
 msgstr "Page Wordpress"
 
 # @ default
 # @ wp-app-kit
-#: ../lib/components/components-types/posts-list.php:150
-#: ../lib/components/components-types/posts-list.php:186
+#: ../lib/components/components-types/posts-list.php:153
+#: ../lib/components/components-types/posts-list.php:189
 msgid "Post type"
 msgstr "Post type"
 
 # @ default
 # @ wp-app-kit
-#: ../lib/components/components-types/posts-list.php:151
-#: ../lib/components/components-types/posts-list.php:245
+#: ../lib/components/components-types/posts-list.php:154
+#: ../lib/components/components-types/posts-list.php:248
 msgid "Taxonomy"
 msgstr "Taxonomie"
 
 # @ default
-#: ../lib/components/components-types/posts-list.php:152
+#: ../lib/components/components-types/posts-list.php:155
 msgid "Term"
 msgstr "Terme"
 
 # @ wp-app-kit
-#: ../lib/components/components-types/posts-list.php:192
+#: ../lib/components/components-types/posts-list.php:195
 msgid "Custom, using hooks"
 msgstr "Personnalisé, en utilisant des hooks"
 
 # @ wp-app-kit
-#: ../lib/components/components-types/posts-list.php:268
+#: ../lib/components/components-types/posts-list.php:271
 #, php-format
 msgid "No %s found"
 msgstr "%s non trouvé"
 
 # @ wp-app-kit
-#: ../lib/components/components-types/posts-list.php:271
+#: ../lib/components/components-types/posts-list.php:274
 #, php-format
 msgid "No taxonomy found for post type %s"
 msgstr "Aucune taxonomie trouvée pour le post type %s"
 
 # @ wp-app-kit
-#: ../lib/components/components-types/posts-list.php:290
+#: ../lib/components/components-types/posts-list.php:293
 msgid "Posts list"
 msgstr "Liste d'articles"
 

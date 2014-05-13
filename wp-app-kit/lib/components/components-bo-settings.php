@@ -271,13 +271,17 @@ class WpakComponentsBoSettings{
 			$id = $data['component_id'];
 			$post_id = $data['post_id'];
 			if(  is_numeric($id) && is_numeric($post_id) ){
-				if( $component = WpakComponentsStorage::component_exists($post_id,$id) ){
-					if( !WpakComponentsStorage::delete_component($post_id,$id) ){
-						$answer['message'] = __('Could not delete component',WpAppKit::i18n_domain);
+				if( $component_id = WpakComponentsStorage::component_exists($post_id,$id) ){
+					if( WpakNavigationItemsStorage::navigation_item_exists_by_component($post_id,$component_id) ){
+						$answer['message'] = __('The component to delete is in the app navigation. Please remove the component from app navigation before deleting it.',WpAppKit::i18n_domain);
 					}else{
-						$answer['ok'] = 1;
-						$answer['type'] = 'updated';
-						$answer['message'] = __('Component deleted successfuly',WpAppKit::i18n_domain);
+						if( !WpakComponentsStorage::delete_component($post_id,$id) ){
+							$answer['message'] = __('Could not delete component',WpAppKit::i18n_domain);
+						}else{
+							$answer['ok'] = 1;
+							$answer['type'] = 'updated';
+							$answer['message'] = __('Component deleted successfuly',WpAppKit::i18n_domain);
+						}
 					}
 				}else{
 					$answer['message'] = __('Component to delete not found',WpAppKit::i18n_domain);
