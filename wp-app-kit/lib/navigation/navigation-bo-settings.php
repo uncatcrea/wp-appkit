@@ -180,7 +180,9 @@ class WpakNavigationBoSettings{
 			$post_id = $data['navigation_post_id'];
 			
 			$nav_item_component_id = $data['component_id'];
-			$nav_item_position = !empty($data['position']) && is_numeric($data['position']) ? $data['position'] : 0;
+			
+			$new_item_position = WpakNavigationItemsStorage::get_nb_navigation_items($post_id) + 1;
+			$nav_item_position = !empty($data['position']) && is_numeric($data['position']) ? $data['position'] : $new_item_position;
 				
 			if( empty($nav_item_component_id) ){
 				$answer['message'] = __('You must choose a component!',WpAppKit::i18n_domain);
