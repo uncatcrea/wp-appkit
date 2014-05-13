@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP App Kit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-13 15:43+0100\n"
-"PO-Revision-Date: 2014-05-13 15:46+0100\n"
+"POT-Creation-Date: 2014-05-13 16:41+0100\n"
+"PO-Revision-Date: 2014-05-13 16:44+0100\n"
 "Last-Translator: uncatcrea <uncategorized.creations@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -40,7 +40,7 @@ msgid "Add an application"
 msgstr "Ajouter une application"
 
 # @ wp-app-kit
-#: ../lib/apps/apps.php:43 ../lib/components/components-bo-settings.php:95
+#: ../lib/apps/apps.php:43 ../lib/components/components-bo-settings.php:100
 msgid "Edit"
 msgstr "Modifier"
 
@@ -443,117 +443,147 @@ msgstr "Erreur lors de la création de l'archive"
 msgid "Couldn't delete old export [%s]"
 msgstr "Impossible d'effacer l'ancien export [%s]"
 
+#: ../lib/components/components-bo-settings.php:23
+msgid ""
+"Deleting a component will remove it from all existing instances of your app "
+"(even those already built and running on real phones). Are you sure you want "
+"to delete this component?"
+msgstr ""
+"Effacer un composant le supprime de toutes les instances de l'application "
+"(même celles déjà compilées et installées sur de \"vrais\" téléphones). "
+"Souhaitez-vous vraiment supprimer ce composant?"
+
+#: ../lib/components/components-bo-settings.php:24
+msgid ""
+"Modifying a component will affect it on all existing instances of your app "
+"(even those already built and running on real phones). Are you sure you want "
+"to modify this component?"
+msgstr ""
+"La modification d'un composant se répercute sur toutes les instances de "
+"l'application (même celles déjà compilées et installées sur de \"vrais\" "
+"téléphones). Souhaitez-vous vraiment modifier ce composant?"
+
+#: ../lib/components/components-bo-settings.php:25
+msgid ""
+"Creating a component will create it on all existing instances of your app "
+"(even those already built and running on real phones). Are you sure you want "
+"to create this component?"
+msgstr ""
+"L'ajout d'un composant le crée sur toutes les instances de l'application "
+"(même celles déjà compilées et installées sur de \"vrais\" téléphones). "
+"Souhaitez-vous vraiment créer ce composant?"
+
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:29
+#: ../lib/components/components-bo-settings.php:34
 msgid "App components"
 msgstr "Composants de l'application"
 
 # @ default
-#: ../lib/components/components-bo-settings.php:48
+#: ../lib/components/components-bo-settings.php:53
 msgid "New Component"
 msgstr "Nouveau composant"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:55
+#: ../lib/components/components-bo-settings.php:60
 msgid "Name"
 msgstr "Nom"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:56
+#: ../lib/components/components-bo-settings.php:61
 msgid "Slug"
 msgstr "Slug"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:57
+#: ../lib/components/components-bo-settings.php:62
 msgid "Type"
 msgstr "Type"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:58
+#: ../lib/components/components-bo-settings.php:63
 msgid "Options"
 msgstr "Options"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:68
+#: ../lib/components/components-bo-settings.php:73
 msgid "No Component yet!"
 msgstr "Aucun composant pour l'instant!"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:96
-#: ../lib/navigation/navigation-bo-settings.php:94
+#: ../lib/components/components-bo-settings.php:101
+#: ../lib/navigation/navigation-bo-settings.php:99
 msgid "Delete"
 msgstr "Supprimer"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:135
+#: ../lib/components/components-bo-settings.php:140
 msgid "Component label"
 msgstr "Libellé du composant"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:139
+#: ../lib/components/components-bo-settings.php:144
 msgid "Component slug"
 msgstr "Slug du composant"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:143
+#: ../lib/components/components-bo-settings.php:148
 msgid "Component type"
 msgstr "Type de composant"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:154
+#: ../lib/components/components-bo-settings.php:159
 msgid "Component options"
 msgstr "Options du composant"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:163
-#: ../lib/navigation/navigation-bo-settings.php:146
+#: ../lib/components/components-bo-settings.php:168
+#: ../lib/navigation/navigation-bo-settings.php:151
 msgid "Cancel"
 msgstr "Annuler"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:164
+#: ../lib/components/components-bo-settings.php:169
 msgid "Save Changes"
 msgstr "Enregistrer"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:217
+#: ../lib/components/components-bo-settings.php:222
 msgid "Application not found."
 msgstr "Application non trouvée."
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:229
+#: ../lib/components/components-bo-settings.php:234
 msgid "You must provide a label for the component!"
 msgstr "Le champ libellé est requis"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:234
+#: ../lib/components/components-bo-settings.php:239
 msgid "You must provide a slug for the component."
 msgstr "Le champ slug est requis."
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:239
+#: ../lib/components/components-bo-settings.php:244
 msgid "The component slug can't be numeric."
 msgstr "Le slug ne peut pas être numérique."
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:245
+#: ../lib/components/components-bo-settings.php:250
 #, php-format
 msgid "A component with the slug \"%s\" already exists!"
 msgstr "Un composant avec le slug \"%s\" existe déjà!"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:260
+#: ../lib/components/components-bo-settings.php:265
 #, php-format
 msgid "Component \"%s\" updated successfuly"
 msgstr "Composant \"%s\" enregistré"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:265
+#: ../lib/components/components-bo-settings.php:270
 #, php-format
 msgid "Component \"%s\" created successfuly"
 msgstr "Composant \"%s\" créé"
 
-#: ../lib/components/components-bo-settings.php:276
+#: ../lib/components/components-bo-settings.php:281
 msgid ""
 "The component to delete is in the app navigation. Please remove the "
 "component from app navigation before deleting it."
@@ -562,17 +592,17 @@ msgstr ""
 "Supprimez le composant de la navigation pour pouvoir l'effacer."
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:279
+#: ../lib/components/components-bo-settings.php:284
 msgid "Could not delete component"
 msgstr "Impossible d'effacer le composant"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:283
+#: ../lib/components/components-bo-settings.php:288
 msgid "Component deleted successfuly"
 msgstr "Composant effacé"
 
 # @ wp-app-kit
-#: ../lib/components/components-bo-settings.php:287
+#: ../lib/components/components-bo-settings.php:292
 msgid "Component to delete not found"
 msgstr "Le composant à effacer est introuvable"
 
@@ -656,93 +686,124 @@ msgstr "Aucune taxonomie trouvée pour le post type %s"
 msgid "Posts list"
 msgstr "Liste d'articles"
 
+#: ../lib/navigation/navigation-bo-settings.php:24
+msgid ""
+"Deleting a navigation item will remove it from all existing instances of "
+"your app (even those already built and running on real phones). Are you sure "
+"you want to remove this item from your app navigation?"
+msgstr ""
+"Effacer un élément de navigation le supprime de toutes les instances de "
+"l'application (même celles déjà compilées et installées sur de \"vrais\" "
+"téléphones). Souhaitez-vous vraiment supprimer cet élément de la navigation?"
+
+#: ../lib/navigation/navigation-bo-settings.php:25
+msgid ""
+"Modifying a navigation item will affect it on all existing instances of your "
+"app (even those already built and running on real phones). Are you sure you "
+"want to modify this navigation item?"
+msgstr ""
+"La modification d'un élément de navigation se répercute sur toutes les "
+"instances de l'application (même celles déjà compilées et installées sur de "
+"\"vrais\" téléphones). Souhaitez-vous vraiment modifier cet élément de "
+"navigation?"
+
+#: ../lib/navigation/navigation-bo-settings.php:26
+msgid ""
+"Adding a navigation item will add it on all existing instances of your app "
+"(even those already built and running on real phones). Are you sure you want "
+"to add this navigation item?"
+msgstr ""
+"L'ajout d'un élément de navigation le crée sur toutes les instances de "
+"l'application (même celles déjà compilées et installées sur de \"vrais\" "
+"téléphones). Souhaitez-vous vraiment ajouter cet élément à la navigation?"
+
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:30
+#: ../lib/navigation/navigation-bo-settings.php:35
 msgid "App navigation"
 msgstr "Navigation de l'application"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:42
+#: ../lib/navigation/navigation-bo-settings.php:47
 msgid "Add new component to navigation"
 msgstr "Ajouter un composant à la navigation"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:47
+#: ../lib/navigation/navigation-bo-settings.php:52
 msgid "New navigation item"
 msgstr "Nouvel élément de navigation"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:54
+#: ../lib/navigation/navigation-bo-settings.php:59
 msgid "Navigation components"
 msgstr "Elements de navigation"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:64
+#: ../lib/navigation/navigation-bo-settings.php:69
 msgid "No navigation item yet!"
 msgstr "Aucun élément de navigation pour l'instant!"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:128
+#: ../lib/navigation/navigation-bo-settings.php:133
 msgid "Component"
 msgstr "Composant"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:138
+#: ../lib/navigation/navigation-bo-settings.php:143
 msgid "All components are already in navigation!"
 msgstr "Tous les composants sont déjà dans la navigation!"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:148
+#: ../lib/navigation/navigation-bo-settings.php:153
 msgid "Add component to navigation"
 msgstr "Ajouter un composant à la navigation"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:154
+#: ../lib/navigation/navigation-bo-settings.php:159
 msgid "No component found!"
 msgstr "Aucun composant trouvé!"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:154
+#: ../lib/navigation/navigation-bo-settings.php:159
 msgid "Please create a component!"
 msgstr "Veuillez créer un composant!"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:181
+#: ../lib/navigation/navigation-bo-settings.php:186
 msgid "You must choose a component!"
 msgstr "Veuillez choisir un composant!"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:186
+#: ../lib/navigation/navigation-bo-settings.php:191
 msgid "This component doesn't exist!"
 msgstr "Ce composant n'existe pas"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:191
+#: ../lib/navigation/navigation-bo-settings.php:196
 msgid "This component is already in navigation!"
 msgstr "Ce composant est déjà dans la navigation"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:202
+#: ../lib/navigation/navigation-bo-settings.php:207
 msgid "New navigation item created successfuly"
 msgstr "Nouvel élément de navigation créé"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:212
+#: ../lib/navigation/navigation-bo-settings.php:217
 msgid "Could not delete navigation item"
 msgstr "Impossible de supprimer cet élément de navigation"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:216
+#: ../lib/navigation/navigation-bo-settings.php:221
 msgid "Navigation item deleted successfuly"
 msgstr "Elément de navigation supprimé"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:219
+#: ../lib/navigation/navigation-bo-settings.php:224
 msgid "Navigation item to delete not found"
 msgstr "L'élément de navigation à supprimer est introuvable"
 
 # @ wp-app-kit
-#: ../lib/navigation/navigation-bo-settings.php:227
+#: ../lib/navigation/navigation-bo-settings.php:232
 msgid "Navigation order updated successfuly"
 msgstr "Ordre des éléments de navigation enregistré"
 

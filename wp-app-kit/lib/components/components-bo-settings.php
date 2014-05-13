@@ -18,7 +18,12 @@ class WpakComponentsBoSettings{
 			wp_enqueue_script('wpak_components_bo_settings_js',plugins_url('lib/components/components-bo-settings.js', dirname(dirname(__FILE__))),array('jquery'),WpAppKit::resources_version);
 			wp_localize_script('wpak_components_bo_settings_js', 'wpak_components', array(
 				'post_id'=>$post->ID,
-				'nonce'=>wp_create_nonce('wpak-component-data-'. $post->ID)
+				'nonce'=>wp_create_nonce('wpak-component-data-'. $post->ID),
+				'messages'=>array(
+					'confirm_delete' => __('Deleting a component will remove it from all existing instances of your app (even those already built and running on real phones). Are you sure you want to delete this component?',WpAppKit::i18n_domain),
+					'confirm_edit' => __('Modifying a component will affect it on all existing instances of your app (even those already built and running on real phones). Are you sure you want to modify this component?',WpAppKit::i18n_domain),
+					'confirm_add' => __('Creating a component will create it on all existing instances of your app (even those already built and running on real phones). Are you sure you want to create this component?',WpAppKit::i18n_domain),
+				 )
 			));
 		}
 	}
@@ -45,7 +50,7 @@ class WpakComponentsBoSettings{
 			<div id="components-feedback" style="display:none"></div>
 			
 			<div id="new-component-form" style="display:none">
-				<h4><?php _e('New Component') ?></h4>
+				<h4><?php _e('New Component',WpAppKit::i18n_domain) ?></h4>
 				<?php self::echo_component_form($post->ID) ?>
 			</div>
 			

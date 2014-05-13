@@ -19,7 +19,12 @@ class WpakNavigationBoSettings{
 			wp_enqueue_script('wpak_navigation_bo_settings_js',plugins_url('lib/navigation/navigation-bo-settings.js', dirname(dirname(__FILE__))),array('jquery','jquery-ui-sortable'),WpAppKit::resources_version);
 			wp_localize_script('wpak_navigation_bo_settings_js', 'wpak_navigation', array(
 				'post_id'=>$post->ID,
-				'nonce'=>wp_create_nonce('wpak-navigation-data-'. $post->ID)
+				'nonce'=>wp_create_nonce('wpak-navigation-data-'. $post->ID),
+				'messages'=>array(
+					'confirm_delete' => __('Deleting a navigation item will remove it from all existing instances of your app (even those already built and running on real phones). Are you sure you want to remove this item from your app navigation?',WpAppKit::i18n_domain),
+					'confirm_edit' => __('Modifying a navigation item will affect it on all existing instances of your app (even those already built and running on real phones). Are you sure you want to modify this navigation item?',WpAppKit::i18n_domain),
+					'confirm_add' => __('Adding a navigation item will add it on all existing instances of your app (even those already built and running on real phones). Are you sure you want to add this navigation item?',WpAppKit::i18n_domain),
+				 )
 			));
 		}
 	}
