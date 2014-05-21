@@ -138,12 +138,14 @@ class WpakComponentsBoSettings{
 			<table class="form-table">
 				<tr valign="top">
 					<th scope="row"><?php _e('Component label',WpAppKit::i18n_domain) ?></th>
-			        <td><input type="text" name="component_label" value="<?php echo $component->label ?>" /></td>
+			        <td><input class="can-reset" type="text" name="component_label" value="<?php echo $component->label ?>" /></td>
 			    </tr>
-			    <tr valign="top">
-					<th scope="row"><?php _e('Component slug',WpAppKit::i18n_domain) ?></th>
-			        <td><input type="text" name="component_slug" value="<?php echo $component->slug ?>" /></td>
-			    </tr>
+			    <?php if( $edit ): ?>
+				    <tr valign="top">
+						<th scope="row"><?php _e('Component slug',WpAppKit::i18n_domain) ?></th>
+				        <td><input class="can-reset" type="text" name="component_slug" value="<?php echo $component->slug ?>" /></td>
+				    </tr>
+			    <?php endif ?>
 		        <tr valign="top">
 		        	<th scope="row"><?php _e('Component type',WpAppKit::i18n_domain) ?></th>
 		        	<td>
@@ -209,7 +211,7 @@ class WpakComponentsBoSettings{
 		if( empty($_POST['post_id'])
 			|| empty($_POST['nonce']) 
 			|| !check_admin_referer('wpak-component-data-'. $_POST['post_id'],'nonce') ){
-			exit();
+			exit('bad nonce');
 		}
 		
 		$action = $_POST['wpak_action'];
@@ -227,13 +229,19 @@ class WpakComponentsBoSettings{
 			$edit_id = $edit ? intval($data['component_id']) : 0;
 		
 			$component_label = trim($data['component_label']);
-			$component_slug = trim($data['component_slug']);
 			$component_type = $data['component_type'];
-				
+			
 			if( empty($component_label) ){
 				$answer['message'] = __('You must provide a label for the component!',WpAppKit::i18n_domain);
 				self::exit_sending_json($answer);
 			}
+			
+			if( is_numeric($component_label) ){
+				$answer['message'] = __("The component label can't be numeric.",WpAppKit::i18n_domain);
+				self::exit_sending_json($answer);
+			}
+			
+			$component_slug = $edit ? trim($data['component_slug']) : sanitize_title_with_dashes(remove_accents($component_label));
 			
 			if( empty($component_slug) ){
 				$answer['message'] = __("You must provide a slug for the component.",WpAppKit::i18n_domain);
@@ -245,11 +253,16 @@ class WpakComponentsBoSettings{
 				self::exit_sending_json($answer);
 			}
 		
-			if( !$edit ){
-				if( WpakComponentsStorage::component_exists($post_id,$component_slug) ){
-					$answer['message'] = sprintf(__('A component with the slug "%s" already exists!',WpAppKit::i18n_domain),$component_slug);
-					self::exit_sending_json($answer);
-				}
+			if( WpakComponentsStorage::component_exists($post_id,$component_slug, $edit ? $edit_id : 0) ){
+				$i = 0;
+				do{
+					$component_index = intval(preg_replace('/.*-(\d+)$/','$1',$component_slug));
+					$component_index++;
+					$component_slug = preg_replace('/-(\d+)$/','',$component_slug) .'-'. $component_index;
+					if( $i++ > 100 ){
+						break;
+					}
+				}while(WpakComponentsStorage::component_exists($post_id,$component_slug, $edit ? $edit_id : 0));
 			}
 				
 			$component_options = WpakComponentsTypes::get_component_type_options_from_posted_form($component_type,$data);
@@ -308,7 +321,6 @@ class WpakComponentsBoSettings{
 				ob_end_clean();
 			}
 		}
-		
 		header('Content-type: application/json');
 		echo json_encode($answer);
 		exit();

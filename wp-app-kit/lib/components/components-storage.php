@@ -27,13 +27,14 @@ class WpakComponentsStorage{
 		return null;
 	}
 	
-	public static function component_exists($app_id,$component_slug_or_id){
+	public static function component_exists($app_id,$component_slug_or_id,$except_this_component_id = 0){
 		$components = self::get_components($app_id);
 		
 		$is_slug = !is_numeric($component_slug_or_id);
 		
 		foreach($components as $id => $component){
-			if( $is_slug && $component_slug_or_id == $component->slug || $component_slug_or_id == $id){
+			if( ($is_slug && $component_slug_or_id == $component->slug || $component_slug_or_id == $id) 
+				 && (empty($except_this_component_id) || $except_this_component_id != $id) ){
 				return $id;
 			}
 		}
