@@ -1,0 +1,60 @@
+.list-template .list-title {
+	background-color:#00A2D3;
+	/*margin:0 0 15px 0;*/ /* A reporter dans le tutoriel + tester sous iOS */
+}
+
+.list-template .list-title div {
+	text-align:center;
+	font-size:24px;
+	padding:10px 0 0 0;
+	background-color:#fff;
+	width:60%;
+	margin:auto;
+}
+
+.list-template a {
+	color:#000;
+	margin:0;
+	padding:10px 10px 6px 10px;
+	border-bottom:1px #AC98BA solid;
+	display:block;
+	text-decoration:none;
+	-webkit-user-select:none;
+	-webkit-touch-callout:none;
+	min-height:125px;
+}
+
+.list-template .content-date {
+	font-size:12px;
+	color:#202636;
+}
+
+.list-template h2 {
+	margin:0;
+	font-size:24px;
+	font-weight:normal;
+	color:#024883;
+	line-height:29px;
+}
+
+.list-template .content-excerpt {
+	font-size:14px;
+	line-height:21px;
+}
+
+.list-template .content-thumbnail {
+	float:left;
+	padding:2px;
+	margin-right:10px;
+	background-color:#024883;
+}
+
+.list-template .content-thumbnail div {
+	background:url(../img/img-icon.svg);
+	background-color:#dddddd;
+	background-size:cover;
+	background-position:center center;
+	width:100px;
+	height:100px;
+	border:1px #00A2D3 solid;
+}
