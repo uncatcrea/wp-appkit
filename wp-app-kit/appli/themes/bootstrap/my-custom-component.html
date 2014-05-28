@@ -1,7 +1,7 @@
 <div id="archive">
 	
 	<ol class="breadcrumb">
-		<li><%= title %><% total > 0 ? print(' - ' + total) : print(' - Aucun') %> élément<% total > 1 ? print('s') : '' %></li>
+		<li><%= title %><% total > 0 ? print(' - ' + total) : print(' - No') %> item<% total > 1 ? print('s') : '' %></li>
 	</ol>
 	
 	<% if(items.length){ %>
@@ -26,6 +26,6 @@
 		</ul>
 		
 	<% }else{ %>
-		<p>Aucun élément trouvé!</p>
+		<p>No item found!</p>
 	<% } %>
 </div>
