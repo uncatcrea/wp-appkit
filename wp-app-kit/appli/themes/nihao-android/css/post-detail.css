@@ -1,0 +1,210 @@
+/* Containers */
+
+.single-template {padding-top:0;}
+
+.single-content {
+	text-align:left;
+	padding:10px 10px 0px 10px;
+}
+
+/* Text Titles */
+
+.single-content h2 {
+	color:#2E2E2E;
+	margin:10px 0px 10px 0px;
+	font-size:24px;
+}
+
+.single-content h3 {
+	color:#2E2E2E;
+	margin:5px 0px 5px 0px;
+	font-size:18px;
+}
+
+.single-content h4 {
+	color:#2E2E2E;
+	margin:5px 0px 5px 0px;
+	font-size:16px;
+}
+
+.single-content h5, .single-content h6 {
+	color:#2E2E2E;
+	margin:3px 0px 0px 0px;
+	padding:0;
+	display:inline;
+	font-size:16px;
+	line-height:16px;
+	float:left;
+}
+
+.single-content h5:after, .single-content h6:after {
+	color:#2E2E2E;
+	font-size:16px;
+	line-height:16px;
+	content:"-";
+	margin:0px 3px 0px 3px;
+}
+
+/* Paragraphs */
+
+.single-content p {
+	font-size:16px;
+	line-height:22px;
+	margin:0px 0px 20px 0px;
+}
+
+/* Emphasis */
+
+.single-content strong {
+	font-size:16px;
+	line-height:22px;
+	color:#2E2E2E;
+}
+
+.single-content em {
+	font-size:16px;
+	line-height:22px;
+	color:#2E2E2E;
+}
+
+.single-content em strong, .single-content strong em {
+	font-size:16px;
+	line-height:22px;
+	color:#2E2E2E;	
+}
+
+/* Hyperlinks */
+
+.single-content a {
+	-webkit-touch-callout:none;
+	font-size:16px;
+	line-height:22px;	
+}
+
+.single-content a:link {
+	color:#1C5396;
+}
+
+.single-content a:visited {
+	color:#A5BDFF;
+}
+
+/* Bullet Lists */
+
+.single-content ul, .single-content ol {
+	font-size:14px;
+	margin:-5px 0px 20px 0px;
+	padding:0px 20px 0px 40px;
+}
+
+.single-content ul li {
+	margin:0px 0px 10px 0px;
+}
+
+.single-content ol li {
+	margin:0px 0px 10px 0px;
+}
+
+/* Blockquotes */
+
+.single-content blockquote {
+	background-color:#00A2D3;
+	margin:0 -10px 20px -10px;
+	color:#fff;
+	padding:10px;
+}
+
+.single-content blockquote p {
+	font-size:32px;
+	line-height:40px;
+	text-align:center;
+	padding:0px;
+}
+
+.single-content blockquote p:first-child:before {
+	font-size:32px;
+	line-height:40px;
+	content:"\00ab";
+	padding-right:5px;
+}
+
+.single-content blockquote p:last-child:after {
+	font-size:32px;
+	line-height:40px;
+	content:"\00bb";
+	padding-left:5px;
+}
+
+/* Superscript And Subscript */
+
+.single-content sup, .single-content sub {
+	font-size:10px;
+}
+
+.single-content .content-image a {
+	display:block;
+	border:1px #B2B2B2 solid;
+	padding:1px;
+}
+
+/* Images */
+
+.single-content .content-image img {
+	width:100%;
+	height:auto;
+	display:block;
+}
+
+.single-content .content-image .wp-caption-text {
+	font-size:12px;
+	line-height:14px;
+	color:#808080;
+	margin:5px 2px 20px 2px;
+	text-align:justify;
+}
+
+/* Post Meta */
+
+.single-template .post-meta {
+	padding:20px 10px 10px 10px;
+	text-align:center;
+	background-color:#00A2D3;
+	color:#fff;
+	margin-bottom:-10px;
+}
+
+.single-template .post-author {
+	font-size:18px;
+}
+
+.single-template .post-publish-date {
+	font-size:12px;
+}
+
+/* Post Excerpt */
+.single-content .post-excerpt {
+
+}
+
+/* Post Title */
+
+.single-template .post-title {
+	padding:0px 10px 0px 10px;
+}
+
+.single-template .post-thumbnail {
+	background:url(../img/img-icon.svg);
+	background-color:#dddddd;
+	height:200px;
+	background-size:cover;
+	background-position:center center;
+	margin:0px -10px 0px -10px;
+	border-bottom:2px #00A2D3 solid;
+}
+
+.single-template .post-title h1 {
+	font-size:28px;
+	line-height:36px;
+	color:#024883;
+	margin:10px 0px 0px 0px;
+}
