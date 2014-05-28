@@ -4,7 +4,7 @@ require_once(dirname(__FILE__) .'/themes-bo-settings.php');
 
 class WpakThemes{
 	
-	const appli_theme_directory = '../../appli/themes';
+	const appli_theme_directory = '../../app/themes';
 	
 	public static function get_available_themes(){
 		$available_themes = array();
@@ -31,7 +31,7 @@ class WpakThemes{
 	public static function include_app_theme_php($app_id){
 		$app_theme = WpakThemesStorage::get_current_theme($app_id);
 		if( !empty($app_theme) ){
-			$themes_dir = plugin_dir_path(dirname(dirname(__FILE__))) .'appli/themes/'. $app_theme .'/php';
+			$themes_dir = plugin_dir_path(dirname(dirname(__FILE__))) .'app/themes/'. $app_theme .'/php';
 			if( file_exists($themes_dir) && is_dir($themes_dir) ){
 				foreach( glob($themes_dir ."/*.php" ) as $file ){
 					include_once($file);

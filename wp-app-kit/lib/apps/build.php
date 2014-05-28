@@ -190,7 +190,7 @@ class WpakBuild{
 	}
 	
 	public static function get_appli_dir_url(){
-		return plugins_url('appli' , dirname(dirname(__FILE__)) );
+		return plugins_url('app' , dirname(dirname(__FILE__)) );
 	}
 	
 	public static function get_appli_index_url($app_id){
@@ -263,7 +263,7 @@ class WpakBuild{
 		}
 		
 		$plugin_dir = plugin_dir_path( dirname(dirname(__FILE__)) );
-		$appli_dir = $plugin_dir .'appli';
+		$appli_dir = $plugin_dir .'app';
 		 
 		$export_filename_base = self::get_export_file_base_name($app_id);
 		$export_filename = $export_filename_base .'-'. date('YmdHis');
