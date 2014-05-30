@@ -64,7 +64,7 @@ define(['jquery','core/theme-app','core/theme-tpl-tags'],function($,App,TplTags)
 		$("#content,#header").animate({
 			left:"85%",
 			},300, function() {
-				isMenuOpen=true;
+				setTimeout(function(){isMenuOpen=true;},150);
 			});
 	}
 
