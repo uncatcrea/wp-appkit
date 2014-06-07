@@ -16,7 +16,7 @@ var WpakComponents = (function ($){
 				post_id: wpak_components.post_id,
 				nonce: wpak_components.nonce
 			};
-			jQuery.post(ajaxurl, data, function(response) {
+			$.post(ajaxurl, data, function(response) {
 				$('.ajax-target',$('#'+form_id)).html(response);
 			});
 		};
@@ -29,7 +29,7 @@ var WpakComponents = (function ($){
 				post_id: wpak_components.post_id,
 				nonce: wpak_components.nonce
 			};
-			jQuery.post(ajaxurl, data, function(response) {
+			$.post(ajaxurl, data, function(response) {
 				$('.component-options-target',$('#'+form_id)).html(response);
 			});
 		};
@@ -42,13 +42,11 @@ var WpakComponents = (function ($){
 				post_id: wpak_components.post_id,
 				nonce: wpak_components.nonce
 			};
-			console.log('pif');
-			jQuery.ajax({
+			$.ajax({
 			  type: "POST",
 			  url: ajaxurl,
 			  data: data,
 			  success: function(answer) {
-				  console.log('paf');
 				  callback(answer);
 			  },
 			  error: function(jqXHR, textStatus, errorThrown){
@@ -69,7 +67,7 @@ var WpakComponents = (function ($){
 				nonce: wpak_components.nonce
 			};
 			
-			jQuery.ajax({
+			$.ajax({
 				  type: "POST",
 				  url: ajaxurl,
 				  data: data,
@@ -133,6 +131,7 @@ jQuery().ready(function(){
 						form_tr.prev('tr').replaceWith(answer.html);
 						form_tr.remove();
 					}
+					WpakNavigation.refresh_available_components();
 				}
 				display_feedback(answer.type,answer.message);
 			});
@@ -165,6 +164,7 @@ jQuery().ready(function(){
 				if( answer.ok == 1 ){
 					$('#components-table tr#component-row-'+component_id).remove();
 					$('#components-table tr#edit-component-wrapper-'+component_id).remove();
+					WpakNavigation.refresh_available_components();
 				}
 				display_feedback(answer.type,answer.message);
 			});

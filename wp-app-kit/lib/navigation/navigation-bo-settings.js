@@ -16,7 +16,7 @@ var WpakNavigation = (function ($){
 				nonce: wpak_navigation.nonce
 			};
 			
-			jQuery.ajax({
+			$.ajax({
 			  type: "POST",
 			  url: ajaxurl,
 			  data: data,
@@ -41,7 +41,7 @@ var WpakNavigation = (function ($){
 				nonce: wpak_navigation.nonce
 			};
 			
-			jQuery.ajax({
+			$.ajax({
 				  type: "POST",
 				  url: ajaxurl,
 				  data: data,
@@ -65,7 +65,7 @@ var WpakNavigation = (function ($){
 				nonce: wpak_navigation.nonce
 			};
 			
-			jQuery.ajax({
+			$.ajax({
 				  type: "POST",
 				  url: ajaxurl,
 				  data: data,
@@ -74,6 +74,32 @@ var WpakNavigation = (function ($){
 				  },
 				  error: function(jqXHR, textStatus, errorThrown){
 					  callback({'ok':0,'type':'error','message':'Error moving navigation item'}); //TODO translate js messages
+				  },
+				  dataType: 'json'
+			});
+		};
+		
+		//Called hereunder AND from components-bo-settings.js to refresh available components for navigation
+		//when adding/editing components :
+		wpak.refresh_available_components = function(post_id){
+			
+			var data = {
+				action: 'wpak_update_available_components',
+				post_id: wpak_navigation.post_id,
+				nonce: wpak_navigation.nonce
+			};
+			
+			$.ajax({
+				  type: "POST",
+				  url: ajaxurl,
+				  data: data,
+				  success: function(answer) {
+					  if( answer.ok ==  1 ){
+						  $('#components-available-for-navigation').html(answer.html);
+					  }
+				  },
+				  error: function(jqXHR, textStatus, errorThrown){
+					  callback({'ok':0,'type':'error','message':'Error refreshing available components'}); //TODO translate js messages
 				  },
 				  dataType: 'json'
 			});
@@ -129,6 +155,7 @@ jQuery().ready(function(){
 						form_tr.remove();
 					}
 					$('table#navigation-items-table tbody').sortable('refresh');
+					WpakNavigation.refresh_available_components();
 				}
 				display_feedback(answer.type,answer.message);
 			});
@@ -144,6 +171,7 @@ jQuery().ready(function(){
 			WpakNavigation.ajax_delete_navigation_row(post_id,navigation_item_id,function(answer){
 				if( answer.ok == 1 ){
 					$('#navigation-items-table tr#navigation-item-row-'+navigation_item_id).remove();
+					WpakNavigation.refresh_available_components();
 				}
 				display_feedback(answer.type,answer.message);
 			});
@@ -171,7 +199,7 @@ jQuery().ready(function(){
 		$('#new-item-form').slideToggle();
 	});
 	
-	$('#cancel-new-item').click(function(e){
+	$('#navigation-wrapper').on('click','#cancel-new-item',function(e){
 		e.preventDefault();
 		$('#new-item-form').slideUp();
 	});

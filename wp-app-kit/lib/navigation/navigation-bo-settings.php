@@ -9,6 +9,7 @@ class WpakNavigationBoSettings{
 			add_action('add_meta_boxes', array(__CLASS__,'add_meta_boxes'));
 			add_action('admin_enqueue_scripts', array(__CLASS__,'admin_enqueue_scripts'));
 			add_action('wp_ajax_wpak_edit_navigation', array(__CLASS__,'ajax_wpak_edit_navigation'));
+			add_action('wp_ajax_wpak_update_available_components', array(__CLASS__,'ajax_wpak_update_available_components'));
 		}
 	}
 	
@@ -33,14 +34,14 @@ class WpakNavigationBoSettings{
 		add_meta_box(
 			'wpak_app_navigation',
 			__('App navigation',WpAppKit::i18n_domain),
-			array(__CLASS__,'inner_components_box'),
+			array(__CLASS__,'inner_navigation_box'),
 			'wpak_apps',
 			'normal',
 			'default'
 		);
 	}
 	
-	public static function inner_components_box($post,$current_box){
+	public static function inner_navigation_box($post,$current_box){
 		$nav_items = WpakNavigationItemsStorage::get_navigation_items($post->ID);
 		?>
 		<div id="navigation-wrapper">
@@ -50,7 +51,7 @@ class WpakNavigationBoSettings{
 			
 			<div id="new-item-form" style="display:none">
 				<h4><?php _e('New navigation item',WpAppKit::i18n_domain) ?></h4>
-				<?php self::echo_item_form($post->ID) ?>
+				<div id="components-available-for-navigation"><?php self::echo_item_form($post->ID) ?></div>
 			</div>
 			
 			<table class="wp-list-table widefat fixed" id="navigation-items-table" data-post-id="<?php echo $post->ID ?>">
@@ -239,6 +240,34 @@ class WpakNavigationBoSettings{
 		}
 		
 		//We should not arrive here, but just in case :
+		self::exit_sending_json($answer);
+	}
+	
+	public static function ajax_wpak_update_available_components(){
+		$answer = array('ok' => 0, 'message' => '', 'type' => 'error', 'html' => '');
+
+		if( empty($_POST['post_id'])
+				|| !is_numeric($_POST['post_id'])
+				|| empty($_POST['nonce'])
+				|| !check_admin_referer('wpak-navigation-data-'. $_POST['post_id'],'nonce') ){
+			exit();
+		}
+		
+		$post_id = $_POST['post_id'];
+		
+		ob_start();
+		self::echo_item_form($post_id);
+		$html = ob_get_contents();
+		ob_end_clean();
+		
+		if( !empty($html) ){
+			$answer['html'] = $html;
+			$answer['ok'] = 1;
+			$answer['type'] = 'updated';
+		}else{
+			$answer['message'] = __('Error while retrieving components available for navigation',WpAppKit::i18n_domain);
+		}
+		
 		self::exit_sending_json($answer);
 	}
 	

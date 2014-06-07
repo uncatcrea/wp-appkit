@@ -9,7 +9,7 @@ if( !class_exists('WpAppKit') ){
 	
 class WpAppKit{
 	
-	const resources_version = '0.3';
+	const resources_version = '0.4';
 	const i18n_domain = 'wp-app-kit';
 	
 	public static function hooks(){
