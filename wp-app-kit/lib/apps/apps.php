@@ -74,7 +74,7 @@ class WpakApps{
 		
 		add_meta_box(
 			'wpak_app_main_infos',
-			__('Main infos',WpAppKit::i18n_domain),
+			__('Platform',WpAppKit::i18n_domain),
 			array(__CLASS__,'inner_main_infos_box'),
 			'wpak_apps',
 			'normal',
@@ -109,10 +109,6 @@ class WpakApps{
 		$main_infos = self::get_app_main_infos($post->ID);
 		?>
 		<div class="wpak_settings">
-			<label><?php _e('Application title (displayed in app top bar)',WpAppKit::i18n_domain) ?></label> : <br/> 
-			<input type="text" name="wpak_app_title" value="<?php echo $main_infos['title'] ?>" />
-			<br/><br/>
-			<label><?php _e('Platform',WpAppKit::i18n_domain) ?></label> : <br/>
 			<select name="wpak_app_platform">
 				<?php foreach(self::get_platforms() as $value => $label): ?>
 					<?php $selected = $value == $main_infos['platform'] ? 'selected="selected"' : '' ?>
@@ -222,10 +218,6 @@ class WpakApps{
 			return;
 		}
 	
-		if ( isset( $_POST['wpak_app_title'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_title', sanitize_text_field( $_POST['wpak_app_title'] ) );
-		}
-		
 		if ( isset( $_POST['wpak_app_name'] ) ) {
 	        update_post_meta( $post_id, '_wpak_app_name', sanitize_text_field( $_POST['wpak_app_name'] ) );
 	    }
@@ -355,7 +347,7 @@ class WpakApps{
 	}
 	
 	public static function get_app_main_infos($post_id){
-		$title = get_post_meta($post_id,'_wpak_app_title',true);
+		$title = get_post_meta($post_id,'_wpak_app_title',true); //handled in WpakThemesBoSettings
 		$app_phonegap_id = get_post_meta($post_id,'_wpak_app_phonegap_id',true);
 		$name = get_post_meta($post_id,'_wpak_app_name',true);
 		$desc = get_post_meta($post_id,'_wpak_app_desc',true);

@@ -17,8 +17,8 @@
 
 			<div class="content-item">
 				<a href="<%= TemplateTags.getPostLink(post.id) %>">
-					<% if( post.featured_img.src && post.featured_img.src.length ){ %>
-						<div class="content-thumbnail"><div style="background:url(<%= post.featured_img.src %>);background-size:cover;"></div></div>
+					<% if( post.thumbnail.src && post.thumbnail.src.length ){ %>
+						<div class="content-thumbnail"><div style="background:url(<%= post.thumbnail.src %>);background-size:cover;"></div></div>
 					<% } %>	
 					<div class="content-date"><%= month +'/'+ day +'/'+ year %></div>
 					<h2><span><%= post.title %></span></h2>

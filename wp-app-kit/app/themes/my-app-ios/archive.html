@@ -17,8 +17,8 @@
 				var year = date.getUTCFullYear();
 	  		%>
 
-			<% if( post.featured_img.src && post.featured_img.src.length ){ %>
-				<div class="content-item-with-thumbnail" style="background:url(<%= post.featured_img.src %>);background-size:100% auto;">				
+			<% if( post.thumbnail.src && post.thumbnail.src.length ){ %>
+				<div class="content-item-with-thumbnail" style="background:url(<%= post.thumbnail.src %>);background-size:100% auto;">				
 			<% }else{ %>
 				<div class="content-item">
 			<% } %>

@@ -26,7 +26,7 @@ class WpakComponentTypePage extends WpakComponentType{
 				'title' => $post->post_title,
 				'content' => '',
 				'excerpt' => '',
-				'featured-img' => '',
+				'thumbnail' => '',
 				'author' => get_the_author_meta('nickname'),
 				'nb_comments' => (int)get_comments_number()
 		);
@@ -45,35 +45,15 @@ class WpakComponentTypePage extends WpakComponentType{
 		$post_featured_img_id = get_post_thumbnail_id($post->ID);
 		if( !empty($post_featured_img_id) ){
 			$featured_img_src = wp_get_attachment_image_src($post_featured_img_id, 'mobile-featured-thumb');
-			$post_data['featured_img']['src'] = $featured_img_src[0];
+			@$post_data['thumbnail']['src'] = $featured_img_src[0];
+			$post_data['thumbnail']['width'] = $featured_img_src[1];
+			$post_data['thumbnail']['height'] = $featured_img_src[2];
 		}
 	
 		//To customize page data sent to the app (for example add a page meta to the default page data),
 		//use this "wpak_page_data" filter :
 		$post_data = apply_filters('wpak_page_data',$post_data,$post);
 	
-		return (object)$post_data;
-	}
-	
-	protected function get_post_data($_post){
-		global $post;
-		$post = $_post;
-		setup_postdata($post);
-		
-		$post_data = array(
-			'id' => $post->ID,
-			'date' => strtotime($post->post_date),
-			'title' => $post->post_title,
-			'content' => '',
-			'excerpt' => '',
-			'featured_img' => '',
-			'author' => '',
-			'url' => get_permalink(),
-			'nb_comments' => (int)get_comments_number()
-		);
-		
-		$post_data = apply_filters('wpak_page_post_data',$post_data,$post);
-		
 		return (object)$post_data;
 	}
 	

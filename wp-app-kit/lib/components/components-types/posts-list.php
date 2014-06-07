@@ -111,7 +111,7 @@ class WpakComponentTypePostsList extends WpakComponentType{
 			'title' => $post->post_title,
 			'content' => '',
 			'excerpt' => '',
-			'featured_img' => '',
+			'thumbnail' => '',
 			'author' => get_the_author_meta('nickname'), 
 			'nb_comments' => (int)get_comments_number()
 		);
@@ -130,9 +130,9 @@ class WpakComponentTypePostsList extends WpakComponentType{
 		$post_featured_img_id = get_post_thumbnail_id($post->ID);
 		if( !empty($post_featured_img_id) ){
 			$featured_img_src = wp_get_attachment_image_src($post_featured_img_id, 'mobile-featured-thumb');
-			@$post_data['featured_img']['src'] = $featured_img_src[0];
-			$post_data['featured_img']['width'] = $featured_img_src[1];
-			$post_data['featured_img']['height'] = $featured_img_src[2];
+			@$post_data['thumbnail']['src'] = $featured_img_src[0];
+			$post_data['thumbnail']['width'] = $featured_img_src[1];
+			$post_data['thumbnail']['height'] = $featured_img_src[2];
 		}
 		
 		//To customize post data sent to the app (for example add a post meta to the default post data), 

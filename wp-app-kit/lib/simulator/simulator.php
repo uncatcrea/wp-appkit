@@ -24,7 +24,7 @@ class WpakSimulator{
 				$trash_mem = $actions['trash'];
 				unset($actions['trash']);
 				$actions['wpak-simulate-app'] = '<a href="'. self::get_simulator_url($post->ID) .'">'. __('View in simulator',WpAppKit::i18n_domain) .'</a>';
-				$actions['wpak-view-app-in-browser'] = '<a href="'. WpakBuild::get_appli_index_url($post->ID) .'">'. __('View in browser',WpAppKit::i18n_domain) .'</a>';
+				$actions['wpak-view-app-in-browser'] = '<a href="'. WpakBuild::get_appli_index_url($post->ID) .'" target="_blank">'. __('View in browser',WpAppKit::i18n_domain) .'</a>';
 				$actions['trash'] = $trash_mem;
 			}
 		}
@@ -74,7 +74,7 @@ class WpakSimulator{
 					</div>
 					
 					<div id="debug-infos">
-						<h3><a href="<?php echo $appli_url ?>"><?php _e('Preview in browser',WpAppKit::i18n_domain) ?></a></h3>
+						<h3><a href="<?php echo $appli_url ?>" target="_blank"><?php _e('Preview in browser',WpAppKit::i18n_domain) ?></a></h3>
 						
 						<h3><a href="<?php echo $appli_dir_url .'/config.js?wpak_app_id='. $app_id ?>"><?php _e('View config.js',WpAppKit::i18n_domain) ?></a></h3>
 						

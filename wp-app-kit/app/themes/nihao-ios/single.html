@@ -1,8 +1,8 @@
 <div id="content" class="container content full single-template">
 
 	<div class="post-title">
-		<% if(  post.featured_img && post.featured_img.src && post.featured_img.src.length ){ %>
-			<div class="post-thumbnail" style="background-image:url(<%= post.featured_img.src %>);background-size:cover;"></div>
+		<% if(  post.thumbnail && post.thumbnail.src && post.thumbnail.src.length ){ %>
+			<div class="post-thumbnail" style="background-image:url(<%= post.thumbnail.src %>);background-size:cover;"></div>
 		<% } %>	
 		<h1>
 			<%= post.title %>

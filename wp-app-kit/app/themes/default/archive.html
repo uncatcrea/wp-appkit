@@ -13,8 +13,8 @@
 		  		%>
 				<li class="topcoat-list__item">
 					<a href="<%= TemplateTags.getPostLink(post.id) %>" class="archive-post-link">
-						<% if( post.featured_img.src && post.featured_img.src.length ){ %>
-							<img src="<%= post.featured_img.src %>" />
+						<% if( post.thumbnail.src && post.thumbnail.src.length ){ %>
+							<img src="<%= post.thumbnail.src %>" />
 						<% } %>
 						<span class="title"><%= post.title %></span>
 						<span class="date">Le <%= day +'/'+ month +'/'+ year %></span>

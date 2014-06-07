@@ -50,7 +50,7 @@ class WpakBuild{
 		<a href="<?php echo WpakSimulator::get_simulator_url($post->ID) ?>" class="button button-large"><?php _e('View application in simulator',WpAppKit::i18n_domain) ?></a>
 		<br/>
 		<br/>
-		<a href="<?php echo $appli_url ?>" class="button button-large"><?php _e('View application in browser',WpAppKit::i18n_domain) ?></a>
+		<a href="<?php echo $appli_url ?>" class="button button-large" target="_blank"><?php _e('View application in browser',WpAppKit::i18n_domain) ?></a>
 		<br/>
 		<br/>
 		<a href="<?php echo self::get_appli_dir_url() .'/config.js?wpak_app_id='. WpakApps::get_app_slug($post->ID) ?>"><?php _e('View config.js',WpAppKit::i18n_domain) ?></a>

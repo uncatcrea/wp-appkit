@@ -20,6 +20,7 @@ class WpakThemesBoSettings{
 	public static function inner_main_infos_box($post,$current_box){
 		$available_themes = WpakThemes::get_available_themes();
 		$current_theme = WpakThemesStorage::get_current_theme($post->ID);
+		$main_infos = WpakApps::get_app_main_infos($post->ID);
 		?>
 		
 		<label><?php _e('Choose theme',WpAppKit::i18n_domain) ?> : </label>
@@ -29,6 +30,10 @@ class WpakThemesBoSettings{
 				<option value="<?php echo $theme ?>" <?php echo $selected ?>><?php echo ucfirst($theme)?> </option>
 			<?php endforeach ?>
 		</select>
+		<br/><br/>
+		
+		<label><?php _e('Application title (displayed in app top bar)',WpAppKit::i18n_domain) ?></label> : <br/> 
+		<input type="text" name="wpak_app_title" value="<?php echo $main_infos['title'] ?>" />
 		
 		<?php wp_nonce_field('wpak-theme-data-'. $post->ID,'wpak-nonce-theme-data') ?>
 		
@@ -51,6 +56,10 @@ class WpakThemesBoSettings{
 	
 		if( !check_admin_referer('wpak-theme-data-'. $post_id, 'wpak-nonce-theme-data') ){
 			return;
+		}
+		
+		if ( isset( $_POST['wpak_app_title'] ) ) {
+			update_post_meta( $post_id, '_wpak_app_title', sanitize_text_field( $_POST['wpak_app_title'] ) );
 		}
 		
 		if ( isset( $_POST['wpak_app_theme_choice'] ) ) {

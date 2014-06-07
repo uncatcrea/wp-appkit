@@ -5,8 +5,8 @@
 		- <a class="comments" href="<%= TemplateTags.getCommentsLink(post.id) %>"><% print(post.nb_comments) %>&nbsp;comment<% post.nb_comments > 1 ? print('s') : '' %></a>
 	<% } %>
 	<div id="single-content">
-		<% if(  post.featured_img && post.featured_img.src && post.featured_img.src.length ){ %>
-			<img src="<%= post.featured_img.src %>" />
+		<% if(  post.thumbnail && post.thumbnail.src && post.thumbnail.src.length ){ %>
+			<img src="<%= post.thumbnail.src %>" />
 		<% } %>
 		<%= post.content %>
 	</div>
