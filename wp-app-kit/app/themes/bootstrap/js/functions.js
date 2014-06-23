@@ -1,23 +1,8 @@
-define(['jquery','core/theme-app','core/lib/storage.js','theme/js/bootstrap.min'],function($,App,Storage){
+define(['jquery','core/theme-app','core/lib/storage','theme/js/bootstrap.min'],function($,App,Storage){
 	
-	//Example of how to overide the web services token computation :
-	App.filter('get-token',function(token,auth_key,web_service){
-		//Here you can make your own token computation, provided you've done the same  
-		//on Wordpress side using the "wpak_generate_token" hook !
-		return token; //For this example, we do nothing, just return the default token.
-	});
-	
-	//Example of how to chose a template for a specific custom component :
-	App.filter('template',function(template,current_page){
-		if( current_page.fragment == 'component-total-custom' ){
-			template = 'my-custom-component';
-		}else if( current_page.global == 'custom-global-total-custom' ){
-			template = 'my-single';
-		}
-		return template;
-	});
-	
-	//Launch app contents refresh when clicking the refresh button :
+	/**
+	 * Launch app contents refresh when clicking the refresh button :
+	 */
 	$('#refresh-button').click(function(e){
 		e.preventDefault();
 		closeMenu();
@@ -26,27 +11,39 @@ define(['jquery','core/theme-app','core/lib/storage.js','theme/js/bootstrap.min'
 		});
 	});
 	
+	/**
+	 * Animate refresh button when the app starts refreshing
+	 */
 	App.on('refresh:start',function(){
 		$('#refresh-button').addClass('refreshing');
 	});
 	
+	/**
+	 * Stop refresh button animation when the app stops refreshing
+	 */
 	App.on('refresh:end',function(){
 		scrollTop();
-		Storage.clear('scroll-pos');
+		Storage.clear('scroll-pos'); 
 		$('#refresh-button').removeClass('refreshing');
 	});
 	
+	/**
+	 * When an error occurs, display it in the feedback box
+	 */
 	App.on('error',function(error){
 		$('#feedback').addClass('error').html(error.message).slideDown();
 	});
 	
-	App.on('info',function(info){
-		if( info.event == 'no-content' ){
-			
-		}
+	/**
+	 * Hide the feedback box when clicking anywhere in the body
+	 */
+	$('body').click(function(e){
+		$('#feedback').slideUp();
 	});
 	
-	//Automatically shows and hide Back button according to current page
+	/**
+	 * Automatically shows and hide Back button according to current page
+	 */
 	App.setAutoBackButton($('#go-back'),function(back_button_showed){
 		if(back_button_showed){
 			$('#refresh-button').hide();
@@ -55,23 +52,26 @@ define(['jquery','core/theme-app','core/lib/storage.js','theme/js/bootstrap.min'
 		}
 	}); 
 	
-	$('body').click(function(e){
-		$('#feedback').slideUp();
-	});
-	
-	//Allow to click anywhere on li to go to post detail :
+	/**
+	 * Allow to click anywhere on post list <li> to go to post detail :
+	 */
 	$('#container').on('click','li.media',function(e){
 		e.preventDefault();
 		var navigate_to = $('a',this).attr('href');
 		App.navigate(navigate_to);
 	});
 	
-	//The menu can be dynamically refreshed, so we use "on" on parent div (which is always here):
+	/**
+	 * Close menu when we click a link inside it.
+	 * The menu can be dynamically refreshed, so we use "on" on parent div (which is always here):
+	 */
 	$('#navbar-collapse').on('click','a',function(e){
-		//Close menu when we click a link inside it
 		closeMenu();
 	});
 	
+	/**
+	 * "Get more" button in post lists
+	 */
 	$('#container').on('click','.get-more',function(e){
 		e.preventDefault();
 		$(this).attr('disabled','disabled').text('Loading...');
@@ -83,6 +83,11 @@ define(['jquery','core/theme-app','core/lib/storage.js','theme/js/bootstrap.min'
 		});
 	});
 	
+	/**
+	 * Do something before leaving a page.
+	 * Here, if we're leaving a post list, we memorize the current scroll position, to 
+	 * get back to it when coming back to this list.
+	 */
 	App.on('page:leave',function(current_page,queried_page,view){
 		//current_page.page_type can be 'list','single','page','comments'
 		if( current_page.page_type == 'list' ){
@@ -90,6 +95,10 @@ define(['jquery','core/theme-app','core/lib/storage.js','theme/js/bootstrap.min'
 		}
 	});
 	
+	/**
+	 * Do something when a new page is showed.
+	 * Here, if we arrive on a post list, we resore the scroll position
+	 */
 	App.on('page:showed',function(current_page,view){
 		//current_page.page_type can be 'list','single','page','comments'
 		if( current_page.page_type == 'list' ){
@@ -104,18 +113,9 @@ define(['jquery','core/theme-app','core/lib/storage.js','theme/js/bootstrap.min'
 		}
 	});
 	
-	//Example of how to display your own customized page :
-	$('#container').on('click','#custom-page',function(e){
-		e.preventDefault();
-		//Render custom page using any custom template that you created in your theme (here, a template called "info.html") : 
-		App.showCustomPage('info',{
-			title:"Custom page example",
-			content:"This is a custom page created dynamically in functions.js :-)",
-			any_data_i_want:"Display anything you want! A key > value list for example :",
-			my_list:{"First element":"Item one", "Second one":"Item two"}
-		}); 
-	});
-	
+	/**
+	 * Manually close the bootstrap navbar
+	 */
 	function closeMenu(){
 		var navbar_toggle_button = $(".navbar-toggle").eq(0);
 		if( !navbar_toggle_button.hasClass('collapsed') ){
@@ -123,6 +123,9 @@ define(['jquery','core/theme-app','core/lib/storage.js','theme/js/bootstrap.min'
 		}
 	}
 	
+	/**
+	 * Get back to the top of the page
+	 */
 	function scrollTop(){
 		window.scrollTo(0,0);
 	}
