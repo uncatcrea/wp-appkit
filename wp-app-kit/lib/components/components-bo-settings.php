@@ -218,7 +218,10 @@ class WpakComponentsBoSettings{
 		$data = $_POST['data'];
 
 		if( $action == 'add_or_update' ){
-			
+
+			// Unslash POST data before manipulating DB
+			$data = wp_unslash( $data );
+
 			$post_id = $data['component_post_id'];
 
 			if( empty($post_id) ){
