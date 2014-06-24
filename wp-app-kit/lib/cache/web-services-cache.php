@@ -1,11 +1,11 @@
 <?php
 /**
- * This class may be used before the Wordpress API is loaded (for WP cache applications : see advanced-cache.php),
- * so this must be pure PHP -> no use of Wordpress API functions inhere. No hook either!   
+ * This class may be used before the WordPress API is loaded (for WP cache applications : see advanced-cache.php),
+ * so this must be pure PHP -> no use of WordPress API functions inhere. No hook either!
  */
 
 class WpakCache{
-	
+
 	public static function cache_web_service_result($web_service_cache_id,$web_service_result,$timestamp){
 		if( self::create_cache_directory_if_doesnt_exist() ){
 			$filename = self::get_cache_file_full_path($web_service_cache_id,$timestamp);
@@ -15,11 +15,11 @@ class WpakCache{
 			}
 		}
 	}
-	
+
 	public static function get_cached_web_service($web_service_cache_id,$force_reload=false,$last_update=0,$not_changed_answer_callback=null){
-		
+
 		$cached_web_service_content = '';
-		
+
 		if( !$force_reload ){
 			$cached_web_service_infos = self::get_cached_web_service_infos($web_service_cache_id);
 			if( !empty($cached_web_service_infos) ){
@@ -36,10 +36,10 @@ class WpakCache{
 				}
 			}
 		}
-		
+
 		return $cached_web_service_content;
 	}
-	
+
 	/**
 	 * Builds a webservice cache id from given identifiers that allow to make this cache unique.
 	 * @param array $cache_identifiers Cache identifiers : ews_data, ews_id, ews_action, ews_subaction, ews_subaction_data, ews_mapping
@@ -49,15 +49,15 @@ class WpakCache{
 	 */
 	public static function build_web_service_cache_id($ws_slug,$cache_identifiers,$get=array(),$reserved_keys=array()){
 		$cache_id = '';
-		
+
 		$to_hash = array();
-		
+
 		foreach($cache_identifiers as $k=>$value){
 			if( !empty($value) ){
 				$to_hash[$k] = $value;
 			}
 		}
-		
+
 		if( !empty($get) ){
 			$reserved_get_keys = array_merge(array('last_update','force_reload','callback'),$reserved_keys);
 			foreach($get as $k => $v){
@@ -66,16 +66,16 @@ class WpakCache{
 				}
 			}
 		}
-		
+
 		ksort($to_hash);
-		
+
 		$cache_id = $ws_slug .'__'. md5(implode('',$to_hash));
-		
+
 		return $cache_id;
 	}
-	
+
 	public static function build_web_service_cache_id_by_slug($web_service_slug,$action,$id='',$subaction='',$subaction_data='',$get=array(),$reserved_keys=array()){
-		
+
 		$identifiers = array(
 				'ews_data' => $web_service_slug,
 				'ews_id' => $id,
@@ -83,10 +83,10 @@ class WpakCache{
 				'ews_subaction' => $subaction,
 				'ews_subaction_data' => $subaction_data
 		);
-		
+
 		return self::build_web_service_cache_id($web_service_slug,$identifiers,$get,$reserved_keys);
 	}
-	
+
 	/**
 	 * Retrieves info from the last cached file for the given web service cache id.
 	 * @param string $web_service_cache_id
@@ -94,14 +94,14 @@ class WpakCache{
 	 */
 	public static function get_cached_web_service_infos($web_service_cache_id){
 		$cached_web_service = array();
-		
+
 		$path = self::get_cache_files_path();
 		if( file_exists($path) ){
 			if( $handle = opendir($path) ){
-				
+
 				$prefix = $web_service_cache_id .'__';
 				$found_files = array();
-				
+
 				while( false !== ($entry = readdir($handle)) ){
 					if ($entry != "." && $entry != "..") {
 						if( strpos($entry,$prefix) !== false ){
@@ -110,9 +110,9 @@ class WpakCache{
 						}
 					}
 				}
-				
+
 				closedir($handle);
-				
+
 				if( !empty($found_files) ){
 					krsort($found_files);
 					$last_file = reset($found_files);
@@ -125,20 +125,20 @@ class WpakCache{
 							'timestamp' => $timestamp
 					);
 				}
-				
+
 			}
 		}
-		
+
 		return $cached_web_service;
 	}
-	
+
 	/**
 	 * Deletes the cache for the given web service
 	 * @param string $web_service_slug To delete all caches, set $web_service_slug = 'wpak-delete-all-caches'
 	 */
 	public static function delete_web_service_cache($web_service_slug_or_prefix){
 		$result = array('ok'=>true,'deletes_nok'=>array(),'deletes_ok'=>array());
-		
+
 		$path = self::get_cache_files_path();
 		if( !empty($web_service_slug_or_prefix) && file_exists($path) ){
 			if( $handle = opendir($path) ){
@@ -163,19 +163,19 @@ class WpakCache{
 						}
 					}
 				}
-		
+
 				closedir($handle);
 			}
 		}
-		
+
 		$result['ok'] = empty($result['deletes_nok']);
-		
+
 		return $result;
 	}
-	
+
 	public static function delete_web_service_cache_before_timestamp($timestamp){
 		$result = array('ok'=>true,'deletes_nok'=>array(),'deletes_ok'=>array());
-		
+
 		$path = self::get_cache_files_path();
 		if( !empty($timestamp) && is_numeric($timestamp) && file_exists($path) ){
 			if( $handle = opendir($path) ){
@@ -196,21 +196,21 @@ class WpakCache{
 				closedir($handle);
 			}
 		}
-		
+
 		$result['ok'] = empty($result['deletes_nok']);
-		
+
 		return $result;
 	}
-	
+
 	private static function get_cache_file_full_path($web_service_cache_id,$timestamp){
 		$path = self::get_cache_files_path();
 		return $path .'/'. $web_service_cache_id .'__'. $timestamp .'.cache';
 	}
-	
+
 	private static function get_cache_files_path(){
 		return WP_CONTENT_DIR .'/uploads/web-services-cache'; //WP_CONTENT_DIR is defined even when WP API is not loaded yet.
 	}
-	
+
 	private static function create_cache_directory_if_doesnt_exist(){
 		$cache_directory = self::get_cache_files_path();
 		$ok = true;
@@ -219,10 +219,10 @@ class WpakCache{
 		}
 		return $ok;
 	}
-	
+
 	private static function get_not_changed_answer($cached_last_update){
 		$not_changed_answer = array('result' => (object)array('status'=>2,'message'=>''), 'last-update' => $cached_last_update );
-		if( function_exists('apply_filters') ){ //We can pass here when Wordpress API is not loaded yet... 
+		if( function_exists('apply_filters') ){ //We can pass here when WordPress API is not loaded yet...
 			$not_changed_answer = apply_filters('wpak_not_changed_answer',$not_changed_answer,$cached_last_update);
 		}
 		return json_encode((object)$not_changed_answer);

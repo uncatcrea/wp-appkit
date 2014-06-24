@@ -1,9 +1,9 @@
 <?php
 class WpakComponentTypePage extends WpakComponentType{
-	
+
 	protected function compute_data($component,$options,$args=array()){
 		global $wpdb;
-		
+
 		if( !empty($options['page']) ){
 			$page = get_post($options['page']);
 			if( !empty($page) ){
@@ -12,13 +12,13 @@ class WpakComponentTypePage extends WpakComponentType{
 				$this->set_globals('pages',$pages);
 			}
 		}
-	} 
-	
+	}
+
 	protected function get_page_data($page){
 		global $post;
 		$post = $page;
 		setup_postdata($post);
-	
+
 		$post_data = array(
 				'id' => $post->ID,
 				'post_type' => $post->post_type,
@@ -30,18 +30,18 @@ class WpakComponentTypePage extends WpakComponentType{
 				'author' => get_the_author_meta('nickname'),
 				'nb_comments' => (int)get_comments_number()
 		);
-	
+
 		//Use the "wpak_posts_list_post_content" filter to format app pages content your own way :
-		//(To apply the default App Kit formating to the content and add only minor modifications to it, 
+		//(To apply the default App Kit formating to the content and add only minor modifications to it,
 		//use the "wpak_post_content_format" filter instead.)
 		$content = apply_filters('wpak_page_content','',$post);
 		if( empty($content) ){
 			$content = WpakComponentsUtils::get_formated_content();
 		}
 		$post_data['content'] = $content;
-	
+
 		$post_data['excerpt'] = WpakComponentsUtils::get_post_excerpt($post);
-	
+
 		$post_featured_img_id = get_post_thumbnail_id($post->ID);
 		if( !empty($post_featured_img_id) ){
 			$featured_img_src = wp_get_attachment_image_src($post_featured_img_id, 'mobile-featured-thumb');
@@ -49,14 +49,14 @@ class WpakComponentTypePage extends WpakComponentType{
 			$post_data['thumbnail']['width'] = $featured_img_src[1];
 			$post_data['thumbnail']['height'] = $featured_img_src[2];
 		}
-	
+
 		//To customize page data sent to the app (for example add a page meta to the default page data),
 		//use this "wpak_page_data" filter :
 		$post_data = apply_filters('wpak_page_data',$post_data,$post);
-	
+
 		return (object)$post_data;
 	}
-	
+
 	public function get_options_to_display($component){
 		$page = get_post($component->options['page']);
 		$page_title = !empty($page) ? $page->post_title .' (ID='. $page->ID .')' : __('Page not found',WpAppKit::i18n_domain);
@@ -65,11 +65,11 @@ class WpakComponentTypePage extends WpakComponentType{
 		);
 		return $options;
 	}
-	
+
 	public function echo_form_fields($component){
 		$pages = get_posts(array('post_type'=>'page','posts_per_page'=>-1));
 		$pages = apply_filters('wpak_component_type_pages_form_pages',$pages);
-		
+
 		$current_page = '';
 		if( !empty($component) ){
 			$options = $component->options;
@@ -87,19 +87,19 @@ class WpakComponentTypePage extends WpakComponentType{
 		</div>
 		<?php
 	}
-	
+
 	public function echo_form_javascript(){
 	}
-	
+
 	public function get_ajax_action_html_answer($action,$params){
 	}
-	
+
 	public function get_options_from_posted_form($data){
 		$page_id = $data['page_id'];
 		$options = array('page' => $page_id);
 		return $options;
 	}
-	
+
 }
 
-WpakComponentsTypes::register_component_type('page', array('label'=> __('Wordpress page',WpAppKit::i18n_domain)));
+WpakComponentsTypes::register_component_type('page', array('label'=> __('WordPress page',WpAppKit::i18n_domain)));
