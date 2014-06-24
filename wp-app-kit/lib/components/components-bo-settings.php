@@ -245,7 +245,8 @@ class WpakComponentsBoSettings{
 				self::exit_sending_json($answer);
 			}
 
-			$component_slug = $edit ? trim($data['component_slug']) : sanitize_title_with_dashes(remove_accents($component_label));
+			$component_slug = $edit ? trim($data['component_slug']) : $component_label;
+			$component_slug = sanitize_title_with_dashes(remove_accents($component_slug));
 
 			if( empty($component_slug) ){
 				$answer['message'] = __("You must provide a slug for the component.",WpAppKit::i18n_domain);
