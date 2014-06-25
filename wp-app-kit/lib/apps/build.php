@@ -1,9 +1,9 @@
 <?php
 
 class WpakBuild{
-	
+
 	const export_file_memory = 10;
-	
+
 	public static function hooks(){
 		if( is_admin() ){
 			add_action('wp_ajax_wpak_build_app_sources', array(__CLASS__,'build_app_sources') );
@@ -12,7 +12,7 @@ class WpakBuild{
 			add_action('save_post', array(__CLASS__,'save_post'));
 		}
 	}
-	
+
 	public static function add_meta_boxes(){
 		add_meta_box(
 			'wpak_simulation_box',
@@ -22,7 +22,7 @@ class WpakBuild{
 			'side',
 			'default'
 		);
-		
+
 		add_meta_box(
 			'wpak_export_box',
 			__('Phonegap ready App export',WpAppKit::i18n_domain),
@@ -32,7 +32,7 @@ class WpakBuild{
 			'default'
 		);
 	}
-	
+
 	public static function inner_simulation_box($post,$current_box){
 		$debug_mode = self::get_app_debug_mode_raw($post->ID);
 		$wp_ws_url = WpakWebServices::get_app_web_service_url($post->ID,'synchronization');
@@ -42,7 +42,7 @@ class WpakBuild{
 		<select name="wpak_app_debug_mode">
 			<option value="on" <?php echo $debug_mode == 'on' ? 'selected="selected"' : '' ?>><?php _e('On',WpAppKit::i18n_domain) ?></option>
 			<option value="off" <?php echo $debug_mode == 'off' ? 'selected="selected"' : '' ?>><?php _e('Off',WpAppKit::i18n_domain) ?></option>
-			<option value="wp" <?php echo $debug_mode == 'wp' ? 'selected="selected"' : '' ?>><?php _e('Same as Wordpress WP_DEBUG',WpAppKit::i18n_domain) ?></option>
+			<option value="wp" <?php echo $debug_mode == 'wp' ? 'selected="selected"' : '' ?>><?php _e('Same as WordPress WP_DEBUG',WpAppKit::i18n_domain) ?></option>
 		</select>
 		<br/><span class="description"><?php _e('If activated, echoes debug infos in the browser javascript console while simulating the app.',WpAppKit::i18n_domain) ?></span>
 		<br/>
@@ -61,9 +61,9 @@ class WpakBuild{
 			<?php _e('Synchronization',WpAppKit::i18n_domain) ?> : <a href="<?php echo $wp_ws_url ?>"><?php echo $wp_ws_url ?></a>
 		</div>
 		<?php wp_nonce_field('wpak-simulation-data-'. $post->ID,'wpak-nonce-simulation-data') ?>
-		<?php 
+		<?php
 	}
-	
+
 	public static function inner_export_box($post,$current_box){
 		$app_id = $post->ID;
 		$available_themes = WpakThemes::get_available_themes();
@@ -82,7 +82,7 @@ class WpakBuild{
 		<label for="wpak_download_after_build"><?php _e('Download after export',WpAppKit::i18n_domain) ?></label> <input type="checkbox" id="wpak_download_after_build" checked="checked" />
 		<a id="wpak_export_link" href="#" class="button button-primary button-large"><?php _e('Export as PhoneGap App sources',WpAppKit::i18n_domain) ?>!</a>
 		<div id="wpak_export_feedback"></div>
-		
+
 		<?php $previous_exports = self::get_available_app_exports($app_id) ?>
 		<?php if( !empty($previous_exports) ): ?>
 			<label><?php _e('Download a previous export',WpAppKit::i18n_domain) ?> : </label>
@@ -93,9 +93,9 @@ class WpakBuild{
 			</select>
 			<a id="wpak_download_existing_link" href="#" class="button button-large"><?php _e('Download',WpAppKit::i18n_domain) ?>!</a>
 		<?php endif ?>
-		
+
 		<?php wp_nonce_field('wpak-export-data-'. $post->ID,'wpak-nonce-export-data') ?>
-		
+
 		<script>
 			jQuery("#wpak_export_link").click(function(e) {
 				e.preventDefault();
@@ -152,61 +152,61 @@ class WpakBuild{
 		</style>
 		<?php
 	}
-	
+
 	public static function save_post($post_id){
-	
+
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ){
 			return;
 		}
-	
+
 		if( empty($_POST['post_type']) || $_POST['post_type'] != 'wpak_apps' ){
 			return;
 		}
-	
+
 		if( !current_user_can('edit_post', $post_id) ){
 			return;
 		}
-		
+
 		if( !check_admin_referer('wpak-simulation-data-'. $post_id, 'wpak-nonce-simulation-data')
 			|| !check_admin_referer('wpak-export-data-'. $post_id, 'wpak-nonce-export-data')
 		){
 			return;
 		}
-	
+
 		if ( isset( $_POST['wpak_app_debug_mode'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_debug_mode', $_POST['wpak_app_debug_mode']);
 		}
 
 	}
-	
+
 	private static function get_app_debug_mode_raw($app_id){
 		$debug_mode = get_post_meta($app_id,'_wpak_app_debug_mode',true);
 		return empty($debug_mode) ? 'off' : $debug_mode;
 	}
-	
+
 	public static function get_app_debug_mode($app_id){
 		$debug_mode = self::get_app_debug_mode_raw($app_id);
 		return $debug_mode == 'wp' ? (WP_DEBUG ? 'on' : 'off') : $debug_mode;
 	}
-	
+
 	public static function get_appli_dir_url(){
 		return plugins_url('app' , dirname(dirname(__FILE__)) );
 	}
-	
+
 	public static function get_appli_index_url($app_id){
 		return self::get_appli_dir_url() .'/index.html?wpak_app_id='. WpakApps::get_app_slug($app_id);
 	}
-	
+
 	public static function download_app_sources(){
-		
+
 		if( !check_admin_referer('wpak_download_app_sources') ){
 			return;
 		}
-		
+
 		$export = addslashes($_GET['export']);
 		$filename = $export .'.zip';
 		$filename_full = self::get_export_files_path() ."/". $filename;
-		
+
 		if( file_exists($filename_full) ){
 			header("Pragma: public");
 			header("Expires: 0");
@@ -226,22 +226,22 @@ class WpakBuild{
 			exit();
 		}
 	}
-	
+
 	public static function build_app_sources(){
 		$answer = array('ok'=>1, 'msg'=>'');
-		
+
 		if( empty($_POST) || empty($_POST['app_id']) || !is_numeric($_POST['app_id']) ){
 			$answer['ok'] = 0;
 			$answer['msg'] = __('Wrong application ID',WpAppKit::i18n_domain);
 			self::exit_sending_json($answer);
 		}
-		
+
 		$app_id = addslashes($_POST['app_id']);
-		
+
 		if( !check_admin_referer('wpak_build_app_sources_'. $app_id,'nonce') ){
 			return;
 		}
-		
+
 		if( !extension_loaded('zip') ){
 			$answer['ok'] = 0;
 			$answer['msg'] = __('Zip PHP extension is required to run file export. See http://www.php.net/manual/fr/book.zip.php.',WpAppKit::i18n_domain);
@@ -254,34 +254,34 @@ class WpakBuild{
 			$answer['msg'] = sprintf(__('The export directory [%s] could not be created. Please check that you have the right permissions to create this directory.',WpAppKit::i18n_domain),$export_directory);
 			self::exit_sending_json($answer);
 		}
-		
+
 		$themes = !empty($_POST['themes']) && is_array($_POST['themes']) ? $_POST['themes'] : null;
 		if( $themes == null ){
 			$answer['ok'] = 0;
 			$answer['msg'] = __('Please choose at least one theme for the export',WpAppKit::i18n_domain);
 			self::exit_sending_json($answer);
 		}
-		
+
 		$plugin_dir = plugin_dir_path( dirname(dirname(__FILE__)) );
 		$appli_dir = $plugin_dir .'app';
-		 
+
 		$export_filename_base = self::get_export_file_base_name($app_id);
 		$export_filename = $export_filename_base .'-'. date('YmdHis');
 		$export_filename_full = self::get_export_files_path() ."/". $export_filename .'.zip';
-		
+
 		$answer = self::build_zip($app_id,$appli_dir,$export_filename_full,$themes);
-		
+
 		$maintenance_answer = self::export_files_maintenance($app_id);
 		if( $maintenance_answer['ok'] == 0 ){
 			$answer['ok'] = $answer['ok'] == 1 ? 2 : $answer['ok'];
 			$answer['msg'] .= "<br/>". $maintenance_answer['msg'];
 		}
-		
+
 		$answer['export'] = $export_filename;
-		
+
 		self::exit_sending_json($answer);
 	}
-	
+
 	private static function exit_sending_json($answer){
 		//If something was displayed before, clean it so that our answer can
 		//be valid json (and store it in an "echoed_before_json" answer key
@@ -291,20 +291,20 @@ class WpakBuild{
 			$answer['echoed_before_json'] = $content_already_echoed;
 			ob_end_clean();
 		}
-		
+
 		header('Content-type: application/json');
 		echo json_encode($answer);
 		exit();
 	}
-	
+
 	private static function get_export_files_path(){
 		return WP_CONTENT_DIR .'/uploads/wpak-export';
 	}
-	
+
 	private static function get_export_file_base_name($app_id){
 		return 'phonegap-export-'.  WpakApps::get_app_slug($app_id);
 	}
-	
+
 	private static function create_export_directory_if_doesnt_exist(){
 		$export_directory = self::get_export_files_path();
 		$ok = true;
@@ -313,32 +313,32 @@ class WpakBuild{
 		}
 		return $ok;
 	}
-	
+
 	private static function build_zip($app_id,$source, $destination,$themes){
 
-		$answer = array('ok'=>1, 'msg'=>'');		
-		
+		$answer = array('ok'=>1, 'msg'=>'');
+
 	    if (!extension_loaded('zip') || !file_exists($source)) {
 	        $answer['msg'] = sprintf(__('The Zip archive file [%s] could not be created. Please check that you have the permissions to write to this directory.',WpAppKit::i18n_domain),$destination);
 	        $answer['ok'] = 0;
 			return $answer;
 	    }
-	
+
 	    $zip = new ZipArchive();
 	    if( !$zip->open($destination, ZIPARCHIVE::CREATE) ){
 			$answer['msg'] = sprintf(__('The Zip archive file [%s] could not be opened. Please check that you have the permissions to write to this directory.',WpAppKit::i18n_domain),$destination);
 	        $answer['ok'] = 0;
 			return $answer;
 	    }
-	   	
+
 	    if( is_dir($source) === true ){
 
 	        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source), RecursiveIteratorIterator::SELF_FIRST);
-	
+
 	        foreach($files as $file){
 				$filename = str_replace($source, '', $file);
 				$filename = ltrim($filename,'/\\');
-				
+
 				//Filter themes :
 				if( preg_match('|themes[/\\\].+|',$filename) ){
 					$theme = preg_replace('|themes[/\\\]([^/\\\]*).*|','$1',$filename);
@@ -346,12 +346,12 @@ class WpakBuild{
 						continue;
 					}
 				}
-				
+
 				//Filter php directory
 				if( preg_match('|themes[/\\\].+?[/\\\]php|',$filename) ){
 					continue;
 				}
-				
+
 	            if( is_dir($file) === true ){
 	                if( !$zip->addEmptyDir($filename) ){
 						$answer['msg'] = sprintf(__('Could not add directory [%s] to zip archive',WpAppKit::i18n_domain),filename);
@@ -361,15 +361,15 @@ class WpakBuild{
 	            }elseif( is_file($file) === true ){
 
 					if( $filename == 'index.html' ){
-						
+
 						$index_content = self::filter_index(file_get_contents($file));
-						
+
 						if( !$zip->addFromString($filename,$index_content) ){
 							$answer['msg'] = sprintf(__('Could not add file [%s] to zip archive',WpAppKit::i18n_domain),filename);
 							$answer['ok'] = 0;
 							return $answer;
 						}
-						
+
 					}else{
 
 		                if( !$zip->addFile($file,$filename) ){
@@ -380,33 +380,33 @@ class WpakBuild{
 					}
 	            }
 	        }
-	        
+
 	        //Create config.js and config.xml files
 	        $zip->addFromString('config.js', WpakConfigFile::get_config_js($app_id));
 	        $zip->addFromString('config.xml', WpakConfigFile::get_config_xml($app_id));
-	        
+
 	    }else{
 	        $answer['msg'] = sprintf(__('Zip archive source directory [%s] could not be found.',WpAppKit::i18n_domain),$source);
 	        $answer['ok'] = 0;
 	        return $answer;
 	    }
-	
+
 	    if( !$zip->close() ){
 			$answer['msg'] = __('Error during archive creation',WpAppKit::i18n_domain);
 			$answer['ok'] = 0;
 			return $answer;
 		}
-		
+
 	    return $answer;
 	}
-	
+
 	private static function export_files_maintenance($app_id){
 		$answer = array('ok'=>1, 'msg'=>'');
-		
+
 		$export_directory = self::get_export_files_path();
-		
+
 		$entries = self::get_available_app_exports($app_id);
-		
+
 		if( !empty($entries) ){
 			$i = 1;
 			foreach($entries as $entry){
@@ -419,19 +419,19 @@ class WpakBuild{
 				$i++;
 			}
 		}
-		
+
 		return $answer;
 	}
-	
+
 	/**
-	 * Retrieves app export zip files ordered by date desc. 
+	 * Retrieves app export zip files ordered by date desc.
 	 */
 	private static function get_available_app_exports($app_id){
 		$available_exports = array();
-		
+
 		$export_filename_base = self::get_export_file_base_name($app_id);
 		$export_directory = self::get_export_files_path();
-		
+
 		if( self::create_export_directory_if_doesnt_exist() ){
 			if( $handle = opendir($export_directory) ){
 				while( false !== ($entry = readdir($handle)) ){
@@ -449,15 +449,15 @@ class WpakBuild{
 
 		return $available_exports;
 	}
-	
+
 	private static function filter_index($index_content){
-		
+
 		//Add phonegap.js script :
 		$index_content = str_replace('<head>', "<head>\r\n\t\t<script src=\"phonegap.js\"></script>\r\n\t\t", $index_content);
-		
+
 		//Remove script used only for app simulation in web browser :
 		$index_content = preg_replace('/<script[^>]*>[^<]*var query[^<]*<\/script>\s*<script/is','<script',$index_content);
-		
+
 		return $index_content;
 	}
 }
