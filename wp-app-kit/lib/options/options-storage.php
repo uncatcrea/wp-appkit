@@ -34,6 +34,14 @@ class WpakOptionsStorage {
 			$options['refresh_interval'] = intval( $options['refresh_interval'] ); // Positive integer
 		}
 
+		/**
+		 * Filter options values just before it is inserted into the database.
+		 *
+		 * @param array $options    An array of options values.
+		 * @param int 	$post_id 	The app ID.
+		 */
+		$options = apply_filters( 'wpak_update_options_data', $options, $post_id );
+
 		return update_post_meta( $post_id, self::meta_id, $options );
 	}
 }

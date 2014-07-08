@@ -48,6 +48,16 @@ class WpakOptionsBoSettings {
 			<?php wp_nonce_field( 'wpak-options-' . $post->ID, 'wpak-nonce-options' ) ?>
 		</div>
 		<?php
+		/**
+		 * Fires when the options meta box is displayed, at the end of WpakOptionsBoSettings::inner_options_box().
+		 *
+		 * @see WpakOptionsBoSettings::inner_options_box()
+		 *
+		 * @param WP_Post 	$post 			The app object.
+		 * @param array 	$current_box 	The box settings.
+		 * @param array 	$options 		The app options.
+		 */
+		do_action( 'wpak_inner_options_box', $post, $current_box, $options );
 	}
 
 	/**
