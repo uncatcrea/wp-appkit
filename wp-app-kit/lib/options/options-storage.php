@@ -12,14 +12,11 @@ class WpakOptionsStorage {
 	 * Returns options for a given app.
 	 *
 	 * @param int				$post_id	The app ID.
+	 * @param array				$default	Default options values.
 	 * @return array						App options.
 	 */
-	public static function get_options( $post_id ) {
+	public static function get_options( $post_id, $default ) {
 		$options = (array)get_post_meta( $post_id, self::meta_id, true );
-
-		$default = array(
-			'refresh_interval' => 0,
-		);
 
 		return array_merge( $default, $options );
 	}

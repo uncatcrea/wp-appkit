@@ -38,7 +38,7 @@ class WpakOptionsBoSettings {
 	 * @param array					$current_box	The box settings.
 	 */
 	public static function inner_options_box( $post, $current_box ) {
-		$options = WpakOptionsStorage::get_options( $post->ID );
+		$options = WpakOptions::get_app_options( $post->ID );
 		?>
 		<div class="wpak_settings">
 			<label for="wpak_app_options_refresh_interval"><?php _e( 'Refresh interval (in seconds)', WpAppKit::i18n_domain ) ?></label> : <br/>

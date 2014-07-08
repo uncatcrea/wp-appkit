@@ -14,6 +14,10 @@ class WpakOptions {
 	 * @return	array					The app options.
 	 */
 	public static function get_app_options( $app_post_id ) {
-		return WpakOptionsStorage::get_options( $app_post_id );
+		$default = array(
+			'refresh_interval' => 0,
+		);
+
+		return WpakOptionsStorage::get_options( $app_post_id, $default );
 	}
 }
