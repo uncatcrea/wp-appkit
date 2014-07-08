@@ -4,13 +4,18 @@
  */
 class WpakOptionsStorage {
 	/**
+	 * Meta key used to store options.
+	 */
+	const meta_id = '_wpak_options';
+
+	/**
 	 * Returns options for a given app.
 	 *
 	 * @param int				$post_id	The app ID.
 	 * @return array						App options.
 	 */
 	public static function get_options( $post_id ) {
-		$options = (array)get_post_meta( $post_id, '_wpak_app_options', true );
+		$options = (array)get_post_meta( $post_id, self::meta_id, true );
 
 		$default = array(
 			'refresh_interval' => 0,
@@ -32,6 +37,6 @@ class WpakOptionsStorage {
 			$options['refresh_interval'] = intval( $options['refresh_interval'] ); // Positive integer
 		}
 
-		return update_post_meta( $post_id, '_wpak_app_options', $options );
+		return update_post_meta( $post_id, self::meta_id, $options );
 	}
 }
