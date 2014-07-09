@@ -78,6 +78,8 @@ class WpakConfigFile {
 		$auth_key = WpakApps::get_app_is_secured( $app_id ) ? WpakToken::get_hash_key() : '';
 		//TODO : options to choose if the auth key is displayed in config.js.
 
+		$options = WpakOptions::get_app_options( $app_id, WpakOptions::static_type );
+
 		if ( !$echo ) {
 			ob_start();
 		}
@@ -92,13 +94,23 @@ define(function (require) {
 		wp_ws_url : '<?php echo $wp_ws_url ?>',
 		theme : '<?php echo addslashes($theme) ?>',
 		app_title : '<?php echo addslashes($app_title) ?>',
-		debug_mode : '<?php echo $debug_mode ?>'<?php 
+		debug_mode : '<?php echo $debug_mode ?>'<?php
 		if( !empty( $auth_key ) ):
 		?>,
 		auth_key : '<?php echo $auth_key ?>'<?php
-		endif 
+		endif
 		?>
-		
+		<?php
+		$options_js = array();
+		foreach( $options as $key => $value ) {
+			$value = is_numeric( $value ) ? $value : '"' . esc_js( $value ) . '"';
+			$options_js[] = $key . ' : ' . $value;
+		}
+
+		if( !empty( $options_js ) ) {
+			echo ",\n" . implode( ",\n", $options_js );
+		}
+		?>
 	};
 
 });
@@ -144,22 +156,22 @@ define(function (require) {
         version     = "<?php echo $app_version ?>" >
 
 	<name><?php echo $app_name ?></name>
-	
+
 	<description><?php echo $app_description ?></description>
-	
+
 	<author href="<?php echo $app_author_website ?>" email="<?php echo $app_author_email ?>"><?php echo $app_author ?></author>
 
 	<gap:platform name="<?php echo $app_platform ?>" />
-	
+
 <?php if( !empty( $app_phonegap_version ) ): ?>
 	<preference name="phonegap-version" value="<?php echo $app_phonegap_version ?>" />
-	
+
 <?php endif ?>
 	<!-- Add Icon, Splash screen and any PhoneGap plugin declaration here -->
 <?php if( !empty( $app_phonegap_plugins ) ): ?>
 
 	<?php echo str_replace( "\n", "\n\t", $app_phonegap_plugins ) ?>
-	
+
 <?php endif ?>
 
 </widget>
