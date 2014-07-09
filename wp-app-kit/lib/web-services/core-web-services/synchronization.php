@@ -12,6 +12,7 @@ class WpakWebServiceSynchronization {
 		$app_id = WpakApps::get_app_id( $app_id );
 
 		$service_answer = WpakComponents::get_components_synchro_data( $app_id );
+		$service_answer['options'] = WpakOptions::get_app_options( $app_id, WpakOptions::dynamic_type );
 
 		return ( object ) $service_answer;
 	}
