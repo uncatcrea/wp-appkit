@@ -1,7 +1,6 @@
 <?php
 
 class WpakConfigFile {
-
 	public static function hooks() {
 		add_action( 'init', array( __CLASS__, 'rewrite_rules' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'template_redirect' ), 1 );
@@ -40,6 +39,7 @@ class WpakConfigFile {
 					}
 
 					$file = $wp_query->query_vars['wpak_appli_file'];
+
 					switch ( $file ) {
 						case 'config.js':
 							header( "Content-type: text/javascript;  charset=utf-8" );
@@ -85,7 +85,7 @@ class WpakConfigFile {
 		}
 //Indentation is a bit funky here so it appears ok in the config.js file source:
 ?>
-define(function (require) {
+define( function ( require ) {
 
 	"use strict";
 
@@ -126,7 +126,6 @@ define(function (require) {
 
 	public static function get_config_xml( $app_id, $echo = false ) {
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
-
 		$app_name = $app_main_infos['name'];
 		$app_description = $app_main_infos['desc'];
 		$app_phonegap_id = $app_main_infos['app_phonegap_id'];
