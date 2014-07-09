@@ -31,7 +31,7 @@ class WpakOptionsStorage {
 	public static function update_options( $post_id, $options ) {
 		// Sanitization
 		if( isset( $options['refresh_interval'] ) ) {
-			$options['refresh_interval'] = intval( $options['refresh_interval'] ); // Positive integer
+			$options['refresh_interval'] = abs( intval( $options['refresh_interval'] ) ); // Positive integer
 		}
 
 		/**
