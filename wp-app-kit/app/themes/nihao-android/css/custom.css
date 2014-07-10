@@ -1,3 +1,7 @@
+@media screen and (orientation: landscape){
+    .doesnt-exist { background:red; }
+}
+
 @font-face {
 	font-family : "Roboto-Regular";
 	src : url('../fonts/Roboto-Regular.ttf');
