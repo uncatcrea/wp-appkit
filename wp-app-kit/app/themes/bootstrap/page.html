@@ -1,0 +1,69 @@
+<%  
+	//Use the global "post" to get the current page object (containing page title, page content ...).
+	
+	var parent = TemplateTags.getPageParent();
+	var next_page = TemplateTags.getNextPage();
+	var previous_page = TemplateTags.getPreviousPage();
+	var siblings = TemplateTags.getPageSiblings();
+	var sub_pages = TemplateTags.getPageChildren();
+	var page_depth = TemplateTags.getPageDepth();
+	var ariane = TemplateTags.getPageAriane();
+%>
+
+<% if( page_depth > 0 ){ %>
+	<div class="btn-group btn-group-justified">
+	  <div class="btn-group">
+	  	<% if( previous_page ){ %>
+	    	<a class="btn btn-default" href="<%= TemplateTags.getPageLink(previous_page.id) %>">Previous</a>
+	    <% }else{ %>
+	    	<a class="btn btn-default" href="#" disabled="disabled">Previous</a>
+	    <% } %>
+	  </div>
+	  <div class="btn-group">
+	  	<% if( parent ){ %>
+	    	<a class="btn btn-default" href="<%= TemplateTags.getPageLink(parent.id) %>">Up</a>
+	    <% }else{ %>
+	    	<a class="btn btn-default" href="#" disabled="disabled">Up</a>
+	    <% } %>
+	  </div>
+	  <div class="btn-group">
+	  	<% if( next_page ){ %>
+	    	<a class="btn btn-default" href="<%= TemplateTags.getPageLink(next_page.id) %>">Next</a>
+	    <% }else{ %>
+	    	<a class="btn btn-default" href="#" disabled="disabled">Next</a>
+	    <% } %>
+	  </div>
+	</div>
+	
+<% } %>
+
+<% if( ariane.length ){ %>
+	<ol class="breadcrumb">
+		<% _.each( ariane, function(page){ %>
+			<li><a href="<%= TemplateTags.getPageLink(page.id) %>"><%= page.title %></a></li>
+		<% }); %>
+	  	<li class="active"><%= post.title %></li>
+	</ol>
+<% } %>
+<h1 class="<% print(parent ? 'with-parent' : '') %>"><%= post.title %></h1>
+
+<div class="page-content">
+	<%= post.content %>
+</div>
+
+<% if( sub_pages.length ){ %>
+	<div class="list-group related-pages">
+		<% _.each( sub_pages, function(page){ %>
+			<a href="<%= TemplateTags.getPageLink(page.id) %>" class="list-group-item"><%= page.title %></a>
+		<% }); %>
+	</div>
+<% } %>
+
+<% if( siblings.length ){ %>
+	<div class="list-group related-pages siblings">
+		<h3><%= parent.title %></h3>
+		<% _.each( siblings, function(page){ %>
+			<a href="<%= TemplateTags.getPageLink(page.id) %>" class="list-group-item <% print(page.id == post.id ? 'list-group-item-info' : '') %>"><%= page.title %></a>
+		<% }); %>
+	</div>
+<% } %> 

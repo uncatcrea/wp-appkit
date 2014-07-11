@@ -21,7 +21,7 @@ class WpakWebServices{
 		add_rewrite_rule('^app-kit-api/(.+?)/(.+?)/(.+?)/?$', 'index.php?wpak=2&wpak_app_id=$matches[1]&wpak_token=$matches[2]&wpak_slug=$matches[3]&wpak_action=list', 'top');
 
 		//To define rewrite rules specific to a web service created via hooks (see web-services-crud.php) :
-		add_action('wpak_add_rewrite_rules','');
+		do_action('wpak_add_rewrite_rules');
 	}
 
 	public static function template_redirect(){

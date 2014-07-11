@@ -3,6 +3,8 @@ class WpakComponentTypeHooks extends WpakComponentType{
 	
 	protected function compute_data($component,$options,$args=array()){
 			
+		do_action('wpak_before_component_hooks',$component,$options);
+		
 		$component_default_data = array(
 			'query' => array('type'=>'custom-component'),
 			'total' => 0,

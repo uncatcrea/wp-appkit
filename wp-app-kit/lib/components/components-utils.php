@@ -25,8 +25,11 @@ class WpakComponentsUtils{
 		//Apply "the_content" filter : formats shortcodes etc... :
 		$content = apply_filters('the_content', $content);
 		$content = str_replace(']]>', ']]&gt;', $content);
-	
-		$content = strip_tags($content,'<br/><br><p><div><h1><h2><h3><h4><h5><h6><a><span><sup><sub><img><i><em><strong><b><ul><ol><li><blockquote>');
+		
+		$allowed_tags = '<br/><br><p><div><h1><h2><h3><h4><h5><h6><a><span><sup><sub><img><i><em><strong><b><ul><ol><li><blockquote><pre>';
+		$allowed_tags = apply_filters('wpak_post_content_allowed_tags',$allowed_tags,$post);
+		
+		$content = strip_tags($content,$allowed_tags);
 	
 		//Use this "wpak_post_content_format" filter to add your own formating to
 		//apps posts and pages.
@@ -59,6 +62,30 @@ class WpakComponentsUtils{
 		return $img;
 	}
 	
+	/**
+	 * Used to replace urls that link to content that is also available in the app
+	 * (used in "page" component for example).
+	 * 
+	 * @param string $content Post content
+	 * @param array $internal_ids IDs of posts considered as being available in the app
+	 * @param callback $build_link_callback Function to call to build the link
+	 * @param array $callback_args Args that are passed to the callback. NOTE : "post_id" is prepended to this array.
+	 * @return string Modified content with filtered links
+	 */
+	public static function handle_internal_links($content,$internal_ids,$build_link_callback,$callback_args){
+		if( preg_match_all('/<a .*?(href="(.*?)").*?>/',$content,$matches,PREG_SET_ORDER) ){
+			foreach($matches as $match){
+				if( $post_id = url_to_postid($match[2]) ){
+					if( in_array($post_id,$internal_ids) ){
+						$args = $callback_args;
+						array_unshift($args,$post_id);
+						$content = str_replace($match[1],'href="'. call_user_func_array($build_link_callback,$args) .'"',$content);
+					}
+				}
+			}
+		}
+		return $content;
+	}
 }
 
 class WpakComponentsUtilsHooksCallbacks{

@@ -4,6 +4,8 @@ class WpakComponentTypePostsList extends WpakComponentType{
 	protected function compute_data($component,$options,$args=array()){
 		global $wpdb;
 		
+		do_action('wpak_before_component_posts_list',$component,$options);
+		
 		$before_post_date = '';
 		if( !empty($args['before_item']) && is_numeric($args['before_item']) ){
 			$before_post = get_post($args['before_item']);
@@ -89,7 +91,7 @@ class WpakComponentTypePostsList extends WpakComponentType{
 		
 		$posts_by_ids = array();
 		foreach($posts as $post){
-			$posts_by_ids[$post->ID] = self::get_post_data($post);
+			$posts_by_ids[$post->ID] = self::get_post_data($component,$post);
 		}
 		
 		$this->set_specific('ids',array_keys($posts_by_ids));
@@ -99,7 +101,7 @@ class WpakComponentTypePostsList extends WpakComponentType{
 		
 	} 
 	
-	protected function get_post_data($_post){
+	protected static function get_post_data($component,$_post){
 		global $post;
 		$post = $_post;
 		setup_postdata($post);
@@ -118,8 +120,8 @@ class WpakComponentTypePostsList extends WpakComponentType{
 		
 		//Use the "wpak_posts_list_post_content" filter to format app posts content your own way :
 		//(To apply the default App Kit formating to the content and add only minor modifications to it, 
-		//use the "wpak_post_content_format" filter instead.)
-		$content = apply_filters('wpak_posts_list_post_content','',$post);
+		//use the "wpak_post_content_format" filter instead, applied in WpakComponentsUtils::get_formated_content()).
+		$content = apply_filters('wpak_posts_list_post_content','',$post,$component);
 		if( empty($content) ){
 			$content = WpakComponentsUtils::get_formated_content();
 		}
@@ -137,7 +139,7 @@ class WpakComponentTypePostsList extends WpakComponentType{
 		
 		//To customize post data sent to the app (for example add a post meta to the default post data), 
 		//use this "wpak_post_data" filter :
-		$post_data = apply_filters('wpak_post_data',$post_data,$post);
+		$post_data = apply_filters('wpak_post_data',$post_data,$post,$component);
 		
 		return (object)$post_data;
 	}
@@ -232,7 +234,7 @@ class WpakComponentTypePostsList extends WpakComponentType{
 		} 
 	}
 	
-	protected function echo_sub_options_html($current_post_type,$current_taxonomy='',$current_term = '',$current_hook = ''){
+	protected static function echo_sub_options_html($current_post_type,$current_taxonomy='',$current_term = '',$current_hook = ''){
 
 		?>
 		<?php if( $current_post_type != 'custom'): ?>

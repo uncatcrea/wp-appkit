@@ -81,12 +81,23 @@ define(function (require) {
 	  
 	  //Router must be set before calling this resetDefaultRoute :
 	  app.resetDefaultRoute = function(){
-		  var first_nav_component_id = app.navigation.first().get('component_id');
-		  app.router.setDefaultRoute('#component-'+ first_nav_component_id);
+		  if( app.navigation.length > 0 ){
+			  var first_nav_component_id = app.navigation.first().get('component_id');
+			  app.router.setDefaultRoute('#component-'+ first_nav_component_id);
+		  }else{
+			  //No navigation item : set default route to first component found:
+			  if( app.components.length ){
+				  var first_component = app.components.first();
+				  app.router.setDefaultRoute('#component-'+ first_component.id);
+			  }else{
+				  Utils.log('No navigation, no component found. Could not set default route.');
+			  }
+		  }
 	  };
 	  
 	  //--------------------------------------------------------------------------
-	  //History :
+	  //History : allows to handle back button.
+	  
 	  var history_stack = [];
 	  var queried_page_data = {};
 	  var previous_page_memory = {};
@@ -105,7 +116,11 @@ define(function (require) {
 			  global:page_data.hasOwnProperty('global') ? page_data.global : '',
 		  };
 	  };
-	  
+
+	  /**
+	   * Called in router.js to set the queried page according to the current route.
+	   * This queried page is then pushed to history in app.addQueriedPageToHistory(). 
+	   */
 	  app.setQueriedPage = function(page_data){
 		  queried_page_data = formatPageData(_.extend(page_data,{fragment: Backbone.history.fragment}));
 	  };
@@ -114,6 +129,9 @@ define(function (require) {
 		  return queried_page_data;
 	  };
 	  
+	  /**
+	   * Pushes the queried page to the history stack according to the page type and where we're from. 
+	   */
 	  app.addQueriedPageToHistory = function(force_flush){
 		  
 		  var force_flush_history = force_flush != undefined && force_flush == true;
@@ -150,8 +168,23 @@ define(function (require) {
 					  history_push(queried_page_data);
 				  }
 			  }else if( queried_page_data.page_type == 'page' ){
-				  history_stack = [];
-				  history_push(queried_page_data);
+				  if( current_page.page_type == 'page' 
+					  && current_page.component_id == queried_page_data.component_id
+					  && !queried_page_data.data.is_tree_root
+					  ){
+					  if( previous_page.page_type == 'page' 
+						  && previous_page.component_id == queried_page_data.component_id
+						  && previous_page.item_id == queried_page_data.item_id
+						  ){
+						  history_stack.pop();
+					  }else{
+						  history_push(queried_page_data);
+					  }
+					  
+				  }else{
+					  history_stack = [];
+					  history_push(queried_page_data);
+				  }
 			  }else if( queried_page_data.page_type == 'comments' ){
 				  //if( current_page.page_type == 'single' && current_page.item_id == item_id ){
 					  history_push(queried_page_data);
@@ -528,11 +561,13 @@ define(function (require) {
 	    			  var component_global = component.get('global');
 	    			  var global = app.globals[component_global];
 	    			  if( global ){
-	    				  var page = global.get(data.id);
+	    				  var page = global.get(data.root_id);
 	    				  if( page ){
+	    					  //Page component are directly redirected to "page" route in router.js.
+	    					  //> Don't need "view_data" here.
 	    					  component_data = {
 	    							  type: component_type,
-	        						  view_data: {item:page,global:component_global},
+	        						  view_data: {}, 
 	        						  data: data
 	        				  };
 	    				  }
@@ -595,6 +630,35 @@ define(function (require) {
 
     	  return component_data;
       };
+      
+      app.getGlobalItems = function(global_key,items_ids){
+    	  var items = []; //Must be an array (and not JSON object) to keep items order.
+    	  
+    	  if( _.has(app.globals,global_key) ){
+			  var global = app.globals[global_key];
+			  _.each(items_ids,function(item_id, index){
+				  var item = global.get(item_id);
+				  items.push(item ? item.toJSON() : null);
+			  });
+    	  }
+    	  
+    	  return items;
+      };
+      
+      app.getGlobalItem = function(global_key,item_id){
+    	  var item = null;
+    	  
+    	  if( _.has(app.globals,global_key) ){
+			  var global = app.globals[global_key];
+			  var item_raw = global.get(item_id);
+			  if( item_raw ){
+				  item = item_raw.toJSON();
+			  }
+    	  }
+    	  
+    	  return item;
+      };
+      
       
 	  return app;
 	  

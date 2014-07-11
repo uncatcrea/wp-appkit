@@ -64,6 +64,7 @@ ul.media-list .comments{
 #refresh-button, #go-back{
 	font-size: 24px;
 	padding:0;	
+	height:auto;
 }
 
 @-webkit-keyframes rotating {
@@ -99,4 +100,8 @@ li.media{
 
 .get-more{
 	margin-bottom:1em;	
+}
+
+ol.breadcrumb{
+	margin-top:1em;
 }

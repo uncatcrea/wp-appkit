@@ -9,8 +9,13 @@ class WpakConfigFile{
 	public static function rewrite_rules(){
 		add_rewrite_tag('%wpak_appli_file%','([^&]+)');
 		$wp_content = str_replace(ABSPATH,'',WP_CONTENT_DIR);
-		add_rewrite_rule('^'. $wp_content .'/plugins/wp-app-kit/app/(config\.js)$', 'index.php?wpak_appli_file=$matches[1]', 'top');
-		add_rewrite_rule('^'. $wp_content .'/plugins/wp-app-kit/app/(config\.xml)$', 'index.php?wpak_appli_file=$matches[1]', 'top');
+		$url_to_config_file = plugins_url('app' , dirname(dirname(__FILE__)));
+		$wp_content_pos = strpos($url_to_config_file,$wp_content);
+		if( $wp_content_pos !== false ){
+			$config_file_prefix = substr($url_to_config_file, $wp_content_pos); //Something like "wp-content/plugins/wp-app-kit/app"
+			add_rewrite_rule('^'. $config_file_prefix .'/(config\.js)$', 'index.php?wpak_appli_file=$matches[1]', 'top');
+			add_rewrite_rule('^'. $config_file_prefix .'/(config\.xml)$', 'index.php?wpak_appli_file=$matches[1]', 'top');
+		}
 	}
 	
 	public static function template_redirect(){

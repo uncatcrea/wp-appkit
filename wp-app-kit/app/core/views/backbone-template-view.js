@@ -26,6 +26,7 @@ define(function (require) {
     	
     	page_data: null,
     	template_name: 'default',
+    	fallback_template_name: '',
     	template: null,
     	
     	/**
@@ -39,9 +40,25 @@ define(function (require) {
   						cb_ok();
   	      		  	},
   	      		  	function(error){
-  	      		  		Utils.log('Error : view template "'+ _this.template_name +'.html" not found in theme');
-  	      		  		if( cb_error ){
-  	      		  			cb_error();
+  	      		  		if( _this.fallback_template_name != '' ){
+	  	      		  		Utils.log('View template "'+ _this.template_name +'.html" not found in theme : load fallback template "'+ _this.fallback_template_name +'"');
+		  	      		  	require(['text!theme/'+ _this.fallback_template_name +'.html'],
+	  	    					function(tpl){
+	  	    						_this.template = _.template(tpl);
+	  	    						cb_ok();
+	  	    	      		  	},
+	  	    	      		  	function(error){
+	  	    	      		  		Utils.log('Error : view templates "'+ _this.template_name +'.html" and "'+ _this.fallback_template_name +'.html" not found in theme');
+	  	    	      		  		if( cb_error ){
+	  	    	      		  			cb_error();
+	  	    	      		  		}
+	  	    	      		  	}
+		  	    			);
+  	      		  		}else{
+	  	      		  		Utils.log('Error : view template "'+ _this.template_name +'.html" not found in theme');
+	  	      		  		if( cb_error ){
+	  	      		  			cb_error();
+	  	      		  		}
   	      		  		}
   	      		  	}
   			);
@@ -51,7 +68,7 @@ define(function (require) {
          * Called in children extended views, so that we can filter the template to use
          * for rendering.
          */
-        setTemplate : function(default_template){
+        setTemplate : function(default_template,fallback_template){
         	
         	var template = default_template != undefined ? default_template : '';
         	
@@ -59,7 +76,12 @@ define(function (require) {
 
     		if( template != ''){
     			this.template_name = template;
+    			
+    			if( fallback_template != undefined && fallback_template != ''){
+        			this.fallback_template_name = fallback_template;
+        		}
     		}
+    		
         }
         
     });

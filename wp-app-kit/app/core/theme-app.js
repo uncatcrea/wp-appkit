@@ -153,21 +153,6 @@ define(function (require,exports) {
     	  return refreshing > 0;
       };
       
-      themeApp.getMoreComponentItems = function(do_after){
-    	  var current_page = App.getCurrentPageData();
-    	  if( current_page.page_type == 'list' ){
-    		  App.getMoreOfComponent(
-    			  current_page.component_id,
-    			  function(new_items,is_last,data){
-    				  var current_archive_view = RegionManager.getCurrentView();
-    				  current_archive_view.addPosts(new_items);
-      				  current_archive_view.render();
-      				  do_after(is_last,new_items,data.nb_left);
-    			  }
-    		  );
-    	  }
-      };
-      
       /************************************************
 	   * App navigation
 	   */
@@ -205,6 +190,11 @@ define(function (require,exports) {
 		  });
 	  };
 	  
+	  /**
+	   * To know if the back button can be displayed on the current page,
+	   * according to app history. Use this to configure back button 
+	   * manually if you don't use themeApp.setAutoBackButton().
+	   */
 	  themeApp.getBackButtonDisplay = function(){
 		  var display = '';
 		  
@@ -219,6 +209,11 @@ define(function (require,exports) {
 		  return display;
 	  };
 	  
+	  /**
+	   * Sets back buton click event. Use this to configure back button 
+	   * manually if you don't use themeApp.setAutoBackButton().
+	   * @param $go_back_btn Back button jQuery DOM element 
+	   */
 	  themeApp.updateBackButtonEvents = function($go_back_btn){
 		  if( $go_back_btn.length ){
 			  var display = themeApp.getBackButtonDisplay();
@@ -256,6 +251,21 @@ define(function (require,exports) {
 		  
 		  return get_more_link_data;
 	  };
+	  
+	  themeApp.getMoreComponentItems = function(do_after){
+    	  var current_page = App.getCurrentPageData();
+    	  if( current_page.page_type == 'list' ){
+    		  App.getMoreOfComponent(
+    			  current_page.component_id,
+    			  function(new_items,is_last,data){
+    				  var current_archive_view = RegionManager.getCurrentView();
+    				  current_archive_view.addPosts(new_items);
+      				  current_archive_view.render();
+      				  do_after(is_last,new_items,data.nb_left);
+    			  }
+    		  );
+    	  }
+      };
 	  
 	  /************************************************
 	   * DOM element auto class
