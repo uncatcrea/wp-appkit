@@ -48,7 +48,16 @@ define(['jquery','core/theme-app','core/theme-tpl-tags'],function($,App,TplTags)
 	});
 
 	/* UI Events */
-
+    
+     try {
+        StatusBar.overlaysWebView(false);
+        StatusBar.styleDefault();
+        StatusBar.backgroundColorByHexString("#f4efef");
+    } catch(e) {
+        alert("StatusBar plugin not available");
+        // https://build.phonegap.com/plugins/715
+    }
+   
 	var isMenuOpen = false;
 
 	$("#container").on("touchstart","#menu-button",menuButtonTapOn);
