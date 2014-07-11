@@ -1,67 +1,68 @@
 <?php
-class WpakComponentsUtils{
-	
-	public static function get_formated_content(){
+
+class WpakComponentsUtils {
+
+	public static function get_formated_content() {
 		global $post;
-		
+
 		$content = get_the_content();
-	
+
 		$replacement_image = self::get_unavailable_media_img();
-	
+
 		//Convert dailymotion video
-		$content = preg_replace('/\[dailymotion\](.*?)(\[\/dailymotion\])/is','<div class="video">$1</div>',$content);
-		$content = preg_replace('/<iframe (.*?)(src)="(.*?(www.dailymotion.com).*?)".*?>\s*<\/iframe>/is','<div class="video">$3</div>',$content);
-	
+		$content = preg_replace( '/\[dailymotion\](.*?)(\[\/dailymotion\])/is', '<div class="video">$1</div>', $content );
+		$content = preg_replace( '/<iframe (.*?)(src)="(.*?(www.dailymotion.com).*?)".*?>\s*<\/iframe>/is', '<div class="video">$3</div>', $content );
+
 		//Youtube and mp3 inserted via <a> :
-		$content = preg_replace('/<a[^>]*href="[^"]*youtube.com.*?".*?>.*?(<\/a>)/is',$replacement_image,$content);
-		$content = preg_replace('/<a[^>]*href="[^"]*(\.mp3).*?".*?>.*?(<\/a>)/is',$replacement_image,$content);
-	
+		$content = preg_replace( '/<a[^>]*href="[^"]*youtube.com.*?".*?>.*?(<\/a>)/is', $replacement_image, $content );
+		$content = preg_replace( '/<a[^>]*href="[^"]*(\.mp3).*?".*?>.*?(<\/a>)/is', $replacement_image, $content );
+
 		//Delete [embed]
-		$content = preg_replace('/\[embed .*?\](.*?)(\[\/embed\\])/is',$replacement_image,$content);
-	
+		$content = preg_replace( '/\[embed .*?\](.*?)(\[\/embed\\])/is', $replacement_image, $content );
+
 		//Replace iframes (slideshare etc...) by default image :
-		$content = preg_replace('/<iframe([^>]*?)>.*?(<\/iframe>)/is',$replacement_image,$content);
-	
+		$content = preg_replace( '/<iframe([^>]*?)>.*?(<\/iframe>)/is', $replacement_image, $content );
+
 		//Apply "the_content" filter : formats shortcodes etc... :
-		$content = apply_filters('the_content', $content);
-		$content = str_replace(']]>', ']]&gt;', $content);
-		
+		$content = apply_filters( 'the_content', $content );
+		$content = str_replace( ']]>', ']]&gt;', $content );
+
 		$allowed_tags = '<br/><br><p><div><h1><h2><h3><h4><h5><h6><a><span><sup><sub><img><i><em><strong><b><ul><ol><li><blockquote><pre>';
-		$allowed_tags = apply_filters('wpak_post_content_allowed_tags',$allowed_tags,$post);
-		
-		$content = strip_tags($content,$allowed_tags);
-	
+		$allowed_tags = apply_filters( 'wpak_post_content_allowed_tags', $allowed_tags, $post );
+
+		$content = strip_tags( $content, $allowed_tags );
+
 		//Use this "wpak_post_content_format" filter to add your own formating to
 		//apps posts and pages.
 		//To overide (relace) this default formating completely, use the "wpak_posts_list_post_content"
 		//and "wpak_page_content" hooks. 
-		$content = apply_filters('wpak_post_content_format',$content,$post);
-		
+		$content = apply_filters( 'wpak_post_content_format', $content, $post );
+
 		return $content;
 	}
-	
-	public static function get_post_excerpt($post){
-		add_filter('excerpt_length',array('WpakComponentsUtilsHooksCallbacks','excerpt_length'));
-		add_filter('excerpt_more',array('WpakComponentsUtilsHooksCallbacks','excerpt_more'));
-		$post_excerpt = apply_filters('get_the_excerpt', $post->post_excerpt);
-		return apply_filters('wpak_post_excerpt',$post_excerpt,$post);
+
+	public static function get_post_excerpt( $post ) {
+		add_filter( 'excerpt_length', array( 'WpakComponentsUtilsHooksCallbacks', 'excerpt_length' ) );
+		add_filter( 'excerpt_more', array( 'WpakComponentsUtilsHooksCallbacks', 'excerpt_more' ) );
+		$post_excerpt = apply_filters( 'get_the_excerpt', $post->post_excerpt );
+		return apply_filters( 'wpak_post_excerpt', $post_excerpt, $post );
 	}
-	
-	public static function get_unavailable_media_img(){
-		
+
+	public static function get_unavailable_media_img() {
+
 		$params = array(
-				'src' => get_bloginfo('wpurl') .'/wp-content/uploads/wpak_unavailable_media.png',
-				'width' => 604,
-				'height' => 332
+			'src' => get_bloginfo( 'wpurl' ) . '/wp-content/uploads/wpak_unavailable_media.png',
+			'width' => 604,
+			'height' => 332
 		);
-		
-		$params = apply_filters('wpak_unavailable_media_img',$params);
-		
-		$img = '<img class="unavailable" alt="'. __('Unavailable content',WpAppKit::i18n_domain) .'" src="'. $params['src'] .'" width="'. $params['width'] .'" height="'. $params['height'] .'" />';
-		
+
+		$params = apply_filters( 'wpak_unavailable_media_img', $params );
+
+		$img = '<img class="unavailable" alt="' . __( 'Unavailable content', WpAppKit::i18n_domain ) . '" src="' . $params['src'] . '" width="' . $params['width'] . '" height="' . $params['height'] . '" />';
+
 		return $img;
 	}
-	
+
 	/**
 	 * Used to replace urls that link to content that is also available in the app
 	 * (used in "page" component for example).
@@ -72,32 +73,33 @@ class WpakComponentsUtils{
 	 * @param array $callback_args Args that are passed to the callback. NOTE : "post_id" is prepended to this array.
 	 * @return string Modified content with filtered links
 	 */
-	public static function handle_internal_links($content,$internal_ids,$build_link_callback,$callback_args){
-		if( preg_match_all('/<a .*?(href="(.*?)").*?>/',$content,$matches,PREG_SET_ORDER) ){
-			foreach($matches as $match){
-				if( $post_id = url_to_postid($match[2]) ){
-					if( in_array($post_id,$internal_ids) ){
+	public static function handle_internal_links( $content, $internal_ids, $build_link_callback, $callback_args ) {
+		if ( preg_match_all( '/<a .*?(href="(.*?)").*?>/', $content, $matches, PREG_SET_ORDER ) ) {
+			foreach ( $matches as $match ) {
+				if ( $post_id = url_to_postid( $match[2] ) ) {
+					if ( in_array( $post_id, $internal_ids ) ) {
 						$args = $callback_args;
-						array_unshift($args,$post_id);
-						$content = str_replace($match[1],'href="'. call_user_func_array($build_link_callback,$args) .'"',$content);
+						array_unshift( $args, $post_id );
+						$content = str_replace( $match[1], 'href="' . call_user_func_array( $build_link_callback, $args ) . '"', $content );
 					}
 				}
 			}
 		}
 		return $content;
 	}
+
 }
 
-class WpakComponentsUtilsHooksCallbacks{
-	
-	public static function excerpt_more($default_wp_excerpt_more){
-		$excerpt_more = apply_filters('wpak_excerpt_more',' ...',$default_wp_excerpt_more);
+class WpakComponentsUtilsHooksCallbacks {
+
+	public static function excerpt_more( $default_wp_excerpt_more ) {
+		$excerpt_more = apply_filters( 'wpak_excerpt_more', ' ...', $default_wp_excerpt_more );
 		return $excerpt_more;
 	}
-	
-	public static function excerpt_length($default_wp_excerpt_length){
-		$excerpt_length = apply_filters('wpak_excerpt_length',30,$default_wp_excerpt_length);
+
+	public static function excerpt_length( $default_wp_excerpt_length ) {
+		$excerpt_length = apply_filters( 'wpak_excerpt_length', 30, $default_wp_excerpt_length );
 		return $excerpt_length;
 	}
-	
+
 }
