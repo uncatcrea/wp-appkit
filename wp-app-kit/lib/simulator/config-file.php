@@ -1,6 +1,7 @@
 <?php
 
 class WpakConfigFile {
+
 	public static function hooks() {
 		add_action( 'init', array( __CLASS__, 'rewrite_rules' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'template_redirect' ), 1 );
@@ -99,18 +100,8 @@ define( function ( require ) {
 		?>,
 		auth_key : '<?php echo $auth_key ?>'<?php
 		endif
-		?>
-		<?php
-		$options_js = array();
-		foreach( $options as $key => $value ) {
-			$value = is_numeric( $value ) ? $value : '"' . esc_js( $value ) . '"';
-			$options_js[] = $key . ' : ' . $value;
-		}
-
-		if( !empty( $options_js ) ) {
-			echo ",\n" . implode( ",\n", $options_js );
-		}
-		?>
+		?>,
+		options : <?php echo json_encode( $options ); ?>
 	};
 
 });
