@@ -52,7 +52,7 @@ define(['jquery','core/theme-app','core/theme-tpl-tags'],function($,App,TplTags)
      try {
         StatusBar.overlaysWebView(false);
         StatusBar.styleDefault();
-        StatusBar.backgroundColorByHexString("#f4efef");
+        StatusBar.backgroundColorByHexString("#F8F8F8");
     } catch(e) {
         alert("StatusBar plugin not available");
         // https://build.phonegap.com/plugins/715
