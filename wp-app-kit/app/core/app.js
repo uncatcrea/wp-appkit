@@ -8,6 +8,7 @@ define(function (require) {
           Components          = require('core/models/components'),
           Globals             = require('core/models/globals'),
           Navigation          = require('core/models/navigation'),
+          Options             = require('core/models/options'),
           Items               = require('core/models/items'),
           Comments            = require('core/models/comments'),
           CustomPage          = require('core/models/custom-page'),
@@ -15,19 +16,19 @@ define(function (require) {
           Utils               = require('core/app-utils'),
           Hooks               = require('core/lib/hooks'),
           Sha256              = require('core/lib/sha256');
-      
+
 	  var app = {};
-	  
+
 	  //--------------------------------------------------------------------------
 	  //Event aggregator
 	  var vent = _.extend({}, Backbone.Events);
 	  app.on = function(event,callback){
 		  vent.on(event,callback);
 	  };
-	  
+
 	  //--------------------------------------------------------------------------
 	  //Error handling
-	  
+
 	  app.triggerError = function(error_id,error_data,error_callback){
 		  vent.trigger('error:'+ error_id,error_data);
 		  Utils.log('app.js error ('+ error_id +') : '+ error_data.message, error_data);
@@ -35,16 +36,16 @@ define(function (require) {
 	  		error_callback(error_data);
 	  	  }
 	  };
-	  
+
 	  //--------------------------------------------------------------------------
 	  //Custom pages handling
-	  
+
 	  var current_custom_page = null;
-	  
+
 	  app.getCurrentCustomPage = function(){
 		  return current_custom_page;
 	  };
-	  
+
 	  /**
 	   * Displays a custom page using the given template.
 	   * @param data see models/custom-page.js for data fields
@@ -53,14 +54,14 @@ define(function (require) {
 		  current_custom_page = new CustomPage({template: template, data: data});
 		  app.router.navigate('custom-page',{trigger: true});
 	  };
-	  
+
 	  //--------------------------------------------------------------------------
 	  //App params :
 	  //Params that can be changed by themes
 	  var params = {
 		  'custom-screen-rendering' : false
 	  };
-	  
+
 	  app.getParam = function(param){
 		  var value = null;
 		  if( params.hasOwnProperty(param) ){
@@ -68,17 +69,17 @@ define(function (require) {
     	  }
     	  return value;
 	  };
-	  
+
 	  app.setParam = function(param,value){
 		  if( params.hasOwnProperty(param) ){
 			  params[param] = value;
 		  }
 	  };
-	  
+
 	  //--------------------------------------------------------------------------
 	  //App Backbone router :
 	  app.router = null;
-	  
+
 	  //Router must be set before calling this resetDefaultRoute :
 	  app.resetDefaultRoute = function(){
 		  if( app.navigation.length > 0 ){
@@ -94,20 +95,20 @@ define(function (require) {
 			  }
 		  }
 	  };
-	  
+
 	  //--------------------------------------------------------------------------
 	  //History : allows to handle back button.
-	  
+
 	  var history_stack = [];
 	  var queried_screen_data = {};
 	  var previous_screen_memory = {};
-	  
+
 	  var history_push = function(screen_data){
 		  history_stack.push(screen_data);
 	  };
-	  
+
 	  var formatScreenData = function(screen_data){
-		  return {	
+		  return {
 			  screen_type:screen_data.screen_type,
 			  component_id:screen_data.component_id,
 			  item_id:screen_data.item_id,
@@ -119,35 +120,35 @@ define(function (require) {
 
 	  /**
 	   * Called in router.js to set the queried screen according to the current route.
-	   * This queried screen is then pushed to history in app.addQueriedScreenToHistory(). 
+	   * This queried screen is then pushed to history in app.addQueriedScreenToHistory().
 	   */
 	  app.setQueriedScreen = function(screen_data){
 		  queried_screen_data = formatScreenData(_.extend(screen_data,{fragment: Backbone.history.fragment}));
 	  };
-	  
+
 	  app.getQueriedScreen = function(){
 		  return queried_screen_data;
 	  };
-	  
+
 	  /**
-	   * Pushes the queried screen to the history stack according to the screen type and where we're from. 
+	   * Pushes the queried screen to the history stack according to the screen type and where we're from.
 	   */
 	  app.addQueriedScreenToHistory = function(force_flush){
-		  
+
 		  var force_flush_history = force_flush != undefined && force_flush == true;
-		  
+
 		  var current_screen = app.getCurrentScreenData();
 		  var previous_screen = app.getPreviousScreenData();
-		  
+
 		  previous_screen_memory = current_screen;
-		  
-		  if( current_screen.screen_type != queried_screen_data.screen_type || current_screen.component_id != queried_screen_data.component_id 
+
+		  if( current_screen.screen_type != queried_screen_data.screen_type || current_screen.component_id != queried_screen_data.component_id
 			  || current_screen.item_id != queried_screen_data.item_id || current_screen.fragment != queried_screen_data.current_fragment ){
-			  
+
 			  if( force_flush_history ){
 				  history_stack = [];
 			  }
-			  
+
 			  if( queried_screen_data.screen_type == 'list' ){
 				  history_stack = [];
 				  history_push(queried_screen_data);
@@ -168,11 +169,11 @@ define(function (require) {
 					  history_push(queried_screen_data);
 				  }
 			  }else if( queried_screen_data.screen_type == 'page' ){
-				  if( current_screen.screen_type == 'page' 
+				  if( current_screen.screen_type == 'page'
 					  && current_screen.component_id == queried_screen_data.component_id
 					  && !queried_screen_data.data.is_tree_root
 					  ){
-					  if( previous_screen.screen_type == 'page' 
+					  if( previous_screen.screen_type == 'page'
 						  && previous_screen.component_id == queried_screen_data.component_id
 						  && previous_screen.item_id == queried_screen_data.item_id
 						  ){
@@ -180,7 +181,7 @@ define(function (require) {
 					  }else{
 						  history_push(queried_screen_data);
 					  }
-					  
+
 				  }else{
 					  history_stack = [];
 					  history_push(queried_screen_data);
@@ -198,15 +199,15 @@ define(function (require) {
 			  }else{
 				  history_stack = [];
 			  }
-			  
+
 		  }
-		  
+
 	  };
-	  
+
 	  /**
 	   * Returns infos about the currently displayed screen.
 	   * @returns {screen_type:string, component_id:string, item_id:integer, fragment:string}
-	   * Core screen_types are "list", "single", "page" "comments". 
+	   * Core screen_types are "list", "single", "page" "comments".
 	   */
 	  app.getCurrentScreenData = function(){
 		  var current_screen = {};
@@ -215,10 +216,10 @@ define(function (require) {
 		  }
 		  return current_screen;
 	  };
-	  
+
 	  /**
 	   * Returns infos about the screen displayed previously.
-	   * @returns {screen_type:string, component_id:string, item_id:integer, fragment:string} or {} if no previous screen 
+	   * @returns {screen_type:string, component_id:string, item_id:integer, fragment:string} or {} if no previous screen
 	   */
 	  app.getPreviousScreenData = function(){
 		  var previous_screen = {};
@@ -227,11 +228,11 @@ define(function (require) {
 		  }
 		  return previous_screen;
 	  };
-	  
+
 	  app.getPreviousScreenMemoryData = function(){
 		  return previous_screen_memory;
 	  };
-	  
+
 	  app.getPreviousScreenLink = function(){
 		  var previous_screen_link = '';
 		  var previous_screen = app.getPreviousScreenData();
@@ -240,21 +241,22 @@ define(function (require) {
 		  }
 		  return previous_screen_link;
 	  };
-	  
+
 	  //--------------------------------------------------------------------------
 	  //App items data :
 	  app.components = new Components;
 	  app.navigation = new Navigation;
-	  
-	  //For globals, separate keys from values because localstorage on 
+	  app.options    = new Options;
+
+	  //For globals, separate keys from values because localstorage on
 	  //collections of collections won't work :-(
-	  var globals_keys = new Globals; 
+	  var globals_keys = new Globals;
 	  app.globals = {};
-	  
+
 	  var getToken = function(web_service){
 		  var token = '';
 		  var key = '';
-		  
+
 		  if( Config.hasOwnProperty('auth_key') ){
 			  key = Config.auth_key;
 			  var app_slug = Config.app_slug;
@@ -272,20 +274,20 @@ define(function (require) {
 	    	  var hash = Sha256(key + app_slug + date_str);
 	    	  token = window.btoa(hash);
 		  }
-		  
+
 		  token = Hooks.applyFilter('get-token',token,[key,web_service]);
-		  
+
 		  if( token.length ){
 			  token = '/'+ token;
 		  }
-		  
+
     	  return token;
 	  };
-	  
+
 	  app.sync = function(cb_ok,cb_error,force_reload){
-		  
+
 		  var force = force_reload != undefined && force_reload;
-		  
+
 		  app.components.fetch({'success': function(components, response, options){
 	    		 if( components.length == 0 || force ){
 	    			 syncWebService(cb_ok,cb_error);
@@ -301,21 +303,21 @@ define(function (require) {
 	    	    	    			 syncWebService(cb_ok,cb_error);
 	    	    	    		 }else{
 	    	    	    			 app.globals = {};
-	    	    	    			 
+
 	    	    	    			 var fetch = function(_items,_key){
 	    	    	    				 return _items.fetch({'success': function(fetched_items, response_items, options_items){
     	    	    	    				app.globals[_key] = fetched_items;
-    	    	    	    				//Backbone's fetch returns jQuery ajax deferred object > works with $.when 
-    	    	    					 }}); 
+    	    	    	    				//Backbone's fetch returns jQuery ajax deferred object > works with $.when
+    	    	    					 }});
 	    	    	    			 };
-	    	    	    			 
+
 	    	    	    			 var fetches = [];
 	    	    	    			 global_keys.each(function(value, key, list){
 	    	    	    				 var global_id = value.get('id');
 	    	    	    				 var items = new Items.Items({global:global_id});
 	    	    	    				 fetches.push(fetch(items,global_id));
 	    	    	    			 });
-	    	    	    			 
+
 	    	    	    			 $.when.apply($, fetches).done(function () {
 	    	    	    				 if( app.globals.length == 0 ){
 		    	    	    				 syncWebService(cb_ok,cb_error);
@@ -324,44 +326,51 @@ define(function (require) {
 		    	    	    				 cb_ok();
 		    	    	    			 }
 	    	    	    		     });
-	    	    	    			 
+
 	    	    	    		 }
 	    	    			 }});
 	    	    		 }
 	    			 }});
 	    		 }
 		  }});
-		  
+
       };
-      
+
 	  var syncWebService = function(cb_ok,cb_error,force_reload){
 		  var token = getToken('synchronization');
     	  var ws_url = token +'/synchronization/';
-    	  
+
 		  $.ajax({
-				url : Config.wp_ws_url + ws_url, 
+				url : Config.wp_ws_url + ws_url,
 				timeout : 40000,
 				dataType : 'json',
 				success : function(data) {
 				  	  if( data.hasOwnProperty('result') && data.result.hasOwnProperty('status') ){
 				  		  if( data.result.status == 1 ){
-				  			  if( data.hasOwnProperty('components') 
+				  			  if( data.hasOwnProperty('components')
 				  				  && data.hasOwnProperty('navigation')
 				  				  && data.hasOwnProperty('globals')
+				  				  && data.hasOwnProperty('options')
 				  				  ){
-				  				  
+
 					  			  app.components.resetAll();
 								  _.each(data.components,function(value, key, list){
 									  app.components.add({id:key,label:value.label,type:value.type,data:value.data,global:value.global});
 								  });
 								  app.components.saveAll();
-								  
+
+								  // TODO: manage dynamic options retrieval
+								  _.each( data.options, function( value, key, list ) {
+								  	  app.options.add( { id: key, value: value } );
+								  });
+								  app.options.saveAll( true );
+
 								  app.navigation.resetAll();
 								  _.each(data.navigation,function(value, key, list){
 									  app.navigation.add({id:key,component_id:key,data:{}});
 								  });
 								  app.navigation.saveAll();
-								  
+
 								  globals_keys.resetAll();
 								  _.each(data.globals,function(global, key, list){
 									  var items = new Items.Items({global:key});
@@ -374,7 +383,7 @@ define(function (require) {
 									  globals_keys.add({id:key});
 								  });
 								  globals_keys.saveAll();
-								  
+
 								  Utils.log('Components, navigation and globals retrieved from online.',{components:app.components,navigation:app.navigation,globals:app.globals});
 
 								  cb_ok();
@@ -385,7 +394,7 @@ define(function (require) {
 				    		  		    cb_error
 							  	  );
 				  			  }
-				  			  
+
 				  		  }else if( data.result.status == 0 ){
 				  			  app.triggerError(
 				  					'synchro:ws-return-error',
@@ -406,7 +415,7 @@ define(function (require) {
 		    		  		    cb_error
 					  	  );
 				  	  }
-					  
+
 				},
 			  	error : function(jqXHR, textStatus, errorThrown){
 			  		app.triggerError(
@@ -417,15 +426,15 @@ define(function (require) {
 			  	}
 		  });
 	  };
-	  
+
 	  app.getPostComments = function(post_id,cb_ok,cb_error){
     	  var token = getToken('comments-post');
     	  var ws_url = token +'/comments-post/'+ post_id;
-    	  
+
     	  var comments = new Comments.Comments;
-    	  
+
     	  var post = app.globals['posts'].get(post_id);
-    	  
+
     	  if( post != undefined ){
 	    	  $.ajax({
 	    		  type: 'GET',
@@ -452,21 +461,21 @@ define(function (require) {
     		  );
     	  }
       };
-      
+
       app.getMoreOfComponent = function(component_id,cb_ok,cb_error){
     	  var component = app.components.get(component_id);
     	  if( component ){
-    		  
+
     		  var component_data = component.get('data');
-    		  
+
     		  if( component_data.hasOwnProperty('ids') ){
-    		  
+
 		    	  var token = getToken('component');
 		    	  var ws_url = token +'/component/'+ component_id;
-		    	  
+
 		    	  var last_item_id = _.last(component_data.ids);
 		    	  ws_url += '?before_item='+ last_item_id;
-		    	  
+
 		    	  $.ajax({
 		    		  type: 'GET',
 		    		  url: Config.wp_ws_url + ws_url,
@@ -475,29 +484,29 @@ define(function (require) {
 			    			  if( answer.component.slug == component_id ){
 			    				  var global = answer.component.global;
 			    				  if( app.globals.hasOwnProperty(global) ){
-			    					  
+
 			    					  var new_ids = _.difference(answer.component.data.ids,component_data.ids);
-			    					  
+
 			    					  component_data.ids = _.union(component_data.ids,answer.component.data.ids); //merge ids
 			    					  component.set('data',component_data);
-			    					  
+
 				    				  var current_items = app.globals[global];
 									  _.each(answer.globals[global],function(item, id){
 										  current_items.add(_.extend({id:id},item)); //auto merges if "id" already in items
 									  });
-									  
+
 			    					  var new_items = [];
 									  _.each(new_ids,function(item_id){
 										  new_items.push(current_items.get(item_id));
 				          	  		  });
-									  
+
 									  var nb_left = component_data.total - component_data.ids.length;
-									  var is_last = !_.isEmpty(answer.component.data.query.is_last_page) ? true : nb_left <= 0;  
-									  
+									  var is_last = !_.isEmpty(answer.component.data.query.is_last_page) ? true : nb_left <= 0;
+
 									  Utils.log('More content retrieved for component',{component_id:component_id,new_ids:new_ids,new_items:new_items,component:component});
-									  
+
 									  cb_ok(new_items,is_last,{nb_left:nb_left,new_ids:new_ids,global:global,component:component});
-									  
+
 			    				  }else{
 				    				  app.triggerError(
 				    					  'getmore:global-not-found',
@@ -531,14 +540,14 @@ define(function (require) {
     		  }
     	  }
       };
-	  
+
       app.alertNoContent = function(){
     	  vent.trigger('info:no-content');
       };
-      
+
       app.getComponentData = function(component_id){
     	  var component_data = null;
-    	  
+
     	  var component = app.components.get(component_id);
     	  if( component ){
     		  var component_type = component.get('type');
@@ -567,7 +576,7 @@ define(function (require) {
 	    					  //> Don't need "view_data" here.
 	    					  component_data = {
 	    							  type: component_type,
-	        						  view_data: {}, 
+	        						  view_data: {},
 	        						  data: data
 	        				  };
 	    				  }
@@ -584,25 +593,25 @@ define(function (require) {
 			    					  _.each(data.ids,function(post_id, index){
 			        					  items.add(global.get(post_id));
 			        				  });
-			    					  
+
 			    					  var view_data = {items:items.toJSON(),title: component.get('label')};
 			    					  if( data.hasOwnProperty('total') ){
 			    						  view_data = _.extend(view_data,{total:data.total});
 			    					  }
-			    					  
+
 			    					  component_data = {
 		    							  type: 'hooks-list',
 		        						  view_data: view_data,
 		        						  data: data
 			        				  };
-			    					  
+
 			    				  }else{
 			    					  //We have a global, but no ids : it's just as if we had no global :
 			    					  component_data = {
 		    							  type: 'hooks-no-global',
 		        						  view_data: data,
 		        						  data: data
-			        				  }; 
+			        				  };
 			    				  }
 			    			  }
 		    			  }else{
@@ -619,21 +628,21 @@ define(function (require) {
   			    			  {type:'wrong-data',where:'app::getComponentData',message: 'Custom component has no data attribute',data:{component:component}},
   			    			  cb_error
   			    		  );
-    		  		  }
+    		  		  }sy
 	    			  break;
     		  }
     	  };
-    	  
+
     	  if( component_data != null ){
     		  component_data = _.extend({id:component.get('id'),label:component.get('label'),global:component.get('global')},component_data);
     	  }
 
     	  return component_data;
       };
-      
+
       app.getGlobalItems = function(global_key,items_ids){
     	  var items = []; //Must be an array (and not JSON object) to keep items order.
-    	  
+
     	  if( _.has(app.globals,global_key) ){
 			  var global = app.globals[global_key];
 			  _.each(items_ids,function(item_id, index){
@@ -641,13 +650,13 @@ define(function (require) {
 				  items.push(item ? item.toJSON() : null);
 			  });
     	  }
-    	  
+
     	  return items;
       };
-      
+
       app.getGlobalItem = function(global_key,item_id){
     	  var item = null;
-    	  
+
     	  if( _.has(app.globals,global_key) ){
 			  var global = app.globals[global_key];
 			  var item_raw = global.get(item_id);
@@ -655,11 +664,22 @@ define(function (require) {
 				  item = item_raw.toJSON();
 			  }
     	  }
-    	  
+
     	  return item;
       };
-      
-      
+
+      /**
+       * App init:
+       *  - set options
+       */
+      app.initialize = function () {
+      	// Retrieve static options from Config and store them locally
+      	_.each( Config.options, function( value, key, list ) {
+      		app.options.add( { id: key, value: value } );
+      	});
+	  	app.options.saveAll( true );
+      };
+
 	  return app;
-	  
+
 });
