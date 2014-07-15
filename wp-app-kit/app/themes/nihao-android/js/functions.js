@@ -1,4 +1,4 @@
-define(['jquery','core/theme-app','core/theme-tpl-tags'],function($,App,TplTags){
+define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags'],function($,App,Storage,TplTags){
 
 	/* App Events */
 
@@ -9,6 +9,7 @@ define(['jquery','core/theme-app','core/theme-tpl-tags'],function($,App,TplTags)
 	App.on('refresh:end',function(){
 
 		scrollTop();
+        Storage.clear('scroll-pos'); 
 		
 		$("#refresh-button").removeClass("refresh-on").addClass("refresh-off");
 		
@@ -25,7 +26,7 @@ define(['jquery','core/theme-app','core/theme-tpl-tags'],function($,App,TplTags)
 
 	App.on('page:showed',function(current_page,view){
 
-		scrollTop();
+//		scrollTop();
 
 		if (isMenuOpen) {
 
@@ -37,8 +38,26 @@ define(['jquery','core/theme-app','core/theme-tpl-tags'],function($,App,TplTags)
 			cleanImgTag();
 		}
 
+		if( current_page.page_type == "list" ){
+			var pos = Storage.get("scroll-pos",current_page.fragment);
+			if( pos !== null ){
+				$("#content").scrollTop(pos);
+			}else{
+				scrollTop();
+			}
+		}else{
+			scrollTop();
+		}
+        
 	});
 
+	App.on('page:leave',function(current_page,queried_page,view){
+		//current_page.page_type can be 'list','single','page','comments'
+		if( current_page.page_type == "list" ){
+			Storage.set("scroll-pos",current_page.fragment,$("#content").scrollTop());
+		}
+	});
+    
 	/* UI Events */
 
 	var isMenuOpen = false;
@@ -57,6 +76,10 @@ define(['jquery','core/theme-app','core/theme-tpl-tags'],function($,App,TplTags)
 
     /* Functions */
 
+	function scrollTop(){
+		window.scrollTo(0,0);
+	}
+    
 	function openMenu() {
 
 		$("#menu").css("display","block");
