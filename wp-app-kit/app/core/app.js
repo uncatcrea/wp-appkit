@@ -58,7 +58,7 @@ define(function (require) {
 	  //App params :
 	  //Params that can be changed by themes
 	  var params = {
-		  'custom-page-rendering' : false
+		  'custom-screen-rendering' : false
 	  };
 	  
 	  app.getParam = function(param){
@@ -99,102 +99,102 @@ define(function (require) {
 	  //History : allows to handle back button.
 	  
 	  var history_stack = [];
-	  var queried_page_data = {};
-	  var previous_page_memory = {};
+	  var queried_screen_data = {};
+	  var previous_screen_memory = {};
 	  
-	  var history_push = function(page_data){
-		  history_stack.push(page_data);
+	  var history_push = function(screen_data){
+		  history_stack.push(screen_data);
 	  };
 	  
-	  var formatPageData = function(page_data){
+	  var formatScreenData = function(screen_data){
 		  return {	
-			  page_type:page_data.page_type,
-			  component_id:page_data.component_id,
-			  item_id:page_data.item_id,
-			  fragment:page_data.fragment,
-			  data:page_data.hasOwnProperty('data') ? page_data.data : {},
-			  global:page_data.hasOwnProperty('global') ? page_data.global : '',
+			  screen_type:screen_data.screen_type,
+			  component_id:screen_data.component_id,
+			  item_id:screen_data.item_id,
+			  fragment:screen_data.fragment,
+			  data:screen_data.hasOwnProperty('data') ? screen_data.data : {},
+			  global:screen_data.hasOwnProperty('global') ? screen_data.global : '',
 		  };
 	  };
 
 	  /**
-	   * Called in router.js to set the queried page according to the current route.
-	   * This queried page is then pushed to history in app.addQueriedPageToHistory(). 
+	   * Called in router.js to set the queried screen according to the current route.
+	   * This queried screen is then pushed to history in app.addQueriedScreenToHistory(). 
 	   */
-	  app.setQueriedPage = function(page_data){
-		  queried_page_data = formatPageData(_.extend(page_data,{fragment: Backbone.history.fragment}));
+	  app.setQueriedScreen = function(screen_data){
+		  queried_screen_data = formatScreenData(_.extend(screen_data,{fragment: Backbone.history.fragment}));
 	  };
 	  
-	  app.getQueriedPage = function(page_data){
-		  return queried_page_data;
+	  app.getQueriedScreen = function(){
+		  return queried_screen_data;
 	  };
 	  
 	  /**
-	   * Pushes the queried page to the history stack according to the page type and where we're from. 
+	   * Pushes the queried screen to the history stack according to the screen type and where we're from. 
 	   */
-	  app.addQueriedPageToHistory = function(force_flush){
+	  app.addQueriedScreenToHistory = function(force_flush){
 		  
 		  var force_flush_history = force_flush != undefined && force_flush == true;
 		  
-		  var current_page = app.getCurrentPageData();
-		  var previous_page = app.getPreviousPageData();
+		  var current_screen = app.getCurrentScreenData();
+		  var previous_screen = app.getPreviousScreenData();
 		  
-		  previous_page_memory = current_page;
+		  previous_screen_memory = current_screen;
 		  
-		  if( current_page.page_type != queried_page_data.page_type || current_page.component_id != queried_page_data.component_id 
-			  || current_page.item_id != queried_page_data.item_id || current_page.fragment != queried_page_data.current_fragment ){
+		  if( current_screen.screen_type != queried_screen_data.screen_type || current_screen.component_id != queried_screen_data.component_id 
+			  || current_screen.item_id != queried_screen_data.item_id || current_screen.fragment != queried_screen_data.current_fragment ){
 			  
 			  if( force_flush_history ){
 				  history_stack = [];
 			  }
 			  
-			  if( queried_page_data.page_type == 'list' ){
+			  if( queried_screen_data.screen_type == 'list' ){
 				  history_stack = [];
-				  history_push(queried_page_data);
-			  }else if( queried_page_data.page_type == 'single' ){
-				  if( current_page.page_type == 'list' ){
-					  history_push(queried_page_data);
-				  }else if( current_page.page_type == 'custom-component' ){
-					  history_push(queried_page_data);
-				  }else if( current_page.page_type == 'comments' ){
-					  if( previous_page.page_type == 'single' && previous_page.item_id == queried_page_data.item_id ){
+				  history_push(queried_screen_data);
+			  }else if( queried_screen_data.screen_type == 'single' ){
+				  if( current_screen.screen_type == 'list' ){
+					  history_push(queried_screen_data);
+				  }else if( current_screen.screen_type == 'custom-component' ){
+					  history_push(queried_screen_data);
+				  }else if( current_screen.screen_type == 'comments' ){
+					  if( previous_screen.screen_type == 'single' && previous_screen.item_id == queried_screen_data.item_id ){
 						  history_stack.pop();
 					  }else{
 						  history_stack = [];
-						  history_push(queried_page_data);
+						  history_push(queried_screen_data);
 					  }
 				  }else{
 					  history_stack = [];
-					  history_push(queried_page_data);
+					  history_push(queried_screen_data);
 				  }
-			  }else if( queried_page_data.page_type == 'page' ){
-				  if( current_page.page_type == 'page' 
-					  && current_page.component_id == queried_page_data.component_id
-					  && !queried_page_data.data.is_tree_root
+			  }else if( queried_screen_data.screen_type == 'page' ){
+				  if( current_screen.screen_type == 'page' 
+					  && current_screen.component_id == queried_screen_data.component_id
+					  && !queried_screen_data.data.is_tree_root
 					  ){
-					  if( previous_page.page_type == 'page' 
-						  && previous_page.component_id == queried_page_data.component_id
-						  && previous_page.item_id == queried_page_data.item_id
+					  if( previous_screen.screen_type == 'page' 
+						  && previous_screen.component_id == queried_screen_data.component_id
+						  && previous_screen.item_id == queried_screen_data.item_id
 						  ){
 						  history_stack.pop();
 					  }else{
-						  history_push(queried_page_data);
+						  history_push(queried_screen_data);
 					  }
 					  
 				  }else{
 					  history_stack = [];
-					  history_push(queried_page_data);
+					  history_push(queried_screen_data);
 				  }
-			  }else if( queried_page_data.page_type == 'comments' ){
-				  //if( current_page.page_type == 'single' && current_page.item_id == item_id ){
-					  history_push(queried_page_data);
+			  }else if( queried_screen_data.screen_type == 'comments' ){
+				  //if( current_screen.screen_type == 'single' && current_screen.item_id == item_id ){
+					  history_push(queried_screen_data);
 				  //}
-			  }else if( queried_page_data.page_type == 'custom-page' ){
+			  }else if( queried_screen_data.screen_type == 'custom-page' ){
 				  history_stack = [];
-				  history_push(queried_page_data);
-			  }else if( queried_page_data.page_type == 'custom-component' ){
+				  history_push(queried_screen_data);
+			  }else if( queried_screen_data.screen_type == 'custom-component' ){
 				  history_stack = [];
-				  history_push(queried_page_data);
+				  history_push(queried_screen_data);
 			  }else{
 				  history_stack = [];
 			  }
@@ -204,41 +204,41 @@ define(function (require) {
 	  };
 	  
 	  /**
-	   * Returns infos about the currently displayed page.
-	   * @returns {page_type:string, component_id:string, item_id:integer, fragment:string}
-	   * Core page_types are "list", "single", "page" "comments". 
+	   * Returns infos about the currently displayed screen.
+	   * @returns {screen_type:string, component_id:string, item_id:integer, fragment:string}
+	   * Core screen_types are "list", "single", "page" "comments". 
 	   */
-	  app.getCurrentPageData = function(){
-		  var current_page = {};
+	  app.getCurrentScreenData = function(){
+		  var current_screen = {};
 		  if( history_stack.length ){
-			  current_page = history_stack[history_stack.length-1];
+			  current_screen = history_stack[history_stack.length-1];
 		  }
-		  return current_page;
+		  return current_screen;
 	  };
 	  
 	  /**
-	   * Returns infos about the page displayed previously.
-	   * @returns {page_type:string, component_id:string, item_id:integer, fragment:string} or {} if no previous page 
+	   * Returns infos about the screen displayed previously.
+	   * @returns {screen_type:string, component_id:string, item_id:integer, fragment:string} or {} if no previous screen 
 	   */
-	  app.getPreviousPageData = function(){
-		  var previous_page = {};
+	  app.getPreviousScreenData = function(){
+		  var previous_screen = {};
 		  if( history_stack.length > 1 ){
-			  previous_page = history_stack[history_stack.length-2];
+			  previous_screen = history_stack[history_stack.length-2];
 		  }
-		  return previous_page;
+		  return previous_screen;
 	  };
 	  
-	  app.getPreviousPageMemoryData = function(){
-		  return previous_page_memory;
+	  app.getPreviousScreenMemoryData = function(){
+		  return previous_screen_memory;
 	  };
 	  
-	  app.getPreviousPageLink = function(){
-		  var previous_page_link = '';
-		  var previous_page = app.getPreviousPageData();
-		  if( !_.isEmpty(previous_page) ){
-			  previous_page_link = '#'+ previous_page.fragment;
+	  app.getPreviousScreenLink = function(){
+		  var previous_screen_link = '';
+		  var previous_screen = app.getPreviousScreenData();
+		  if( !_.isEmpty(previous_screen) ){
+			  previous_screen_link = '#'+ previous_screen.fragment;
 		  }
-		  return previous_page_link;
+		  return previous_screen_link;
 	  };
 	  
 	  //--------------------------------------------------------------------------

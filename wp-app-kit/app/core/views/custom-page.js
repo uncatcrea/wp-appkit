@@ -1,3 +1,7 @@
+/**
+ * Custom pages are pages created dynamically in javascript in the app theme.
+ * They're not WordPress pages.
+ */
 define(function (require) {
 
     "use strict";
@@ -10,7 +14,7 @@ define(function (require) {
 
     return TemplateView.extend({
     	
-    	className: "app-page",
+    	className: "app-screen",
     	
     	custom_page_data : null,
     	

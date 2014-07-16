@@ -126,7 +126,7 @@ define(function (require) {
 	    		if( $(elMenu).length 
 	    			&& (!$(elMenu).html().length || (force_reload!=undefined && force_reload) ) ){
 		    		menuView.render();
-		    		vent.trigger('menu:refresh',App.getCurrentPageData(),menuView);
+		    		vent.trigger('menu:refresh',App.getCurrentScreenData(),menuView);
 		    		Utils.log('Render navigation',{menu_view:menuView,force_reload:force_reload});
 	    		}
 	    	}else{
@@ -147,17 +147,17 @@ define(function (require) {
 		    	if( headerView.containsMenu() ){
 		    		showMenu(true);
 		    	}
-			    vent.trigger('header:render',App.getCurrentPageData(),headerView);
+			    vent.trigger('header:render',App.getCurrentScreenData(),headerView);
 	    	}
 	    };
 	    
 	    var closeView = function (view) {
 	        if( view ){
 	        	if( view.isStatic ){
-	        		var static_pages_wrapper = $('#app-static-pages');
-	        		if( !static_pages_wrapper.find('[data-viewid='+ view.cid +']').length ){
+	        		var static_screens_wrapper = $('#app-static-screens');
+	        		if( !static_screens_wrapper.find('[data-viewid='+ view.cid +']').length ){
 	        			$(view.el).attr('data-viewid',currentView.cid);
-	        			static_pages_wrapper.append(view.el);
+	        			static_screens_wrapper.append(view.el);
 	        		}
 	        	}else{
 		        	if( view.close ){
@@ -171,32 +171,32 @@ define(function (require) {
 	    	
 	    	if( !view.isStatic || !$(view.el).html().length ){
 	    		if( view.isStatic != undefined && view.isStatic ){
-	    			Utils.log('Open static view',{page_data:App.getCurrentPageData(),view:view});
+	    			Utils.log('Open static view',{screen_data:App.getCurrentScreenData(),view:view});
 	    		}else{
-	    			Utils.log('Open view',{page_data:App.getCurrentPageData(),view:view});
+	    			Utils.log('Open view',{screen_data:App.getCurrentScreenData(),view:view});
 	    		}
 				view.render();
 				
 				var $el = $(el);
 				
-				vent.trigger('page:before-transition',App.getCurrentPageData(),currentView);
+				vent.trigger('screen:before-transition',App.getCurrentScreenData(),currentView);
 				
-				var custom_rendering = App.getParam('custom-page-rendering');
+				var custom_rendering = App.getParam('custom-screen-rendering');
 				if( custom_rendering ){
 					Hooks.doAction(
-						'page-transition',
-						[$el,$('div:first-child',$el),$(view.el),App.getCurrentPageData(),App.getPreviousPageMemoryData()]
+						'screen-transition',
+						[$el,$('div:first-child',$el),$(view.el),App.getCurrentScreenData(),App.getPreviousScreenMemoryData()]
 					).done(function(){
 						 renderSubRegions();
-						 vent.trigger('page:showed',App.getCurrentPageData(),currentView);
+						 vent.trigger('screen:showed',App.getCurrentScreenData(),currentView);
 					}).fail(function(){
 						 renderSubRegions();
-						 vent.trigger('page:showed:failed',App.getCurrentPageData(),currentView);
+						 vent.trigger('screen:showed:failed',App.getCurrentScreenData(),currentView);
 					});
 				}else{
 					$el.empty().append(view.el);
 					renderSubRegions();
-					vent.trigger('page:showed',App.getCurrentPageData(),currentView);
+					vent.trigger('screen:showed',App.getCurrentScreenData(),currentView);
 				}
 				
 				if(view.onShow) {
@@ -207,7 +207,7 @@ define(function (require) {
 	    		Utils.log('Re-open existing static view',{view:view});
 	    		$(el).empty().append(view.el);
 	    		renderSubRegions();
-				vent.trigger('page:showed',App.getCurrentPageData(),currentView);
+				vent.trigger('screen:showed',App.getCurrentScreenData(),currentView);
 	    	}
 	    	
 	    };
@@ -245,10 +245,10 @@ define(function (require) {
 	    
 	    var showSimple = function(view) {
 			
-	    	var custom_rendering = App.getParam('custom-page-rendering');
+	    	var custom_rendering = App.getParam('custom-screen-rendering');
 	    	
 	    	if( currentView ){
-	    		if( !custom_rendering ){ //Custom rendering must handle views closing by itself (on page:leave)
+	    		if( !custom_rendering ){ //Custom rendering must handle views closing by itself (on screen:leave)
 	    			closeView(currentView);
 	    		}
 	    	}
@@ -258,9 +258,9 @@ define(function (require) {
 	    };
 	    
 	    region.show = function(view,force_flush,force_no_waiting) {
-	    	vent.trigger('page:leave',App.getCurrentPageData(),App.getQueriedPage(),currentView);
+	    	vent.trigger('screen:leave',App.getCurrentScreenData(),App.getQueriedScreen(),currentView);
 	    	
-			App.addQueriedPageToHistory(force_flush);
+			App.addQueriedScreenToHistory(force_flush);
 			
 	    	showView(view,force_no_waiting);
 	    };
@@ -270,11 +270,11 @@ define(function (require) {
 	    };
 	    
 	    region.startWaiting = function(){
-	    	vent.trigger('waiting:start',App.getCurrentPageData(),currentView);
+	    	vent.trigger('waiting:start',App.getCurrentScreenData(),currentView);
 	    };
 	    
 	    region.stopWaiting = function(){
-	    	vent.trigger('waiting:stop',App.getCurrentPageData(),currentView);
+	    	vent.trigger('waiting:stop',App.getCurrentScreenData(),currentView);
 	    };
 	    
 	    return region;

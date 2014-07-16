@@ -34,7 +34,7 @@ define(function (require) {
         		if( component ){
         			switch( component.type ){
         				case 'posts-list':
-        					App.setQueriedPage({page_type:'list',component_id:component_id,item_id:0,global:component.global,data:component.data});
+        					App.setQueriedScreen({screen_type:'list',component_id:component_id,item_id:0,global:component.global,data:component.data});
         					require(["core/views/archive"],function(ArchiveView){
         						var view = new ArchiveView(component.view_data);
         						view.checkTemplate(function(){
@@ -48,7 +48,7 @@ define(function (require) {
         					break;
         				case 'hooks-list':
         				case 'hooks-no-global':
-        					App.setQueriedPage({page_type:'custom-component',component_id:component_id,item_id:0,global:component.global,data:component.data});
+        					App.setQueriedScreen({screen_type:'custom-component',component_id:component_id,item_id:0,global:component.global,data:component.data});
         					require(["core/views/custom-component"],function(CustomComponentView){
         						var view = new CustomComponentView({component:component});
         						view.checkTemplate(function(){
@@ -74,7 +74,7 @@ define(function (require) {
 		        	var item = global.get(item_id);
 		        	if( item ){
 		        		var item_data = item_global == 'posts' ? {post:item.toJSON()} : {item:item.toJSON()};
-		        		App.setQueriedPage({page_type:'single',component_id:'',item_id:parseInt(item_id),global:item_global,data:item_data});
+		        		App.setQueriedScreen({screen_type:'single',component_id:'',item_id:parseInt(item_id),global:item_global,data:item_data});
 		        		require(["core/views/single"],function(SingleView){
 		        			var view = new SingleView({item:item,global:item_global});
     						view.checkTemplate(function(){
@@ -110,7 +110,7 @@ define(function (require) {
 			        			root_depth:component.data.root_depth
 			        		};
 			        		
-			        		App.setQueriedPage({page_type:'page',component_id:component_id,item_id:parseInt(page_id),global:item_global,data:item_data});
+			        		App.setQueriedScreen({screen_type:'page',component_id:component_id,item_id:parseInt(page_id),global:item_global,data:item_data});
 			        		require(["core/views/page"],function(PageView){
 			        			var view = new PageView({item:item,global:item_global});
 	    						view.checkTemplate(function(){
@@ -126,7 +126,7 @@ define(function (require) {
 	        			App.router.default_route();
 	        		}
 	        	}else{
-	        		Utils.log('Error : router : page route : global "'+ item_global +'" not found.');
+	        		Utils.log('Error : router : screen route : global "'+ item_global +'" not found.');
 	    			App.router.default_route();
 	    		}
         	});
@@ -134,15 +134,15 @@ define(function (require) {
         
         comments: function (post_id) {
         	require(["core/app","core/views/comments"],function(App,CommentsView){
-        		App.setQueriedPage({page_type:'comments',component_id:'',item_id:parseInt(post_id)});
+        		App.setQueriedScreen({screen_type:'comments',component_id:'',item_id:parseInt(post_id)});
         		RegionManager.startWaiting();
 	        	App.getPostComments(
 	        		post_id,
 	        		function(comments,post){
 	        			RegionManager.stopWaiting();
 	        			//Check if we are still on the right post :
-	        			var current_page = App.getCurrentPageData();
-	        			if( current_page.page_type == 'single' && current_page.item_id == post_id ){
+	        			var current_screen = App.getCurrentScreenData();
+	        			if( current_screen.screen_type == 'single' && current_screen.item_id == post_id ){
 		        			var view = new CommentsView({comments:comments,post:post});
     						view.checkTemplate(function(){
 								RegionManager.show(view);
@@ -161,7 +161,7 @@ define(function (require) {
         	require(["core/app","core/views/custom-page"],function(App,CustomPageView){
         		var current_custom_page = App.getCurrentCustomPage();
         		if( current_custom_page !== null ){
-        			App.setQueriedPage({page_type:'custom-page',component_id:'',item_id:0,data:current_custom_page});
+        			App.setQueriedScreen({screen_type:'custom-page',component_id:'',item_id:0,data:current_custom_page});
 	        		var view = new CustomPageView({custom_page:current_custom_page});
 	        		view.checkTemplate(function(){
 						RegionManager.show(view);

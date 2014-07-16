@@ -42,7 +42,7 @@ define(['jquery','core/theme-app','core/lib/storage','theme/js/bootstrap.min'],f
 	});
 	
 	/**
-	 * Automatically shows and hide Back button according to current page
+	 * Automatically shows and hide Back button according to current screen
 	 */
 	App.setAutoBackButton($('#go-back'),function(back_button_showed){
 		if(back_button_showed){
@@ -84,25 +84,25 @@ define(['jquery','core/theme-app','core/lib/storage','theme/js/bootstrap.min'],f
 	});
 	
 	/**
-	 * Do something before leaving a page.
+	 * Do something before leaving a screen.
 	 * Here, if we're leaving a post list, we memorize the current scroll position, to 
 	 * get back to it when coming back to this list.
 	 */
-	App.on('page:leave',function(current_page,queried_page,view){
-		//current_page.page_type can be 'list','single','page','comments'
-		if( current_page.page_type == 'list' ){
-			Storage.set('scroll-pos',current_page.fragment,$('body').scrollTop());
+	App.on('screen:leave',function(current_screen,queried_screen,view){
+		//current_screen.screen_type can be 'list','single','page','comments'
+		if( current_screen.screen_type == 'list' ){
+			Storage.set('scroll-pos',current_screen.fragment,$('body').scrollTop());
 		}
 	});
 	
 	/**
-	 * Do something when a new page is showed.
+	 * Do something when a new screen is showed.
 	 * Here, if we arrive on a post list, we resore the scroll position
 	 */
-	App.on('page:showed',function(current_page,view){
-		//current_page.page_type can be 'list','single','page','comments'
-		if( current_page.page_type == 'list' ){
-			var pos = Storage.get('scroll-pos',current_page.fragment);
+	App.on('screen:showed',function(current_screen,view){
+		//current_screen.screen_type can be 'list','single','page','comments'
+		if( current_screen.screen_type == 'list' ){
+			var pos = Storage.get('scroll-pos',current_screen.fragment);
 			if( pos !== null ){
 				$('body').scrollTop(pos);
 			}else{
@@ -124,7 +124,7 @@ define(['jquery','core/theme-app','core/lib/storage','theme/js/bootstrap.min'],f
 	}
 	
 	/**
-	 * Get back to the top of the page
+	 * Get back to the top of the screen
 	 */
 	function scrollTop(){
 		window.scrollTo(0,0);

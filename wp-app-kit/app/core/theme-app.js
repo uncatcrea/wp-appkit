@@ -25,9 +25,9 @@ define(function (require,exports) {
       //Event aggregator
 	  var vent = _.extend({}, Backbone.Events);
 	  themeApp.on = function(event,callback){
-		  if( _.contains(['page:leave',
-		                  'page:showed',
-		                  'page:before-transition',
+		  if( _.contains(['screen:leave',
+		                  'screen:showed',
+		                  'screen:before-transition',
 		                  'menu:refresh',
 		                  'header:render',
 		                  'waiting:start',
@@ -167,12 +167,12 @@ define(function (require,exports) {
 	   */
       
 	  /**
-	   * Automatically shows and hide Back button according to current page (list, single, comments, etc...)
-	   * Use only if back button is not refreshed at each page load! (otherwhise $go_back_btn will not be set correctly).
+	   * Automatically shows and hide Back button according to current screen (list, single, page, comments, etc...)
+	   * Use only if back button is not refreshed at each screen load! (otherwhise $go_back_btn will not be set correctly).
 	   * @param $go_back_btn Back button jQuery DOM element 
 	   */
 	  themeApp.setAutoBackButton = function($go_back_btn,do_before_auto_action){
-		  RegionManager.on('page:showed',function(current_page,view){
+		  RegionManager.on('screen:showed',function(current_screen,view){
 			  var display = themeApp.getBackButtonDisplay();
 			  if( display == 'show' ){
 				  if( do_before_auto_action != undefined ){
@@ -191,16 +191,16 @@ define(function (require,exports) {
 	  };
 	  
 	  /**
-	   * To know if the back button can be displayed on the current page,
+	   * To know if the back button can be displayed on the current screen,
 	   * according to app history. Use this to configure back button 
 	   * manually if you don't use themeApp.setAutoBackButton().
 	   */
 	  themeApp.getBackButtonDisplay = function(){
 		  var display = '';
 		  
-		  var previous_page = App.getPreviousPageData();
+		  var previous_screen = App.getPreviousScreenData();
 		  
-		  if( !_.isEmpty(previous_page) ){
+		  if( !_.isEmpty(previous_screen) ){
 			  display = 'show';
 		  }else{
 			  display = 'hide';
@@ -220,8 +220,8 @@ define(function (require,exports) {
 			  if( display == 'show' ){
 				  $go_back_btn.unbind('click').click(function(e){
 					  e.preventDefault();
-					  var prev_page_link = App.getPreviousPageLink();
-					  themeApp.navigate(prev_page_link);
+					  var prev_screen_link = App.getPreviousScreenLink();
+					  themeApp.navigate(prev_screen_link);
 				  });
 			  }else if( display == 'hide' ){
 				  $go_back_btn.unbind('click');
@@ -236,9 +236,9 @@ define(function (require,exports) {
 	  themeApp.getGetMoreLinkDisplay = function(){
 		  var get_more_link_data = {display:false, nb_left:0};
 		  
-		  var current_page = App.getCurrentPageData();
-		  if( current_page.page_type == 'list' ){
-			  var component = App.components.get(current_page.component_id);
+		  var current_screen = App.getCurrentScreenData();
+		  if( current_screen.screen_type == 'list' ){
+			  var component = App.components.get(current_screen.component_id);
 	    	  if( component ){
 	    		  var component_data = component.get('data');
 	    		  if( component_data.hasOwnProperty('ids') ){
@@ -253,10 +253,10 @@ define(function (require,exports) {
 	  };
 	  
 	  themeApp.getMoreComponentItems = function(do_after){
-    	  var current_page = App.getCurrentPageData();
-    	  if( current_page.page_type == 'list' ){
+    	  var current_screen = App.getCurrentScreenData();
+    	  if( current_screen.screen_type == 'list' ){
     		  App.getMoreOfComponent(
-    			  current_page.component_id,
+    			  current_screen.component_id,
     			  function(new_items,is_last,data){
     				  var current_archive_view = RegionManager.getCurrentView();
     				  current_archive_view.addPosts(new_items);
@@ -272,56 +272,56 @@ define(function (require,exports) {
 	   */
 	  
 	  /**
-	   * Sets class to the given DOM element according to the given current page. 
+	   * Sets class to the given DOM element according to the given current screen. 
 	   * If element is not provided, defaults to <body>.
 	   */
-	  var setContextClass = function(current_page,element_id){
-		  if( !_.isEmpty(current_page) ){
+	  var setContextClass = function(current_screen,element_id){
+		  if( !_.isEmpty(current_screen) ){
 			  var $element = element_id == undefined ? $('body') : $('#'+element_id);
 			  $element.removeClass(function(index, css){
 				  return (css.match (/\app-\S+/g) || []).join(' ');
 			  });
-			  $element.addClass('app-'+ current_page.page_type);
-			  $element.addClass('app-'+ current_page.fragment);
+			  $element.addClass('app-'+ current_screen.screen_type);
+			  $element.addClass('app-'+ current_screen.fragment);
 		  }
 	  };
 	  
 	  /**
-	   * Adds class on given DOM element according to the current page.
+	   * Adds class on given DOM element according to the current screen.
 	   * If element is not provided, defaults to <body>.
 	   * @param activate Set to true to activate
 	   */
 	  themeApp.setAutoContextClass = function(activate,element_id){
 		  if( activate ){
-			  RegionManager.on('page:showed',function(current_page){ setContextClass(current_page,element_id); } );
-			  setContextClass(App.getCurrentPageData(),element_id);
+			  RegionManager.on('screen:showed',function(current_screen){ setContextClass(current_screen,element_id); } );
+			  setContextClass(App.getCurrentScreenData(),element_id);
 		  }
 		  //TODO : handle deactivation!
 	  };
       
 	  
 	  /************************************************
-	   * Page transitions
+	   * Screen transitions
 	   */
 	  
-	  themeApp.getTransitionDirection = function(current_page,previous_page){
+	  themeApp.getTransitionDirection = function(current_screen,previous_screen){
 		  var transition = 'replace';
 		  
-		  if( current_page.page_type == 'list' || current_page.page_type == 'custom-component' ){
-			  if( previous_page.page_type == 'single' ){
+		  if( current_screen.screen_type == 'list' || current_screen.screen_type == 'custom-component' ){
+			  if( previous_screen.screen_type == 'single' ){
 				  transition = 'right';
 			  }else{
 				  transition = 'replace';
 			  }
-		  }else if( current_page.page_type == 'single' ){
-			  if( previous_page.page_type == 'list' || previous_page.page_type == 'custom-component' ){
+		  }else if( current_screen.screen_type == 'single' ){
+			  if( previous_screen.screen_type == 'list' || previous_screen.screen_type == 'custom-component' ){
 				  transition = 'left';
-			  }else if( previous_page.page_type == 'comments' ){
+			  }else if( previous_screen.screen_type == 'comments' ){
 				  transition = 'right';
 			  }else{
 				  transition = 'replace';
 			  }
-		  }else if( current_page.page_type == 'comments' ){
+		  }else if( current_screen.screen_type == 'comments' ){
 			  transition = 'left';
 		  }else{
 			  transition = 'replace';
@@ -330,13 +330,13 @@ define(function (require,exports) {
 		  return transition;
 	  };
 	  
-	  themeApp.setAutoPageTransitions = function(transition_replace,transition_left,transition_right){
+	  themeApp.setAutoScreenTransitions = function(transition_replace,transition_left,transition_right){
 
-		  themeApp.setParam('custom-page-rendering', true);
+		  themeApp.setParam('custom-screen-rendering', true);
 
-		  themeApp.action('page-transition',function($deferred,$wrapper,$current,$next,current_page,previous_page){
+		  themeApp.action('screen-transition',function($deferred,$wrapper,$current,$next,current_screen,previous_screen){
 
-			  var direction = themeApp.getTransitionDirection(current_page,previous_page);
+			  var direction = themeApp.getTransitionDirection(current_screen,previous_screen);
 
 			  switch(direction){
 				  case 'left':

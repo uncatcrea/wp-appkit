@@ -12,7 +12,7 @@ define(function (require) {
     
     return TemplateView.extend({
     	
-    	className: "app-page",
+    	className: "app-screen",
     	
     	component: null,
     	

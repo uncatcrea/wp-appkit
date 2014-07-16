@@ -24,7 +24,7 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags'],func
 		showMessage(error.message);
 	});
 
-	App.on('page:showed',function(current_page,view){
+	App.on('screen:showed',function(current_screen,view){
 
 //		scrollTop();
 
@@ -42,12 +42,12 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags'],func
 			closeMenu();
 		}
 
-		if (current_page.page_type=="single") {
+		if (current_screen.screen_type=="single") {
 			cleanImgTag();
 		}
 
-		if( current_page.page_type == "list" ){
-			var pos = Storage.get("scroll-pos",current_page.fragment);
+		if( current_screen.screen_type == "list" ){
+			var pos = Storage.get("scroll-pos",current_screen.fragment);
 			if( pos !== null ){
 				$("#content").scrollTop(pos);
 			}else{
@@ -59,10 +59,10 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags'],func
         
 	});
 
-	App.on('page:leave',function(current_page,queried_page,view){
-		//current_page.page_type can be 'list','single','page','comments'
-		if( current_page.page_type == "list" ){
-			Storage.set("scroll-pos",current_page.fragment,$("#content").scrollTop());
+	App.on('screen:leave',function(current_screen,queried_screen,view){
+		//current_screen.screen_type can be 'list','single','page','comments'
+		if( current_screen.screen_type == "list" ){
+			Storage.set("scroll-pos",current_screen.fragment,$("#content").scrollTop());
 		}
 	});
     
@@ -204,7 +204,7 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags'],func
 
 	function backButtonTapOff() {
 		$("#back-button").removeClass("button-tap-on").addClass("button-tap-off");
-		App.navigate(TplTags.getPreviousPageLink());
+		App.navigate(TplTags.getPreviousScreenLink());
 	}
 
 	function scrollTop(){

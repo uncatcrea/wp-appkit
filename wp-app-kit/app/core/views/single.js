@@ -9,7 +9,7 @@ define(function (require) {
 
     return TemplateView.extend({
     	
-    	className: "app-page",
+    	className: "app-screen",
     	
     	initialize : function(args) {
             

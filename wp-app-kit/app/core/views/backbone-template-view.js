@@ -24,13 +24,13 @@ define(function (require) {
 
     _.extend(TemplateView.prototype, Backbone.View.prototype, {
     	
-    	page_data: null,
+    	screen_data: null,
     	template_name: 'default',
     	fallback_template_name: '',
     	template: null,
     	
     	/**
-    	 * Called in router to validate the view's template before showing the page.
+    	 * Called in router to validate the view's template before showing the screen.
     	 */
     	checkTemplate : function(cb_ok,cb_error){
         	var _this = this;
@@ -72,7 +72,7 @@ define(function (require) {
         	
         	var template = default_template != undefined ? default_template : '';
         	
-    		template = Hooks.applyFilter('template',template,[App.getQueriedPage()]);
+    		template = Hooks.applyFilter('template',template,[App.getQueriedScreen()]);
 
     		if( template != ''){
     			this.template_name = template;
