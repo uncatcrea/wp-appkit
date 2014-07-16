@@ -55,12 +55,6 @@ require(['root/config'],function(Config){
 													//Refresh at app launch : as the theme is now loaded, use theme-app :
 													require(['core/theme-app'],function(ThemeApp){
 														ThemeApp.refresh();
-
-														// Refresh each X seconds, X being set in config.js
-														var refresh_interval = App.options.get( 'refresh_interval' );
-														if( undefined !== refresh_interval && refresh_interval.get( 'value' ) ) {
-															setInterval( ThemeApp.refresh, refresh_interval.get( 'value' ) * 1000 );
-														}
 													});
 
 													PhoneGap.hideSplashScreen();
