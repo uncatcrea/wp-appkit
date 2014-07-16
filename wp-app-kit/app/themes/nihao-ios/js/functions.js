@@ -1,4 +1,4 @@
-define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags'],function($,App,Storage,TplTags){
+define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','theme/js/jquery.velocity.min'],function($,App,Storage,TplTags){
 
 	/* App Events */
 
@@ -103,7 +103,7 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags'],func
 
 		$("#menu").css("display","block");
 
-		$("#content,#header").animate({
+        $("#content,#header").velocity({
 			left:"85%",
 			},300, function() {
 				isMenuOpen=true;
@@ -114,7 +114,7 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags'],func
 
 		isMenuOpen = false;
 
-		$("#content,#header").animate({
+        $("#content,#header").velocity({
 			left:"0",
 		},300, function() {
 
