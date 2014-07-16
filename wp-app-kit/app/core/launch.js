@@ -33,49 +33,51 @@ require(['root/config'],function(Config){
 
 			var launch = function() {
 				// Initialize application before using it
-				App.initialize();
+				App.initialize( function() {
 
-				RegionManager.buildHead(function(){
+					RegionManager.buildHead(function(){
 
-					RegionManager.buildLayout(function(){
+						RegionManager.buildLayout(function(){
 
-						RegionManager.buildHeader(function(){
+							RegionManager.buildHeader(function(){
 
-							App.router = new Router();
+								App.router = new Router();
 
-							require(['theme/js/functions'],
-									function(){
-										App.sync(
-											function(){
-												RegionManager.buildMenu(function(){ //Menu items are loaded by App.sync
-													App.resetDefaultRoute();
+								require(['theme/js/functions'],
+										function(){
+											App.sync(
+												function(){
+													RegionManager.buildMenu(function(){ //Menu items are loaded by App.sync
+														App.resetDefaultRoute();
 
-													Backbone.history.start();
+														Backbone.history.start();
 
-													//Refresh at app launch : as the theme is now loaded, use theme-app :
-													require(['core/theme-app'],function(ThemeApp){
-														ThemeApp.refresh();
+														//Refresh at app launch : as the theme is now loaded, use theme-app :
+														require(['core/theme-app'],function(ThemeApp){
+															ThemeApp.refresh();
+														});
+
+														PhoneGap.hideSplashScreen();
 													});
+												},
+												function(){
+													Backbone.history.start();
+													Utils.log("launch.js error : App could not synchronize with website.");
 
 													PhoneGap.hideSplashScreen();
-												});
-											},
-											function(){
-												Backbone.history.start();
-												Utils.log("launch.js error : App could not synchronize with website.");
 
-												PhoneGap.hideSplashScreen();
+													App.alertNoContent();
+												},
+												false //true to force refresh local storage at each app launch.
+											);
 
-												App.alertNoContent();
-											},
-											false //true to force refresh local storage at each app launch.
-										);
+										},
+										function(error){
+											Utils.log('Error : theme/js/functions.js not found', error);
+										}
+								);
 
-									},
-									function(error){
-										Utils.log('Error : theme/js/functions.js not found', error);
-									}
-							);
+							});
 
 						});
 

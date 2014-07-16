@@ -355,9 +355,12 @@ define(function (require) {
 
 								  // Retrieve dynamic options
 								  _.each( data.options, function( value, key, list ) {
-								  	  app.options.add( { id: key, value: value } );
+							  		  if( undefined === app.options.get( key ) ) {
+      									Utils.log( 'Dynamic option not existing: adding to collection', { key: key, value: value } );
+								  	    app.options.add( { id: key, value: value } );
+							  		  }
 								  });
-								  app.options.saveAll( true );
+								  app.options.saveAll();
 
 					  			  app.components.resetAll();
 								  _.each(data.components,function(value, key, list){
@@ -672,13 +675,35 @@ define(function (require) {
        * App init:
        *  - set options
        */
-      app.initialize = function () {
+      app.initialize = function ( callback ) {
+      	// First retrieve all existing options
+      	app.options.fetch( {
+      		'success': function( appOptions, response, options ) {
+				Utils.log( 'Options retrieved from local storage.', { options: appOptions } );
+				app.saveStaticOptions( callback );
+	      	},
+	      	'error': function( appOptions, response, options ) {
+	      		app.saveStaticOptions( callback );
+	      	}
+      	});
+      };
+
+      app.saveStaticOptions = function( callback ) {
       	// Retrieve static options from Config and store them locally
       	_.each( Config.options, function( value, key, list ) {
-      		app.options.add( { id: key, value: value } );
+      		// Don't override an existing option
+      		if( undefined === app.options.get( key ) ) {
+      			Utils.log( 'Static option not existing: adding to collection', { key: key, value: value } );
+      			app.options.add( { id: key, value: value } );
+      		}
       	});
-	  	app.options.saveAll( true );
-      };
+	  	app.options.saveAll();
+
+	  	// If a callback was passed, call it
+	  	if( undefined !== callback ) {
+	  		callback();
+	  	}
+      }
 
 	  return app;
 

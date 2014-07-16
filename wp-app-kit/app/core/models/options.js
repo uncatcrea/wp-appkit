@@ -17,22 +17,8 @@ define(function (require) {
     var Options = Backbone.Collection.extend({
     	localStorage: new Backbone.LocalStorage("Options"),
     	model : Option,
-    	saveAll : function( preserve ){
-       	 	this.map(function(option){
-                option
-                    .fetch()
-                    .done(function() {
-                        // Option already exists
-                        if( preserve ) {
-                            return;
-                        }
-                        option.save();
-                    })
-                    .fail(function() {
-                        // Option doesn't already exist
-                        option.save();
-                    });
-            });
+    	saveAll : function(){
+       	 	this.map(function(option){option.save();});
         },
         resetAll : function(){
         	var length = this.length;
