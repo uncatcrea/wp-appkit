@@ -353,17 +353,17 @@ define(function (require) {
 				  				  && data.hasOwnProperty('options')
 				  				  ){
 
+								  // Retrieve dynamic options
+								  _.each( data.options, function( value, key, list ) {
+								  	  app.options.add( { id: key, value: value } );
+								  });
+								  app.options.saveAll( true );
+
 					  			  app.components.resetAll();
 								  _.each(data.components,function(value, key, list){
 									  app.components.add({id:key,label:value.label,type:value.type,data:value.data,global:value.global});
 								  });
 								  app.components.saveAll();
-
-								  // TODO: manage dynamic options retrieval
-								  _.each( data.options, function( value, key, list ) {
-								  	  app.options.add( { id: key, value: value } );
-								  });
-								  app.options.saveAll( true );
 
 								  app.navigation.resetAll();
 								  _.each(data.navigation,function(value, key, list){
