@@ -44,6 +44,7 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','them
 
 		if (current_screen.screen_type=="single") {
 			cleanImgTag();
+            $("#container").on("click",".single-template a",openInBrowser);
 		}
 
 		if( current_screen.screen_type == "list" ){
@@ -218,5 +219,10 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','them
 		$(".single-template .wp-caption a").removeAttr("href");
 
 	}
+    
+    function openInBrowser(e) {
+        window.open(e.target.href,"_blank","location=yes");
+        e.preventDefault();
+    }
 
 });
