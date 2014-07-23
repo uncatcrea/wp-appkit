@@ -13,7 +13,6 @@ class WpakOptions {
 	 * @var array
 	 */
 	private static $default = array(
-		'refresh_interval' => 0,
 	);
 
 	/**
