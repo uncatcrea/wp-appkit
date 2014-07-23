@@ -38,6 +38,9 @@ class WpakOptionsStorage {
 	 */
 	public static function update_options( $post_id, $options ) {
 		// Sanitization
+		if( isset( $options['refresh_interval'] ) ) {
+			$options['refresh_interval'] = abs( intval( $options['refresh_interval'] ) ); // Positive integer
+		}
 
 		/**
 		 * Filter options values just before it is inserted into the database.
