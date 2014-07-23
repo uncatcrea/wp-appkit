@@ -350,17 +350,7 @@ define(function (require) {
 				  			  if( data.hasOwnProperty('components')
 				  				  && data.hasOwnProperty('navigation')
 				  				  && data.hasOwnProperty('globals')
-				  				  && data.hasOwnProperty('options')
 				  				  ){
-
-								  // Retrieve dynamic options
-								  _.each( data.options, function( value, key, list ) {
-							  		  if( undefined === app.options.get( key ) ) {
-      									Utils.log( 'Dynamic option not existing: adding to collection', { key: key, value: value } );
-								  	    app.options.add( { id: key, value: value } );
-							  		  }
-								  });
-								  app.options.saveAll();
 
 					  			  app.components.resetAll();
 								  _.each(data.components,function(value, key, list){
@@ -680,20 +670,20 @@ define(function (require) {
       	app.options.fetch( {
       		'success': function( appOptions, response, options ) {
 				Utils.log( 'Options retrieved from local storage.', { options: appOptions } );
-				app.saveStaticOptions( callback );
+				app.saveOptions( callback );
 	      	},
 	      	'error': function( appOptions, response, options ) {
-	      		app.saveStaticOptions( callback );
+	      		app.saveOptions( callback );
 	      	}
       	});
       };
 
-      app.saveStaticOptions = function( callback ) {
-      	// Retrieve static options from Config and store them locally
+      app.saveOptions = function( callback ) {
+      	// Retrieve options from Config and store them locally
       	_.each( Config.options, function( value, key, list ) {
       		// Don't override an existing option
       		if( undefined === app.options.get( key ) ) {
-      			Utils.log( 'Static option not existing: adding to collection', { key: key, value: value } );
+      			Utils.log( 'Option not existing: adding to collection', { key: key, value: value } );
       			app.options.add( { id: key, value: value } );
       		}
       	});

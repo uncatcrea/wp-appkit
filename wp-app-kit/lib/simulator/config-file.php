@@ -79,7 +79,7 @@ class WpakConfigFile {
 		$auth_key = WpakApps::get_app_is_secured( $app_id ) ? WpakToken::get_hash_key() : '';
 		//TODO : options to choose if the auth key is displayed in config.js.
 
-		$options = WpakOptions::get_app_options( $app_id, WpakOptions::static_type );
+		$options = WpakOptions::get_app_options( $app_id );
 
 		if ( !$echo ) {
 			ob_start();
