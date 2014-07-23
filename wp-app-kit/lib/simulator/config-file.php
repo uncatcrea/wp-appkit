@@ -40,6 +40,7 @@ class WpakConfigFile {
 					}
 
 					$file = $wp_query->query_vars['wpak_appli_file'];
+
 					switch ( $file ) {
 						case 'config.js':
 							header( "Content-type: text/javascript;  charset=utf-8" );
@@ -78,12 +79,14 @@ class WpakConfigFile {
 		$auth_key = WpakApps::get_app_is_secured( $app_id ) ? WpakToken::get_hash_key() : '';
 		//TODO : options to choose if the auth key is displayed in config.js.
 
+		$options = WpakOptions::get_app_options( $app_id );
+
 		if ( !$echo ) {
 			ob_start();
 		}
 //Indentation is a bit funky here so it appears ok in the config.js file source:
 ?>
-define(function (require) {
+define( function ( require ) {
 
 	"use strict";
 
@@ -92,13 +95,13 @@ define(function (require) {
 		wp_ws_url : '<?php echo $wp_ws_url ?>',
 		theme : '<?php echo addslashes($theme) ?>',
 		app_title : '<?php echo addslashes($app_title) ?>',
-		debug_mode : '<?php echo $debug_mode ?>'<?php 
+		debug_mode : '<?php echo $debug_mode ?>'<?php
 		if( !empty( $auth_key ) ):
 		?>,
 		auth_key : '<?php echo $auth_key ?>'<?php
-		endif 
-		?>
-		
+		endif
+		?>,
+		options : <?php echo json_encode( $options ); ?>
 	};
 
 });
@@ -114,7 +117,6 @@ define(function (require) {
 
 	public static function get_config_xml( $app_id, $echo = false ) {
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
-
 		$app_name = $app_main_infos['name'];
 		$app_description = $app_main_infos['desc'];
 		$app_phonegap_id = $app_main_infos['app_phonegap_id'];
@@ -144,22 +146,22 @@ define(function (require) {
         version     = "<?php echo $app_version ?>" >
 
 	<name><?php echo $app_name ?></name>
-	
+
 	<description><?php echo $app_description ?></description>
-	
+
 	<author href="<?php echo $app_author_website ?>" email="<?php echo $app_author_email ?>"><?php echo $app_author ?></author>
 
 	<gap:platform name="<?php echo $app_platform ?>" />
-	
+
 <?php if( !empty( $app_phonegap_version ) ): ?>
 	<preference name="phonegap-version" value="<?php echo $app_phonegap_version ?>" />
-	
+
 <?php endif ?>
 	<!-- Add Icon, Splash screen and any PhoneGap plugin declaration here -->
 <?php if( !empty( $app_phonegap_plugins ) ): ?>
 
 	<?php echo str_replace( "\n", "\n\t", $app_phonegap_plugins ) ?>
-	
+
 <?php endif ?>
 
 </widget>
