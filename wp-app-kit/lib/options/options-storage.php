@@ -15,10 +15,18 @@ class WpakOptionsStorage {
 	 * @param array				$default	Default options values.
 	 * @return array						App options.
 	 */
-	public static function get_options( $post_id, $default ) {
-		$options = (array)get_post_meta( $post_id, self::meta_id, true );
+	public static function get_options( $post_id, $default = array() ) {
+		$options = get_post_meta( $post_id, self::meta_id );
 
-		return array_merge( $default, $options );
+		if( !empty( $options ) ) {
+			$options = array_shift( $options );
+		}
+
+		if( !empty( $options ) || !empty( $default ) ) {
+			$options = array_merge( (array)$default, (array)$options );
+		}
+
+		return $options;
 	}
 
 	/**
