@@ -3,7 +3,8 @@ define(function (require) {
     "use strict";
 
     var Backbone                 = require('backbone'),
-    	_                   	 = require('underscore');
+    	_                   	 = require('underscore'),
+        Config                   = require( 'root/config' );
 
     require('localstorage');
 
@@ -15,7 +16,7 @@ define(function (require) {
     });
 
     var Options = Backbone.Collection.extend({
-    	localStorage: new Backbone.LocalStorage("Options"),
+    	localStorage: new Backbone.LocalStorage( "Options-" + Config.app_slug ),
     	model : Option,
     	saveAll : function(){
        	 	this.map(function(option){option.save();});
