@@ -1,133 +1,147 @@
-define(['jquery','core/theme-app','core/lib/storage','theme/js/bootstrap.min'],function($,App,Storage){
-	
+define( [ 'jquery', 'core/theme-app', 'core/lib/storage', 'theme/js/bootstrap.min' ], function( $, App, Storage ) {
+
 	/**
 	 * Launch app contents refresh when clicking the refresh button :
 	 */
-	$('#refresh-button').click(function(e){
+	$( '#refresh-button' ).click( function( e ) {
 		e.preventDefault();
 		closeMenu();
-		App.refresh(function(){
-			$('#feedback').removeClass('error').html('Content updated successfully :)').slideDown();
-		});
-	});
-	
+		App.refresh();
+	} );
+
 	/**
 	 * Animate refresh button when the app starts refreshing
 	 */
-	App.on('refresh:start',function(){
-		$('#refresh-button').addClass('refreshing');
-	});
-	
+	App.on( 'refresh:start', function() {
+		$( '#refresh-button' ).addClass( 'refreshing' );
+	} );
+
 	/**
-	 * Stop refresh button animation when the app stops refreshing
+	 * When the app stops refreshing :
+	 * - scroll to top
+	 * - stop refresh button animation
+	 * - display success or error message
+	 * 
+	 * Callback param : result : object { 
+	 *		ok: boolean : true if refresh is successful, 
+	 *		message: string : empty if success, error message if refresh fails, 
+	 *		data: object : empty if success, error object if refresh fails :
+	 *					   use result.data to get more info about the error
+	 *					   if needed.
+	 * }
 	 */
-	App.on('refresh:end',function(){
+	App.on( 'refresh:end', function( result ) {
 		scrollTop();
-		Storage.clear('scroll-pos'); 
-		$('#refresh-button').removeClass('refreshing');
-	});
-	
+		Storage.clear( 'scroll-pos' );
+		$( '#refresh-button' ).removeClass( 'refreshing' );
+		if ( result.ok ) {
+			$( '#feedback' ).removeClass( 'error' ).html( 'Content updated successfully :)' ).slideDown();
+		}else{
+			$( '#feedback' ).addClass( 'error' ).html( result.message ).slideDown();
+		}
+	} );
+
 	/**
 	 * When an error occurs, display it in the feedback box
 	 */
-	App.on('error',function(error){
-		$('#feedback').addClass('error').html(error.message).slideDown();
-	});
-	
+	App.on( 'error', function( error ) {
+		$( '#feedback' ).addClass( 'error' ).html( error.message ).slideDown();
+	} );
+
 	/**
 	 * Hide the feedback box when clicking anywhere in the body
 	 */
-	$('body').click(function(e){
-		$('#feedback').slideUp();
-	});
-	
+	$( 'body' ).click( function( e ) {
+		$( '#feedback' ).slideUp();
+	} );
+
 	/**
 	 * Automatically shows and hide Back button according to current screen
 	 */
-	App.setAutoBackButton($('#go-back'),function(back_button_showed){
-		if(back_button_showed){
-			$('#refresh-button').hide();
-		}else{
-			$('#refresh-button').show();
+	App.setAutoBackButton( $( '#go-back' ), function( back_button_showed ) {
+		if ( back_button_showed ) {
+			$( '#refresh-button' ).hide();
+		} else {
+			$( '#refresh-button' ).show();
 		}
-	}); 
-	
+	} );
+
 	/**
 	 * Allow to click anywhere on post list <li> to go to post detail :
 	 */
-	$('#container').on('click','li.media',function(e){
+	$( '#container' ).on( 'click', 'li.media', function( e ) {
 		e.preventDefault();
-		var navigate_to = $('a',this).attr('href');
-		App.navigate(navigate_to);
-	});
-	
+		var navigate_to = $( 'a', this ).attr( 'href' );
+		App.navigate( navigate_to );
+	} );
+
 	/**
 	 * Close menu when we click a link inside it.
 	 * The menu can be dynamically refreshed, so we use "on" on parent div (which is always here):
 	 */
-	$('#navbar-collapse').on('click','a',function(e){
+	$( '#navbar-collapse' ).on( 'click', 'a', function( e ) {
 		closeMenu();
-	});
-	
+	} );
+
 	/**
 	 * "Get more" button in post lists
 	 */
-	$('#container').on('click','.get-more',function(e){
+	$( '#container' ).on( 'click', '.get-more', function( e ) {
 		e.preventDefault();
-		$(this).attr('disabled','disabled').text('Loading...');
-		App.getMoreComponentItems(function(){
+		$( this ).attr( 'disabled', 'disabled' ).text( 'Loading...' );
+		App.getMoreComponentItems( function() {
 			//If something is needed once items are retrieved, do it here.
 			//Note : if the "get more" link is included in the archive.html template (which is recommended),
 			//it will be automatically refreshed.
-			$(this).removeAttr('disabled');
-		});
-	});
-	
+			$( this ).removeAttr( 'disabled' );
+		} );
+	} );
+
 	/**
 	 * Do something before leaving a screen.
 	 * Here, if we're leaving a post list, we memorize the current scroll position, to 
 	 * get back to it when coming back to this list.
 	 */
-	App.on('screen:leave',function(current_screen,queried_screen,view){
+	App.on( 'screen:leave', function( current_screen, queried_screen, view ) {
 		//current_screen.screen_type can be 'list','single','page','comments'
-		if( current_screen.screen_type == 'list' ){
-			Storage.set('scroll-pos',current_screen.fragment,$('body').scrollTop());
+		if ( current_screen.screen_type == 'list' ) {
+			Storage.set( 'scroll-pos', current_screen.fragment, $( 'body' ).scrollTop() );
 		}
-	});
-	
+	} );
+
 	/**
 	 * Do something when a new screen is showed.
 	 * Here, if we arrive on a post list, we resore the scroll position
 	 */
-	App.on('screen:showed',function(current_screen,view){
+	App.on( 'screen:showed', function( current_screen, view ) {
 		//current_screen.screen_type can be 'list','single','page','comments'
-		if( current_screen.screen_type == 'list' ){
-			var pos = Storage.get('scroll-pos',current_screen.fragment);
-			if( pos !== null ){
-				$('body').scrollTop(pos);
-			}else{
+		if ( current_screen.screen_type == 'list' ) {
+			var pos = Storage.get( 'scroll-pos', current_screen.fragment );
+			if ( pos !== null ) {
+				$( 'body' ).scrollTop( pos );
+			} else {
 				scrollTop();
 			}
-		}else{
+		} else {
 			scrollTop();
 		}
-	});
-	
+	} );
+
 	/**
 	 * Manually close the bootstrap navbar
 	 */
-	function closeMenu(){
-		var navbar_toggle_button = $(".navbar-toggle").eq(0);
-		if( !navbar_toggle_button.hasClass('collapsed') ){
-			navbar_toggle_button.click(); 
+	function closeMenu() {
+		var navbar_toggle_button = $( ".navbar-toggle" ).eq( 0 );
+		if ( !navbar_toggle_button.hasClass( 'collapsed' ) ) {
+			navbar_toggle_button.click();
 		}
 	}
-	
+
 	/**
 	 * Get back to the top of the screen
 	 */
-	function scrollTop(){
-		window.scrollTo(0,0);
+	function scrollTop() {
+		window.scrollTo( 0, 0 );
 	}
-	
-});
+
+} );

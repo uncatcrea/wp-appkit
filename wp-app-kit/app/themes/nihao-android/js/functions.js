@@ -6,7 +6,7 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','them
 		$("#refresh-button").removeClass("refresh-off").addClass("refresh-on");
 	});
 
-	App.on('refresh:end',function(){
+	App.on('refresh:end',function(result){
 
 		scrollTop();
         Storage.clear('scroll-pos'); 
@@ -16,8 +16,11 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','them
 		$("#menu li").removeClass("menu-active-item");
 		$("#menu li:first-child").addClass("menu-active-item");
 		
-		showMessage("Content updated successfully :)");
-
+		if ( result.ok ) {
+			showMessage("Content updated successfully :)");
+		}else{
+			showMessage(result.message);
+		}
 	});
 
 	App.on('error',function(error){

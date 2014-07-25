@@ -33,6 +33,7 @@ define(function (require) {
 		  vent.trigger('error:'+ error_id,error_data);
 		  Utils.log('app.js error ('+ error_id +') : '+ error_data.message, error_data);
 		  if( error_callback != undefined ){
+			error_data = _.extend({event: 'error:'+ error_id}, error_data);
 	  		error_callback(error_data);
 	  	  }
 	  };
