@@ -3,6 +3,8 @@
 class WpakApps {
 
 	const menu_item = 'wpak_main_bo_settings';
+	const refresh_app_meta_id = '_wpak_refresh_app';
+	const refresh_component_meta_id = '_wpak_refresh_component';
 
 	public static function hooks() {
 		add_action( 'init', array( __CLASS__, 'apps_custom_post_type' ) );
@@ -14,6 +16,14 @@ class WpakApps {
 			add_filter( 'post_row_actions', array( __CLASS__, 'remove_quick_edit' ), 10, 2 );
 			add_action( 'admin_head', array( __CLASS__, 'add_icon' ) );
 		}
+
+		// Register hooks for which components may need to refresh their content
+		$refresh_actions = array(
+			'save_post',
+		);
+		foreach( $refresh_actions as $hook ) {
+			add_action( $hook, array( __CLASS__, 'maybe_refresh_content' ), 10, 3 ); // We should pass the max number of arguments our hooks can send
+		}
 	}
 
 	public static function apps_custom_post_type() {
@@ -21,7 +31,7 @@ class WpakApps {
 		$capability = current_user_can('wpak_edit_apps') ? 'wpak_app' : 'post';
 		
 		register_post_type(
-			'wpak_apps', 
+			'wpak_apps',
 			array(
 				'label' => __( 'Applications', WpAppKit::i18n_domain ),
 				'description' => '',
@@ -55,7 +65,7 @@ class WpakApps {
 	public static function add_icon() {
 		global $pagenow, $typenow;
 
-		//TODO : use an external CSS instead of writing style directly in <head>... 
+		//TODO : use an external CSS instead of writing style directly in <head>...
 
 		if ( $typenow == 'wpak_apps' && in_array( $pagenow, array( 'edit.php', 'post-new.php', 'post.php' ) ) ) {
 			?>
@@ -75,38 +85,38 @@ class WpakApps {
 	}
 
 	public static function add_main_meta_box() {
-		
+
 		add_meta_box(
-			'wpak_app_main_infos', 
-			__( 'Platform', WpAppKit::i18n_domain ), 
-			array( __CLASS__, 'inner_main_infos_box' ), 
-			'wpak_apps', 
-			'normal', 
+			'wpak_app_main_infos',
+			__( 'Platform', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_main_infos_box' ),
+			'wpak_apps',
+			'normal',
 			'default'
 		);
-		
+
 	}
 
 	public static function add_phonegap_meta_box() {
 
 		add_meta_box(
-			'wpak_app_phonegap_data', 
-			__( 'Phonegap config.xml data', WpAppKit::i18n_domain ), 
-			array( __CLASS__, 'inner_phonegap_infos_box' ), 
-			'wpak_apps', 
-			'normal', 
+			'wpak_app_phonegap_data',
+			__( 'Phonegap config.xml data', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_phonegap_infos_box' ),
+			'wpak_apps',
+			'normal',
 			'default'
 		);
 
 		add_meta_box(
-			'wpak_app_security', 
-			__( 'Security', WpAppKit::i18n_domain ), 
-			array( __CLASS__, 'inner_security_box' ), 
-			'wpak_apps', 
-			'side', 
+			'wpak_app_security',
+			__( 'Security', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_security_box' ),
+			'wpak_apps',
+			'side',
 			'default'
 		);
-		
+
 	}
 
 	public static function inner_main_infos_box( $post, $current_box ) {
@@ -134,34 +144,34 @@ class WpakApps {
 		<div class="wpak_settings">
 			<span class="description"><?php _e( 'PhoneGap config.xml informations that are going to be displayed on App Stores.<br/>They are required when exporting the App to Phonegap, but are not used for App debug and simulation in browsers.', WpAppKit::i18n_domain ) ?></span>
 			<br/><br/>
-			<label><?php _e( 'Application name', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Application name', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_name" value="<?php echo $main_infos['name'] ?>" />
 			<br/><br/>
 			<label><?php _e( 'Application description', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<textarea name="wpak_app_desc"><?php echo $main_infos['desc'] ?></textarea>
 			<br/><br/>
-			<label><?php _e( 'Application id', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Application id', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_phonegap_id" value="<?php echo $main_infos['app_phonegap_id'] ?>" />
 			<br/><br/>
 			<label><?php _e( 'Version', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_version" value="<?php echo $main_infos['version'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Application versionCode (Android only)', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Application versionCode (Android only)', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_version_code" value="<?php echo $main_infos['version_code'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Phonegap version', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Phonegap version', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_phonegap_version" value="<?php echo $main_infos['phonegap_version'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Application author', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Application author', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_author" value="<?php echo $main_infos['author'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Application author website', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Application author website', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_author_website" value="<?php echo $main_infos['author_website'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Application author email', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Application author email', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_author_email" value="<?php echo $main_infos['author_email'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Phonegap plugins', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Phonegap plugins', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<textarea name="wpak_app_phonegap_plugins"><?php echo $main_infos['phonegap_plugins'] ?></textarea>
 			<span class="description"><?php _e( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
 			<br/><br/>
@@ -272,7 +282,7 @@ class WpakApps {
 		if ( isset( $_POST['wpak_app_simulation_secured'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_simulation_secured', sanitize_text_field( $_POST['wpak_app_simulation_secured'] ) );
 		}
-		
+
 	}
 
 	private static function get_platforms() {
@@ -399,6 +409,53 @@ class WpakApps {
 	private static function get_default_phonegap_plugins() {
 		$default_plugins = '<gap:plugin name="org.apache.cordova.inappbrowser" />';
 		return $default_plugins;
+	}
+
+	/**
+	 * Notifies each app that something happened that could leverage a content refresh.
+	 * Called on several hooks (@see WpakApps::hooks())
+	 *
+	 * @param	mixed						The hook's params.
+	 */
+	public static function maybe_refresh_content() {
+		$hook = current_filter(); // We could use 'current_action()' here but it's an alias
+		$args = func_get_args();
+		array_unshift( $args, $hook );
+		$apps = self::get_apps();
+
+		foreach( $apps as $app ) {
+			$components = WpakComponents::get_app_components( $app->ID );
+
+			foreach( $components as $component ) {
+				if( !$component->maybe_refresh_content( $args ) ) {
+					continue;
+				}
+
+				self::set_refresh( $app, $component );
+
+			}
+		}
+	}
+
+	/**
+	 * Registers metas for the apps to be able to know that a content refresh may be necessary.
+	 *
+	 * @param	WP_Post			$app		The app object.
+	 * @param	WpakComponent	$component	The component object.
+	 */
+	public static function set_refresh( $app, $component ) {
+		// Global meta to refresh the whole app
+		update_post_meta( $app->ID, self::refresh_app_meta_id, true );
+
+		// Specific meta to refresh a single component
+		$value = get_post_meta( $app->ID, self::refresh_component_meta_id, true );
+
+		if( !$value ) {
+			$value = array();
+		}
+		$value[$component->slug] = true;
+
+		update_post_meta( $app->ID, self::refresh_component_meta_id, $value );
 	}
 
 }

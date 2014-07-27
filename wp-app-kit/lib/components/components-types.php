@@ -16,6 +16,17 @@ abstract class WpakComponentType {
 
 	abstract public function get_options_from_posted_form( $data );
 
+	/**
+	 * Returns true when a content refresh is needed for the given component regarding the passed args.
+	 * Called on several hooks (@see WpakApps::hooks())
+	 *
+	 * @param	WpakComponent	$component		The component object.
+	 * @param	array			$args			The hook's name and params.
+	 *
+	 * @return	boolean							Whether a refresh may be needed or not.
+	 */
+	abstract public function maybe_refresh_content( $component, $args );
+
 	public function get_data( WpakComponent $component, $globals, $args = array() ) {
 		$this->data['globals'] = $globals;
 		$this->data['specific']['label'] = $component->label;
@@ -116,6 +127,25 @@ class WpakComponentsTypes {
 			$class .= ucfirst( $word );
 		}
 		return class_exists( $class ) ? new $class : null;
+	}
+
+	/**
+	 * Returns true when a content refresh is needed for the given component regarding the passed args.
+	 * Called on several hooks (@see WpakApps::hooks())
+	 *
+	 * @param	WpakComponent	$component		The component object.
+	 * @param	array			$args			The hook's name and params.
+	 *
+	 * @return	boolean							Whether a refresh may be needed or not.
+	 */
+	public static function maybe_refresh_content( $component, $args ) {
+		$return = false;
+
+		if ( self::component_type_exists( $component->type ) ) {
+			$return = self::factory( $component->type )->maybe_refresh_content( $component, $args );
+		}
+
+		return $return;
 	}
 
 }

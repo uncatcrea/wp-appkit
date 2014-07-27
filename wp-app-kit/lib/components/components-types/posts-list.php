@@ -117,7 +117,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		);
 
 		//Use the "wpak_posts_list_post_content" filter to format app posts content your own way :
-		//(To apply the default App Kit formating to the content and add only minor modifications to it, 
+		//(To apply the default App Kit formating to the content and add only minor modifications to it,
 		//use the "wpak_post_content_format" filter instead, applied in WpakComponentsUtils::get_formated_content()).
 		$content = apply_filters( 'wpak_posts_list_post_content', '', $post, $component );
 		if ( empty( $content ) ) {
@@ -135,7 +135,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			$post_data['thumbnail']['height'] = $featured_img_src[2];
 		}
 
-		//To customize post data sent to the app (for example add a post meta to the default post data), 
+		//To customize post data sent to the app (for example add a post meta to the default post data),
 		//use this "wpak_post_data" filter :
 		$post_data = apply_filters( 'wpak_post_data', $post_data, $post, $component );
 
@@ -183,7 +183,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			$current_term = $options['term'];
 			$current_hook = !empty( $options['hook'] ) ? $options['hook'] : '';
 		}
-		
+
 		?>
 		<div class="component-params">
 			<label><?php _e( 'Post type', WpAppKit::i18n_domain ) ?> : </label>
@@ -285,6 +285,20 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		$hook = !empty( $data['hook'] ) ? $data['hook'] : '';
 		$options = array( 'post-type' => $post_type, 'taxonomy' => $taxonomy, 'term' => $term, 'hook' => $hook );
 		return $options;
+	}
+
+	/**
+	 * Returns true when a content refresh is needed for the given component regarding the passed args.
+	 * Called on several hooks (@see WpakApps::hooks())
+	 *
+	 * @param	WpakComponent	$component		The component object.
+	 * @param	array			$args			The hook's name and params.
+	 *
+	 * @return	boolean							Whether a refresh may be needed or not.
+	 */
+	public function maybe_refresh_content( $component, $args ) {
+		// TODO: implement this
+		return false;
 	}
 
 }

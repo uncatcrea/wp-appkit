@@ -36,8 +36,8 @@ class WpakComponentTypePage extends WpakComponentType {
 
 					$this->set_specific( 'is_tree', true );
 				} else {
-					//Important : Include page tree data here too for consistency with the "with_subtree" case : 
-					//pages referenced in the tree data wont be  included in the global 'pages' if they 
+					//Important : Include page tree data here too for consistency with the "with_subtree" case :
+					//pages referenced in the tree data wont be  included in the global 'pages' if they
 					//are not included in another page tree in the app.
 					$all_pages_by_ids = array( $page->ID => self::get_page_data( $component, $page, self::get_page_tree_data( $page->ID, $page->post_parent ) ) );
 
@@ -307,6 +307,34 @@ class WpakComponentTypePage extends WpakComponentType {
 	protected static function hierachical_post_type_exists( $post_type ) {
 		$post_types = get_post_types( array( 'hierarchical' => true ), 'names' );
 		return in_array( $post_type, $post_types );
+	}
+
+	/**
+	 * Returns true when a content refresh is needed for the given component regarding the passed args.
+	 * Called on several hooks (@see WpakApps::hooks())
+	 *
+	 * @param	WpakComponent	$component		The component object.
+	 * @param	array			$args			The hook's name and params.
+	 *
+	 * @return	boolean							Whether a refresh may be needed or not.
+	 */
+	public function maybe_refresh_content( $component, $args ) {
+		//
+		// $args[0] == current filter/action
+		// if current filter == 'save_post', $args[1] == post ID
+		//
+
+		if( 'save_post' !== $args[0] || 'page' !== get_post_type( $args[1] ) ) {
+			return false;
+		}
+
+		// Check if the updated page concerns our tree
+		$data = $this->get_data( $component, array() );
+		if( !isset( $data['globals']['pages'][$args[1]] ) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 }

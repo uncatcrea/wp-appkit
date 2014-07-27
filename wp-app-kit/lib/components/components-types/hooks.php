@@ -75,6 +75,20 @@ class WpakComponentTypeHooks extends WpakComponentType {
 		return $options;
 	}
 
+	/**
+	 * Returns true when a content refresh is needed for the given component regarding the passed args.
+	 * Called on several hooks (@see WpakApps::hooks())
+	 *
+	 * @param	WpakComponent	$component		The component object.
+	 * @param	array			$args			The hook's name and params.
+	 *
+	 * @return	boolean							Whether a refresh may be needed or not.
+	 */
+	public function maybe_refresh_content( $component, $args ) {
+		// TODO: implement this
+		return false;
+	}
+
 }
 
 WpakComponentsTypes::register_component_type( 'hooks', array( 'label' => __( 'Custom component, using hooks', WpAppKit::i18n_domain ) ) );

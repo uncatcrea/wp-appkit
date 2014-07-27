@@ -73,4 +73,16 @@ class WpakComponent {
 		return isset( $this->$attribute );
 	}
 
+	/**
+	 * Returns true when a content refresh is needed for the component regarding the passed args.
+	 * Called on several hooks (@see WpakApps::hooks())
+	 *
+	 * @param	array			$args			The hook's name and params.
+	 *
+	 * @return	boolean							Whether a refresh may be needed or not.
+	 */
+	public function maybe_refresh_content( $args ) {
+		return WpakComponentsTypes::maybe_refresh_content( $this, $args );
+	}
+
 }
