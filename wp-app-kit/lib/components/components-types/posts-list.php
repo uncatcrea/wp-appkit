@@ -297,8 +297,42 @@ class WpakComponentTypePostsList extends WpakComponentType {
 	 * @return	boolean							Whether a refresh may be needed or not.
 	 */
 	public function maybe_refresh_content( $component, $args ) {
-		// TODO: implement this
-		return false;
+		$return = false;
+
+		//
+		// TODO: take care of these actions:
+		//  - when a post is updated:
+		//    => if it's now related to our term
+		//    => if it was related to our term but not anymore
+		//  - when a term is updated and it's ours
+		//
+
+		// $args[0] == current filter/action
+		switch( $args[0] ) {
+			case 'save_post':
+				$term = get_term_by( 'slug', $component->term, $component->taxonomy );
+
+				// $args[1] == post ID
+				$return = has_term( $component->term, $component->taxonomy, $args[1] ) || $this->has_descendant_term( $term->id, $component->taxonomy, $args[1] );
+				break;
+		}
+
+		return $return;
+	}
+
+	/**
+	 * Returns true when a post has one of the given term's children
+	 *
+	 * @param	int				$term_id			The parent term ID.
+	 * @param	string			$taxonomy			The taxonomy's slug.
+	 * @param	WP_Post|int		$post				The post object or ID.
+	 *
+	 * @return	boolean								Whether the post is a descendant of the given term or not.
+	 */
+	private function has_descendant_term( $term_id, $taxonomy, $post ) {
+		$descendants = get_term_children( $term_id, $taxonomy );
+
+		return $descendants && has_term( $descendants, $post );
 	}
 
 }
