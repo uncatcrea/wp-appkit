@@ -378,6 +378,9 @@ define(function (require) {
 								  });
 								  globals_keys.saveAll();
 
+								  app.options.set( { id: 'last_updated', value: Date.now() } );
+								  app.options.saveAll();
+
 								  Utils.log('Components, navigation and globals retrieved from online.',{components:app.components,navigation:app.navigation,globals:app.globals});
 
 								  cb_ok();
