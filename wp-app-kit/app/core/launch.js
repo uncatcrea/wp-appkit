@@ -70,6 +70,8 @@ require(['root/config'],function(Config){
 														});
 
 														PhoneGap.hideSplashScreen();
+
+														App.resetOptions();
 													});
 												},
 												function(){

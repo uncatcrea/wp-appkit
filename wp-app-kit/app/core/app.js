@@ -713,6 +713,12 @@ define(function (require) {
 	  	}
       }
 
+	  app.resetOptions = function() {
+	  	if( Config.debug_mode == 'on' && confirm( 'Do you want to reset all your options?' ) ) {
+	  		app.options.resetAll();
+	  	}
+	  }
+
 	  return app;
 
 });
