@@ -26,12 +26,22 @@ class WpakToken {
 
 	public static function get_hash_key() {
 		$hash_key = '';
+		
 		//WPPH_AUTH_KEY can be defined in wp-config.php
 		if ( defined( 'WPPH_AUTH_KEY' ) ) {
 			$hash_key = WPPH_AUTH_KEY;
 		} else {
 			$hash_key = AUTH_KEY;
 		}
+
+		$hash_key = apply_filters( 'wpak_hash_key', $hash_key );
+
+		//Remove \ from hash key as it makes the JS crash on app side :
+		$hash_key = str_replace( '\\', '', $hash_key );
+		
+		//Remove simple quote (') from hash key to avoid JS strings problems on app side :
+		$hash_key = str_replace( "'", '', $hash_key );
+
 		return $hash_key;
 	}
 
