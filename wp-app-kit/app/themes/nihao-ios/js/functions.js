@@ -2,21 +2,31 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','them
 
 	/* App Events */
 
-	App.on('refresh:start',function(){
-		$("#refresh-button").removeClass("refresh-off").addClass("refresh-on");
-	});
+    // Refresh process begins
+    App.on('refresh:start',function(){
 
-	App.on('refresh:end',function(result){
+        // the refresh button begins to spin
+        $("#refresh-button").removeClass("refresh-off").addClass("refresh-on");
 
-		scrollTop();
+    });
+
+    // Refresh process ends
+    App.on('refresh:end',function(result){
+
+		// Reset scroll position
+        scrollTop();
         Storage.clear('scroll-pos'); 
 		
-		$("#refresh-button").removeClass("refresh-on").addClass("refresh-off");
+		// Stop spinnning for the refresh button
+        $("#refresh-button").removeClass("refresh-on").addClass("refresh-off");
 		
+        // Change active items in the left menu
 		$("#menu li").removeClass("menu-active-item");
 		$("#menu li:first-child").addClass("menu-active-item");
 		
-		if ( result.ok ) {
+		// Display if the refresh process has worked or not
+        // TODO : if an errors occurs we should not reset scroll position
+        if ( result.ok ) {
 			showMessage("Content updated successfully :)");
 		}else{
 			showMessage(result.message);
@@ -24,38 +34,63 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','them
 
 	});
 
-	App.on('error',function(error){
-		showMessage(error.message);
-	});
+	// Error occurs
+    App.on('error',function(error){
 
-	App.on('screen:showed',function(current_screen,view){
+        // Display error message
+        showMessage(error.message);
 
-//		scrollTop();
+    });
 
-		if (TplTags.displayBackButton()) {
-			$("#back-button").css("display","block");
+	// A new screen is displayed
+    App.on('screen:showed',function(current_screen,view){
+        //current_screen.screen_type can be 'list','single','page','comments'
+        
+		// iOS back button support
+        if (TplTags.displayBackButton()) {
+			
+            // Display iOS back button
+            $("#back-button").css("display","block");
 			$("#menu-button").css("display","none");
-		} else {
-			$("#back-button").css("display","none");
+		
+        } else {
+			
+            // Display the menu button as iOS back button is not supported
+            $("#back-button").css("display","none");
 			$("#menu-button").css("display","block");
-		}
 
-		if (isMenuOpen) {
+        }
 
-			$("#content").css("left","85%");
+		// Left menu is open
+        if (isMenuOpen) {
+
+			// Close the left menu
+            $("#content").css("left","85%");
 			closeMenu();
-		}
 
-		if (current_screen.screen_type=="single") {
-			cleanImgTag();
+        }
+
+		// A post or a page is displayed
+        if (current_screen.screen_type=="single"||current_screen.screen_type=="page") {
+			
+            // Prepare <img> tags for styling
+            cleanImgTag();
+            
+            // Redirect all hyperlinks clicks
             $("#container").on("click",".single-template a",openInBrowser);
-		}
+		
+        }
 
-		if( current_screen.screen_type == "list" ){
-			var pos = Storage.get("scroll-pos",current_screen.fragment);
+		// A post list is displayed
+        if( current_screen.screen_type == "list" ){
+			
+            // Retrieve any memorized scroll position
+            // If a position has been memorized, scroll to it
+            // If not, scroll to the top of the screen
+            var pos = Storage.get("scroll-pos",current_screen.fragment);
 			if( pos !== null ){
 				$("#content").scrollTop(pos);
-			}else{
+            }else{
 				scrollTop();
 			}
 		}else{
@@ -64,15 +99,21 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','them
         
 	});
 
+    // About to change the current screen
 	App.on('screen:leave',function(current_screen,queried_screen,view){
 		//current_screen.screen_type can be 'list','single','page','comments'
-		if( current_screen.screen_type == "list" ){
+		
+        // If the current screen is a list
+        // Memorize the current scroll position
+        if( current_screen.screen_type == "list" ){
 			Storage.set("scroll-pos",current_screen.fragment,$("#content").scrollTop());
 		}
+        
 	});
     
-    //PhoneGap Plugins Support
+    /* PhoneGap Plugins Support */
     
+    // Status Bar
      try {
         StatusBar.overlaysWebView(false);
         StatusBar.styleDefault();
@@ -82,10 +123,13 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','them
         // https://build.phonegap.com/plugins/715
     }
 
+    // InApp Browser
+    
 	/* UI Events */
     
 	var isMenuOpen = false;
 
+    // Event bindings
 	$("#container").on("touchstart","#menu-button",menuButtonTapOn);
 	$("#container").on("touchend","#menu-button",menuButtonTapOff);
 
@@ -100,10 +144,7 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','them
 
     /* Functions */
 
-	function scrollTop(){
-		window.scrollTo(0,0);
-	}
-    
+    // Open left menu
 	function openMenu() {
 
 		$("#menu").css("display","block");
@@ -115,7 +156,8 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','them
 			});
 	}
 
-	function closeMenu(action,menuItem) {
+	// Close left menu
+    function closeMenu(action,menuItem) {
 
 		isMenuOpen = false;
 
@@ -132,7 +174,8 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','them
 			});
 	}
 
-	function toggleMenu() {
+	// Determine if we open or close the left menu
+    function toggleMenu() {
 
 		if (isMenuOpen) {
 			closeMenu();
@@ -141,89 +184,124 @@ define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','them
 		}
 	}
 
-	function menuButtonTapOn() {
+	// Finger presses on the menu button (1/2)
+    function menuButtonTapOn() {
+        // Effect
 		$("#menu-button").removeClass("button-tap-off").addClass("button-tap-on");
 	}
 
+	// Finger unpresses the menu button (2/2)
 	function menuButtonTapOff() {
 
-		$("#menu-button").removeClass("button-tap-on").addClass("button-tap-off");
-		toggleMenu();
-		return false;
+		// Effect
+        $("#menu-button").removeClass("button-tap-on").addClass("button-tap-off");
+		
+        // We open or close the left menu according to its current state
+        toggleMenu();
+		
+        return false;
 
 	}
 
-	function menuItemTap() {	
+	// Finger presses a menu item
+    function menuItemTap() {	
 
 		if (isMenuOpen) {
 
-			$("#menu li").removeClass("menu-active-item");
+			// Highlight the new current item
+            $("#menu li").removeClass("menu-active-item");
 			$(this).closest("li").addClass("menu-active-item");
 
-			closeMenu(1,$(this));
+			// Close the left menu
+            closeMenu(1,$(this));
 		}
 
 		return false;
 	}
 
-	function contentItemTap() {
+	// Finger presses an item in a list
+    function contentItemTap() {
 
 		if (!isMenuOpen) {
-			App.navigate($(this).attr("href"));
-		} else {
+			
+            // Change the current screen
+            App.navigate($(this).attr("href"));
+		
+        } else {
+            
+            // If the menu is open, close it
 			closeMenu();
-		}
+
+        }
 		return false;
 	}
 
-	function showMessage(msgText) {
+	// Display success/failure message
+    function showMessage(msgText) {
 		$("#refresh-message").html(msgText);
 		$("#refresh-message").removeClass("message-off").addClass("message-on");
 		setTimeout(hideMessage,3000);
 	}
 
-	function hideMessage() {
+	// Hide success/failure message
+    function hideMessage() {
 		$("#refresh-message").removeClass("message-on").addClass("message-off");	
 		$("#refresh-message").html("");
 	}
 
-	function refreshTapOn() {
+	// Finger presses refresh button (1/2)
+    function refreshTapOn() {
 		$("#refresh-button").removeClass("button-touch-off").addClass("button-touch-on");
 	}
 
-	function refreshTapOff() {
-		if (!App.isRefreshing()) {
+	// Finger unpresses refresh button (2/2)
+    function refreshTapOff() {
+		
+        // TODO : give the ability to stop the refresh manually
+        
+        // Check if app's refreshing
+        if (!App.isRefreshing()) {
 			$("#refresh-button").removeClass("button-touch-on").addClass("button-touch-off");
 			$("#refresh-button").removeClass("refresh-off").addClass("refresh-on");
-			App.refresh();
+			
+            // Start the refresh process
+            App.refresh();
 		}
-	}
+	
+    }
 
-	function stopRefresh() {
+	// Stop refresh button animation when refresh ends
+    function stopRefresh() {
 		$("#refresh-button").removeClass("refresh-on").addClass("refresh-off");	
 	}
 
-	function backButtonTapOn() {
+	// Finger presses iOS back button (1/2)
+    function backButtonTapOn() {
 		$("#back-button").removeClass("button-tap-off").addClass("button-tap-on");
 	}
 
-	function backButtonTapOff() {
+	// Finger unpresses iOS back button (2/2)
+    function backButtonTapOff() {
 		$("#back-button").removeClass("button-tap-on").addClass("button-tap-off");
-		App.navigate(TplTags.getPreviousScreenLink());
+		
+        // Go back to the previous screen
+        App.navigate(TplTags.getPreviousScreenLink());
 	}
 
-	function scrollTop(){
+    // Scroll to the top of the screen
+    function scrollTop(){
 		window.scrollTo(0,0);
 	}
-
+    
+    // Prepare <img> tags for proper styling (responsive)
 	function cleanImgTag() {
-
 		$(".single-template img").removeAttr("width height");
 		$(".single-template .wp-caption").removeAttr("style");
 		$(".single-template .wp-caption a").removeAttr("href");
-
 	}
     
+    // Hyperlinks clicks handler
+    // Relies on the InApp Browser PhoneGap Plugin
     function openInBrowser(e) {
         window.open(e.target.href,"_blank","location=yes");
         e.preventDefault();

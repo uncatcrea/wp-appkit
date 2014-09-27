@@ -50,7 +50,7 @@
 }
 
 .list-template .content-thumbnail div {
-	background:url(../img/img-icon.svg);
+	background:url(../img/img-icon.svg); /* Never applied as inline style got it before / TODO : apply inline style only if online */
 	background-color:#dddddd;
 	background-size:cover;
 	background-position:center center;

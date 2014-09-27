@@ -1,5 +1,7 @@
 /* Containers */
 
+/* TODO : handling default img when offline */
+
 .single-template {padding-top:0;}
 
 .single-content {
@@ -193,7 +195,7 @@
 }
 
 .single-template .post-thumbnail {
-	background:url(../img/img-icon.svg);
+	background:url(../img/img-icon.svg);  /* Never applied as inline style got it before / TODO : apply inline style only if online */
 	background-color:#dddddd;
 	height:200px;
 	background-size:cover;
