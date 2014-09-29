@@ -1,4 +1,15 @@
-define( [ 'jquery', 'core/theme-app', 'core/lib/storage', 'theme/js/bootstrap.min' ], function( $, App, Storage ) {
+define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/lib/storage', 'theme/js/bootstrap.min' ], function( $, App, TemplateTags, Storage ) {
+
+	/**
+	 * Display a specific page at first app launch
+	 */
+	App.filter( 'default-route', function(default_route, count_open, last_open_date ) {
+		if( count_open == 1 ){ //First app launch
+			//Display a custom page
+			//default_route = TemplateTags.getPageLink(your_page_id,'your_page_component_slug');
+		}
+		return default_route;
+	} );
 
 	/**
 	 * Launch app contents refresh when clicking the refresh button :

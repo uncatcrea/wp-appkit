@@ -322,13 +322,13 @@ define(function(require, exports) {
     themeTplTags.getPageLink = function(page_id, component_id) {
         var link = '';
 
-        if (themeTplTags.isTreePage()) {
-            if (component_id == undefined) {
-                var screen_data = App.getCurrentScreenData();
-                var component_id = screen_data.component_id;
-            }
-            link = '#page/' + component_id + '/' + page_id;
-        }
+		if ( component_id == undefined ) {
+			var screen_data = App.getCurrentScreenData();
+			component_id = screen_data.component_id;
+		}
+
+		//TODO Check if the exists exists in the pages global
+		link = '#page/' + component_id + '/' + page_id;
 
         return link;
     };

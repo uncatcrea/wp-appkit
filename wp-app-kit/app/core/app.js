@@ -15,6 +15,7 @@ define(function (require) {
           Config              = require('root/config'),
           Utils               = require('core/app-utils'),
           Hooks               = require('core/lib/hooks'),
+		  Stats               = require('core/stats'),
           Sha256              = require('core/lib/sha256');
 
 	  var app = {};
@@ -83,18 +84,31 @@ define(function (require) {
 
 	  //Router must be set before calling this resetDefaultRoute :
 	  app.resetDefaultRoute = function(){
-		  if( app.navigation.length > 0 ){
-			  var first_nav_component_id = app.navigation.first().get('component_id');
-			  app.router.setDefaultRoute('#component-'+ first_nav_component_id);
-		  }else{
-			  //No navigation item : set default route to first component found:
-			  if( app.components.length ){
-				  var first_component = app.components.first();
-				  app.router.setDefaultRoute('#component-'+ first_component.id);
-			  }else{
-				  Utils.log('No navigation, no component found. Could not set default route.');
-			  }
-		  }
+		  
+		var default_route = '';
+		
+		if( app.navigation.length > 0 ){
+			var first_nav_component_id = app.navigation.first().get('component_id');
+			default_route = '#component-'+ first_nav_component_id;
+		}else{
+			//No navigation item : set default route to first component found:
+			if( app.components.length ){
+				var first_component = app.components.first();
+				default_route = '#component-'+ first_component.id;
+			}else{
+				Utils.log('No navigation, no component found. Could not set default route.');
+			}
+		}
+		
+		/**
+		 * Hook : filter 'default-route' : use this to define your own default route
+		 */
+		default_route = Hooks.applyFilter('default-route',default_route,[Stats.get_count_open(),Stats.get_last_open_date()]);
+		  
+		if( default_route != '' ){
+			app.router.setDefaultRoute(default_route);
+		}
+		
 	  };
 
 	  //--------------------------------------------------------------------------

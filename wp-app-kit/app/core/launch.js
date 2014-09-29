@@ -28,8 +28,8 @@ require(['root/config'],function(Config){
 	    }
 	});
 
-	require(['jquery', 'core/app-utils', 'core/app', 'core/router', 'core/region-manager', 'core/phonegap-utils'],
-			function ($, Utils, App, Router, RegionManager, PhoneGap) {
+	require(['jquery', 'core/app-utils', 'core/app', 'core/router', 'core/region-manager', 'core/stats', 'core/phonegap-utils'],
+			function ($, Utils, App, Router, RegionManager, Stats, PhoneGap) {
 
 			var launch = function() {
 				// Initialize application before using it
@@ -48,10 +48,17 @@ require(['root/config'],function(Config){
 											App.sync(
 												function(){
 													RegionManager.buildMenu(function(){ //Menu items are loaded by App.sync
+														
+														Stats.increment_count_open();
+														Utils.log( 'App opening  count : ', Stats.get_count_open() );
+														
+														Stats.increment_last_open_time();
+														Utils.log( 'Last app opening  was on ', Stats.get_last_open_date() );
+														
 														App.resetDefaultRoute();
-
+														
 														Backbone.history.start();
-
+														
 														//Refresh at app launch : as the theme is now loaded, use theme-app :
 														require(['core/theme-app'],function(ThemeApp){
 															last_updated = App.options.get( 'last_updated' );

@@ -3,6 +3,7 @@ define(function (require) {
     "use strict";
 
     var Backbone                 = require('backbone'),
+		Config					 = require('root/config'),
     	_                   	 = require('underscore');
     
     require('localstorage');
@@ -18,7 +19,7 @@ define(function (require) {
     });
 
     var Components = Backbone.Collection.extend({
-    	localStorage: new Backbone.LocalStorage("Components"),
+    	localStorage: new Backbone.LocalStorage("Components-"+ Config.app_slug),
     	model : Component,
     	saveAll : function(){
        	 	this.map(function(component){component.save();});
