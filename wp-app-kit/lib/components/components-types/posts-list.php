@@ -23,8 +23,8 @@ class WpakComponentTypePostsList extends WpakComponentType {
 
 			$query_args = array( 'post_type' => $post_type );
 
-			$query_args['posts_per_page'] = get_option( 'posts_per_page' );
-
+			$query_args['posts_per_page'] = apply_filters('wpak_posts_list_posts_per_page', WpakSettings::get_setting( 'posts_per_page' ), $component, $options, $args );
+			
 			if ( !empty( $options['taxonomy'] ) && !empty( $options['term'] ) ) {
 
 				$query_args['tax_query'] = array(
