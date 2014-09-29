@@ -33,7 +33,9 @@ class WpakConfigFile {
 				if ( !empty( $app ) ) {
 					$app_id = $app->ID;
 
-					$capability = apply_filters( 'wpak_private_simulation_capability', 'manage_options', $app_id );
+					$default_capability = current_user_can('wpak_edit_apps') ? 'wpak_edit_apps' : 'manage_options';
+					
+					$capability = apply_filters( 'wpak_private_simulation_capability', $default_capability, $app_id );
 
 					if ( WpakApps::get_app_simulation_is_secured( $app_id ) && !current_user_can( $capability ) ) {
 						wp_nonce_ays( $action );

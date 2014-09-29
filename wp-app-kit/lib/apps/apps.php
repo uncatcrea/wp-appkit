@@ -18,6 +18,8 @@ class WpakApps {
 
 	public static function apps_custom_post_type() {
 
+		$capability = current_user_can('wpak_edit_apps') ? 'wpak_app' : 'post';
+		
 		register_post_type(
 			'wpak_apps', 
 			array(
@@ -29,7 +31,7 @@ class WpakApps {
 				'exclude_from_search' => true,
 				'publicly_queryable' => false,
 				'show_in_nav_menus' => false,
-				'capability_type' => 'post',
+				'capability_type' => $capability,
 				'hierarchical' => false,
 				'rewrite' => false,
 				'query_var' => false,
@@ -68,7 +70,8 @@ class WpakApps {
 	}
 
 	public static function add_settings_panels() {
-		add_menu_page( __( 'WP App Kit', WpAppKit::i18n_domain ), __( 'WP App Kit', WpAppKit::i18n_domain ), 'manage_options', self::menu_item, array( __CLASS__, 'settings_panel' ) );
+		$capability_required = current_user_can( 'wpak_edit_apps' ) ? 'wpak_edit_apps' : 'manage_options';
+		add_menu_page( __( 'WP App Kit', WpAppKit::i18n_domain ), __( 'WP App Kit', WpAppKit::i18n_domain ), $capability_required, self::menu_item, array( __CLASS__, 'settings_panel' ) );
 	}
 
 	public static function add_main_meta_box() {
@@ -208,7 +211,7 @@ class WpakApps {
 			return;
 		}
 
-		if ( !current_user_can( 'edit_post', $post_id ) ) {
+		if ( !current_user_can( 'edit_post', $post_id ) && !current_user_can( 'wpak_edit_apps', $post_id ) ) {
 			return;
 		}
 

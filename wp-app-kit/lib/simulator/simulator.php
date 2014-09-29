@@ -13,11 +13,13 @@ class WpakSimulator {
 	}
 
 	public static function add_settings_panels() {
-		add_submenu_page( WpakApps::menu_item, __( 'Simulator', WpAppKit::i18n_domain ), __( 'Simulator', WpAppKit::i18n_domain ), 'manage_options', self::menu_item, array( __CLASS__, 'settings_panel' ) );
+		$capability_required = current_user_can( 'wpak_edit_apps' ) ? 'wpak_edit_apps' : 'manage_options';
+		add_submenu_page( WpakApps::menu_item, __( 'Simulator', WpAppKit::i18n_domain ), __( 'Simulator', WpAppKit::i18n_domain ), $capability_required, self::menu_item, array( __CLASS__, 'settings_panel' ) );
 	}
 
 	public static function add_action_link( $actions ) {
 		global $post;
+		
 		if ( $post->post_type == 'wpak_apps' ) {
 			if ( array_key_exists( 'trash', $actions ) ) {
 				$trash_mem = $actions['trash'];
@@ -25,6 +27,9 @@ class WpakSimulator {
 				$actions['wpak-simulate-app'] = '<a href="' . self::get_simulator_url( $post->ID ) . '">' . __( 'View in simulator', WpAppKit::i18n_domain ) . '</a>';
 				$actions['wpak-view-app-in-browser'] = '<a href="' . WpakBuild::get_appli_index_url( $post->ID ) . '" target="_blank">' . __( 'View in browser', WpAppKit::i18n_domain ) . '</a>';
 				$actions['trash'] = $trash_mem;
+			}else{
+				$actions['wpak-simulate-app'] = '<a href="' . self::get_simulator_url( $post->ID ) . '">' . __( 'View in simulator', WpAppKit::i18n_domain ) . '</a>';
+				$actions['wpak-view-app-in-browser'] = '<a href="' . WpakBuild::get_appli_index_url( $post->ID ) . '" target="_blank">' . __( 'View in browser', WpAppKit::i18n_domain ) . '</a>';
 			}
 		}
 		return $actions;

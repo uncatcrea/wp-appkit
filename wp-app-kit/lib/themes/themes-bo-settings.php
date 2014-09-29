@@ -51,7 +51,7 @@ class WpakThemesBoSettings {
 			return;
 		}
 
-		if ( !current_user_can( 'edit_post', $post_id ) ) {
+		if ( !current_user_can( 'edit_post', $post_id ) && !current_user_can( 'wpak_edit_apps', $post_id ) ) {
 			return;
 		}
 
