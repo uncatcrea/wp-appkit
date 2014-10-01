@@ -28,6 +28,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			require_once(dirname( __FILE__ ) . '/lib/apps/apps.php');
 			require_once(dirname( __FILE__ ) . '/lib/apps/build.php');
 			require_once(dirname( __FILE__ ) . '/lib/themes/themes.php');
+			require_once(dirname( __FILE__ ) . '/lib/themes/upload-themes.php');
 			require_once(dirname( __FILE__ ) . '/lib/user-permissions/user-permissions.php');
 			require_once(dirname( __FILE__ ) . '/lib/settings/settings.php');
 			require_once(dirname( __FILE__ ) . '/lib/components/components.php');
