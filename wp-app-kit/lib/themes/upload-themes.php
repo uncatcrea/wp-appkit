@@ -94,23 +94,6 @@ class WpakUploadThemes {
 		}
 	}
 
-	protected static function handle_upload() {
-		$result = array(
-			'message' => '',
-			'type' => 'updated'
-		);
-		
-		if ( ! current_user_can( 'upload_plugins' ) ) {
-			wp_die( __( 'You do not have sufficient permissions to install WP AppKit themes on this site.', WpAppKit::i18n_domain ) );
-		}
-		
-		if ( isset( $_POST['posts_per_page'] ) && check_admin_referer( 'wpak-theme-upload' ) ) {
-			$result['message'] = __( 'Theme uploaded', WpAppKit::i18n_domain );
-		}
-		
-		return $result;
-	}
-
 }
 
 WpakUploadThemes::hooks();
