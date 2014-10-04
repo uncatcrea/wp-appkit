@@ -3,7 +3,7 @@
 class WpakComponentsUtils {
 
 	public static function get_formated_content() {
-		global $post;
+		$post = get_post();
 
 		$content = get_the_content();
 
