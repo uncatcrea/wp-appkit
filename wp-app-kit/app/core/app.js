@@ -684,14 +684,28 @@ define(function (require) {
        *  - set options
        */
       app.initialize = function ( callback ) {
-      	// First retrieve all existing options
+      	var nextOps = function() {
+      		if( Config.debug_mode == 'on' ) {
+      			require( ['core/views/debug', 'jquery.velocity'], function( DebugView ) {
+      				var debugView = new DebugView();
+      				debugView.render();
+      			});
+      		}
+
+		  	// If a callback was passed, call it
+		  	if( undefined !== callback ) {
+		  		callback();
+		  	}
+      	}
+
+      	// Retrieve all existing options
       	app.options.fetch( {
       		'success': function( appOptions, response, options ) {
 				Utils.log( 'Options retrieved from local storage.', { options: appOptions } );
-				app.saveOptions( callback );
+				app.saveOptions( nextOps );
 	      	},
 	      	'error': function( appOptions, response, options ) {
-	      		app.saveOptions( callback );
+	      		app.saveOptions( nextOps );
 	      	}
       	});
       };

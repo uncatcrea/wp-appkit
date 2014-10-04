@@ -1,0 +1,108 @@
+#app-debug-button {
+    position:fixed;
+    left:-60px;
+    bottom:10px;
+    background-color:#a6a6a6;
+    width:50px;
+    height:50px;
+    z-index:9999;
+    opacity:0;
+    box-shadow:2px 2px 2px 0px #2e2e2e;
+    border-radius:50%;
+    background-repeat:no-repeat;
+	background-position:center;
+    background-size:35px;
+    background-image:url('../img/wpak-lady-bug-light.svg');
+    display:none;
+}
+
+#app-debug-panel {
+    position:fixed;
+    width:100%;
+    height:100%;
+    opacity:.95;
+    background-color:#090a36;
+    z-index:9998;
+    display:block;
+    left:-5000px;
+    padding-top:22px;
+    top:0;
+}
+
+#app-debug-content {
+    padding:10px;
+    color:#E8E8E8;
+	-webkit-overflow-scrolling:touch;
+	overflow-y:scroll;
+    width:100%;
+    height:100%;
+}
+
+div.app-button {
+    color:#292929;
+    border:none;
+    border-radius:4px;
+    margin:10px 0 10px 0;
+    font-size:16px;
+    padding:5px 10px 5px 10px;
+    line-height:16px;
+    width:100%;
+}
+
+div.app-button-off {
+    background-color:#E8E8E8;
+}
+
+div.app-button-on {
+    background-color:#e85f5f;
+}
+
+#app-debug-header {
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:25px;
+    background-color:#9b9bcc;
+}
+
+#app-debug-header .app-panel-icon {
+    float:left;
+    width:22px;
+    height:22px;
+    background-repeat:no-repeat;
+	background-position:center;
+    background-size:20px;
+    background-image:url('../img/wpak-lady-bug-dark.svg');
+    border-radius:50%;
+    margin-left:5px;
+}
+
+.app-panel-label {
+    float:left;
+    margin:4px 0 0 5px;
+    line-height:16px;
+    font-size:16px;
+    height:25px;
+}
+
+.app-panel-close {
+    float:right;
+    width:25px;
+    height:25px;
+    background-repeat:no-repeat;
+	background-position:center;
+    background-size:15px;
+}
+
+.app-panel-close-off {
+    background-image:url('../img/wpak-debug-close-off.svg');
+}
+
+.app-panel-close-on {
+    background-image:url('../img/wpak-debug-close-on.svg');
+}
+
+#app-debug-feedback {
+    display:none;
+}
