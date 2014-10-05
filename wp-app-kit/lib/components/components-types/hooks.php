@@ -14,6 +14,14 @@ class WpakComponentTypeHooks extends WpakComponentType {
 			'global-items-ids' => array()
 		);
 
+		/**
+		 * Filter data from a component.
+		 *
+		 * @param array 			$component_default_data    	An array of default data.
+		 * @param WpakComponent 	$component 					The component object.
+		 * @param array 			$options 					An array of options.
+		 * @param array 			$args 						An array of complementary arguments.
+		 */
 		$component_data = apply_filters( 'wpak_custom_component-' . $options['hook'], $component_default_data, $component, $options, $args );
 
 		if ( isset( $component_data['global'] ) && isset( $component_data['global-items'] ) && isset( $component_data['global-items-ids'] ) ) {
@@ -54,11 +62,11 @@ class WpakComponentTypeHooks extends WpakComponentType {
 	}
 
 	public function echo_form_javascript() {
-		
+
 	}
 
 	public function get_ajax_action_html_answer( $action, $params ) {
-		
+
 	}
 
 	public function get_options_from_posted_form( $data ) {
