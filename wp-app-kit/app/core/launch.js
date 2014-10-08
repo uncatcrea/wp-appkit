@@ -6,6 +6,7 @@ require.config({
 
     paths: {
         core: '../core',
+		lang: '../lang',
         root: '..'
     },
 

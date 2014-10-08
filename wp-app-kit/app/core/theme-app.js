@@ -11,6 +11,7 @@ define( function( require, exports ) {
 			RegionManager = require( 'core/region-manager' ),
 			Utils = require( 'core/app-utils' ),
 			Config = require( 'root/config' ),
+			Messages = require( 'core/messages' ),
 			App = require( 'core/app' ),
 			Hooks = require( 'core/lib/hooks' ),
 			TemplateTags = require( 'core/theme-tpl-tags' );
@@ -94,10 +95,10 @@ define( function( require, exports ) {
 			theme_event_data.event = event.replace( 'error:', '' );
 
 			if ( data.type == 'ajax' ) {
-				theme_event_data.message = 'Remote connexion to website failed';
+				theme_event_data.message = Messages.get('error_remote_connexion_failed');
 			}
 			else {
-				theme_event_data.message = 'Oops, an error occured...';
+				theme_event_data.message = Messages.get('error_occured_undefined');
 			}
 
 		} else if ( event.indexOf( 'info:' ) === 0 ) {
@@ -106,7 +107,7 @@ define( function( require, exports ) {
 			theme_event_data.event = event.replace( 'info:', '' );
 
 			if ( event == 'info:no-content' ) {
-				theme_event_data.message = "The application couldn't retrieve any content, please check your internet connexion!";
+				theme_event_data.message = Messages.get('info_no_content');
 			}
 
 		}
