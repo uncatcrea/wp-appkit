@@ -15,9 +15,34 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			}
 		}
 
-		if ( $options['post-type'] != 'custom' ) {
+		if( $options['post-type'] == 'custom' ) {
+			
+			//Custom posts list generated via hook :
+			//Choose "Custom, using hook" when creating the component in BO, and use the following
+			//hook "wpak_posts_list_custom-[your-hook]" to set the component posts.
+			//The wpak_posts_list_custom-[your-hook] filter must return the given $posts_list_data filled in with
+			//your custom data :
+			//- posts : array of the posts retrieved by your component, in the same format as a "get_posts()" or "new WP_Query($query_args)"
+			//- total : total number of those posts (not only those retrieved in posts, taking pagination into account)
+			//- query : data about your query that you want to retrieve on the app side.
 
-			$post_type = !empty( $options['post-type'] ) ? $options['post-type'] : 'post';
+			$posts_list_data = array(
+				'posts' => array(),
+				'total' => 0,
+				'query' => array( 'type' => 'custom-posts-list', 'taxonomy' => '', 'terms' => array(), 'is_last_page' => true, 'before_item' => 0 )
+			);
+
+			$posts_list_data = apply_filters( 'wpak_posts_list_custom-' . $options['hook'], $posts_list_data, $component, $options, $args, $before_post_date );
+
+			$posts = $posts_list_data['posts'];
+			$total = !empty( $posts_list_data['total'] ) ? $posts_list_data['total'] : count( $posts );
+			$query = $posts_list_data['query'];
+			
+		} else { //WordPress Post type or "Latest posts"
+			
+			$is_last_posts = $options['post-type'] == 'last-posts';
+			
+			$post_type = !empty( $options['post-type'] ) && !$is_last_posts ? $options['post-type'] : 'post';
 
 			$query = array( 'post_type' => $post_type );
 
@@ -25,7 +50,11 @@ class WpakComponentTypePostsList extends WpakComponentType {
 
 			$query_args['posts_per_page'] = apply_filters('wpak_posts_list_posts_per_page', WpakSettings::get_setting( 'posts_per_page' ), $component, $options, $args );
 			
-			if ( !empty( $options['taxonomy'] ) && !empty( $options['term'] ) ) {
+			if( $is_last_posts ){
+				
+				$query['type'] = 'last-posts';
+				
+			}elseif ( !empty( $options['taxonomy'] ) && !empty( $options['term'] ) ) {
 
 				$query_args['tax_query'] = array(
 					array(
@@ -65,27 +94,6 @@ class WpakComponentTypePostsList extends WpakComponentType {
 
 			$posts = $posts_query->posts;
 			$total = $posts_query->found_posts;
-		} else {
-			//Custom posts list generated via hook :
-			//Choose "Custom, using hook" when creating the component in BO, and use the following
-			//hook "wpak_posts_list_custom-[your-hook]" to set the component posts.
-			//The wpak_posts_list_custom-[your-hook] filter must return the given $posts_list_data filled in with
-			//your custom data :
-			//- posts : array of the posts retrieved by your component, in the same format as a "get_posts()" or "new WP_Query($query_args)"
-			//- total : total number of those posts (not only those retrieved in posts, taking pagination into account)
-			//- query : data about your query that you want to retrieve on the app side.
-
-			$posts_list_data = array(
-				'posts' => array(),
-				'total' => 0,
-				'query' => array( 'type' => 'custom-posts-list', 'taxonomy' => '', 'terms' => array(), 'is_last_page' => true, 'before_item' => 0 )
-			);
-
-			$posts_list_data = apply_filters( 'wpak_posts_list_custom-' . $options['hook'], $posts_list_data, $component, $options, $args, $before_post_date );
-
-			$posts = $posts_list_data['posts'];
-			$total = !empty( $posts_list_data['total'] ) ? $posts_list_data['total'] : count( $posts );
-			$query = $posts_list_data['query'];
 		}
 
 		$posts_by_ids = array();
@@ -186,12 +194,13 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		
 		?>
 		<div class="component-params">
-			<label><?php _e( 'Post type', WpAppKit::i18n_domain ) ?> : </label>
+			<label><?php _e( 'List type', WpAppKit::i18n_domain ) ?> : </label>
 			<select name="post-type" class="posts-list-post-type">
 				<?php foreach ( $post_types as $post_type => $post_type_object ): ?>
 					<?php $selected = $post_type == $current_post_type ? 'selected="selected"' : '' ?>
 					<option value="<?php echo $post_type ?>" <?php echo $selected ?>><?php echo $post_type_object->labels->name ?></option>
 				<?php endforeach ?>
+				<option value="last-posts" <?php echo 'last-posts' == $current_post_type ? 'selected="selected"' : '' ?>><?php _e( 'Latest posts', WpAppKit::i18n_domain ) ?></option>
 				<option value="custom" <?php echo 'custom' == $current_post_type ? 'selected="selected"' : '' ?>><?php _e( 'Custom, using hooks', WpAppKit::i18n_domain ) ?></option>
 			</select>
 		</div>
@@ -234,7 +243,11 @@ class WpakComponentTypePostsList extends WpakComponentType {
 
 	protected static function echo_sub_options_html( $current_post_type, $current_taxonomy = '', $current_term = '', $current_hook = '' ) {
 		?>
-		<?php if ( $current_post_type != 'custom' ): ?>
+		<?php if( $current_post_type == 'last-posts' ) : //Custom posts list ?>		
+			<?php //no sub option for now ?>
+		<?php elseif( $current_post_type == 'custom' ): //Custom posts list ?>
+			<label><?php _e( 'Hook name', WpAppKit::i18n_domain ) ?></label> : <input type="text" name="hook" value="<?php echo $current_hook ?>" />
+		<?php else: //Post type ?>
 
 			<?php
 				$taxonomies = get_object_taxonomies( $current_post_type );
@@ -272,8 +285,6 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			<?php else: ?>
 				<?php echo sprintf( __( 'No taxonomy found for post type %s', WpAppKit::i18n_domain ), $current_post_type ); ?>
 			<?php endif ?>
-		<?php else: //Custom posts list?>
-			<label><?php _e( 'Hook name', WpAppKit::i18n_domain ) ?></label> : <input type="text" name="hook" value="<?php echo $current_hook ?>" />
 		<?php endif ?>
 		<?php
 	}
