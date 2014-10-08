@@ -118,6 +118,7 @@ define( function ( require ) {
 	}
 
 	public static function get_config_xml( $app_id, $echo = false ) {
+		
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		$app_name = $app_main_infos['name'];
 		$app_description = $app_main_infos['desc'];
@@ -129,7 +130,9 @@ define( function ( require ) {
 		$app_author_email = $app_main_infos['author_email'];
 		$app_author_website = $app_main_infos['author_website'];
 		$app_platform = $app_main_infos['platform'];
-		$app_phonegap_plugins = $app_main_infos['phonegap_plugins'];
+		
+		//Merge our default Phonegap Build plugins to those set in BO :
+		$app_phonegap_plugins = WpakApps::get_merged_phonegap_plugins_xml($app_id, $app_main_infos['phonegap_plugins']);
 
 		$xmlns = 'http://www.w3.org/ns/widgets';
 		$xmlns_gap = 'http://phonegap.com/ns/1.0';

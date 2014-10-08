@@ -361,14 +361,10 @@ class WpakApps {
 		$author_email = get_post_meta( $post_id, '_wpak_app_author_email', true );
 
 		$phonegap_plugins = '';
-
-		if ( !metadata_exists( 'post', $post_id, '_wpak_app_phonegap_plugins' ) ) {
-			//Deactivate default plugins for now.
-			//$phonegap_plugins = self::get_default_phonegap_plugins();
-		} else {
+		if ( metadata_exists( 'post', $post_id, '_wpak_app_phonegap_plugins' ) ) {
 			$phonegap_plugins = get_post_meta( $post_id, '_wpak_app_phonegap_plugins', true );
 		}
-
+		
 		return array( 'title' => $title,
 			'name' => $name,
 			'app_phonegap_id' => $app_phonegap_id,
@@ -396,9 +392,82 @@ class WpakApps {
 		return intval( $secured_raw ) == 1;
 	}
 
-	private static function get_default_phonegap_plugins() {
-		$default_plugins = '<gap:plugin name="org.apache.cordova.inappbrowser" />';
+	/**
+	 * Add/merge WP AppKit default Phonegap Build plugins to those set in BO and return 
+	 * them as config.xml ready XML.
+	 * 
+	 * @param int $app_id Application ID
+	 * @param string $bo_plugins_xml Optional. Pass this if the BO plugins XML has already be computed.
+	 * @return string Merged BO and default plugins XML.
+	 */
+	public static function get_merged_phonegap_plugins_xml( $app_id, $bo_plugins_xml = '' ) {
+
+		if ( empty( $bo_plugins_xml ) ) {
+			$app_main_infos = WpakApps::get_app_main_infos( $app_id );
+			$bo_plugins_xml = $app_main_infos['phonegap_plugins'];
+		}
+
+		$bo_plugins_array = self::parse_plugins_from_xml( $bo_plugins_xml );
+
+		$merged_plugins = array_merge( self::get_default_phonegap_plugins( $app_id ), $bo_plugins_array );
+		
+		return self::get_plugins_xml($merged_plugins);
+	}
+
+	protected static function get_default_phonegap_plugins( $app_id ) {
+
+		$default_plugins = array(
+			'org.apache.cordova.inappbrowser' => array( 'version' => '' ),
+			'org.apache.cordova.network-information' => array( 'version' => '' )
+		);
+
+		/**
+		 * Filter the Phonegap Build plugins that are included by default by WP AppKit
+		 *
+		 * @param array		$default_plugins	Array of default Phonegap plugins.
+		 * @param int		$app_id				Application id
+		 */
+		$default_plugins = apply_filters( 'wpak_default_phonegap_build_plugins', $default_plugins, $app_id );
+
 		return $default_plugins;
+	}
+
+	protected static function get_plugins_xml( $plugins ) {
+		$plugins_xml = '';
+
+		if ( is_array( $plugins ) ) {
+			$plugins_xml_array = array();
+			foreach ( $plugins as $plugin_name => $plugin_data ) {
+				$plugin_xml = '<gap:plugin name="' . $plugin_name . '"';
+				if ( !empty( $plugin_data['version'] ) ) {
+					$plugin_xml .= ' version="'. $plugin_data['version'] .'"';
+				}
+				$plugin_xml .= ' />';
+				$plugins_xml_array[] = $plugin_xml;
+			}
+			$plugins_xml = implode( "\n", $plugins_xml_array );
+		}
+
+		return $plugins_xml;
+	}
+
+	protected static function parse_plugins_from_xml( $plugins_xml ) {
+		$plugins_array = array();
+
+		if ( preg_match_all( '/<gap:plugin [^\/]+\/>/s', $plugins_xml, $matches ) ) {
+			foreach ( $matches[0] as $match ) {
+				$name = '';
+				$version = '';
+				if ( preg_match( '/name="([^"]+)"/', $match, $name_match ) && strlen( $name_match[1] ) > 0 ) {
+					if ( preg_match( '/version="([^"]+)"/', $match, $version_match ) && strlen( $version_match[1] ) > 0 ) {
+						$version = $version_match[1];
+					}
+					$plugins_array[$name_match[1]] = array( 'version' => $version );
+				}
+			}
+		}
+
+		return $plugins_array;
 	}
 
 }
