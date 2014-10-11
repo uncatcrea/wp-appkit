@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP App Kit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-08 16:47+0100\n"
-"PO-Revision-Date: 2014-10-08 16:59+0100\n"
+"POT-Creation-Date: 2014-10-11 15:11+0100\n"
+"PO-Revision-Date: 2014-10-11 15:13+0100\n"
 "Last-Translator: Lionel Pointet <lionel.pointet@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n>1;\n"
-"X-Generator: Poedit 1.6.9\n"
+"X-Generator: Poedit 1.6.5\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;"
 "_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2\n"
@@ -820,13 +820,16 @@ msgstr ""
 
 #: ../lib/options/options-bo-settings.php:44
 msgid "Refresh interval (in seconds)"
-msgstr ""
+msgstr "Intervalle de rafraichissement (en secondes)"
 
 #: ../lib/options/options-bo-settings.php:46
 msgid ""
-"Use 0 to deactivate automatic refreshes. The content will only be refreshed "
-"once, at the app launch. (default value)"
+"Use 0 to avoid intervals between refreshes. The content will be fetched from "
+"the server at each app launch (default value)"
 msgstr ""
+"Utiliser 0 pour désactiver les intervalles entre les rafraichissements. Le "
+"contenu sera récupéré du serveur à chaque lancement de l'application (valeur "
+"par défaut)"
 
 #: ../lib/settings/settings.php:20
 msgid "Settings"
@@ -940,7 +943,7 @@ msgstr ""
 #: ../lib/themes/upload-themes.php:38
 #, php-format
 msgid "Installing WP AppKit from uploaded file: %s"
-msgstr ""
+msgstr "Installer WP AppKit depuis un fichier téléchargé : %s"
 
 #: ../lib/themes/upload-themes.php:59
 #, php-format
