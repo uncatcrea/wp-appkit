@@ -43,7 +43,7 @@ class WpakOptionsBoSettings {
 		<div class="wpak_settings">
 			<label for="wpak_app_options_refresh_interval"><?php _e( 'Refresh interval (in seconds)', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input id="wpak_app_options_refresh_interval" type="text" name="wpak_app_options[refresh_interval]" value="<?php echo $options['refresh_interval'] ?>" />
-			<span class="description"><?php _e( 'Use 0 to deactivate automatic refreshes. The content will only be refreshed once, at the app launch. (default value)', WpAppKit::i18n_domain ) ?></span>
+			<span class="description"><?php _e( 'Use 0 to avoid intervals between refreshes. The content will be fetched from the server at each app launch (default value)', WpAppKit::i18n_domain ) ?></span>
 			<br/><br/>
 			<?php wp_nonce_field( 'wpak-options-' . $post->ID, 'wpak-nonce-options' ) ?>
 		</div>
