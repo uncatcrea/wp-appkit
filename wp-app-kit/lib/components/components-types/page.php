@@ -136,10 +136,10 @@ class WpakComponentTypePage extends WpakComponentType {
 		);
 
 		/**
-		 * Filter a page content. Use this to format app pages content your own way.
+		 * Filter a page content into a page component. Use this to format app pages content your own way.
 		 *
 		 * To apply the default App Kit formating to the content and add only minor modifications to it,
-		 * use the "wpak_post_content_format" filter instead, applied in
+		 * use the "wpak_post_content_format" filter instead.
 		 *
 		 * @see WpakComponentsUtils::get_formated_content()
 		 *
@@ -167,7 +167,7 @@ class WpakComponentTypePage extends WpakComponentType {
 		$post_data['tree_data'] = !empty( $tree_data ) ? $tree_data : array();
 
 		/**
-		 * Filter page data sent to the app.
+		 * Filter page data sent to the app from a page component.
 		 *
 		 * Use this for example to add a page meta to the default page data.
 		 *

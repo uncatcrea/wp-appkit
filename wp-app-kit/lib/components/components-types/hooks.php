@@ -15,7 +15,7 @@ class WpakComponentTypeHooks extends WpakComponentType {
 		);
 
 		/**
-		 * Filter data from a component.
+		 * Filter data from a custom component.
 		 *
 		 * @param array 			$component_default_data    	An array of default data.
 		 * @param WpakComponent 	$component 					The component object.
