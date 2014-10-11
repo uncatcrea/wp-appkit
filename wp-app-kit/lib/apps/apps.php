@@ -19,9 +19,9 @@ class WpakApps {
 	public static function apps_custom_post_type() {
 
 		$capability = current_user_can('wpak_edit_apps') ? 'wpak_app' : 'post';
-		
+
 		register_post_type(
-			'wpak_apps', 
+			'wpak_apps',
 			array(
 				'label' => __( 'Applications', WpAppKit::i18n_domain ),
 				'description' => '',
@@ -55,7 +55,7 @@ class WpakApps {
 	public static function add_icon() {
 		global $pagenow, $typenow;
 
-		//TODO : use an external CSS instead of writing style directly in <head>... 
+		//TODO : use an external CSS instead of writing style directly in <head>...
 
 		if ( $typenow == 'wpak_apps' && in_array( $pagenow, array( 'edit.php', 'post-new.php', 'post.php' ) ) ) {
 			?>
@@ -75,38 +75,38 @@ class WpakApps {
 	}
 
 	public static function add_main_meta_box() {
-		
+
 		add_meta_box(
-			'wpak_app_main_infos', 
-			__( 'Platform', WpAppKit::i18n_domain ), 
-			array( __CLASS__, 'inner_main_infos_box' ), 
-			'wpak_apps', 
-			'normal', 
+			'wpak_app_main_infos',
+			__( 'Platform', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_main_infos_box' ),
+			'wpak_apps',
+			'normal',
 			'default'
 		);
-		
+
 	}
 
 	public static function add_phonegap_meta_box() {
 
 		add_meta_box(
-			'wpak_app_phonegap_data', 
-			__( 'Phonegap config.xml data', WpAppKit::i18n_domain ), 
-			array( __CLASS__, 'inner_phonegap_infos_box' ), 
-			'wpak_apps', 
-			'normal', 
+			'wpak_app_phonegap_data',
+			__( 'Phonegap config.xml data', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_phonegap_infos_box' ),
+			'wpak_apps',
+			'normal',
 			'default'
 		);
 
 		add_meta_box(
-			'wpak_app_security', 
-			__( 'Security', WpAppKit::i18n_domain ), 
-			array( __CLASS__, 'inner_security_box' ), 
-			'wpak_apps', 
-			'side', 
+			'wpak_app_security',
+			__( 'Security', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_security_box' ),
+			'wpak_apps',
+			'side',
 			'default'
 		);
-		
+
 	}
 
 	public static function inner_main_infos_box( $post, $current_box ) {
@@ -134,38 +134,38 @@ class WpakApps {
 		<div class="wpak_settings">
 			<span class="description"><?php _e( 'PhoneGap config.xml informations that are going to be displayed on App Stores.<br/>They are required when exporting the App to Phonegap, but are not used for App debug and simulation in browsers.', WpAppKit::i18n_domain ) ?></span>
 			<br/><br/>
-			<label><?php _e( 'Application name', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Application name', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_name" value="<?php echo $main_infos['name'] ?>" />
 			<br/><br/>
 			<label><?php _e( 'Application description', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<textarea name="wpak_app_desc"><?php echo $main_infos['desc'] ?></textarea>
 			<br/><br/>
-			<label><?php _e( 'Application id', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Application id', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_phonegap_id" value="<?php echo $main_infos['app_phonegap_id'] ?>" />
 			<br/><br/>
 			<label><?php _e( 'Version', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_version" value="<?php echo $main_infos['version'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Application versionCode (Android only)', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Application versionCode (Android only)', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_version_code" value="<?php echo $main_infos['version_code'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Phonegap version', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Phonegap version', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_phonegap_version" value="<?php echo $main_infos['phonegap_version'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Application author', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Application author', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_author" value="<?php echo $main_infos['author'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Application author website', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Application author website', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_author_website" value="<?php echo $main_infos['author_website'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Application author email', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Application author email', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_author_email" value="<?php echo $main_infos['author_email'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Phonegap plugins', WpAppKit::i18n_domain ) ?></label> : <br/> 
+			<label><?php _e( 'Phonegap plugins', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<textarea name="wpak_app_phonegap_plugins"><?php echo $main_infos['phonegap_plugins'] ?></textarea>
 			<span class="description"><?php _e( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
 			<br/><br/>
-			<a href="<?php echo WpakBuild::get_appli_dir_url() . '/config.xml?wpak_app_id=' . self::get_app_slug( $post->ID ) ?>"><?php _e( 'View config.xml', WpAppKit::i18n_domain ) ?></a>
+			<a href="<?php echo WpakBuild::get_appli_dir_url() . '/config.xml?wpak_app_id=' . self::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.xml', WpAppKit::i18n_domain ) ?></a>
 			<?php wp_nonce_field( 'wpak-phonegap-infos-' . $post->ID, 'wpak-nonce-phonegap-infos' ) ?>
 		</div>
 		<?php
@@ -272,7 +272,7 @@ class WpakApps {
 		if ( isset( $_POST['wpak_app_simulation_secured'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_simulation_secured', sanitize_text_field( $_POST['wpak_app_simulation_secured'] ) );
 		}
-		
+
 	}
 
 	private static function get_platforms() {

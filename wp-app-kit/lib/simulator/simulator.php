@@ -19,7 +19,7 @@ class WpakSimulator {
 
 	public static function add_action_link( $actions ) {
 		global $post;
-		
+
 		if ( $post->post_type == 'wpak_apps' ) {
 			if ( array_key_exists( 'trash', $actions ) ) {
 				$trash_mem = $actions['trash'];
@@ -79,7 +79,7 @@ class WpakSimulator {
 				<div id="debug-infos">
 					<h3><a href="<?php echo $appli_url ?>" target="_blank"><?php _e( 'Preview in browser', WpAppKit::i18n_domain ) ?></a></h3>
 
-					<h3><a href="<?php echo $appli_dir_url . '/config.js?wpak_app_id=' . $app_id ?>"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a></h3>
+					<h3><a href="<?php echo $appli_dir_url . '/config.js?wpak_app_id=' . $app_id ?>" target="_blank"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a></h3>
 
 					<br/><br/>
 					<h3><?php _e( 'Web services', WpAppKit::i18n_domain ) ?> :</h3>

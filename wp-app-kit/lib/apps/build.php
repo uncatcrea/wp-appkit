@@ -15,20 +15,20 @@ class WpakBuild {
 
 	public static function add_meta_boxes() {
 		add_meta_box(
-			'wpak_simulation_box', 
-			__( 'App Simulation', WpAppKit::i18n_domain ), 
-			array( __CLASS__, 'inner_simulation_box' ), 
-			'wpak_apps', 
-			'side', 
+			'wpak_simulation_box',
+			__( 'App Simulation', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_simulation_box' ),
+			'wpak_apps',
+			'side',
 			'default'
 		);
 
 		add_meta_box(
-			'wpak_export_box', 
-			__( 'Phonegap ready App export', WpAppKit::i18n_domain ), 
-			array( __CLASS__, 'inner_export_box' ), 
-			'wpak_apps', 
-			'side', 
+			'wpak_export_box',
+			__( 'Phonegap ready App export', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_export_box' ),
+			'wpak_apps',
+			'side',
 			'default'
 		);
 	}
@@ -53,7 +53,7 @@ class WpakBuild {
 		<a href="<?php echo $appli_url ?>" class="button button-large" target="_blank"><?php _e( 'View application in browser', WpAppKit::i18n_domain ) ?></a>
 		<br/>
 		<br/>
-		<a href="<?php echo self::get_appli_dir_url() . '/config.js?wpak_app_id=' . WpakApps::get_app_slug( $post->ID ) ?>"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a>
+		<a href="<?php echo self::get_appli_dir_url() . '/config.js?wpak_app_id=' . WpakApps::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a>
 		<br/>
 		<br/>
 		<div style="word-wrap: break-word;">
