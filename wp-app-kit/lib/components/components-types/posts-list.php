@@ -16,7 +16,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		}
 
 		if( $options['post-type'] == 'custom' ) {
-			
+
 			//Custom posts list generated via hook :
 			//Choose "Custom, using hook" when creating the component in BO, and use the following
 			//hook "wpak_posts_list_custom-[your-hook]" to set the component posts.
@@ -32,28 +32,45 @@ class WpakComponentTypePostsList extends WpakComponentType {
 				'query' => array( 'type' => 'custom-posts-list', 'taxonomy' => '', 'terms' => array(), 'is_last_page' => true, 'before_item' => 0 )
 			);
 
+			/**
+			 * Filter data from a posts list component.
+			 *
+			 * @param array 			$posts_list_data    	An array of default data.
+			 * @param WpakComponent 	$component 				The component object.
+			 * @param array 			$options 				An array of options.
+			 * @param array 			$args 					An array of complementary arguments.
+			 * @param array 			$before_post_date 		The publication of the last displayed post.
+			 */
 			$posts_list_data = apply_filters( 'wpak_posts_list_custom-' . $options['hook'], $posts_list_data, $component, $options, $args, $before_post_date );
 
 			$posts = $posts_list_data['posts'];
 			$total = !empty( $posts_list_data['total'] ) ? $posts_list_data['total'] : count( $posts );
 			$query = $posts_list_data['query'];
-			
+
 		} else { //WordPress Post type or "Latest posts"
-			
+
 			$is_last_posts = $options['post-type'] == 'last-posts';
-			
+
 			$post_type = !empty( $options['post-type'] ) && !$is_last_posts ? $options['post-type'] : 'post';
 
 			$query = array( 'post_type' => $post_type );
 
 			$query_args = array( 'post_type' => $post_type );
 
+			/**
+			 * Filter the number of posts displayed into a posts list component.
+			 *
+			 * @param int 			    					Default number of posts.
+			 * @param WpakComponent 	$component 			The component object.
+			 * @param array 			$options 			An array of options.
+			 * @param array 			$args 				An array of complementary arguments.
+			 */
 			$query_args['posts_per_page'] = apply_filters('wpak_posts_list_posts_per_page', WpakSettings::get_setting( 'posts_per_page' ), $component, $options, $args );
-			
+
 			if( $is_last_posts ){
-				
+
 				$query['type'] = 'last-posts';
-				
+
 			}elseif ( !empty( $options['taxonomy'] ) && !empty( $options['term'] ) ) {
 
 				$query_args['tax_query'] = array(
@@ -83,6 +100,15 @@ class WpakComponentTypePostsList extends WpakComponentType {
 				}
 			}
 
+			/**
+			 * Filter args used for the query made into a posts list component.
+			 *
+			 * @param array 			$query_args    		An array of default args.
+			 * @param WpakComponent 	$component 			The component object.
+			 * @param array 			$options 			An array of options.
+			 * @param array 			$args 				An array of complementary arguments.
+			 * @param array 			$query 				Data about the query to retrieve on the app side.
+			 */
 			$query_args = apply_filters( 'wpak_posts_list_query_args', $query_args, $component, $options, $args, $query );
 
 			$posts_query = new WP_Query( $query_args );
@@ -124,9 +150,18 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			'nb_comments' => ( int ) get_comments_number()
 		);
 
-		//Use the "wpak_posts_list_post_content" filter to format app posts content your own way :
-		//(To apply the default App Kit formating to the content and add only minor modifications to it, 
-		//use the "wpak_post_content_format" filter instead, applied in WpakComponentsUtils::get_formated_content()).
+		/**
+		 * Filter post content into a posts list component. Use this to format app posts content your own way.
+		 *
+		 * To apply the default App Kit formating to the content and add only minor modifications to it,
+		 * use the "wpak_post_content_format" filter instead.
+		 *
+		 * @see WpakComponentsUtils::get_formated_content()
+		 *
+		 * @param string 			''    			The post content: an empty string by default.
+		 * @param WP_Post 			$post 			The post object.
+		 * @param WpakComponent 	$component		The component object.
+		 */
 		$content = apply_filters( 'wpak_posts_list_post_content', '', $post, $component );
 		if ( empty( $content ) ) {
 			$content = WpakComponentsUtils::get_formated_content();
@@ -143,8 +178,15 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			$post_data['thumbnail']['height'] = $featured_img_src[2];
 		}
 
-		//To customize post data sent to the app (for example add a post meta to the default post data), 
-		//use this "wpak_post_data" filter :
+		/**
+		 * Filter post data sent to the app from a posts list component.
+		 *
+		 * Use this for example to add a post meta to the default post data.
+		 *
+		 * @param array 			$post_data    	The default post data sent to an app.
+		 * @param WP_Post 			$post 			The post object.
+		 * @param WpakComponent 	$component		The component object.
+		 */
 		$post_data = apply_filters( 'wpak_post_data', $post_data, $post, $component );
 
 		return ( object ) $post_data;
@@ -191,7 +233,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			$current_term = $options['term'];
 			$current_hook = !empty( $options['hook'] ) ? $options['hook'] : '';
 		}
-		
+
 		?>
 		<div class="component-params">
 			<label><?php _e( 'List type', WpAppKit::i18n_domain ) ?> : </label>
@@ -243,7 +285,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 
 	protected static function echo_sub_options_html( $current_post_type, $current_taxonomy = '', $current_term = '', $current_hook = '' ) {
 		?>
-		<?php if( $current_post_type == 'last-posts' ) : //Custom posts list ?>		
+		<?php if( $current_post_type == 'last-posts' ) : //Custom posts list ?>
 			<?php //no sub option for now ?>
 		<?php elseif( $current_post_type == 'custom' ): //Custom posts list ?>
 			<label><?php _e( 'Hook name', WpAppKit::i18n_domain ) ?></label> : <input type="text" name="hook" value="<?php echo $current_hook ?>" />
@@ -252,6 +294,12 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			<?php
 				$taxonomies = get_object_taxonomies( $current_post_type );
 				$taxonomies = array_diff( $taxonomies, array( 'nav_menu', 'link_category' ) );
+
+				/**
+				 * Filter taxonomies list displayed into a "Posts list" component select field.
+				 *
+				 * @param array 	$taxonomies    	The default taxonomies list to display.
+				 */
 				$taxonomies = apply_filters( 'wpak_component_type_posts_list_form_taxonomies', $taxonomies );
 
 				$first_taxonomy = reset( $taxonomies );
