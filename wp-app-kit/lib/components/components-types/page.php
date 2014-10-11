@@ -36,8 +36,8 @@ class WpakComponentTypePage extends WpakComponentType {
 
 					$this->set_specific( 'is_tree', true );
 				} else {
-					//Important : Include page tree data here too for consistency with the "with_subtree" case : 
-					//pages referenced in the tree data wont be  included in the global 'pages' if they 
+					//Important : Include page tree data here too for consistency with the "with_subtree" case :
+					//pages referenced in the tree data wont be  included in the global 'pages' if they
 					//are not included in another page tree in the app.
 					$all_pages_by_ids = array( $page->ID => self::get_page_data( $component, $page, self::get_page_tree_data( $page->ID, $page->post_parent ) ) );
 
@@ -135,9 +135,18 @@ class WpakComponentTypePage extends WpakComponentType {
 			'nb_comments' => ( int ) get_comments_number()
 		);
 
-		//Use the "wpak_page_content" filter to format app pages content your own way :
-		//(To apply the default App Kit formating to the content and add only minor modifications to it,
-		//use the "wpak_post_content_format" filter instead, applied in WpakComponentsUtils::get_formated_content()).
+		/**
+		 * Filter a page content. Use this to format app pages content your own way.
+		 *
+		 * To apply the default App Kit formating to the content and add only minor modifications to it,
+		 * use the "wpak_post_content_format" filter instead, applied in
+		 *
+		 * @see WpakComponentsUtils::get_formated_content()
+		 *
+		 * @param string 			''    			The page content: an empty string by default.
+		 * @param WP_Post 			$post 			The page object.
+		 * @param WpakComponent 	$component		The component object.
+		 */
 		$content = apply_filters( 'wpak_page_content', '', $post, $component );
 		if ( empty( $content ) ) {
 			$content = WpakComponentsUtils::get_formated_content();
@@ -157,8 +166,15 @@ class WpakComponentTypePage extends WpakComponentType {
 
 		$post_data['tree_data'] = !empty( $tree_data ) ? $tree_data : array();
 
-		//To customize page data sent to the app (for example add a page meta to the default page data),
-		//use this "wpak_page_data" filter :
+		/**
+		 * Filter page data sent to the app.
+		 *
+		 * Use this for example to add a page meta to the default page data.
+		 *
+		 * @param array 			$post_data    	The default page data sent to an app.
+		 * @param WP_Post 			$post 			The page object.
+		 * @param WpakComponent 	$component		The component object.
+		 */
 		$post_data = apply_filters( 'wpak_page_data', $post_data, $post, $component );
 
 		return ( object ) $post_data;
@@ -235,6 +251,13 @@ class WpakComponentTypePage extends WpakComponentType {
 
 	protected static function echo_sub_options_html( $current_post_type_object, $current_page_id = 0, $with_subtree = false ) {
 		$pages = get_posts( array( 'post_type' => $current_post_type_object->name, 'posts_per_page' => -1, 'orderby' => 'title', 'order' => 'ASC' ) );
+
+		/**
+		 * Filter pages list displayed into a "Page" component select field.
+		 *
+		 * @param array 			$pages    							The default pages list to display.
+		 * @param string 			$current_post_type_object->name 	The name of the post type being displayed.
+		 */
 		$pages = apply_filters( 'wpak_component_type_page_form_pages', $pages, $current_post_type_object->name );
 		?>
 		<br/>
