@@ -1,13 +1,13 @@
-<%  
+<%
 	//Use the global "post" to get the current page object (containing page title, page content ...).
-	
+
 	var parent = TemplateTags.getPageParent();
 	var next_page = TemplateTags.getNextPage();
 	var previous_page = TemplateTags.getPreviousPage();
 	var siblings = TemplateTags.getPageSiblings();
 	var sub_pages = TemplateTags.getPageChildren();
 	var page_depth = TemplateTags.getPageDepth();
-	var ariane = TemplateTags.getPageAriane();
+	var ariane = TemplateTags.getPageBreadcrumb();
 %>
 
 <% if( page_depth > 0 ){ %>
@@ -34,7 +34,7 @@
 	    <% } %>
 	  </div>
 	</div>
-	
+
 <% } %>
 
 <% if( ariane.length ){ %>
@@ -66,4 +66,4 @@
 			<a href="<%= TemplateTags.getPageLink(page.id) %>" class="list-group-item <% print(page.id == post.id ? 'list-group-item-info' : '') %>"><%= page.title %></a>
 		<% }); %>
 	</div>
-<% } %> 
+<% } %>

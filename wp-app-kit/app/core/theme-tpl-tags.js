@@ -1,6 +1,6 @@
 /**
- * Defines "template tags like" functions that can be called from theme templates 
- * and theme functions.js. 
+ * Defines "template tags like" functions that can be called from theme templates
+ * and theme functions.js.
  */
 define(function(require, exports) {
 
@@ -156,7 +156,7 @@ define(function(require, exports) {
 
 
     /**********************************************
-     * Pages 
+     * Pages
      */
 
     themeTplTags.isPage = function(page_id) {
@@ -306,7 +306,7 @@ define(function(require, exports) {
         return depth;
     };
 
-    themeTplTags.getPageAriane = function() {
+    themeTplTags.getPageBreadcrumb = function() {
         var ariane = [];
 
         if (themeTplTags.isTreePage()) {
@@ -334,7 +334,7 @@ define(function(require, exports) {
     };
 
     //Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
-    //a circular dependency for requirejs) can both be required at the same time 
-    //(in theme functions.js for example) : 
+    //a circular dependency for requirejs) can both be required at the same time
+    //(in theme functions.js for example) :
     _.extend(exports, themeTplTags);
 });
