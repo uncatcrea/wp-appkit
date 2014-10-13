@@ -165,6 +165,10 @@ class WpakApps {
 			<textarea name="wpak_app_phonegap_plugins"><?php echo $main_infos['phonegap_plugins'] ?></textarea>
 			<span class="description"><?php _e( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
 			<br/><br/>
+			<label><?php _e( 'Icons and splashscreens', WpAppKit::i18n_domain ) ?></label> : <br/>
+			<textarea name="wpak_app_icons"><?php echo $main_infos['icons'] ?></textarea>
+			<span class="description"><?php _e( 'Write the icons and spashscreens tags as defined in the PhoneGap documentation.<br/>Example : &lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;', WpAppKit::i18n_domain ) ?></span>
+			<br/><br/>
 			<a href="<?php echo WpakBuild::get_appli_dir_url() . '/config.xml?wpak_app_id=' . self::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.xml', WpAppKit::i18n_domain ) ?></a>
 			<?php wp_nonce_field( 'wpak-phonegap-infos-' . $post->ID, 'wpak-nonce-phonegap-infos' ) ?>
 		</div>
@@ -264,6 +268,11 @@ class WpakApps {
 			$phonegap_plugins = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $_POST['wpak_app_phonegap_plugins'] );
 			update_post_meta( $post_id, '_wpak_app_phonegap_plugins', trim( $phonegap_plugins ) );
 		}
+		
+		if ( isset( $_POST['wpak_app_icons'] ) ) {
+			$app_icons = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $_POST['wpak_app_icons'] );
+			update_post_meta( $post_id, '_wpak_app_icons', trim( $app_icons ) );
+		}
 
 		if ( isset( $_POST['wpak_app_secured'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_secured', sanitize_text_field( $_POST['wpak_app_secured'] ) );
@@ -359,7 +368,8 @@ class WpakApps {
 		$author = get_post_meta( $post_id, '_wpak_app_author', true );
 		$author_website = get_post_meta( $post_id, '_wpak_app_author_website', true );
 		$author_email = get_post_meta( $post_id, '_wpak_app_author_email', true );
-
+		$icons = get_post_meta( $post_id, '_wpak_app_icons', true );
+		
 		$phonegap_plugins = '';
 		if ( metadata_exists( 'post', $post_id, '_wpak_app_phonegap_plugins' ) ) {
 			$phonegap_plugins = get_post_meta( $post_id, '_wpak_app_phonegap_plugins', true );
@@ -377,6 +387,7 @@ class WpakApps {
 			'author_website' => $author_website,
 			'author_email' => $author_email,
 			'phonegap_plugins' => $phonegap_plugins,
+			'icons' => $icons,
 		);
 	}
 

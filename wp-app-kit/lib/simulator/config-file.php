@@ -130,6 +130,7 @@ define( function ( require ) {
 		$app_author_email = $app_main_infos['author_email'];
 		$app_author_website = $app_main_infos['author_website'];
 		$app_platform = $app_main_infos['platform'];
+		$app_icons = $app_main_infos['icons'];
 		
 		//Merge our default Phonegap Build plugins to those set in BO :
 		$app_phonegap_plugins = WpakApps::get_merged_phonegap_plugins_xml($app_id, $app_main_infos['phonegap_plugins']);
@@ -163,6 +164,11 @@ define( function ( require ) {
 
 <?php endif ?>
 	<!-- Add Icon, Splash screen and any PhoneGap plugin declaration here -->
+<?php if( !empty( $app_icons ) ): ?>
+
+	<?php echo str_replace( "\n", "\n\t", $app_icons ) ?>
+
+<?php endif ?>
 <?php if( !empty( $app_phonegap_plugins ) ): ?>
 
 	<?php echo str_replace( "\n", "\n\t", $app_phonegap_plugins ) ?>
