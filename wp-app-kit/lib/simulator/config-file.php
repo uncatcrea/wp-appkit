@@ -158,11 +158,24 @@ define( function ( require ) {
 	<author href="<?php echo $app_author_website ?>" email="<?php echo $app_author_email ?>"><?php echo $app_author ?></author>
 
 	<gap:platform name="<?php echo $app_platform ?>" />
-
 <?php if( !empty( $app_phonegap_version ) ): ?>
+	
 	<preference name="phonegap-version" value="<?php echo $app_phonegap_version ?>" />
-
 <?php endif ?>
+<?php 
+	/**
+	* Filter to handle the  "Webview bounce effect" on devices.
+	* Pass false to this filter to allow the "Webview bounce effect".
+	*
+	* @param boolean	true		Bounce effect is disallowed by default.
+	* @param int		$app_id		Application id
+	*/
+	if( apply_filters('wpak_config_xml_preference_disallow_overscroll', true, $app_id ) ): ?>
+	
+	<preference name="<?php echo $app_platform == 'android' ? 'd' : 'D' ?>isallowOverscroll" value="true" />
+	<preference name="webviewbounce" value="false" />
+<?php endif ?>
+	
 	<!-- Add Icon, Splash screen and any PhoneGap plugin declaration here -->
 <?php if( !empty( $app_icons ) ): ?>
 
