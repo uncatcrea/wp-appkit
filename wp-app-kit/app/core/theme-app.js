@@ -14,7 +14,8 @@ define( function( require, exports ) {
 			Messages = require( 'core/messages' ),
 			App = require( 'core/app' ),
 			Hooks = require( 'core/lib/hooks' ),
-			TemplateTags = require( 'core/theme-tpl-tags' );
+			TemplateTags = require( 'core/theme-tpl-tags' ),
+			PhoneGap = require( 'core/phonegap-utils' );
 
 	var themeApp = { };
 
@@ -60,6 +61,7 @@ define( function( require, exports ) {
 
 		if ( theme_event_data.type == 'error'
 				|| theme_event_data.type == 'info'
+				|| theme_event_data.type == 'network'
 				) {
 			//2 ways of binding to error and info events :
 			vent.trigger( event, theme_event_data ); //Ex: bind directly to 'info:no-content'
@@ -108,6 +110,17 @@ define( function( require, exports ) {
 
 			if ( event == 'info:no-content' ) {
 				theme_event_data.message = Messages.get('info_no_content');
+			}
+
+		} else if ( event.indexOf( 'network:' ) === 0 ) {
+
+			theme_event_data.type = 'network';
+			theme_event_data.event = event.replace( 'network:', '' );
+
+			if( event == 'network:online' ) {
+				theme_event_data.message = Messages.get('info_network_online');
+			}else if( event == 'network:offline' ) {
+				theme_event_data.message = Messages.get('info_network_offline');
 			}
 
 		}
@@ -436,6 +449,22 @@ define( function( require, exports ) {
 
 	};
 
+	/************************************************
+	 * App network management
+	 */
+	
+	/**
+	 * Retrieve network state : "online", "offline" or "unknown"
+	 * If full_info is passed and set to true, detailed connexion info is 
+	 * returned (Wifi, 3G etc...).
+	 * 
+	 * @param boolean full_info Set to true to get detailed connexion info
+	 * @returns string "online", "offline" or "unknown"
+	 */
+	themeApp.getNetworkState = function(full_info) {
+		return PhoneGap.getNetworkState(full_info);
+	};
+	
 	/************************************************
 	 * App infos management
 	 */

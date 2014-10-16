@@ -137,6 +137,17 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/lib/storage',
 			scrollTop();
 		}
 	} );
+	
+	/**
+	 * React to network state changes :
+	 */
+	App.on( 'network:online', function(event) {
+		$( '#feedback' ).removeClass( 'error' ).html( "Internet connexion ok :)" ).slideDown();
+	} );
+	
+	App.on( 'network:offline', function(event) {
+		$( '#feedback' ).addClass( 'error' ).html( "Internet connexion lost :(" ).slideDown();
+	} );
 
 	/**
 	 * Manually close the bootstrap navbar

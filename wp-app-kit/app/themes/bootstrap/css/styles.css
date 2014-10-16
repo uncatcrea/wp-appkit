@@ -94,6 +94,10 @@ a#refresh-button.refreshing {
 	background:#ffebe8;	
 }
 
+div.info{
+    padding:1em;
+}
+
 li.media{
 	cursor:pointer;
 }

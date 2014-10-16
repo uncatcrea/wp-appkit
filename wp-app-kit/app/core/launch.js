@@ -101,8 +101,11 @@ require(['root/config'],function(Config){
 			};
 
 			if( PhoneGap.isLoaded() ){
+				PhoneGap.setNetworkEvents(App.onOnline,App.onOffline);
 				document.addEventListener('deviceready', launch, false);
 			}else{
+				window.ononline = App.onOnline;
+				window.onoffline = App.onOffline;
 				$(document).ready(launch);
 			}
 

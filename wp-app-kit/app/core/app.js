@@ -725,8 +725,21 @@ define(function (require) {
 	  	if( undefined !== callback ) {
 	  		callback();
 	  	}
-      }
+      };
+	  
+	//--------------------------------------------------------------------------
+	//Network : handle network state if the Network phonegap plugin is available
+	
+	app.onOnline = function(){
+		vent.trigger('network:online');
+		Utils.log('Network event : online');
+	};
+	
+	app.onOffline = function(){
+		vent.trigger('network:offline');
+		Utils.log('Network event : offline');
+	};
 
-	  return app;
+	return app;
 
 });

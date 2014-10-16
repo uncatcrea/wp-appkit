@@ -332,6 +332,24 @@ define(function(require, exports) {
 
         return link;
     };
+	
+	/************************************************
+	 * App network management
+	 */
+	
+	/**
+	 * Retrieve network state : "online", "offline" or "unknown"
+	 * If full_info is passed and set to true, detailed connexion info is 
+	 * returned (Wifi, 3G etc...).
+	 * This is an alias for ThemeApp.getNetworkState(full_info) because it
+	 * can be useful in themes too.
+	 * 
+	 * @param boolean full_info Set to true to get detailed connexion info
+	 * @returns string "online", "offline" or "unknown"
+	 */
+	themeTplTags.getNetworkState = function(full_info) {
+		return ThemeApp.getNetworkState(full_info);
+	};
 
     //Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
     //a circular dependency for requirejs) can both be required at the same time
