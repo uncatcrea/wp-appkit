@@ -139,8 +139,9 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/lib/storage',
 	} );
 	
 	/**
-	 * React to network state changes :
+	 * Example of how to react to network state changes :
 	 */
+	/*
 	App.on( 'network:online', function(event) {
 		$( '#feedback' ).removeClass( 'error' ).html( "Internet connexion ok :)" ).slideDown();
 	} );
@@ -148,6 +149,7 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/lib/storage',
 	App.on( 'network:offline', function(event) {
 		$( '#feedback' ).addClass( 'error' ).html( "Internet connexion lost :(" ).slideDown();
 	} );
+	*/
 
 	/**
 	 * Manually close the bootstrap navbar
