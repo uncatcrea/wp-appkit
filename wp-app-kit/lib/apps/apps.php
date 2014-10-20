@@ -431,6 +431,11 @@ class WpakApps {
 			'org.apache.cordova.inappbrowser' => array( 'version' => '' ),
 			'org.apache.cordova.network-information' => array( 'version' => '' )
 		);
+		
+		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
+		if( $app_main_infos['platform'] == 'ios' ) {
+			$default_plugins['com.phonegap.plugin.statusbar'] = array( 'version' => '' );
+		}
 
 		/**
 		 * Filter the Phonegap Build plugins that are included by default by WP AppKit
