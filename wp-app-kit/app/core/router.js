@@ -34,7 +34,7 @@ define(function (require) {
         		if( component ){
         			switch( component.type ){
         				case 'posts-list':
-        					App.setQueriedScreen({screen_type:'list',component_id:component_id,item_id:0,global:component.global,data:component.data});
+        					App.setQueriedScreen({screen_type:'list',component_id:component_id,item_id:0,global:component.global,data:component.data,label:component.label});
         					require(["core/views/archive"],function(ArchiveView){
         						var view = new ArchiveView(component.view_data);
         						view.checkTemplate(function(){
@@ -48,7 +48,7 @@ define(function (require) {
         					break;
         				case 'hooks-list':
         				case 'hooks-no-global':
-        					App.setQueriedScreen({screen_type:'custom-component',component_id:component_id,item_id:0,global:component.global,data:component.data});
+        					App.setQueriedScreen({screen_type:'custom-component',component_id:component_id,item_id:0,global:component.global,data:component.data,label:component.label});
         					require(["core/views/custom-component"],function(CustomComponentView){
         						var view = new CustomComponentView({component:component});
         						view.checkTemplate(function(){
@@ -73,8 +73,9 @@ define(function (require) {
 	        	if( global ){
 		        	var item = global.get(item_id);
 		        	if( item ){
-		        		var item_data = item_global == 'posts' ? {post:item.toJSON()} : {item:item.toJSON()};
-		        		App.setQueriedScreen({screen_type:'single',component_id:'',item_id:parseInt(item_id),global:item_global,data:item_data});
+						var item_json = item.toJSON();
+		        		var item_data = item_global == 'posts' ? {post:item_json} : {item:item_json};
+		        		App.setQueriedScreen({screen_type:'single',component_id:'',item_id:parseInt(item_id),global:item_global,data:item_data,label:item_json.title});
 		        		require(["core/views/single"],function(SingleView){
 		        			var view = new SingleView({item:item,global:item_global});
     						view.checkTemplate(function(){
@@ -110,7 +111,7 @@ define(function (require) {
 			        			root_depth:component.data.root_depth
 			        		};
 			        		
-			        		App.setQueriedScreen({screen_type:'page',component_id:component_id,item_id:parseInt(page_id),global:item_global,data:item_data});
+			        		App.setQueriedScreen({screen_type:'page',component_id:component_id,item_id:parseInt(page_id),global:item_global,data:item_data,label:item_data.item.title});
 			        		require(["core/views/page"],function(PageView){
 			        			var view = new PageView({item:item,global:item_global});
 	    						view.checkTemplate(function(){

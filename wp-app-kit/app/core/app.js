@@ -130,6 +130,7 @@ define(function (require) {
 			  fragment:screen_data.fragment,
 			  data:screen_data.hasOwnProperty('data') ? screen_data.data : {},
 			  global:screen_data.hasOwnProperty('global') ? screen_data.global : '',
+			  label:screen_data.hasOwnProperty('label') ? screen_data.label : ''
 		  };
 	  };
 
