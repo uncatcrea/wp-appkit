@@ -207,9 +207,19 @@ define( function( require, exports ) {
 				RegionManager.buildMenu(
 					function() {
 						App.resetDefaultRoute();
-						App.router.default_route();
+						
+						/**
+						 * Use the 'go-to-default-route-after-refresh' to control whether
+						 * the default route should be automatically triggered after refresh.
+						 */
+						var go_to_default_route = App.getParam('go-to-default-route-after-refresh');
+
+						if( go_to_default_route ){
+							App.router.default_route();
+						}
+						
 						Backbone.history.stop();
-						Backbone.history.start();
+						Backbone.history.start({silent:false});
 
 						refreshing--;
 						vent.trigger( 'refresh:end', format_result_data(true) );
@@ -250,6 +260,9 @@ define( function( require, exports ) {
 		App.router.navigate( navigate_to_fragment, { trigger: true } );
 	};
 
+	themeApp.navigateToDefaultRoute = function() {
+		App.router.default_route();
+	};
 
 	/************************************************
 	 * Back button
@@ -470,7 +483,7 @@ define( function( require, exports ) {
 	 */
 
 	themeApp.showCustomPage = function( template, data ) {
-		if ( template == undefined ) {
+		if ( template === undefined ) {
 			template = 'custom';
 		}
 		App.showCustomPage( template, data );

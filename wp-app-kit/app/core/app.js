@@ -54,14 +54,20 @@ define(function (require) {
 	   */
 	  app.showCustomPage = function(template,data){
 		  current_custom_page = new CustomPage({template: template, data: data});
-		  app.router.navigate('custom-page',{trigger: true});
+		  app.router.navigate('#custom-page',{trigger: true});
 	  };
 
 	  //--------------------------------------------------------------------------
 	  //App params :
-	  //Params that can be changed by themes
+	  //Params that can be changed by themes dynamically : themes can freely change 
+	  //their value during a same app execution.
+	  //TODO : we should link (but not merge because they don't have the same usage) 
+	  //those params to App options...
+	  
 	  var params = {
-		  'custom-screen-rendering' : false
+		  'refresh-at-app-launch' : true,
+		  'go-to-default-route-after-refresh' : true,
+		  'custom-screen-rendering' : false,
 	  };
 
 	  app.getParam = function(param){
@@ -82,10 +88,17 @@ define(function (require) {
 	  //App Backbone router :
 	  app.router = null;
 
-	  //Router must be set before calling this resetDefaultRoute :
-	  app.resetDefaultRoute = function(){
+	  /**
+	   * Sets the route corresponding to the app homepage : fragment empty or = "#".
+	   * Use the 'default-route' filter to change the default route from functions.js.
+	   * 
+	   * app.router must be set before calling this resetDefaultRoute
+	   */
+	  app.resetDefaultRoute = function(is_app_launch){
 		  
 		var default_route = '';
+		
+		var is_app_launch = is_app_launch !== undefined && is_app_launch === true;
 		
 		if( app.navigation.length > 0 ){
 			var first_nav_component_id = app.navigation.first().get('component_id');
@@ -103,13 +116,66 @@ define(function (require) {
 		/**
 		 * Hook : filter 'default-route' : use this to define your own default route
 		 */
-		default_route = Hooks.applyFilter('default-route',default_route,[Stats.get_count_open(),Stats.get_last_open_date()]);
+		default_route = Hooks.applyFilter('default-route',default_route,[Stats.getVersionDiff(),Stats.getCountOpen(),Stats.getLastOpenDate(),is_app_launch]);
 		  
 		if( default_route != '' ){
 			app.router.setDefaultRoute(default_route);
 		}
 		
+		return default_route;
 	  };
+
+	  app.launchRouting = function() {
+		
+		var default_route = app.resetDefaultRoute(true);
+		
+		var launch_route = default_route;
+		
+		/**
+		 * Use the 'launch-route' filter to display a specific screen at app launch
+		 * If the returned launch_route = '' the initial 
+		 * navigation to launch route is canceled. Then you should navigate manually
+		 * to a choosen page in the "info:app-ready" event for example.
+		 */
+		launch_route = Hooks.applyFilter('launch-route',launch_route,[Stats.getStats()]);
+		
+		Hooks.doAction('pre-start-router',[launch_route,Stats.getStats()]);
+		
+		if( launch_route.length > 0 ){
+			Backbone.history.start();
+			//Navigate to the launch_route :
+			app.router.navigate(launch_route, {trigger: true});
+		}else{
+			Backbone.history.start({silent:true});
+			//Hack : Trigger a non existent route so that no view is loaded :
+			app.router.navigate('#wpak-none', {trigger: true});
+		}
+			
+		/*
+		    //Keep this commented for now in case the problem comes back.
+		    //Normally it was solved by the "Router callback checking" hack in routers.js.
+		 
+			//Start "silently" so that we don't navigate to a url already set in browser 
+			//(that causes some odd crashes opening views that don't correpond to current screen,
+			//when triggering 2 routes in a very short delay) :
+		  
+			Backbone.history.start({silent: true});
+
+			if( launch_route.length > 0 ){
+				//Navigate to the launch_route :
+				app.router.navigate(launch_route, {trigger: true});
+			}else{
+				//Hack : Trigger a non existent route so that no view is loaded :
+				app.router.navigate('#wpak-none', {trigger: true});
+			}
+
+			//If the launch_route is the same as the current browser url, it won't fire.
+			//So we have to restart the router, removing the silent option to really
+			//navigate to the launch_route (at last!).
+			Backbone.history.stop(); 
+			Backbone.history.start({silent: false});
+		*/
+	  } 
 
 	  //--------------------------------------------------------------------------
 	  //History : allows to handle back button.
@@ -553,8 +619,24 @@ define(function (require) {
     	  }
       };
 
-      app.alertNoContent = function(){
-    	  vent.trigger('info:no-content');
+      app.sendInfo = function(info, data){
+		  //Note : we want to control which info is sent by the app :
+		  //only known infos will be triggered as an event.
+		  switch( info ){
+			  case 'no-content':
+				  vent.trigger('info:no-content');
+				  break;
+			  case 'app-launched':
+				  var stats = Stats.getStats();
+				  vent.trigger('info:app-ready',{stats: stats});
+				  if( stats.count_open == 1 ){
+					  vent.trigger('info:app-first-launch',{stats: stats});
+				  }
+				  if( stats.version_diff.diff != 0 ){
+					  vent.trigger('info:app-version-changed',{stats: stats});
+				  }
+				  break;
+		  }
       };
 
       app.getComponentData = function(component_id){

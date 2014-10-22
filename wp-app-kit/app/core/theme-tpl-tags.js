@@ -9,6 +9,7 @@ define(function(require, exports) {
     var _ = require('underscore'),
             Config = require('root/config'),
             App = require('core/app'),
+			Stats = require('core/stats'), 
             ThemeApp = require('core/theme-app');
 
     var themeTplTags = {};
@@ -38,6 +39,7 @@ define(function(require, exports) {
      * - fragment : unique screen url id (what's after # in url)
      * - component_id : component slug id, if displaying a component screen (list, page)
      * - item_id : current item id, if displaying single content (post,page)
+	 * - label : current item label (title of component, title of post)
      * - data : contains more specific data depending on which screen type is displayed
      * 	> total : total number of posts for lists
      * 	> query : query vars used to retrieve contents (taxonomy, terms...)
@@ -79,6 +81,10 @@ define(function(require, exports) {
     themeTplTags.getCommentsLink = function(post_id) {
         //TODO Check if the post exists in the posts global
         return '#comments-' + post_id;
+    };
+	
+	themeTplTags.getDefaultRouteLink = function() {
+        return App.router.getDefaultRoute();
     };
 
     themeTplTags.isSingle = function(post_id) {
@@ -367,6 +373,22 @@ define(function(require, exports) {
 	 */
 	themeTplTags.getNetworkState = function(full_info) {
 		return ThemeApp.getNetworkState(full_info);
+	};
+
+	/************************************************
+	 * App stats management
+	 */
+	
+	/**
+	 * Retrieves app stats. "stat" can be empty to retrieve all stats, or
+	 * "count_open", "last_open_date", "version", "version_diff".
+	 * 
+	 * @param string stat (optionnal) : Name of stat to retrieve
+	 * @returns JSON object|string : Returns JSON object if "stat" is empty, 
+	 * or the specific stat value correponding to the "stat" arg.
+	 */
+	themeTplTags.getAppStats = function(stat) {
+		return Stats.getStats(stat);
 	};
 
     //Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
