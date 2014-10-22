@@ -75,6 +75,8 @@ class WpakConfigFile {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		$app_title = $app_main_infos['title'];
+		
+		$app_version = WpakApps::sanitize_app_version( $app_main_infos['version'] );
 
 		$debug_mode = WpakBuild::get_app_debug_mode( $app_id );
 
@@ -96,6 +98,7 @@ define( function ( require ) {
 		app_slug : '<?php echo $app_slug ?>',
 		wp_ws_url : '<?php echo $wp_ws_url ?>',
 		theme : '<?php echo addslashes($theme) ?>',
+		version : '<?php echo $app_version ?>',
 		app_title : '<?php echo addslashes($app_title) ?>',
 		debug_mode : '<?php echo $debug_mode ?>'<?php
 		if( !empty( $auth_key ) ):

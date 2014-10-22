@@ -237,7 +237,8 @@ class WpakApps {
 		}
 
 		if ( isset( $_POST['wpak_app_version'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_version', sanitize_text_field( $_POST['wpak_app_version'] ) );
+			$app_version = self::sanitize_app_version( $_POST['wpak_app_version'] );
+			update_post_meta( $post_id, '_wpak_app_version', $app_version );
 		}
 
 		if ( isset( $_POST['wpak_app_version_code'] ) ) {
@@ -282,6 +283,25 @@ class WpakApps {
 			update_post_meta( $post_id, '_wpak_app_simulation_secured', sanitize_text_field( $_POST['wpak_app_simulation_secured'] ) );
 		}
 
+	}
+
+	/**
+	 * Checks that the app version is in the 1.2.3 format.
+	 * 
+	 * @param string $app_version_raw App version to sanitize
+	 * @return string Sanitized app version
+	 */
+	public static function sanitize_app_version( $app_version_raw ) {
+		$app_version = array();
+		$app_version_raw = sanitize_text_field( $app_version_raw );
+		$app_version_split = explode( '.', $app_version_raw );
+		foreach ( $app_version_split as $version_part ) {
+			if ( is_numeric( $version_part ) ) {
+				$app_version[] = intval( $version_part );
+			}
+		}
+		$app_version = implode( '.', $app_version );
+		return $app_version;
 	}
 
 	private static function get_platforms() {
