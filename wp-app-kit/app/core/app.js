@@ -116,7 +116,7 @@ define(function (require) {
 		/**
 		 * Hook : filter 'default-route' : use this to define your own default route
 		 */
-		default_route = Hooks.applyFilter('default-route',default_route,[Stats.getVersionDiff(),Stats.getCountOpen(),Stats.getLastOpenDate(),is_app_launch]);
+		default_route = Hooks.applyFilter('default-route',default_route,[Stats.getStats(),is_app_launch]);
 		  
 		if( default_route != '' ){
 			app.router.setDefaultRoute(default_route);
