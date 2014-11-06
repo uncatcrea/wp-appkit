@@ -87,42 +87,62 @@ define(function(require, exports) {
         return App.router.getDefaultRoute();
     };
 
-    themeTplTags.isSingle = function(post_id) {
-        var screen_data = App.getCurrentScreenData();
+	/**
+	 * Checks if displayin a single
+	 * @param int post_id : Optional : The post ID to check
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns boolean
+	 */
+    themeTplTags.isSingle = function(post_id, screen) {
+        var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
         var is_single = screen_data.screen_type == 'single';
         if (is_single && post_id != undefined) {
-            is_single &= parseInt(post_id) == screen_data.item_id;
+            is_single = parseInt(post_id) == screen_data.item_id;
         }
         return is_single == true;
     };
 
-    themeTplTags.isPostType = function(post_type, post_id) {
-        var screen_data = App.getCurrentScreenData();
+	/**
+	 * Checks if displaying a single for the given post type
+	 * @param string post_type
+	 * @param int post_id : Optional : The post ID to check
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns boolean
+	 */
+    themeTplTags.isPostType = function(post_type, post_id, screen) {
+        var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
         var is_post_type = (screen_data.screen_type == 'single');
         if (is_post_type && post_type != undefined) {
-            is_post_type &= (screen_data.data.post.post_type == post_type);
-            if (is_post_type && post_id != undefined) {
-                is_post_type &= (parseInt(post_id) == screen_data.item_id);
+            is_post_type = (screen_data.data.post.post_type == post_type);
+            if (is_post_type && !_.isEmpty(post_id) ) {
+                is_post_type = is_post_type && (parseInt(post_id) == screen_data.item_id);
             }
         }
         return is_post_type == true;
     };
 
-    themeTplTags.isTaxonomy = function(taxonomy, terms) {
+	/**
+	 * Check if displaying a taxonomy terms archive
+	 * @param string taxonomy : Categories slug(s) to check
+	 * @param string|array terms : Optional : Taxonomy terms slug(s) to check
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns boolean
+	 */
+    themeTplTags.isTaxonomy = function(taxonomy, terms, screen) {
         var is_taxonomy = false;
-
-        var screen_data = App.getCurrentScreenData();
+		
+        var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
 
         if (!_.isEmpty(screen_data.data) && !_.isEmpty(screen_data.data.query)) {
             var screen_query = screen_data.data.query;
             is_taxonomy = screen_data.screen_type == 'list' && !_.isEmpty(screen_query.type) && screen_query.type == 'taxonomy';
             if (is_taxonomy && !_.isEmpty(taxonomy)) {
-                is_taxonomy &= !_.isEmpty(screen_query.taxonomy) && screen_query.taxonomy == taxonomy;
-                if (is_taxonomy && terms != undefined) {
+                is_taxonomy = !_.isEmpty(screen_query.taxonomy) && screen_query.taxonomy == taxonomy;
+                if (is_taxonomy && !_.isEmpty(terms)) {
                     if (typeof terms === 'string') {
                         terms = [terms];
                     }
-                    is_taxonomy &= !_.isEmpty(_.intersection(terms, screen_query.terms));
+                    is_taxonomy = is_taxonomy && !_.isEmpty(_.intersection(terms, screen_query.terms));
                 }
             }
         }
@@ -130,16 +150,34 @@ define(function(require, exports) {
         return is_taxonomy;
     };
 
-    themeTplTags.isCategory = function(categories) {
-        return themeTplTags.isTaxonomy('category', categories);
+	/**
+	 * Check if displaying a Category archive
+	 * @param string|array categories : Optional : Categories slug(s) to check
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns boolean
+	 */
+    themeTplTags.isCategory = function(categories, screen) {
+        return themeTplTags.isTaxonomy('category', categories, screen);
     };
 
-    themeTplTags.isTag = function(tags) {
-        return themeTplTags.isTaxonomy('tag', tags);
+	/**
+	 * Check if displaying a Tag archive
+	 * @param string|array tags : Optional : Tags slug(s) to check
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns boolean
+	 */
+    themeTplTags.isTag = function(tags, screen) {
+        return themeTplTags.isTaxonomy('tag', tags, screen);
     };
 
-    themeTplTags.isScreen = function(screen_fragment) {
-        var screen_data = App.getCurrentScreenData();
+	/**
+	 * Check if displaying the given screen_fragment screen
+	 * @param string screen_fragment The string fragment to check
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns boolean
+	 */
+    themeTplTags.isScreen = function(screen_fragment, screen) {
+        var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
         return screen_data.fragment == screen_fragment;
     };
 
@@ -183,26 +221,44 @@ define(function(require, exports) {
      * Pages
      */
 
-    themeTplTags.isPage = function(page_id) {
-        var screen_data = App.getCurrentScreenData();
+	/**
+	 * Check if displaying a page
+	 * @param int page_id
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns boolean
+	 */
+    themeTplTags.isPage = function(page_id, screen) {
+        var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
         var is_page = screen_data.screen_type == 'page';
         if (is_page && page_id != undefined) {
-            is_page &= parseInt(page_id) == screen_data.item_id;
+            is_page = parseInt(page_id) == screen_data.item_id;
         }
         return is_page == true;
     };
 
-    themeTplTags.isTreePage = function(page_id) {
-        var screen_data = App.getCurrentScreenData();
+	/**
+	 * Check if displaying a page that has a subtree
+	 * @param int page_id : Optional
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns boolean
+	 */
+    themeTplTags.isTreePage = function(page_id, screen) {
+        var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
         var is_tree_page = screen_data.screen_type == 'page' && screen_data.data.is_tree_page;
         if (is_tree_page && page_id != undefined) {
-            is_tree_page &= parseInt(page_id) == screen_data.item_id;
+            is_tree_page = parseInt(page_id) == screen_data.item_id;
         }
         return is_tree_page == true;
     };
 
-    var getPageTreeData = function(what) {
-        var screen_data = App.getCurrentScreenData();
+	/**
+	 * Get page tree data
+	 * @param string : what you want to retrieve about the page (parent, siblings, children, depth, ariane)
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns mixed array|page object|int
+	 */
+    var getPageTreeData = function(what, screen) {
+        var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
 
         var tree_data = '';
 
@@ -252,11 +308,16 @@ define(function(require, exports) {
         return tree_data;
     };
 
-    themeTplTags.getPageParent = function() {
+	/**
+	 * Get page parent
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns {unresolved}
+	 */
+    themeTplTags.getPageParent = function(screen) {
         var parent = null;
 
-        if (themeTplTags.isTreePage()) {
-            var parent_id = getPageTreeData('parent');
+        if (themeTplTags.isTreePage(screen)) {
+            var parent_id = getPageTreeData('parent',screen);
             if (parent_id > 0) {
                 parent = App.getGlobalItem('pages', parent_id);
             }
@@ -265,11 +326,16 @@ define(function(require, exports) {
         return parent;
     };
 
-    themeTplTags.getPageSiblings = function() {
+	/**
+	 * Get page siblings
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns {Array}
+	 */
+    themeTplTags.getPageSiblings = function(screen) {
         var siblings = [];
 
-        if (themeTplTags.isTreePage()) {
-            var siblings_ids = getPageTreeData('siblings');
+        if (themeTplTags.isTreePage(screen)) {
+            var siblings_ids = getPageTreeData('siblings', screen);
             if (siblings_ids.length) {
                 siblings = App.getGlobalItems('pages', siblings_ids);
             }
@@ -278,12 +344,17 @@ define(function(require, exports) {
         return siblings;
     };
 
-    themeTplTags.getNextPage = function() {
+	/**
+	 * Get next page
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns page object
+	 */
+    themeTplTags.getNextPage = function(screen) {
         var next_page = null;
 
-        if (themeTplTags.isTreePage()) {
-            var screen_data = App.getCurrentScreenData();
-            var siblings_ids = getPageTreeData('siblings');
+        if (themeTplTags.isTreePage(screen)) {
+            var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
+            var siblings_ids = getPageTreeData('siblings',screen);
             var page_index = siblings_ids.indexOf(screen_data.item_id);
             if (page_index != -1 && page_index < (siblings_ids.length - 1)) {
                 next_page = App.getGlobalItem('pages', siblings_ids[page_index + 1]);
@@ -293,12 +364,17 @@ define(function(require, exports) {
         return next_page;
     };
 
-    themeTplTags.getPreviousPage = function() {
+	/**
+	 * Get previous page
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns page object
+	 */
+    themeTplTags.getPreviousPage = function(screen) {
         var previous_page = null;
 
-        if (themeTplTags.isTreePage()) {
-            var screen_data = App.getCurrentScreenData();
-            var siblings_ids = getPageTreeData('siblings');
+        if (themeTplTags.isTreePage(screen)) {
+            var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
+            var siblings_ids = getPageTreeData('siblings', screen);
             var page_index = siblings_ids.indexOf(screen_data.item_id);
             if (page_index != -1 && page_index > 0) {
                 previous_page = App.getGlobalItem('pages', siblings_ids[page_index - 1]);
@@ -307,11 +383,16 @@ define(function(require, exports) {
         return previous_page;
     };
 
-    themeTplTags.getPageChildren = function() {
+	/**
+	 * Get page children
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns {Array}
+	 */
+    themeTplTags.getPageChildren = function(screen) {
         var children = [];
 
         if (themeTplTags.isTreePage()) {
-            var children_ids = getPageTreeData('children');
+            var children_ids = getPageTreeData('children', screen);
             if (children_ids.length) {
                 children = App.getGlobalItems('pages', children_ids);
             }
@@ -320,21 +401,31 @@ define(function(require, exports) {
         return children;
     };
 
-    themeTplTags.getPageDepth = function() {
+	/**
+	 * Get page depth
+	 * object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns int
+	 */
+    themeTplTags.getPageDepth = function(screen) {
         var depth = 0;
 
-        if (themeTplTags.isTreePage()) {
-            depth = getPageTreeData('depth');
+        if (themeTplTags.isTreePage(screen)) {
+            depth = getPageTreeData('depth',screen);
         }
 
         return depth;
     };
 
-    themeTplTags.getPageBreadcrumb = function() {
+	/**
+	 * Get page breadcrumb
+	 * @param object screen : Optional : use only if you want data from a different screen than the current one
+	 * @returns array
+	 */
+    themeTplTags.getPageBreadcrumb = function(screen) {
         var ariane = [];
 
-        if (themeTplTags.isTreePage()) {
-            var ariane_ids = getPageTreeData('ariane');
+        if (themeTplTags.isTreePage(screen)) {
+            var ariane_ids = getPageTreeData('ariane',screen);
             if (ariane_ids.length) {
                 ariane = App.getGlobalItems('pages', ariane_ids);
             }
@@ -343,11 +434,18 @@ define(function(require, exports) {
         return ariane;
     };
 
-    themeTplTags.getPageLink = function(page_id, component_id) {
+	/**
+	 * Get the link to a given page
+	 * @param int page_id
+	 * @param string component_id Optional : will try to guess from the current screen
+	 * @param object screen Optional : the screen to check if no component_id specified
+	 * @returns string
+	 */
+	themeTplTags.getPageLink = function(page_id, component_id, screen) {
         var link = '';
 
-		if ( component_id == undefined ) {
-			var screen_data = App.getCurrentScreenData();
+		if ( _.isEmpty(component_id) ) {
+			var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
 			component_id = screen_data.component_id;
 		}
 
