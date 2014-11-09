@@ -1,13 +1,13 @@
 define(function (require) {
- 
+
     "use strict";
- 
+
     var Backbone       = require('backbone'),
     	Utils          = require('core/app-utils'),
         RegionManager  = require("core/region-manager");
-    
+
     var default_route = '';
-	
+
 	//Hack to avoid render a view after another route has been triggered
 	//(when 2 routes are called in a very short delay),
 	var route_asked = '';
@@ -16,40 +16,42 @@ define(function (require) {
 		route = route.replace('#','');
 		return route_asked_trimed == route;
 	};
-	
+
     return Backbone.Router.extend({
- 
+
         routes: {
             "": "default_route",
             "single/:global/:id" : "single",
             "page/:component_id/:page_id" : "page",
             "comments-:post_id" : "comments",
             "component-:id" : "component",
-            "custom-page" : "custom_page"
+            "custom-page" : "custom_page",
+            "favorite/:action/:global/:id" : "favorite"
         },
-		
+
         setDefaultRoute: function(_default_route){
     		default_route = _default_route;
     	},
-		
+
 		getDefaultRoute: function(){
 			return default_route;
 		},
-    	
+
         default_route: function(){
         	this.navigate(default_route, {trigger: true});
         },
-        
+
         component: function (component_id) {
         	var _this = this;
 			route_asked = 'component-'+ component_id;
         	require(["core/app"],function(App){
         		var component = App.getComponentData(component_id);
-				
+
         		if( component ) {
 					if( check_route('component-'+ component_id) ){
 						switch( component.type ){
 							case 'posts-list':
+                            case 'favorites':
 								App.setQueriedScreen({screen_type:'list',component_id:component_id,item_id:0,global:component.global,data:component.data,label:component.label});
 								require(["core/views/archive"],function(ArchiveView){
 									var view = new ArchiveView(component.view_data);
@@ -77,16 +79,16 @@ define(function (require) {
         		}else{
         			App.router.default_route();
         		}
-        		
+
         	});
         },
-        
+
         /**
          * The post must be in the "posts" global to be accessed via this "single" route.
          */
         single: function (item_global,item_id) {
 			route_asked = 'single/'+ item_global +'/'+ item_id;
-			
+
         	require(["core/app"],function(App){
 	        	var global = App.globals[item_global];
 	        	if( global ){
@@ -94,7 +96,7 @@ define(function (require) {
 		        	if( item ){
 						var item_json = item.toJSON();
 		        		var item_data = item_global == 'posts' ? {post:item_json} : {item:item_json};
-						
+
 						if( check_route('single/'+ item_global +'/'+ item_id) ){
 							App.setQueriedScreen({screen_type:'single',component_id:'',item_id:parseInt(item_id),global:item_global,data:item_data,label:item_json.title});
 							require(["core/views/single"],function(SingleView){
@@ -104,7 +106,7 @@ define(function (require) {
 								});
 							});
 						}
-						
+
 		        	}else{
 		        		Utils.log('Error : router single route : item with id "'+ item_id +'" not found in global "'+ item_global +'".');
 	        			App.router.default_route();
@@ -115,10 +117,10 @@ define(function (require) {
 	    		}
         	});
         },
-        
+
         page: function (component_id,page_id) {
 			route_asked = 'page/'+ component_id +'/'+ page_id;
-			
+
         	require(["core/app"],function(App){
         		var item_global = 'pages';
 	        	var global = App.globals[item_global];
@@ -127,15 +129,15 @@ define(function (require) {
 		        	if( item ){
 		        		var component = App.getComponentData(component_id);
 		        		if( component ){
-			        		
+
 		        			var item_data = {
-			        			item:item.toJSON(), 
-			        			is_tree_page:component.data.is_tree, 
+			        			item:item.toJSON(),
+			        			is_tree_page:component.data.is_tree,
 			        			is_tree_root:(page_id == component.data.root_id),
 			        			root_id:component.data.root_id,
 			        			root_depth:component.data.root_depth
 			        		};
-			        		
+
 							if( check_route('page/'+ component_id +'/'+ page_id) ){
 								App.setQueriedScreen({screen_type:'page',component_id:component_id,item_id:parseInt(page_id),global:item_global,data:item_data,label:item_data.item.title});
 								require(["core/views/page"],function(PageView){
@@ -145,7 +147,7 @@ define(function (require) {
 									});
 								});
 							}
-							
+
 		        		}else{
 			        		Utils.log('Error : router : page route : component with id "'+ component_id +'" not found');
 		        			App.router.default_route();
@@ -160,7 +162,7 @@ define(function (require) {
 	    		}
         	});
         },
-        
+
         comments: function (post_id) {
         	require(["core/app","core/views/comments"],function(App,CommentsView){
         		App.setQueriedScreen({screen_type:'comments',component_id:'',item_id:parseInt(post_id)});
@@ -185,7 +187,7 @@ define(function (require) {
 		        );
         	});
         },
-        
+
         custom_page: function(){
 			route_asked = 'custom-page';
         	require(["core/app","core/views/custom-page"],function(App,CustomPageView){
@@ -200,8 +202,28 @@ define(function (require) {
 					}
         		}
         	});
+        },
+
+        favorite: function( action, item_global, id ) {
+            require( ["core/app"], function( App ) {
+                switch( action ) {
+                    case 'add':
+                        var global = App.globals[item_global];
+                        if( global ) {
+                            var item = global.get( id );
+                            if( undefined !== item ) {
+                                App.favorites.add( _.extend( { id: item.id, global: item_global }, item.toJSON() ) );
+                            }
+                        }
+                        break;
+                    case 'remove':
+                        // Remove it from the list
+                        break;
+                }
+                App.favorites.saveAll();
+            });
         }
-        
+
     });
- 
+
 });

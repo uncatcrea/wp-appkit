@@ -512,6 +512,43 @@ define(function(require, exports) {
 		return Stats.getStats(stat);
 	};
 
+    themeTplTags.getFavoriteLink = function( action, post_id ) {
+        var screen_data = App.getCurrentScreenData();
+
+        var single_global = '';
+        if (screen_data.screen_type == 'comments') {
+            var previous_screen_data = App.getPreviousScreenData();
+            if (previous_screen_data.screen_type == 'single') {
+                single_global = previous_screen_data.global;
+            }
+        } else {
+            if (screen_data.hasOwnProperty('global') && screen_data.global != '') {
+                single_global = screen_data.global;
+            }
+        }
+
+        return single_global != '' ? '#favorite/' + action + '/' + single_global + '/' + post_id : '';
+    };
+
+    themeTplTags.getFavoriteButton = function( post_id ) {
+        var button = "";
+
+        if( undefined !== post_id ) {
+            var post = App.favorites.get( post_id );
+
+            if( undefined !== post ) {
+                // Post is already a favorite
+                button = '<a class="favorite remove" href="' + themeTplTags.getFavoriteLink( 'remove', post_id ) + '">Remove from favorites</a>';
+            }
+            else {
+                // Post isn't a favorite yet
+                button = '<a class="favorite add" href="' + themeTplTags.getFavoriteLink( 'add', post_id ) + '">Add to favorites</a>';
+            }
+        }
+
+        return button;
+    };
+
     //Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
     //a circular dependency for requirejs) can both be required at the same time
     //(in theme functions.js for example) :
