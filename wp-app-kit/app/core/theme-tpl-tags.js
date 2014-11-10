@@ -123,7 +123,7 @@ define(function(require, exports) {
 
 	/**
 	 * Check if displaying a taxonomy terms archive
-	 * @param string taxonomy : Categories slug(s) to check
+	 * @param string taxonomy : WordPress taxonomy slug to check
 	 * @param string|array terms : Optional : Taxonomy terms slug(s) to check
 	 * @param object screen : Optional : use only if you want data from a different screen than the current one
 	 * @returns boolean
