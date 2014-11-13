@@ -84,6 +84,8 @@ class WpakConfigFile {
 		//TODO : options to choose if the auth key is displayed in config.js.
 
 		$options = WpakOptions::get_app_options( $app_id );
+		
+		$addons = WpakAddons::get_app_addons_for_config( $app_id );
 
 		if ( !$echo ) {
 			ob_start();
@@ -106,7 +108,9 @@ define( function ( require ) {
 		auth_key : '<?php echo $auth_key ?>'<?php
 		endif
 		?>,
-		options : <?php echo json_encode( $options ); ?>
+		options : <?php echo json_encode( $options ); ?>,
+		addons : <?php echo json_encode( $addons ) ?>
+		
 	};
 
 });
