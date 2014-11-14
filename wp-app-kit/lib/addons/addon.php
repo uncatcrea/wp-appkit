@@ -26,7 +26,7 @@ class WpakAddon {
 		$this->url = plugins_url( '', $addon_file ); // > An addon must be a plugin
 	}
 
-	public function add_js( $js_file, $type = 'theme', $is_amd = true ) {
+	public function add_js( $js_file, $type = 'after-theme', $is_amd = true ) {
 		$full_js_file = '';
 
 		if ( strpos( $js_file, $this->directory ) !== false ) {
@@ -44,7 +44,7 @@ class WpakAddon {
 		}
 	}
 
-	public function add_css( $css_file ) {
+	public function add_css( $css_file, $type = 'after-theme' ) {
 
 		$full_css_file = '';
 
@@ -58,7 +58,7 @@ class WpakAddon {
 
 		if ( file_exists( $full_css_file ) ) {
 			if ( !in_array( $css_file, $this->css_files ) ) {
-				$this->css_files[] = array( 'file' => $css_file );
+				$this->css_files[] = array( 'file' => $css_file, 'type' => $type );
 			}
 		}
 	}
