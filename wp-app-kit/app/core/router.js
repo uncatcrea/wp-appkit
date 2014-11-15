@@ -218,6 +218,13 @@ define(function (require) {
                         break;
                     case 'remove':
                         // Remove it from the list
+                        var global = App.globals[item_global];
+                        if( global ) {
+                            var item = global.get( id );
+                            if( undefined !== item ) {
+                                App.favorites.remove( item );
+                            }
+                        }
                         break;
                 }
                 App.favorites.saveAll();
