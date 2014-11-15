@@ -408,6 +408,8 @@ define(function (require) {
 			    	    	    				 syncWebService(cb_ok,cb_error);
 			    	    	    			 }else{
 			    	    	    				 Utils.log('Global items retrieved from local storage.',{globals:app.globals});
+							  					 // @TODO: find a better way to do this?
+			    	    	    				 addFavoritesToGlobals();
 			    	    	    				 cb_ok();
 			    	    	    			 }
 		    	    	    		     });
@@ -473,6 +475,9 @@ define(function (require) {
 								  Utils.log('Components, navigation and globals retrieved from online.',{components:app.components,navigation:app.navigation,globals:app.globals});
 
 								  cb_ok();
+
+								  // @TODO: find a better way to do this?
+								  addFavoritesToGlobals();
 				  			  }else{
 				  				  app.triggerError(
 				  						'synchro:wrong-answer',
@@ -511,6 +516,25 @@ define(function (require) {
 			  		);
 			  	}
 		  });
+	  };
+
+	  var addFavoritesToGlobals = function() {
+		Utils.log( 'Adding favorites to globals' );
+	  	_.each( app.favorites.toJSON(), function( item, index ) {
+	  		if( undefined === globals_keys.get( item.global ) ) {
+	  			// Favorite type doesn't exist into globals keys
+				Utils.log( 'Favorite type doesn\'t exist into globals keys', { type: item.global, globals_keys: globals_keys } );
+	  			globals_keys.add( { id: item.global } );
+	  			app.globals[item.global] = new Items.Items( { global: item.global } );
+	  		}
+	  		if( null === app.getGlobalItem( item.global, item.id ) ) {
+	  			// Favorite item doesn't exist into global items
+				Utils.log( 'Favorite item doesn\'t exist into global items', { item: item, globals: app.globals } );
+	  			app.globals[item.global].add( item );
+	  		}
+	  	});
+
+	  	Utils.log( 'Favorites added to globals', { globals_keys: globals_keys, globals: app.globals } );
 	  };
 
 	  app.getPostComments = function(post_id,cb_ok,cb_error){
