@@ -25,7 +25,7 @@ class WpakAddons {
 		$wp_content_pos = strpos( $url_to_addons_files, $wp_content );
 		if ( $wp_content_pos !== false ) {
 			$addons_file_prefix = substr( $url_to_addons_files, $wp_content_pos ); //Something like "wp-content/plugins/wp-app-kit/app"
-			add_rewrite_rule( '^' . $addons_file_prefix . '/(.*[\.js|\.css])$', 'index.php?wpak_addon_file=$matches[1]', 'top' );
+			add_rewrite_rule( '^' . $addons_file_prefix . '/(.*[\.js|\.css|\.html])$', 'index.php?wpak_addon_file=$matches[1]', 'top' );
 		}
 	}
 
@@ -53,7 +53,7 @@ class WpakAddons {
 
 					$file = $wp_query->query_vars['wpak_addon_file'];
 
-					if ( preg_match( '/([^\/]+?)\/(.+[\.js|\.css])$/', $file, $matches ) ) {
+					if ( preg_match( '/([^\/]+?)\/(.+[\.js|\.css|\.html])$/', $file, $matches ) ) {
 						$addon_slug = $matches[1];
 						$asset_file = $matches[2];
 						$app_addons = self::get_app_addons( $app_id );
@@ -65,6 +65,8 @@ class WpakAddons {
 									header( "Content-type: text/javascript;  charset=utf-8" );
 								} elseif ( $file_type == 'css' ) {
 									header( "Content-type: text/css;  charset=utf-8" );
+								} elseif ( $file_type == 'html' ) {
+									header( "Content-type: text/html;  charset=utf-8" );
 								}
 								echo file_get_contents( $asset_full_path );
 								exit();

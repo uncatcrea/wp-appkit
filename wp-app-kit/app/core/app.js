@@ -16,6 +16,7 @@ define(function (require) {
           Utils               = require('core/app-utils'),
           Hooks               = require('core/lib/hooks'),
 		  Stats               = require('core/stats'),
+		  Addons              = require('core/addons'),
           Sha256              = require('core/lib/sha256');
 
 	  var app = {};
@@ -762,37 +763,23 @@ define(function (require) {
     	  return item;
       };
 
-      /**
-       * App init:
-       *  - set options
+	  /**
+       * App options:
        */
-      app.initialize = function ( callback ) {
-      	var nextOps = function() {
-      		if( Config.debug_mode == 'on' ) {
-      			require( ['core/views/debug', 'jquery.velocity'], function( DebugView ) {
-      				var debugView = new DebugView();
-      				debugView.render();
-      			});
-      		}
-
-		  	// If a callback was passed, call it
-		  	if( undefined !== callback ) {
-		  		callback();
-		  	}
-      	}
-
-      	// Retrieve all existing options
+	  
+	  // Retrieve all existing options
+	  var fetchOptions = function( callback ){
       	app.options.fetch( {
       		'success': function( appOptions, response, options ) {
 				Utils.log( 'Options retrieved from local storage.', { options: appOptions } );
-				app.saveOptions( nextOps );
+				app.saveOptions( callback );
 	      	},
 	      	'error': function( appOptions, response, options ) {
-	      		app.saveOptions( nextOps );
+	      		app.saveOptions( callback );
 	      	}
       	});
-      };
-
+	  };
+	  
       app.saveOptions = function( callback ) {
       	// Retrieve options from Config and store them locally
       	_.each( Config.options, function( value, key, list ) {
@@ -808,6 +795,33 @@ define(function (require) {
 	  	if( undefined !== callback ) {
 	  		callback();
 	  	}
+      };
+	  
+	  /**
+       * App init:
+       *  - set options
+	   *  - initialize addons
+       */
+      app.initialize = function ( callback ) {
+
+		fetchOptions(function(){
+			
+			if( Config.debug_mode == 'on' ) {
+      			require( ['core/views/debug', 'jquery.velocity'], function( DebugView ) {
+      				var debugView = new DebugView();
+      				debugView.render();
+      			});
+      		}
+			
+			Addons.initialize( function(){
+				// If a callback was passed, call it
+				if( undefined !== callback ) {
+					callback();
+				}
+			});
+			
+		});
+      	
       };
 	  
 	//--------------------------------------------------------------------------

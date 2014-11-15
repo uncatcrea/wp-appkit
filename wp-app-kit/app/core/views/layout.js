@@ -6,6 +6,7 @@ define(function (require) {
         _                   = require('underscore'),
         Backbone            = require('backbone'),
         Config              = require('root/config'),
+		Addons              = require('core/addons'),
         Tpl                 = require('text!theme/layout.html'),
 		ThemeTplTags		= require('core/theme-tpl-tags');
 
@@ -14,6 +15,7 @@ define(function (require) {
     return Backbone.View.extend({
     	
     	initialize : function(args) {
+			Tpl = Addons.getHtml('layout','before') + Tpl + Addons.getHtml('layout','after');
     		contains_header = Tpl.match(/<%=\s*header\s*%>/) !== null;
     		this.template = _.template(Tpl);
         },

@@ -47,9 +47,9 @@ require(['root/config'],function(Config){
 
 								App.router = new Router();
 								
-								require(Addons.getJs('before-theme'),function(){
+								require(Addons.getJs('theme','before'),function(){
 									require(['theme/js/functions'],function(){
-										require(Addons.getJs('after-theme'),
+										require(Addons.getJs('theme','after'),
 											function(){
 												App.sync(
 													function(){

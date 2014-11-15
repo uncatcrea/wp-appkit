@@ -8,6 +8,7 @@ class WpakAddon {
 	protected $url = '';
 	protected $js_files = array();
 	protected $css_files = array();
+	protected $html_files = array();
 
 	public function __construct( $name ) {
 		$this->name = $name;
@@ -26,7 +27,7 @@ class WpakAddon {
 		$this->url = plugins_url( '', $addon_file ); // > An addon must be a plugin
 	}
 
-	public function add_js( $js_file, $type = 'after-theme', $is_amd = true ) {
+	public function add_js( $js_file, $type = 'theme', $position = 'after' ) {
 		$full_js_file = '';
 
 		if ( strpos( $js_file, $this->directory ) !== false ) {
@@ -39,12 +40,16 @@ class WpakAddon {
 
 		if ( file_exists( $full_js_file ) ) {
 			if ( !in_array( $js_file, $this->js_files ) ) {
-				$this->js_files[] = array( 'file' => $js_file, 'type' => $type, 'is_amd' => $is_amd );
+				$this->js_files[] = array( 
+					'file' => $js_file, 
+					'type' => $type, 
+					'position' => $position 
+				);
 			}
 		}
 	}
 
-	public function add_css( $css_file, $type = 'after-theme' ) {
+	public function add_css( $css_file, $position = 'after' ) {
 
 		$full_css_file = '';
 
@@ -58,7 +63,34 @@ class WpakAddon {
 
 		if ( file_exists( $full_css_file ) ) {
 			if ( !in_array( $css_file, $this->css_files ) ) {
-				$this->css_files[] = array( 'file' => $css_file, 'type' => $type );
+				$this->css_files[] = array( 
+					'file' => $css_file, 
+					'type' => 'theme',
+					'position' => $position
+				);
+			}
+		}
+	}
+	
+	public function add_html( $html_file, $type = 'layout', $position = 'after' ) {
+
+		$full_html_file = '';
+
+		if ( strpos( $html_file, $this->directory ) !== false ) {
+			$full_html_file = $html_file;
+			$html_file = ltrim( str_replace( $this->directory, '', $html_file ), '/\\' );
+		} else {
+			$html_file = ltrim( $html_file, '/\\' );
+			$full_html_file = $this->directory . '/' . $html_file;
+		}
+
+		if ( file_exists( $full_html_file ) ) {
+			if ( !in_array( $html_file, $this->html_files ) ) {
+				$this->html_files[] = array( 
+					'file' => $html_file, 
+					'type' => $type ,
+					'position' => $position
+				);
 			}
 		}
 	}
@@ -91,6 +123,7 @@ class WpakAddon {
 					'url' => $this->url,
 					'js_files' => $this->js_files,
 					'css_files' => $this->css_files,
+					'html_files' => $this->html_files,
 		);
 	}
 
