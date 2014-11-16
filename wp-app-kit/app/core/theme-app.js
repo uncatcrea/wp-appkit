@@ -1,5 +1,5 @@
 /**
- * Defines functions that can be called from theme functions.js. 
+ * Defines functions that can be called from theme functions.js.
  * (Those functions can't be directly called form theme templates).
  */
 define( function( require, exports ) {
@@ -27,7 +27,7 @@ define( function( require, exports ) {
 	 * Theme event aggregator
 	 */
 	var vent = _.extend( { }, Backbone.Events );
-	
+
 	/**
 	 * Aggregate App and RegionManager events
 	 */
@@ -50,7 +50,7 @@ define( function( require, exports ) {
 
 	/**
 	 * Proxy App events to theme events
-	 * 
+	 *
 	 * @param {string} event App event id
 	 * @param {object} data App event data
 	 * @returns {event} Triggers theme event based on App core event
@@ -72,7 +72,7 @@ define( function( require, exports ) {
 
 	/**
 	 * Formats App core events feedbacks in a themes friendly way.
-	 * 
+	 *
 	 * @param {string} event App event id (example "error:synchro:ajax")
 	 * @param {object} data
 	 * @returns {object} {
@@ -135,22 +135,22 @@ define( function( require, exports ) {
 	/**
 	 * Formats data that is used in themes as the result of an event or
 	 * treatment.
-	 * 
+	 *
 	 * @param {boolean} ok
 	 * @param {string} message
 	 * @param {object} data
-	 * @returns object { 
-	 *		ok: boolean, 
-	 *		message: string, 
+	 * @returns object {
+	 *		ok: boolean,
+	 *		message: string,
 	 *		data: object
 	 * }
 	 */
 	var format_result_data = function( ok, message, data ) {
-		
+
 		ok = ok === true || ok === 1 || ok === '1';
 
 		message = !_.isUndefined(message) && _.isString(message) ? message: '';
-		
+
 		data = !_.isUndefined(data) ? data : {};
 
 		return { ok: ok, message: message, data: data };
@@ -181,28 +181,28 @@ define( function( require, exports ) {
 
 	/**
 	 * Launches app content refresh
-	 * 
+	 *
 	 * @param {callback} cb_ok Treatment to apply on success
 	 * @param {callback} cb_error Treatment to apply on error
 	 * @returns {event|callback} : when refresh is finished :
 	 * - "refresh:end" event is triggered with a "result" object param
 	 * - callback cb_ok is called if success, with a "result" object param
 	 * - callback cb_error is called if error, with a "result" object param
-	 * 
-	 * "result" object : { 
-	 *		ok: boolean : true if refresh is successful, 
-	 *		message: string : empty if success, error message if refresh fails, 
+	 *
+	 * "result" object : {
+	 *		ok: boolean : true if refresh is successful,
+	 *		message: string : empty if success, error message if refresh fails,
 	 *		data: object : empty if success, error object if refresh fails :
 	 *			  Use this result.data if you need specific info about the error.
 	 *			  See format_theme_event_data() for error object details.
-	 * } 
+	 * }
 	 */
 	themeApp.refresh = function( cb_ok, cb_error ) {
 
 		refreshing++;
 		vent.trigger( 'refresh:start' );
 
-		App.sync( 
+		App.sync(
 			function() {
 				RegionManager.buildMenu(
 					function() {
@@ -230,18 +230,18 @@ define( function( require, exports ) {
 					},
 					true
 				);
-			}, 
+			},
 			function( error ) {
 				refreshing--;
-				
+
 				var formated_error = format_theme_event_data( error.event, error );
-				
+
 				if ( cb_error ) {
 					cb_error( formated_error );
 				}
-				
+
 				var result = format_result_data(false,formated_error.message,formated_error);
-				
+
 				vent.trigger( 'refresh:end', result );
 			},
 			true
@@ -271,7 +271,7 @@ define( function( require, exports ) {
 	/**
 	 * Automatically shows and hide Back button according to current screen (list, single, page, comments, etc...)
 	 * Use only if back button is not refreshed at each screen load! (otherwhise $go_back_btn will not be set correctly).
-	 * @param $go_back_btn Back button jQuery DOM element 
+	 * @param $go_back_btn Back button jQuery DOM element
 	 */
 	themeApp.setAutoBackButton = function( $go_back_btn, do_before_auto_action ) {
 		RegionManager.on( 'screen:showed', function( current_screen, view ) {
@@ -294,7 +294,7 @@ define( function( require, exports ) {
 
 	/**
 	 * To know if the back button can be displayed on the current screen,
-	 * according to app history. Use this to configure back button 
+	 * according to app history. Use this to configure back button
 	 * manually if you don't use themeApp.setAutoBackButton().
 	 */
 	themeApp.getBackButtonDisplay = function() {
@@ -312,9 +312,9 @@ define( function( require, exports ) {
 	};
 
 	/**
-	 * Sets back buton click event. Use this to configure back button 
+	 * Sets back buton click event. Use this to configure back button
 	 * manually if you don't use themeApp.setAutoBackButton().
-	 * @param $go_back_btn Back button jQuery DOM element 
+	 * @param $go_back_btn Back button jQuery DOM element
 	 */
 	themeApp.updateBackButtonEvents = function( $go_back_btn ) {
 		if ( $go_back_btn.length ) {
@@ -374,7 +374,7 @@ define( function( require, exports ) {
 	 */
 
 	/**
-	 * Sets class to the given DOM element according to the given current screen. 
+	 * Sets class to the given DOM element according to the given current screen.
 	 * If element is not provided, defaults to <body>.
 	 */
 	var setContextClass = function( current_screen, element_id ) {
@@ -489,8 +489,22 @@ define( function( require, exports ) {
 		App.showCustomPage( template, data );
 	};
 
+	themeApp.addToFavorites = function( item_global, id ) {
+		var item = App.getGlobalItem( item_global, id );
+		if( null !== item ) {
+			App.favorites.add( _.extend( { global: item_global }, item ) );
+		}
+	};
+
+	themeApp.removeFromFavorites = function( item_global, id ) {
+		var item = App.getGlobalItem( item_global, id );
+		if( null !== item ) {
+			App.favorites.remove( item );
+		}
+	};
+
 	//Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
-	//a circular dependency for requirejs) can both be required at the same time 
-	//(in theme functions.js for example) : 
+	//a circular dependency for requirejs) can both be required at the same time
+	//(in theme functions.js for example) :
 	_.extend( exports, themeApp );
 } );

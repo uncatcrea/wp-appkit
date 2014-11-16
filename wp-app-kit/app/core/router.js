@@ -205,26 +205,13 @@ define(function (require) {
         },
 
         favorite: function( action, item_global, id ) {
-            require( ["core/app"], function( App ) {
+            require( ["core/app", "core/theme-app"], function( App, ThemeApp ) {
                 switch( action ) {
                     case 'add':
-                        var global = App.globals[item_global];
-                        if( global ) {
-                            var item = global.get( id );
-                            if( undefined !== item ) {
-                                App.favorites.add( _.extend( { id: item.id, global: item_global }, item.toJSON() ) );
-                            }
-                        }
+                        ThemeApp.addToFavorites( item_global, id );
                         break;
                     case 'remove':
-                        // Remove it from the list
-                        var global = App.globals[item_global];
-                        if( global ) {
-                            var item = global.get( id );
-                            if( undefined !== item ) {
-                                App.favorites.remove( item );
-                            }
-                        }
+                        ThemeApp.removeFromFavorites( item_global, id );
                         break;
                 }
                 App.favorites.saveAll();
