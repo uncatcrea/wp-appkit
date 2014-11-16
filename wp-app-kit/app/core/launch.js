@@ -120,4 +120,19 @@ require(['root/config'],function(Config){
 
 	});
 
+},function(){ //Config.js not found
+	
+	//Can't use Utils.log here : log messages by hand :
+	var message = 'WP AppKit error : config.js not found.';
+	console && console.log(message);
+	document.write(message);
+
+	//Check if we are simulating in browser :
+	var query = window.location.search.substring(1);
+	if( query.length && query.indexOf('wpak_app_id') != -1 ){
+		message = 'Please check that you are connected to your WordPress back office.';
+		console && console.log(message);
+		document.write('<br>'+ message);
+	}
+	
 });
