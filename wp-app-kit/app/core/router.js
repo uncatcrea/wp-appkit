@@ -215,6 +215,12 @@ define(function (require) {
                         break;
                 }
                 App.favorites.saveAll();
+
+                var screen = App.getCurrentScreenData();
+
+                if( undefined !== screen.fragment ) {
+                    Backbone.history.loadUrl( screen.fragment );
+                }
             });
         }
 
