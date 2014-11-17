@@ -29,6 +29,15 @@ define( function( require, exports ) {
 	var vent = _.extend( { }, Backbone.Events );
 	
 	/**
+	 * Allows themes (and addons) to trigger events
+	 * @param string event Event id
+	 * @param JSON object data
+	 */
+	themeApp.trigger = function( event, data ) {
+		vent.trigger( event, data );
+	};
+	
+	/**
 	 * Aggregate App and RegionManager events
 	 */
 	themeApp.on = function( event, callback ) {
