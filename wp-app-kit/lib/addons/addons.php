@@ -71,22 +71,27 @@ class WpakAddons {
 								echo file_get_contents( $asset_full_path );
 								exit();
 							} else {
+								header("HTTP/1.0 404 Not Found");
 								_e( 'Addon file not found', WpAppKit::i18n_domain );
 								exit();
 							}
 						} else {
+							header("HTTP/1.0 404 Not Found");
 							_e( 'Addon not found for this app', WpAppKit::i18n_domain );
 							exit();
 						}
 					} else {
+						header("HTTP/1.0 404 Not Found");
 						_e( 'Wrong addon file', WpAppKit::i18n_domain );
 						exit();
 					}
 				} else {
+					header("HTTP/1.0 404 Not Found");
 					_e( 'App not found', WpAppKit::i18n_domain ) . ' : [' . $app_id . ']';
 					exit();
 				}
 			} else {
+				header("HTTP/1.0 404 Not Found");
 				_e( 'App id not found in _GET parmeters', WpAppKit::i18n_domain );
 				exit();
 			}
