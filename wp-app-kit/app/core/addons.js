@@ -44,6 +44,16 @@ define( function( require ) {
 		});
 	};
 	
+	addons.isActive = function(addon_slug){
+		var is_active = false;
+		_.each(config_addons,function(addon){
+			if( !is_active && addon.slug == addon_slug ){
+				is_active = true;
+			}
+		});
+		return is_active;
+	};
+	
 	addons.getJs = function(type, position){
 		var js_files = [];
 		

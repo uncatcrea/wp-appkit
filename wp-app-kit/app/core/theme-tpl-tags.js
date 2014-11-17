@@ -10,6 +10,7 @@ define(function(require, exports) {
             Config = require('root/config'),
             App = require('core/app'),
 			Stats = require('core/stats'), 
+			Addons = require( 'core/addons' ),
             ThemeApp = require('core/theme-app');
 
     var themeTplTags = {};
@@ -215,7 +216,19 @@ define(function(require, exports) {
 
         return format;
     };
-
+	
+	/**********************************************
+	 * Addons
+	 */
+	
+	/**
+	 * Checks if an addon is active
+	 * @param string addon_slug
+	 * @returns Boolean True if the addon is active
+	 */
+	themeTplTags.addonIsActive = function( addon_slug ) {
+		return Addons.isActive( addon_slug );
+	};
 
     /**********************************************
      * Pages
