@@ -28,7 +28,12 @@ define( function( require ) {
 		_.each(config_addons,function(addon){
 			_.each(addon.html_files,function(file){
 				html_files_require.push('text!addons/'+ addon.slug +'/'+ file.file +'?'+ css_query_args);
-				html_files.push({file:file.file, type: file.type, position: file.position});
+				html_files.push({
+					file: file.file, 
+					type: file.type, 
+					position: file.position,
+					data: file.data
+				});
 			});
 		});
 		
@@ -92,6 +97,18 @@ define( function( require ) {
 		});
 		
 		return layout_html;
+	};
+	
+	addons.getHtmlData = function(type){
+		var html_data = {};
+		
+		_.each(html_files,function(file){
+			if( file.type == type ){
+				html_data = _.extend(html_data, file.data);
+			}
+		});
+		
+		return html_data;
 	};
 	
 	return addons;

@@ -21,14 +21,21 @@ define(function (require) {
         },
         
         render : function() {
-        	var renderedContent = this.template({ 
+			
+			var data = { 
         		app_title : Config.app_title, 
         		header : '<div id="app-header"></div>', 
         		menu : '<div id="app-menu"></div>', 
         		content : '<div id="app-content-wrapper"></div>',
 				TemplateTags : ThemeTplTags
-        	});
-            $(this.el).html(renderedContent); 
+        	};
+			
+			var addons_data = Addons.getHtmlData('layout');
+			data = _.extend(data, addons_data);
+			
+        	var rendered_content = this.template(data);
+			
+            $(this.el).html(rendered_content); 
             return this;
         },
         

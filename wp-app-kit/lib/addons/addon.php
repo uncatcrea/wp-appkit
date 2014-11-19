@@ -27,8 +27,18 @@ class WpakAddon {
 		$this->url = plugins_url( '', $addon_file ); // > An addon must be a plugin
 	}
 
-	public function add_js( $js_file, $type = 'theme', $position = 'after' ) {
+	public function add_js( $js_file, $type = 'module', $position = '' ) {
+		
+		$file_type = pathinfo( $js_file, PATHINFO_EXTENSION );
+		if( $file_type !== 'js' ){
+			return;
+		}
+		
 		$full_js_file = '';
+		
+		if( $type == 'theme' && $position === '' ){
+			$position = 'after';
+		}
 
 		if ( strpos( $js_file, $this->directory ) !== false ) {
 			$full_js_file = $js_file;
@@ -51,6 +61,11 @@ class WpakAddon {
 
 	public function add_css( $css_file, $position = 'after' ) {
 
+		$file_type = pathinfo( $css_file, PATHINFO_EXTENSION );
+		if( $file_type !== 'css' ){
+			return;
+		}
+		
 		$full_css_file = '';
 
 		if ( strpos( $css_file, $this->directory ) !== false ) {
@@ -72,8 +87,13 @@ class WpakAddon {
 		}
 	}
 	
-	public function add_html( $html_file, $type = 'layout', $position = 'after' ) {
+	public function add_html( $html_file, $type = 'layout', $position = 'after', $data = array() ) {
 
+		$file_type = pathinfo( $html_file, PATHINFO_EXTENSION );
+		if( $file_type !== 'html' ){
+			return;
+		}
+		
 		$full_html_file = '';
 
 		if ( strpos( $html_file, $this->directory ) !== false ) {
@@ -89,7 +109,8 @@ class WpakAddon {
 				$this->html_files[] = array( 
 					'file' => $html_file, 
 					'type' => $type ,
-					'position' => $position
+					'position' => $position,
+					'data' => $data
 				);
 			}
 		}
