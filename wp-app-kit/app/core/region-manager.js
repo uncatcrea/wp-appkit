@@ -110,7 +110,7 @@ define(function (require) {
 		    		App.navigation.each(function(element, index){
 		    			var component = App.components.get(element.get('component_id'));
 		    			if( component ){
-		    				menuView.addItem(component.get('id'),component.get('type'),component.get('label'));
+		    				menuView.addItem(component.get('id'),component.get('type'),component.get('label'),element.get('options'));
 		    			}
 		   		  	});
 		    		showMenu(force_reload);

@@ -19,8 +19,8 @@ define(function (require) {
   			
   	    },
 
-  	    addItem : function(id,type,label){
-  	    	this.menu.add({id:id,label:label,type:type,link: '#component-'+id});
+  	    addItem : function(id,type,label,options){
+  	    	this.menu.add(_.extend({id:id,label:label,type:type,link: '#component-'+id},options));
   	    },
   	    
   	    resetAll : function(){

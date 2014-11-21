@@ -193,7 +193,12 @@ class WpakComponentTypePostsList extends WpakComponentType {
 	}
 
 	public function get_options_to_display( $component ) {
-		if ( $component->options['post-type'] != 'custom' ) {
+		$options = array();
+		if ( $component->options['post-type'] == 'custom' ) {
+			$options = array(
+				'hook' => array( 'label' => __( 'Hook', WpAppKit::i18n_domain ), 'value' => $component->options['hook'] ),
+			);
+		} elseif ( $component->options['post-type'] != 'last-posts' ) {
 			$post_type = get_post_type_object( $component->options['post-type'] );
 			$taxonomy = get_taxonomy( $component->options['taxonomy'] );
 			$term = get_term_by( 'slug', $component->options['term'], $component->options['taxonomy'] );
@@ -205,10 +210,6 @@ class WpakComponentTypePostsList extends WpakComponentType {
 					'term' => array( 'label' => __( 'Term' ), 'value' => $term->name )
 				);
 			}
-		} else {
-			$options = array(
-				'hook' => array( 'label' => __( 'Hook', WpAppKit::i18n_domain ), 'value' => $component->options['hook'] ),
-			);
 		}
 		return $options;
 	}

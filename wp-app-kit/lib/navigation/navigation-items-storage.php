@@ -120,6 +120,16 @@ class WpakNavigationItemsStorage{
 		}
 	}
 	
+	public static function update_item_option($post_id,$navigation_item_id,$option,$value){
+		$navigation_items = self::get_navigation_items_raw($post_id);
+		if( !empty($navigation_items) ){
+			if( array_key_exists($navigation_item_id,$navigation_items) ){
+				$navigation_items[$navigation_item_id]->set_option($option,$value);
+				self::update_navigation_items($post_id,$navigation_items);
+			}
+		}
+	}
+	
 	private static function update_navigation_items($post_id,$navigation_items){
 		$navigation_items = self::order_items($navigation_items);
 		update_post_meta( $post_id, self::meta_id, $navigation_items );

@@ -19,7 +19,11 @@ class WpakNavigationItem{
 	public function __construct($component_id,$position,$options=array()){
 		$this->component_id = $component_id;
 		$this->position = $position;
-		$this->options = $options;
+		$this->options = $this->merge_default_options($options);
+	}
+	
+	public function __wakeup(){
+		$this->options = $this->merge_default_options($this->options);
 	}
 
 	public function __get($attribute){
@@ -34,6 +38,10 @@ class WpakNavigationItem{
 		$this->position = $position;
 	}
 	
+	public function set_option($option,$value){
+		$this->options[$option] = $value;
+	}
+	
 	public function to_array(){
 		return array('component_id'=>$this->component_id,
 					 'position'=>$this->position,
@@ -41,4 +49,17 @@ class WpakNavigationItem{
 				    );
 	}
 
+	protected function merge_default_options( $options ) {
+		$navigation_item_default_options = apply_filters( 'wpak_navigation_item_default_options', array(
+			'icon_slug' => ''
+		) );
+		
+		foreach( $options as $option => $value ) {
+			if( !array_key_exists( $option, $navigation_item_default_options ) ) {
+				unset( $options[$option] );
+			}
+		}
+		
+		return wp_parse_args($options, $navigation_item_default_options);
+	}
 }

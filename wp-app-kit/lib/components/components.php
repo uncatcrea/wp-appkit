@@ -28,6 +28,8 @@ class WpakComponents {
 
 			$navigation_items = WpakNavigationItemsStorage::get_navigation_indexed_by_components_slugs( $app_id, true );
 
+			$navigation_items = apply_filters( 'wpak_navigation_items', $navigation_items, WpakApps::get_app_slug( $app_id ) );
+			
 			$components_data['navigation'] = $navigation_items;
 			$components_data['components'] = $components;
 			$components_data['globals'] = $globals;

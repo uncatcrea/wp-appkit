@@ -9,7 +9,7 @@ define(function (require) {
     	defaults : {
     		id : "",
     		component_id : "",
-            data : ""
+            options : {}
         }
     });
 

@@ -79,6 +79,30 @@ var WpakNavigation = (function ($){
 			});
 		};
 		
+		wpak.ajax_edit_navigation_item_option = function(navigation_item_id,option,value,callback){
+
+			var data = {
+				action: 'wpak_edit_navigation',
+				wpak_action: 'edit_option',
+				data:  {navigation_item_id: navigation_item_id, option: option, value: value},
+				post_id: wpak_navigation.post_id,
+				nonce: wpak_navigation.nonce
+			};
+			
+			$.ajax({
+				  type: "POST",
+				  url: ajaxurl,
+				  data: data,
+				  success: function(answer) {
+					  callback(answer);
+				  },
+				  error: function(jqXHR, textStatus, errorThrown){
+					  callback({'ok':0,'type':'error','message':'Error setting navigation item option "'+ option +'"'}); //TODO translate js messages
+				  },
+				  dataType: 'json'
+			});
+		};
+		
 		//Called hereunder AND from components-bo-settings.js to refresh available components for navigation
 		//when adding/editing components :
 		wpak.refresh_available_components = function(post_id){
@@ -179,19 +203,25 @@ jQuery().ready(function(){
 	});
 	
 	$('table#navigation-items-table tbody').sortable({
-		  axis: "y",
-		  stop: function( event, ui ) {
-			  var positions = {};
-			  var table = $('table#navigation-items-table');
-			  var post_id = table.data('post-id');
-			  $('tbody tr',table).each(function(index){
-				  $('#position-'+ $(this).data('id')).attr('value',index+1);
-				  positions[$(this).data('id')] = index+1;
-			  });
-			  WpakNavigation.ajax_move_navigation_row(post_id,positions,function(answer){
-				  display_feedback(answer.type,answer.message);
-			  });
-		  }
+		axis: "y",
+		stop: function( event, ui ) {
+			var positions = { };
+			var table = $( 'table#navigation-items-table' );
+			var post_id = table.data( 'post-id' );
+			$( 'tbody tr', table ).each( function( index ) {
+				$( '#position-' + $( this ).data( 'id' ) ).attr( 'value', index + 1 );
+				positions[$( this ).data( 'id' )] = index + 1;
+			} );
+			WpakNavigation.ajax_move_navigation_row( post_id, positions, function( answer ) {
+				display_feedback( answer.type, answer.message );
+			} );
+		},
+		helper: function( e, ui ) { //So that row's <td> don't collapse when moving items
+			ui.children().each( function() {
+				$( this ).width( $( this ).width() );
+			} );
+			return ui;
+		}
 	});
 	
 	$('#add-new-item').click(function(e){
@@ -202,6 +232,45 @@ jQuery().ready(function(){
 	$('#navigation-wrapper').on('click','#cancel-new-item',function(e){
 		e.preventDefault();
 		$('#new-item-form').slideUp();
+	});
+	
+	$('#navigation-wrapper').on('click','.change-icon-slug',function(e){
+		e.preventDefault();
+		var nav_item_id = $(this).data('id');
+		$('#nav-item-value-'+ nav_item_id).hide();
+		$('#nav-item-input-'+ nav_item_id).show();
+		var value = $('#span-'+ nav_item_id).html();
+		$('#icon-'+ nav_item_id).val(value !== 'none' ? value : '').focus();
+	});
+	
+	$('#navigation-wrapper').on('click','.change-icon-slug-ok',function(e){
+		e.preventDefault();
+		var nav_item_id = $(this).data('id');
+		var post_id = $(this).data('post-id');
+		WpakNavigation.ajax_edit_navigation_item_option(nav_item_id,'icon_slug',$('#icon-'+ nav_item_id).val(),function(answer){
+			if( answer.ok == 1 ){
+				$('#nav-item-input-'+ nav_item_id).hide();
+				var new_value = answer.data;
+				$('#span-'+ nav_item_id).html(new_value !== '' ? new_value : 'none'); //TODO : 'none' should be translated here!
+				$('#nav-item-value-'+ nav_item_id).show();
+			}
+			display_feedback(answer.type,answer.message);
+		});
+	});
+	
+	$('#navigation-wrapper').on('click','.change-icon-slug-cancel',function(e){
+		e.preventDefault();
+		var nav_item_id = $(this).data('id');
+		$('#nav-item-input-'+ nav_item_id).hide();
+		$('#nav-item-value-'+ nav_item_id).show();
+	});
+	
+	$('.menu-item-icon-input').bind('keypress', function(e){
+		if ( e.keyCode == 13 ) {
+			var nav_item_id = $(this).data('id');
+			$('#change-icon-slug-ok-'+nav_item_id).click();
+			e.preventDefault();
+		}
 	});
 	
 });
