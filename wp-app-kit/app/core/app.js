@@ -441,8 +441,8 @@ define(function (require) {
 								  app.components.saveAll();
 
 								  app.navigation.resetAll();
-								  _.each(data.navigation,function(value, key, list){
-									  app.navigation.add({id:key,component_id:key,data:{}});
+								  _.each(data.navigation,function(options, key, list){
+									  app.navigation.add({id:key,component_id:key,options:options});
 								  });
 								  app.navigation.saveAll();
 
