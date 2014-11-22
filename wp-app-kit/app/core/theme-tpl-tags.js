@@ -546,39 +546,19 @@ define(function(require, exports) {
     };
 
     /**
-     * Return a link to add or remove a post to the favorites list.
-     *
-     * @uses ThemeTplTags.getFavoriteData()
+     * Return true or false whether the post is in the favorites list or not.
      *
      * @param   int     post_id     The post id.
-     * @param   array   html_class  A list of HTML classes to add to the link.
-     * @return  string  button      The HTML for the button.
+     * @return  bool    isFavorite  The HTML for the button.
      */
-    themeTplTags.getFavoriteButton = function( post_id, html_class ) {
-        var button = "";
-        var html_class = html_class || [];
+    themeTplTags.isFavorite = function( post_id ) {
+        var isFavorite = false;
 
         if( undefined !== post_id ) {
-            var post = App.favorites.get( post_id );
-            var action;
-            var label;
-
-            if( undefined !== post ) {
-                // Post is already a favorite
-                action = 'remove';
-                label = 'Remove from favorites';
-            }
-            else {
-                // Post isn't a favorite yet
-                action = 'add';
-                label = 'Add to favorites';
-            }
-
-            html_class.push( action );
-            button = '<a class="' + html_class.join( ' ' ) + '" href="#" ' + themeTplTags.getFavoriteData( action, post_id ) + '>' + label + '</a>';
+            isFavorite = undefined !== App.favorites.get( post_id );
         }
 
-        return button;
+        return isFavorite;
     };
 
     //Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
