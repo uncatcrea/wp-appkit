@@ -551,22 +551,31 @@ define(function(require, exports) {
      * @uses ThemeTplTags.getFavoriteData()
      *
      * @param   int     post_id     The post id.
+     * @param   array   html_class  A list of HTML classes to add to the link.
      * @return  string  button      The HTML for the button.
      */
-    themeTplTags.getFavoriteButton = function( post_id ) {
+    themeTplTags.getFavoriteButton = function( post_id, html_class ) {
         var button = "";
+        var html_class = html_class || [];
 
         if( undefined !== post_id ) {
             var post = App.favorites.get( post_id );
+            var action;
+            var label;
 
             if( undefined !== post ) {
                 // Post is already a favorite
-                button = '<a class="favorite remove" href="#" ' + themeTplTags.getFavoriteData( 'remove', post_id ) + '>Remove from favorites</a>';
+                action = 'remove';
+                label = 'Remove from favorites';
             }
             else {
                 // Post isn't a favorite yet
-                button = '<a class="favorite add" href="#" ' + themeTplTags.getFavoriteData( 'add', post_id ) + '>Add to favorites</a>';
+                action = 'add';
+                label = 'Add to favorites';
             }
+
+            html_class.push( action );
+            button = '<a class="' + html_class.join( ' ' ) + '" href="#" ' + themeTplTags.getFavoriteData( action, post_id ) + '>' + label + '</a>';
         }
 
         return button;
