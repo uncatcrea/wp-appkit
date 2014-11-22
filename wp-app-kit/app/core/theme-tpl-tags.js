@@ -10,7 +10,7 @@ define(function(require, exports) {
             Config = require('root/config'),
             App = require('core/app'),
 			RegionManager = require( 'core/region-manager' ),
-			Stats = require('core/stats'), 
+			Stats = require('core/stats'),
             ThemeApp = require('core/theme-app');
 
     var themeTplTags = {};
@@ -32,7 +32,7 @@ define(function(require, exports) {
     themeTplTags.getCurrentScreen = function() {
         return App.getCurrentScreenData();
     };
-	
+
 	/**
      * Retrieves previous screen infos :
      * @return JSON object containing :
@@ -83,7 +83,7 @@ define(function(require, exports) {
         //TODO Check if the post exists in the posts global
         return '#comments-' + post_id;
     };
-	
+
 	themeTplTags.getDefaultRouteLink = function() {
         return App.router.getDefaultRoute();
     };
@@ -131,7 +131,7 @@ define(function(require, exports) {
 	 */
     themeTplTags.isTaxonomy = function(taxonomy, terms, screen) {
         var is_taxonomy = false;
-		
+
         var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
 
         if (!_.isEmpty(screen_data.data) && !_.isEmpty(screen_data.data.query)) {
@@ -224,19 +224,19 @@ define(function(require, exports) {
 	themeTplTags.getThemePath = function() {
 		return 'themes/'+ Config.theme;
 	};
-	
+
 	/**
 	 * Retrieves menu items, in the same format as in the menu.html template
 	 * @returns {Array of JSON objects} Menu items
 	 */
 	themeTplTags.getMenuItems = function() {
-		var menu_items = []; 
-		
+		var menu_items = [];
+
 		var menu_view = RegionManager.getMenuView();
 		if ( menu_view ) {
 			menu_items = menu_view.menu.toJSON();
 		}
-		
+
 		return menu_items;
 	};
 
@@ -477,18 +477,18 @@ define(function(require, exports) {
 
         return link;
     };
-	
+
 	/************************************************
 	 * App network management
 	 */
-	
+
 	/**
 	 * Retrieve network state : "online", "offline" or "unknown"
-	 * If full_info is passed and set to true, detailed connexion info is 
+	 * If full_info is passed and set to true, detailed connexion info is
 	 * returned (Wifi, 3G etc...).
 	 * This is an alias for ThemeApp.getNetworkState(full_info) because it
 	 * can be useful in themes too.
-	 * 
+	 *
 	 * @param boolean full_info Set to true to get detailed connexion info
 	 * @returns string "online", "offline" or "unknown"
 	 */
@@ -499,21 +499,29 @@ define(function(require, exports) {
 	/************************************************
 	 * App stats management
 	 */
-	
+
 	/**
 	 * Retrieves app stats. "stat" can be empty to retrieve all stats, or
 	 * "count_open", "last_open_date", "version", "version_diff".
-	 * 
+	 *
 	 * @param string stat (optionnal) : Name of stat to retrieve
-	 * @returns JSON object|string : Returns JSON object if "stat" is empty, 
+	 * @returns JSON object|string : Returns JSON object if "stat" is empty,
 	 * or the specific stat value correponding to the "stat" arg.
 	 */
 	themeTplTags.getAppStats = function(stat) {
 		return Stats.getStats(stat);
 	};
 
-    themeTplTags.getFavoriteLink = function( action, post_id ) {
+    /**
+     * Return a list of "data-xxx" attributes to include into a "favorites" link for a post.
+     *
+     * @param   string  action          The action that will be performed if the link is clicked: should be "add" or "remove".
+     * @param   int     post_id         The post id.
+     * @return  string  favorite_data   The completed "data-xxx" attributes.
+     */
+    themeTplTags.getFavoriteData = function( action, post_id ) {
         var screen_data = App.getCurrentScreenData();
+        var favorite_data = '';
 
         var single_global = '';
         if (screen_data.screen_type == 'comments') {
@@ -527,9 +535,24 @@ define(function(require, exports) {
             }
         }
 
-        return single_global != '' ? '#favorite/' + action + '/' + single_global + '/' + post_id : '';
+        if( single_global != '' ) {
+            favorite_data+= 'data-global="' + single_global + '" ';
+        }
+
+        favorite_data+= 'data-id="' + post_id + '" ';
+        favorite_data+= 'data-action="' + action + '" ';
+
+        return favorite_data;
     };
 
+    /**
+     * Return a link to add or remove a post to the favorites list.
+     *
+     * @uses ThemeTplTags.getFavoriteData()
+     *
+     * @param   int     post_id     The post id.
+     * @return  string  button      The HTML for the button.
+     */
     themeTplTags.getFavoriteButton = function( post_id ) {
         var button = "";
 
@@ -538,11 +561,11 @@ define(function(require, exports) {
 
             if( undefined !== post ) {
                 // Post is already a favorite
-                button = '<a class="favorite remove" href="' + themeTplTags.getFavoriteLink( 'remove', post_id ) + '">Remove from favorites</a>';
+                button = '<a class="favorite remove" href="#" ' + themeTplTags.getFavoriteData( 'remove', post_id ) + '>Remove from favorites</a>';
             }
             else {
                 // Post isn't a favorite yet
-                button = '<a class="favorite add" href="' + themeTplTags.getFavoriteLink( 'add', post_id ) + '">Add to favorites</a>';
+                button = '<a class="favorite add" href="#" ' + themeTplTags.getFavoriteData( 'add', post_id ) + '>Add to favorites</a>';
             }
         }
 

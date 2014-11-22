@@ -518,6 +518,13 @@ define(function (require) {
 		  });
 	  };
 
+	  /**
+	   * Add the list of favorites into the global list of items, if they don't already exist into it.
+	   *
+	   * Favorites list persists and is never reset unless the user requested it.
+	   * Global list is reset at each app launch.
+	   * This allows to use app routes and templates for favorites the same way that for other posts (single and archive views for instance).
+	   */
 	  var addFavoritesToGlobals = function() {
 		Utils.log( 'Adding favorites to globals' );
 	  	_.each( app.favorites.toJSON(), function( item, index ) {

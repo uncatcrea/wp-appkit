@@ -25,8 +25,7 @@ define(function (require) {
             "page/:component_id/:page_id" : "page",
             "comments-:post_id" : "comments",
             "component-:id" : "component",
-            "custom-page" : "custom_page",
-            "favorite/:action/:global/:id" : "favorite"
+            "custom-page" : "custom_page"
         },
 
         setDefaultRoute: function(_default_route){

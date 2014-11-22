@@ -207,7 +207,7 @@ define( function( require, exports ) {
 				RegionManager.buildMenu(
 					function() {
 						App.resetDefaultRoute();
-						
+
 						/**
 						 * Use the 'go-to-default-route-after-refresh' to control whether
 						 * the default route should be automatically triggered after refresh.
@@ -217,7 +217,7 @@ define( function( require, exports ) {
 						if( go_to_default_route ){
 							App.router.default_route();
 						}
-						
+
 						Backbone.history.stop();
 						Backbone.history.start({silent:false});
 
@@ -465,19 +465,19 @@ define( function( require, exports ) {
 	/************************************************
 	 * App network management
 	 */
-	
+
 	/**
 	 * Retrieve network state : "online", "offline" or "unknown"
-	 * If full_info is passed and set to true, detailed connexion info is 
+	 * If full_info is passed and set to true, detailed connexion info is
 	 * returned (Wifi, 3G etc...).
-	 * 
+	 *
 	 * @param boolean full_info Set to true to get detailed connexion info
 	 * @returns string "online", "offline" or "unknown"
 	 */
 	themeApp.getNetworkState = function(full_info) {
 		return PhoneGap.getNetworkState(full_info);
 	};
-	
+
 	/************************************************
 	 * App infos management
 	 */
@@ -489,17 +489,37 @@ define( function( require, exports ) {
 		App.showCustomPage( template, data );
 	};
 
+	/**
+	 * Add a post to the favorites list.
+	 * Refresh the current view in order to reflect this addition (the link/button should be updated).
+	 *
+	 * @param 	string 	item_global 	The global key the post belongs to (ex: "posts").
+	 * @param 	int 	id 				The post id.
+	 */
 	themeApp.addToFavorites = function( item_global, id ) {
 		var item = App.getGlobalItem( item_global, id );
 		if( null !== item ) {
 			App.favorites.add( _.extend( { global: item_global }, item ) );
+			App.favorites.saveAll();
+			var current_view = RegionManager.getCurrentView();
+			current_view.render();
 		}
 	};
 
+	/**
+	 * Remove a post from the favorites list.
+	 * Refresh the current view in order to reflect this removal (the link/button should be updated).
+	 *
+	 * @param 	string 	item_global 	The global key the post belongs to (ex: "posts").
+	 * @param 	int 	id 				The post id.
+	 */
 	themeApp.removeFromFavorites = function( item_global, id ) {
 		var item = App.getGlobalItem( item_global, id );
 		if( null !== item ) {
 			App.favorites.remove( item );
+			App.favorites.saveAll();
+			var current_view = RegionManager.getCurrentView();
+			current_view.render();
 		}
 	};
 
