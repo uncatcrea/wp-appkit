@@ -4,6 +4,7 @@ define(function (require) {
 
     var $                   = require('jquery'),
         _                   = require('underscore'),
+        Config              = require('root/config'),
         TemplateView        = require('core/views/backbone-template-view'),
         ThemeTplTags		= require('core/theme-tpl-tags'),
         Hooks               = require('core/lib/hooks'),
@@ -25,7 +26,11 @@ define(function (require) {
         
         render : function() {
         	if( this.template ){
-	        	var view_data = _.extend(this.component.view_data,{component: this.component, TemplateTags : ThemeTplTags});
+	        	var view_data = _.extend(this.component.view_data,{
+					component: this.component, 
+					TemplateTags : ThemeTplTags, 
+					theme_path : 'themes/'+ Config.theme
+				});
 	    		var renderedContent = this.template(view_data);
 	    		$(this.el).html(renderedContent);
 	        }

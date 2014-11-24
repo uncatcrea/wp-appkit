@@ -31,7 +31,12 @@ define(function (require) {
 
   	    render : function(){
   	    	if( tpl !== null ){
-	  	    	var renderedContent = this.template({title : Config.app_title, menu : '<div id="app-menu"></div>', TemplateTags : ThemeTplTags});
+	  	    	var renderedContent = this.template({
+					title : Config.app_title, 
+					menu : '<div id="app-menu"></div>', 
+					TemplateTags : ThemeTplTags, 
+					theme_path : 'themes/'+ Config.theme
+				});
 	  	        $(this.el).html(renderedContent);
   	    	}
   	        return this;

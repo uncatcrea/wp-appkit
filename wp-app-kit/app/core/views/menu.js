@@ -4,6 +4,7 @@ define(function (require) {
 
       var _                   = require('underscore'),
       	  Backbone            = require('backbone'),
+      	  Config              = require('root/config'),
       	  Tpl                 = require('text!theme/menu.html'),
       	  MenuItems           = require('core/models/menu-items');
       	  
@@ -28,7 +29,7 @@ define(function (require) {
   	    },
   	    
   	    render : function( ) {
-  	    	var renderedContent = this.template({'menu_items':this.menu.toJSON()});
+  	    	var renderedContent = this.template({menu_items:this.menu.toJSON(), theme_path:'themes/'+ Config.theme});
   	        $(this.el).html(renderedContent);
   	        return this;
   	    }

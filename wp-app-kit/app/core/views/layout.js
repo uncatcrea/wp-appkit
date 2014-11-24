@@ -24,7 +24,8 @@ define(function (require) {
         		header : '<div id="app-header"></div>', 
         		menu : '<div id="app-menu"></div>', 
         		content : '<div id="app-content-wrapper"></div>',
-				TemplateTags : ThemeTplTags
+				TemplateTags : ThemeTplTags, 
+				theme_path: 'themes/'+ Config.theme
         	});
             $(this.el).html(renderedContent); 
             return this;

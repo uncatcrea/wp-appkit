@@ -4,6 +4,7 @@ define(function (require) {
 
     var $                   = require('jquery'),
         _                   = require('underscore'),
+        Config              = require('root/config'),
         TemplateView        = require('core/views/backbone-template-view'),
         ThemeTplTags		= require('core/theme-tpl-tags');
 
@@ -24,7 +25,13 @@ define(function (require) {
         },
 
         render : function() {
-        	var renderedContent = this.template({ posts : this.posts.toJSON(), list_title: this.title, total:this.total, TemplateTags : ThemeTplTags });
+        	var renderedContent = this.template({ 
+				posts : this.posts.toJSON(), 
+				list_title: this.title, 
+				total:this.total, 
+				TemplateTags : ThemeTplTags,
+				theme_path : 'themes/'+ Config.theme
+			});
             $(this.el).html(renderedContent); 
             return this;
         },
