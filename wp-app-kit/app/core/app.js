@@ -324,6 +324,28 @@ define(function (require) {
 		  return previous_screen_link;
 	  };
 
+	  app.getCurrentScreenGlobal = function( global ) {
+        var screen_data = app.getCurrentScreenData();
+
+        var single_global = '';
+        if (global != undefined) {
+            single_global = global;
+        } else {
+            if (screen_data.screen_type == 'comments') {
+                var previous_screen_data = app.getPreviousScreenData();
+                if (previous_screen_data.screen_type == 'single') {
+                    single_global = previous_screen_data.global;
+                }
+            } else {
+                if (screen_data.hasOwnProperty('global') && screen_data.global != '') {
+                    single_global = screen_data.global;
+                }
+            }
+        }
+
+        return single_global;
+	  }
+
 	  //--------------------------------------------------------------------------
 	  //App items data :
 	  app.components = new Components;
@@ -578,6 +600,20 @@ define(function (require) {
     		  );
     	  }
       };
+
+      app.getPostGlobal = function( id ) {
+      	var global = app.getCurrentScreenGlobal();
+
+      	// If global isn't returned by app.getCurrentScreenGlobal, it could be in favorites list
+      	if( '' == global ) {
+      		var post = app.favorites.get( id );
+      		if( undefined !== post ) {
+      			global = post.global;
+      		}
+      	}
+
+      	return global;
+      }
 
       app.getMoreOfComponent = function(component_id,cb_ok,cb_error){
     	  var component = app.components.get(component_id);

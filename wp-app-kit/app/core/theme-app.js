@@ -493,10 +493,10 @@ define( function( require, exports ) {
 	 * Add a post to the favorites list.
 	 * Refresh the current view in order to reflect this addition (the link/button should be updated).
 	 *
-	 * @param 	string 	item_global 	The global key the post belongs to (ex: "posts").
 	 * @param 	int 	id 				The post id.
 	 */
-	themeApp.addToFavorites = function( item_global, id ) {
+	themeApp.addToFavorites = function( id ) {
+		var item_global = App.getPostGlobal( id );
 		var item = App.getGlobalItem( item_global, id );
 		if( null !== item ) {
 			App.favorites.add( _.extend( { global: item_global }, item ) );
@@ -510,11 +510,10 @@ define( function( require, exports ) {
 	 * Remove a post from the favorites list.
 	 * Refresh the current view in order to reflect this removal (the link/button should be updated).
 	 *
-	 * @param 	string 	item_global 	The global key the post belongs to (ex: "posts").
 	 * @param 	int 	id 				The post id.
 	 */
-	themeApp.removeFromFavorites = function( item_global, id ) {
-		var item = App.getGlobalItem( item_global, id );
+	themeApp.removeFromFavorites = function( id ) {
+		var item = App.getGlobalItem( App.getPostGlobal( id ), id );
 		if( null !== item ) {
 			App.favorites.remove( item );
 			App.favorites.saveAll();

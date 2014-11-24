@@ -58,23 +58,7 @@ define(function(require, exports) {
     themeTplTags.getPostLink = function(post_id, global) {
         //TODO Check if the post exists in the posts global
 
-        var screen_data = App.getCurrentScreenData();
-
-        var single_global = '';
-        if (global != undefined) {
-            single_global = global;
-        } else {
-            if (screen_data.screen_type == 'comments') {
-                var previous_screen_data = App.getPreviousScreenData();
-                if (previous_screen_data.screen_type == 'single') {
-                    single_global = previous_screen_data.global;
-                }
-            } else {
-                if (screen_data.hasOwnProperty('global') && screen_data.global != '') {
-                    single_global = screen_data.global;
-                }
-            }
-        }
+        var single_global = App.getCurrentScreenGlobal( global );
 
         return single_global != '' ? '#single/' + single_global + '/' + post_id : '';
     };
@@ -520,29 +504,7 @@ define(function(require, exports) {
      * @return  string  favorite_data   The completed "data-xxx" attributes.
      */
     themeTplTags.getFavoriteData = function( action, post_id ) {
-        var screen_data = App.getCurrentScreenData();
-        var favorite_data = '';
-
-        var single_global = '';
-        if (screen_data.screen_type == 'comments') {
-            var previous_screen_data = App.getPreviousScreenData();
-            if (previous_screen_data.screen_type == 'single') {
-                single_global = previous_screen_data.global;
-            }
-        } else {
-            if (screen_data.hasOwnProperty('global') && screen_data.global != '') {
-                single_global = screen_data.global;
-            }
-        }
-
-        if( single_global != '' ) {
-            favorite_data+= 'data-global="' + single_global + '" ';
-        }
-
-        favorite_data+= 'data-id="' + post_id + '" ';
-        favorite_data+= 'data-action="' + action + '" ';
-
-        return favorite_data;
+        return 'data-id="' + post_id + '" ';
     };
 
     /**
