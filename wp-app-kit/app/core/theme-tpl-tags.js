@@ -9,6 +9,7 @@ define(function(require, exports) {
     var _ = require('underscore'),
             Config = require('root/config'),
             App = require('core/app'),
+			RegionManager = require( 'core/region-manager' ),
 			Stats = require('core/stats'), 
             ThemeApp = require('core/theme-app');
 
@@ -220,8 +221,23 @@ define(function(require, exports) {
 	 * Retrieves the path to the current theme
 	 * @returns string Path to the current theme
 	 */
-	themeTplTags.getThemePath = function(){
+	themeTplTags.getThemePath = function() {
 		return 'themes/'+ Config.theme;
+	};
+	
+	/**
+	 * Retrieves menu items, in the same format as in the menu.html template
+	 * @returns {Array of JSON objects} Menu items
+	 */
+	themeTplTags.getMenuItems = function() {
+		var menu_items = []; 
+		
+		var menu_view = RegionManager.getMenuView();
+		if ( menu_view ) {
+			menu_items = menu_view.menu.toJSON();
+		}
+		
+		return menu_items;
 	};
 
     /**********************************************
