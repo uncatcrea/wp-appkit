@@ -34,8 +34,7 @@ define(function (require) {
 	  	    	var renderedContent = this.template({
 					title : Config.app_title, 
 					menu : '<div id="app-menu"></div>', 
-					TemplateTags : ThemeTplTags, 
-					theme_path : 'themes/'+ Config.theme
+					TemplateTags : ThemeTplTags
 				});
 	  	        $(this.el).html(renderedContent);
   	    	}

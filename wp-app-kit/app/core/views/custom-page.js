@@ -8,7 +8,6 @@ define(function (require) {
 
     var $                   = require('jquery'),
         _                   = require('underscore'),
-        Config              = require('root/config'),
         TemplateView        = require('core/views/backbone-template-view'),
         ThemeTplTags		= require('core/theme-tpl-tags'),
         Utils               = require('core/app-utils');
@@ -34,8 +33,7 @@ define(function (require) {
         	if( this.custom_page_data !== null ){
         		var renderedContent = this.template({ 
 					data : this.custom_page_data, 
-					TemplateTags : ThemeTplTags, 
-					theme_path : 'themes/'+ Config.theme 
+					TemplateTags : ThemeTplTags 
 				});
         		$(this.el).html(renderedContent);
         	}

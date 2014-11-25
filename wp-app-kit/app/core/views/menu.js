@@ -2,10 +2,11 @@ define(function (require) {
 
       "use strict";
 
-      var _                   = require('underscore'),
+      var $                   = require('jquery'),
+		  _                   = require('underscore'),
       	  Backbone            = require('backbone'),
-      	  Config              = require('root/config'),
       	  Tpl                 = require('text!theme/menu.html'),
+		  ThemeTplTags		  = require('core/theme-tpl-tags'),
       	  MenuItems           = require('core/models/menu-items');
       	  
       return Backbone.View.extend({
@@ -29,7 +30,10 @@ define(function (require) {
   	    },
   	    
   	    render : function( ) {
-  	    	var renderedContent = this.template({menu_items:this.menu.toJSON(), theme_path:'themes/'+ Config.theme});
+  	    	var renderedContent = this.template({
+				menu_items : this.menu.toJSON(), 
+				TemplateTags : ThemeTplTags 
+			});
   	        $(this.el).html(renderedContent);
   	        return this;
   	    }

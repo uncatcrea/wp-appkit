@@ -216,6 +216,13 @@ define(function(require, exports) {
         return format;
     };
 
+	/**
+	 * Retrieves the path to the current theme
+	 * @returns string Path to the current theme
+	 */
+	themeTplTags.getThemePath = function(){
+		return 'themes/'+ Config.theme;
+	};
 
     /**********************************************
      * Pages
