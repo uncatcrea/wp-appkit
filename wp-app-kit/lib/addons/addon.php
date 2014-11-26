@@ -9,10 +9,12 @@ class WpakAddon {
 	protected $js_files = array();
 	protected $css_files = array();
 	protected $html_files = array();
+	protected $app_data_callback = null;
+	protected $app_data = null;
 
-	public function __construct( $name ) {
+	public function __construct( $name, $slug = '' ) {
 		$this->name = $name;
-		$this->slug = sanitize_title_with_dashes( remove_accents( $name ) );
+		$this->slug = sanitize_title_with_dashes( remove_accents( empty($slug) ? $name : $slug ) );
 	}
 
 	public function __get( $property ) {
@@ -115,6 +117,23 @@ class WpakAddon {
 			}
 		}
 	}
+	
+	/**
+	 * Set the addon callback that will retrieve additionnal addon data specific to a given app.
+	 * @param type $callback Should be a function that takes $app_id as argument and returns an associative array
+	 */
+	public function add_app_data( $callback ){
+		$this->app_data_callback = $callback;
+	}
+	
+	public function set_app_data( $app_id ){
+		if( $this->app_data_callback !== null && is_callable($this->app_data_callback) ){
+			$app_data = call_user_func( $this->app_data_callback, $app_id );
+			if( $app_data !== false && is_array($app_data) ){
+				$this->app_data = $app_data;
+			}
+		}
+	}
 
 	public function get_asset_file( $file_relative_to_addon ) {
 
@@ -139,12 +158,13 @@ class WpakAddon {
 
 	public function to_config_object() {
 		return ( object ) array(
-					'name' => $this->name,
-					'slug' => $this->slug,
-					'url' => $this->url,
-					'js_files' => $this->js_files,
-					'css_files' => $this->css_files,
-					'html_files' => $this->html_files,
+			'name' => $this->name,
+			'slug' => $this->slug,
+			'url' => $this->url,
+			'js_files' => $this->js_files,
+			'css_files' => $this->css_files,
+			'html_files' => $this->html_files,
+			'app_data' => $this->app_data
 		);
 	}
 

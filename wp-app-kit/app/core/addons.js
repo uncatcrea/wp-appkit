@@ -111,6 +111,20 @@ define( function( require ) {
 		return html_data;
 	};
 	
+	addons.getAppData = function(addon_slug, field){
+		var addon_app_data = {};
+		_.each(config_addons,function(addon){
+			if( addon.slug == addon_slug && !_.isEmpty(addon.app_data) ){
+				if( field !== undefined && addon.app_data.hasOwnProperty(field) ){
+					addon_app_data = addon.app_data[field];
+				}else{
+					addon_app_data = addon.app_data;
+				}
+			}
+		});
+		return addon_app_data;
+	};
+	
 	return addons;
 } );
 
