@@ -3,6 +3,8 @@ require_once(dirname( __FILE__ ) . '/addon.php');
 
 class WpakAddons {
 
+	const meta_id = '_wpak_addons';
+	
 	protected static $addons = null;
 
 	public static function hooks() {
@@ -10,6 +12,7 @@ class WpakAddons {
 		add_action( 'template_redirect', array( __CLASS__, 'template_redirect' ), 5 );
 		if ( is_admin() ) {
 			add_action( 'add_meta_boxes', array( __CLASS__, 'add_main_meta_box' ), 20 );
+			add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 		}
 	}
 
@@ -104,7 +107,7 @@ class WpakAddons {
 
 		if ( !empty( $addons ) ) {
 			add_meta_box(
-					'wpak_app_addons', __( 'Addons', WpAppKit::i18n_domain ), array( __CLASS__, 'inner_addon_box' ), 'wpak_apps', 'normal', 'default'
+				'wpak_app_addons', __( 'Addons', WpAppKit::i18n_domain ), array( __CLASS__, 'inner_addon_box' ), 'wpak_apps', 'normal', 'default'
 			);
 		}
 	}
@@ -132,10 +135,28 @@ class WpakAddons {
 
 		$app_id = WpakApps::get_app_id( $app_id_or_slug );
 		if ( !empty( $app_id ) ) {
-			$app_addons = self::get_addons(); //TODO: save in post meta! :)
+
+			$app_addons_raw = get_post_meta( $app_id, self::meta_id, true );
+			
+			if ( !empty( $app_addons_raw ) ) {
+				//Check if the app addons are still installed :
+				$all_addons = self::get_addons();
+				foreach ( $app_addons_raw as $addon_slug ) {
+					if ( array_key_exists( $addon_slug, $all_addons ) ) {
+						$addon = $all_addons[$addon_slug];
+						$addon->set_app_data( $app_id );
+						$app_addons[$addon_slug] = $addon;
+					}
+				}
+			}
 		}
 
 		return $app_addons;
+	}
+
+	public static function addon_activated_for_app( $addon_slug, $app_id_or_slug ) {
+		$app_addons_raw = self::get_app_addons( $app_id_or_slug );
+		return array_key_exists( $addon_slug, $app_addons_raw );
 	}
 
 	public static function get_app_addons_for_config( $app_id_or_slug ) {
@@ -165,6 +186,48 @@ class WpakAddons {
 				}
 			}
 			self::$addons = $addons;
+		}
+	}
+
+	public static function save_post( $post_id ) {
+
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+
+		if ( empty( $_POST['post_type'] ) || $_POST['post_type'] != 'wpak_apps' ) {
+			return;
+		}
+		
+		if ( !current_user_can( 'edit_post', $post_id ) && !current_user_can( 'wpak_edit_apps', $post_id ) ) {
+			return;
+		}
+
+		if ( !check_admin_referer( 'wpak-addons-' . $post_id, 'wpak-nonce-addons' ) ) {
+			return;
+		}
+
+		if ( isset( $_POST['wpak-addons'] ) && is_array( $_POST['wpak-addons'] ) ) {
+
+			$app_addons = array();
+			$all_addons = array_keys( self::get_addons() );
+			foreach ( $_POST['wpak-addons'] as $addon_slug ) {
+				if ( in_array( $addon_slug, $all_addons ) ) {
+					$app_addons[] = $addon_slug;
+				}
+			}
+
+			if ( !empty( $app_addons ) ) {
+				update_post_meta( $post_id, self::meta_id, $app_addons );
+			} else {
+				delete_post_meta( $post_id, self::meta_id );
+			}
+			
+		}else{
+			//$_POST['wpak-addons'] is null if no addons checked.
+			//At this point, wpak-nonce-addons is ok so we can be sure that
+			//the form has been submitted : we can delete the meta :
+			delete_post_meta( $post_id, self::meta_id );
 		}
 	}
 
