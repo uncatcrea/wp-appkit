@@ -499,11 +499,10 @@ define(function(require, exports) {
     /**
      * Return a list of "data-xxx" attributes to include into a "favorites" link for a post.
      *
-     * @param   string  action          The action that will be performed if the link is clicked: should be "add" or "remove".
      * @param   int     post_id         The post id.
      * @return  string  favorite_data   The completed "data-xxx" attributes.
      */
-    themeTplTags.getFavoriteData = function( action, post_id ) {
+    themeTplTags.getFavoriteData = function( post_id ) {
         return 'data-id="' + post_id + '" ';
     };
 
