@@ -497,12 +497,12 @@ define(function(require, exports) {
 	};
 
     /**
-     * Return a list of "data-xxx" attributes to include into a "favorites" link for a post.
+     * Return a list of "data-xxx" attributes to include into a link for a specific post.
      *
      * @param   int     post_id         The post id.
-     * @return  string  favorite_data   The completed "data-xxx" attributes.
+     * @return  string                  The completed "data-xxx" attributes.
      */
-    themeTplTags.getFavoriteData = function( post_id ) {
+    themeTplTags.getPostDataAttributes = function( post_id ) {
         return 'data-id="' + post_id + '" ';
     };
 
