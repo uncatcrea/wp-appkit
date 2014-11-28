@@ -9,7 +9,8 @@ define(function (require) {
 
     var Favorite = Backbone.Model.extend({
     	defaults : {
-    		id : ""
+    		id : "",
+            add_date : ""
         }
     });
 
@@ -18,7 +19,8 @@ define(function (require) {
     	localStorage: null,
     	initialize : function(args){
     		this.localStorage = new Backbone.LocalStorage( "Favorites-" + Config.app_slug );
-            this.bind( 'remove', this.onRemove, this );
+            this.bind( 'remove', this.onRemove );
+            this.bind( 'add', this.onAdd );
     	},
     	saveAll : function(){
        	 	this.map(function(item){item.save();});
@@ -30,7 +32,10 @@ define(function (require) {
         	}
         	this.reset();
         },
-        onRemove : function( model, collection, options ) {
+        onAdd : function( model ) {
+            model.set( 'add_date', Math.round( Date.now() / 1000 ) );
+        },
+        onRemove : function( model ) {
             model.destroy();
         }
     });
