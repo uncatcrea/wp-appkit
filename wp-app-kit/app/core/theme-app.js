@@ -495,14 +495,19 @@ define( function( require, exports ) {
 	 *
 	 * @param 	int 	id 				The post id.
 	 */
-	themeApp.addToFavorites = function( id ) {
+	themeApp.addToFavorites = function( id, callback ) {
 		var item_global = App.getPostGlobal( id );
 		var item = App.getGlobalItem( item_global, id );
+		var saved = false;
+
 		if( null !== item ) {
 			App.favorites.add( _.extend( { global: item_global }, item ) );
 			App.favorites.saveAll();
-			var current_view = RegionManager.getCurrentView();
-			current_view.render();
+			saved = true;
+		}
+
+		if( undefined !== callback ) {
+			callback( saved );
 		}
 	};
 
@@ -512,13 +517,18 @@ define( function( require, exports ) {
 	 *
 	 * @param 	int 	id 				The post id.
 	 */
-	themeApp.removeFromFavorites = function( id ) {
+	themeApp.removeFromFavorites = function( id, callback ) {
 		var item = App.getGlobalItem( App.getPostGlobal( id ), id );
+		var saved = false;
+
 		if( null !== item ) {
 			App.favorites.remove( item );
 			App.favorites.saveAll();
-			var current_view = RegionManager.getCurrentView();
-			current_view.render();
+			saved = true;
+		}
+
+		if( undefined !== callback ) {
+			callback( saved );
 		}
 	};
 
