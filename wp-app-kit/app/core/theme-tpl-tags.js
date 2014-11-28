@@ -6,12 +6,13 @@ define(function(require, exports) {
 
     "use strict";
 
-    var _ = require('underscore'),
-            Config = require('root/config'),
-            App = require('core/app'),
-			RegionManager = require( 'core/region-manager' ),
-			Stats = require('core/stats'),
-            ThemeApp = require('core/theme-app');
+    var _             = require('underscore'),
+        Config        = require('root/config'),
+        App           = require('core/app'),
+        RegionManager = require( 'core/region-manager' ),
+		Stats         = require('core/stats'),
+        ThemeApp      = require('core/theme-app'),
+        Hooks         = require('core/lib/hooks');
 
     var themeTplTags = {};
 
@@ -503,7 +504,11 @@ define(function(require, exports) {
      * @return  string                  The completed "data-xxx" attributes.
      */
     themeTplTags.getPostDataAttributes = function( post_id ) {
-        return 'data-id="' + post_id + '" ';
+        var attributes = ['data-id="' + post_id + '"'];
+
+        attributes = Hooks.applyFilter( 'post-data-attributes', attributes, [post_id] );
+
+        return attributes.join( ' ' );
     };
 
     /**
