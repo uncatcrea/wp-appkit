@@ -18,6 +18,7 @@ define(function (require) {
     	localStorage: null,
     	initialize : function(args){
     		this.localStorage = new Backbone.LocalStorage( "Favorites-" + Config.app_slug );
+            this.bind( 'remove', this.onRemove, this );
     	},
     	saveAll : function(){
        	 	this.map(function(item){item.save();});
@@ -28,6 +29,9 @@ define(function (require) {
         		this.at(i).destroy();
         	}
         	this.reset();
+        },
+        onRemove : function( model, collection, options ) {
+            model.destroy();
         }
     });
 
