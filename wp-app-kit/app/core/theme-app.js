@@ -532,6 +532,17 @@ define( function( require, exports ) {
 		}
 	};
 
+    /**
+     * Reset the list of favorites.
+     */
+    themeApp.resetFavorites = function( callback ) {
+    	App.favorites.resetAll();
+
+    	if( undefined !== callback ) {
+    		callback();
+    	}
+    };
+
 	//Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
 	//a circular dependency for requirejs) can both be required at the same time
 	//(in theme functions.js for example) :
