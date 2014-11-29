@@ -34,9 +34,13 @@ define(function (require) {
         },
         onAdd : function( model ) {
             model.set( 'add_date', Math.round( Date.now() / 1000 ) );
+            this.sort();
         },
         onRemove : function( model ) {
             model.destroy();
+        },
+        comparator : function( favorite ) {
+            return -favorite.get( 'add_date' );
         }
     });
 
