@@ -50,9 +50,17 @@ define(function (require) {
 					if( check_route('component-'+ component_id) ){
 						switch( component.type ){
 							case 'posts-list':
+                                App.setQueriedScreen({screen_type:'list',component_id:component_id,item_id:0,global:component.global,data:component.data,label:component.label});
+                                require(["core/views/archive"],function(ArchiveView){
+                                    var view = new ArchiveView(component.view_data);
+                                    view.checkTemplate(function(){
+                                        RegionManager.show(view);
+                                    });
+                                });
+                                break;
                             case 'favorites':
 								App.setQueriedScreen({screen_type:'list',component_id:component_id,item_id:0,global:component.global,data:component.data,label:component.label});
-								require(["core/views/archive"],function(ArchiveView){
+								require(["core/views/favorites"],function(ArchiveView){
 									var view = new ArchiveView(component.view_data);
 									view.checkTemplate(function(){
 										RegionManager.show(view);
