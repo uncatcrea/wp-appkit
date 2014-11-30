@@ -507,7 +507,7 @@ define( function( require, exports ) {
 		}
 
 		if( undefined !== callback ) {
-			callback( saved );
+			callback( saved, id );
 		}
 	};
 
@@ -528,7 +528,7 @@ define( function( require, exports ) {
 		}
 
 		if( undefined !== callback ) {
-			callback( saved );
+			callback( saved, id );
 		}
 	};
 
