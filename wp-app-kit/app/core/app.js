@@ -12,6 +12,7 @@ define(function (require) {
           Items               = require('core/models/items'),
           Comments            = require('core/models/comments'),
           CustomPage          = require('core/models/custom-page'),
+          Favorites           = require('core/models/favorites'),
           Config              = require('root/config'),
           Utils               = require('core/app-utils'),
           Hooks               = require('core/lib/hooks'),
@@ -59,11 +60,11 @@ define(function (require) {
 
 	  //--------------------------------------------------------------------------
 	  //App params :
-	  //Params that can be changed by themes dynamically : themes can freely change 
+	  //Params that can be changed by themes dynamically : themes can freely change
 	  //their value during a same app execution.
-	  //TODO : we should link (but not merge because they don't have the same usage) 
+	  //TODO : we should link (but not merge because they don't have the same usage)
 	  //those params to App options...
-	  
+
 	  var params = {
 		  'refresh-at-app-launch' : true,
 		  'go-to-default-route-after-refresh' : true,
@@ -91,15 +92,14 @@ define(function (require) {
 	  /**
 	   * Sets the route corresponding to the app homepage : fragment empty or = "#".
 	   * Use the 'default-route' filter to change the default route from functions.js.
-	   * 
+	   *
 	   * app.router must be set before calling this resetDefaultRoute
 	   */
 	  app.resetDefaultRoute = function(is_app_launch){
-		  
+
 		var default_route = '';
-		
+
 		var is_app_launch = is_app_launch !== undefined && is_app_launch === true;
-		
 		if( app.navigation.length > 0 ){
 			var first_nav_component_id = app.navigation.first().get('component_id');
 			default_route = '#component-'+ first_nav_component_id;
@@ -112,35 +112,35 @@ define(function (require) {
 				Utils.log('No navigation, no component found. Could not set default route.');
 			}
 		}
-		
+
 		/**
 		 * Hook : filter 'default-route' : use this to define your own default route
 		 */
 		default_route = Hooks.applyFilter('default-route',default_route,[Stats.getStats(),is_app_launch]);
-		  
+
 		if( default_route != '' ){
 			app.router.setDefaultRoute(default_route);
 		}
-		
+
 		return default_route;
 	  };
 
 	  app.launchRouting = function() {
-		
+
 		var default_route = app.resetDefaultRoute(true);
-		
+
 		var launch_route = default_route;
-		
+
 		/**
 		 * Use the 'launch-route' filter to display a specific screen at app launch
-		 * If the returned launch_route = '' the initial 
+		 * If the returned launch_route = '' the initial
 		 * navigation to launch route is canceled. Then you should navigate manually
 		 * to a choosen page in the "info:app-ready" event for example.
 		 */
 		launch_route = Hooks.applyFilter('launch-route',launch_route,[Stats.getStats()]);
-		
+
 		Hooks.doAction('pre-start-router',[launch_route,Stats.getStats()]);
-		
+
 		if( launch_route.length > 0 ){
 			Backbone.history.start();
 			//Navigate to the launch_route :
@@ -150,15 +150,15 @@ define(function (require) {
 			//Hack : Trigger a non existent route so that no view is loaded :
 			app.router.navigate('#wpak-none', {trigger: true});
 		}
-			
+
 		/*
 		    //Keep this commented for now in case the problem comes back.
 		    //Normally it was solved by the "Router callback checking" hack in routers.js.
-		 
-			//Start "silently" so that we don't navigate to a url already set in browser 
+
+			//Start "silently" so that we don't navigate to a url already set in browser
 			//(that causes some odd crashes opening views that don't correpond to current screen,
 			//when triggering 2 routes in a very short delay) :
-		  
+
 			Backbone.history.start({silent: true});
 
 			if( launch_route.length > 0 ){
@@ -172,10 +172,10 @@ define(function (require) {
 			//If the launch_route is the same as the current browser url, it won't fire.
 			//So we have to restart the router, removing the silent option to really
 			//navigate to the launch_route (at last!).
-			Backbone.history.stop(); 
+			Backbone.history.stop();
 			Backbone.history.start({silent: false});
 		*/
-	  } 
+	  }
 
 	  //--------------------------------------------------------------------------
 	  //History : allows to handle back button.
@@ -324,11 +324,34 @@ define(function (require) {
 		  return previous_screen_link;
 	  };
 
+	  app.getCurrentScreenGlobal = function( global ) {
+        var screen_data = app.getCurrentScreenData();
+
+        var single_global = '';
+        if (global != undefined) {
+            single_global = global;
+        } else {
+            if (screen_data.screen_type == 'comments') {
+                var previous_screen_data = app.getPreviousScreenData();
+                if (previous_screen_data.screen_type == 'single') {
+                    single_global = previous_screen_data.global;
+                }
+            } else {
+                if (screen_data.hasOwnProperty('global') && screen_data.global != '') {
+                    single_global = screen_data.global;
+                }
+            }
+        }
+
+        return single_global;
+	  }
+
 	  //--------------------------------------------------------------------------
 	  //App items data :
 	  app.components = new Components;
 	  app.navigation = new Navigation;
 	  app.options    = new Options;
+	  app.favorites  = new Favorites;
 
 	  //For globals, separate keys from values because localstorage on
 	  //collections of collections won't work :-(
@@ -371,49 +394,58 @@ define(function (require) {
 		  var force = force_reload != undefined && force_reload;
 
 		  app.components.fetch({'success': function(components, response, options){
-	    		 if( components.length == 0 || force ){
-	    			 syncWebService(cb_ok,cb_error);
-	    		 }else{
-	    			 Utils.log('Components retrieved from local storage.',{components:components});
-	    			 app.navigation.fetch({'success': function(navigation, response_nav, options_nav){
-	    	    		 if( navigation.length == 0 ){
-	    	    			 syncWebService(cb_ok,cb_error);
-	    	    		 }else{
-	    	    			 Utils.log('Navigation retrieved from local storage.',{navigation:navigation});
-	    	    			 globals_keys.fetch({'success': function(global_keys, response_global_keys, options_global_keys){
-	    	    	    		 if( global_keys.length == 0 ){
-	    	    	    			 syncWebService(cb_ok,cb_error);
-	    	    	    		 }else{
-	    	    	    			 app.globals = {};
+			  // @TODO: find a better place to fetch?
+			  app.favorites.fetch({
+	      		'success': function( appFavorites, response, options ) {
+					Utils.log( 'Favorites retrieved from local storage.', { favorites: appFavorites } );
+		    		 if( components.length == 0 || force ){
+		    			 syncWebService(cb_ok,cb_error);
+		    		 }else{
+		    			 Utils.log('Components retrieved from local storage.',{components:components});
+		    			 app.navigation.fetch({'success': function(navigation, response_nav, options_nav){
+		    	    		 if( navigation.length == 0 ){
+		    	    			 syncWebService(cb_ok,cb_error);
+		    	    		 }else{
+		    	    			 Utils.log('Navigation retrieved from local storage.',{navigation:navigation});
+		    	    			 globals_keys.fetch({'success': function(global_keys, response_global_keys, options_global_keys){
+		    	    	    		 if( global_keys.length == 0 ){
+		    	    	    			 syncWebService(cb_ok,cb_error);
+		    	    	    		 }else{
+		    	    	    			 var fetch = function(_items,_key){
+		    	    	    				 return _items.fetch({'success': function(fetched_items, response_items, options_items){
+	    	    	    	    				app.globals[_key] = fetched_items;
+	    	    	    	    				//Backbone's fetch returns jQuery ajax deferred object > works with $.when
+	    	    	    					 }});
+		    	    	    			 };
 
-	    	    	    			 var fetch = function(_items,_key){
-	    	    	    				 return _items.fetch({'success': function(fetched_items, response_items, options_items){
-    	    	    	    				app.globals[_key] = fetched_items;
-    	    	    	    				//Backbone's fetch returns jQuery ajax deferred object > works with $.when
-    	    	    					 }});
-	    	    	    			 };
+		    	    	    			 var fetches = [];
+		    	    	    			 global_keys.each(function(value, key, list){
+		    	    	    				 var global_id = value.get('id');
+		    	    	    				 var items = new Items.Items({global:global_id});
+		    	    	    				 fetches.push(fetch(items,global_id));
+		    	    	    			 });
 
-	    	    	    			 var fetches = [];
-	    	    	    			 global_keys.each(function(value, key, list){
-	    	    	    				 var global_id = value.get('id');
-	    	    	    				 var items = new Items.Items({global:global_id});
-	    	    	    				 fetches.push(fetch(items,global_id));
-	    	    	    			 });
+		    	    	    			 $.when.apply($, fetches).done(function () {
+		    	    	    				 if( app.globals.length == 0 ){
+			    	    	    				 syncWebService(cb_ok,cb_error);
+			    	    	    			 }else{
+			    	    	    				 Utils.log('Global items retrieved from local storage.',{globals:app.globals});
+							  					 // @TODO: find a better way to do this?
+			    	    	    				 addFavoritesToGlobals();
+			    	    	    				 cb_ok();
+			    	    	    			 }
+		    	    	    		     });
 
-	    	    	    			 $.when.apply($, fetches).done(function () {
-	    	    	    				 if( app.globals.length == 0 ){
-		    	    	    				 syncWebService(cb_ok,cb_error);
-		    	    	    			 }else{
-		    	    	    				 Utils.log('Global items retrieved from local storage.',{globals:app.globals});
-		    	    	    				 cb_ok();
-		    	    	    			 }
-	    	    	    		     });
-
-	    	    	    		 }
-	    	    			 }});
-	    	    		 }
-	    			 }});
-	    		 }
+		    	    	    		 }
+		    	    			 }});
+		    	    		 }
+		    			 }});
+		    		 }
+			      	},
+		      	'error': function( appFavorites, response, options ) {
+					Utils.log( 'Error occured while retrieving favorites.', { favorites: appFavorites } );
+		      	}
+	      	  });
 		  }});
 
       };
@@ -465,6 +497,9 @@ define(function (require) {
 								  Utils.log('Components, navigation and globals retrieved from online.',{components:app.components,navigation:app.navigation,globals:app.globals});
 
 								  cb_ok();
+
+								  // @TODO: find a better way to do this?
+								  addFavoritesToGlobals();
 				  			  }else{
 				  				  app.triggerError(
 				  						'synchro:wrong-answer',
@@ -505,6 +540,32 @@ define(function (require) {
 		  });
 	  };
 
+	  /**
+	   * Add the list of favorites into the global list of items, if they don't already exist into it.
+	   *
+	   * Favorites list persists and is never reset unless the user requested it.
+	   * Global list is reset at each app launch.
+	   * This allows to use app routes and templates for favorites the same way that for other posts (single and archive views for instance).
+	   */
+	  var addFavoritesToGlobals = function() {
+		Utils.log( 'Adding favorites to globals' );
+	  	_.each( app.favorites.toJSON(), function( item, index ) {
+	  		if( undefined === globals_keys.get( item.global ) ) {
+	  			// Favorite type doesn't exist into globals keys
+				Utils.log( 'Favorite type doesn\'t exist into globals keys', { type: item.global, globals_keys: globals_keys } );
+	  			globals_keys.add( { id: item.global } );
+	  			app.globals[item.global] = new Items.Items( { global: item.global } );
+	  		}
+	  		if( null === app.getGlobalItem( item.global, item.id ) ) {
+	  			// Favorite item doesn't exist into global items
+				Utils.log( 'Favorite item doesn\'t exist into global items', { item: item, globals: app.globals } );
+	  			app.globals[item.global].add( item );
+	  		}
+	  	});
+
+	  	Utils.log( 'Favorites added to globals', { globals_keys: globals_keys, globals: app.globals } );
+	  };
+
 	  app.getPostComments = function(post_id,cb_ok,cb_error){
     	  var token = getToken('comments-post');
     	  var ws_url = token +'/comments-post/'+ post_id;
@@ -539,6 +600,20 @@ define(function (require) {
     		  );
     	  }
       };
+
+      app.getPostGlobal = function( id ) {
+      	var global = app.getCurrentScreenGlobal();
+
+      	// If global isn't returned by app.getCurrentScreenGlobal, it could be in favorites list
+      	if( '' == global ) {
+      		var post = app.favorites.get( id );
+      		if( undefined !== post ) {
+      			global = post.global;
+      		}
+      	}
+
+      	return global;
+      }
 
       app.getMoreOfComponent = function(component_id,cb_ok,cb_error){
     	  var component = app.components.get(component_id);
@@ -653,13 +728,23 @@ define(function (require) {
     				  _.each(data.ids,function(post_id, index){
     					  items.add(global.get(post_id));
     				  });
+
     				  component_data = {
     						  type: component_type,
     						  view_data: {posts:items,title: component.get('label'), total: data.total},
     						  data: data
     				  };
+	    			  break
+	    		  case 'favorites':
+	    			  var data = component.get('data');
+
+    				  component_data = {
+    						  type: component_type,
+    						  view_data: {posts:app.favorites,title: component.get('label'), total: app.favorites.length},
+    						  data: data
+    				  };
 	    			  break;
-	    		  case 'page':
+    			  case 'page':
 	    			  var data = component.get('data');
 	    			  var component_global = component.get('global');
 	    			  var global = app.globals[component_global];
@@ -809,15 +894,15 @@ define(function (require) {
 	  		callback();
 	  	}
       };
-	  
+
 	//--------------------------------------------------------------------------
 	//Network : handle network state if the Network phonegap plugin is available
-	
+
 	app.onOnline = function(){
 		vent.trigger('network:online');
 		Utils.log('Network event : online');
 	};
-	
+
 	app.onOffline = function(){
 		vent.trigger('network:offline');
 		Utils.log('Network event : offline');

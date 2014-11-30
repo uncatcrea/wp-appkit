@@ -6,12 +6,13 @@ define(function(require, exports) {
 
     "use strict";
 
-    var _ = require('underscore'),
-            Config = require('root/config'),
-            App = require('core/app'),
-			RegionManager = require( 'core/region-manager' ),
-			Stats = require('core/stats'), 
-            ThemeApp = require('core/theme-app');
+    var _             = require('underscore'),
+        Config        = require('root/config'),
+        App           = require('core/app'),
+        RegionManager = require( 'core/region-manager' ),
+		Stats         = require('core/stats'),
+        ThemeApp      = require('core/theme-app'),
+        Hooks         = require('core/lib/hooks');
 
     var themeTplTags = {};
 
@@ -32,7 +33,7 @@ define(function(require, exports) {
     themeTplTags.getCurrentScreen = function() {
         return App.getCurrentScreenData();
     };
-	
+
 	/**
      * Retrieves previous screen infos :
      * @return JSON object containing :
@@ -58,23 +59,7 @@ define(function(require, exports) {
     themeTplTags.getPostLink = function(post_id, global) {
         //TODO Check if the post exists in the posts global
 
-        var screen_data = App.getCurrentScreenData();
-
-        var single_global = '';
-        if (global != undefined) {
-            single_global = global;
-        } else {
-            if (screen_data.screen_type == 'comments') {
-                var previous_screen_data = App.getPreviousScreenData();
-                if (previous_screen_data.screen_type == 'single') {
-                    single_global = previous_screen_data.global;
-                }
-            } else {
-                if (screen_data.hasOwnProperty('global') && screen_data.global != '') {
-                    single_global = screen_data.global;
-                }
-            }
-        }
+        var single_global = App.getCurrentScreenGlobal( global );
 
         return single_global != '' ? '#single/' + single_global + '/' + post_id : '';
     };
@@ -83,7 +68,7 @@ define(function(require, exports) {
         //TODO Check if the post exists in the posts global
         return '#comments-' + post_id;
     };
-	
+
 	themeTplTags.getDefaultRouteLink = function() {
         return App.router.getDefaultRoute();
     };
@@ -131,7 +116,7 @@ define(function(require, exports) {
 	 */
     themeTplTags.isTaxonomy = function(taxonomy, terms, screen) {
         var is_taxonomy = false;
-		
+
         var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
 
         if (!_.isEmpty(screen_data.data) && !_.isEmpty(screen_data.data.query)) {
@@ -224,19 +209,19 @@ define(function(require, exports) {
 	themeTplTags.getThemePath = function() {
 		return 'themes/'+ Config.theme;
 	};
-	
+
 	/**
 	 * Retrieves menu items, in the same format as in the menu.html template
 	 * @returns {Array of JSON objects} Menu items
 	 */
 	themeTplTags.getMenuItems = function() {
-		var menu_items = []; 
-		
+		var menu_items = [];
+
 		var menu_view = RegionManager.getMenuView();
 		if ( menu_view ) {
 			menu_items = menu_view.menu.toJSON();
 		}
-		
+
 		return menu_items;
 	};
 
@@ -477,18 +462,18 @@ define(function(require, exports) {
 
         return link;
     };
-	
+
 	/************************************************
 	 * App network management
 	 */
-	
+
 	/**
 	 * Retrieve network state : "online", "offline" or "unknown"
-	 * If full_info is passed and set to true, detailed connexion info is 
+	 * If full_info is passed and set to true, detailed connexion info is
 	 * returned (Wifi, 3G etc...).
 	 * This is an alias for ThemeApp.getNetworkState(full_info) because it
 	 * can be useful in themes too.
-	 * 
+	 *
 	 * @param boolean full_info Set to true to get detailed connexion info
 	 * @returns string "online", "offline" or "unknown"
 	 */
@@ -499,18 +484,48 @@ define(function(require, exports) {
 	/************************************************
 	 * App stats management
 	 */
-	
+
 	/**
 	 * Retrieves app stats. "stat" can be empty to retrieve all stats, or
 	 * "count_open", "last_open_date", "version", "version_diff".
-	 * 
+	 *
 	 * @param string stat (optionnal) : Name of stat to retrieve
-	 * @returns JSON object|string : Returns JSON object if "stat" is empty, 
+	 * @returns JSON object|string : Returns JSON object if "stat" is empty,
 	 * or the specific stat value correponding to the "stat" arg.
 	 */
 	themeTplTags.getAppStats = function(stat) {
 		return Stats.getStats(stat);
 	};
+
+    /**
+     * Return a list of "data-xxx" attributes to include into a link for a specific post.
+     *
+     * @param   int     post_id         The post id.
+     * @return  string                  The completed "data-xxx" attributes.
+     */
+    themeTplTags.getPostDataAttributes = function( post_id ) {
+        var attributes = ['data-id="' + post_id + '"'];
+
+        attributes = Hooks.applyFilter( 'post-data-attributes', attributes, [post_id] );
+
+        return attributes.join( ' ' );
+    };
+
+    /**
+     * Return true or false whether the post is in the favorites list or not.
+     *
+     * @param   int     post_id     The post id.
+     * @return  bool    isFavorite  The HTML for the button.
+     */
+    themeTplTags.isFavorite = function( post_id ) {
+        var isFavorite = false;
+
+        if( undefined !== post_id ) {
+            isFavorite = undefined !== App.favorites.get( post_id );
+        }
+
+        return isFavorite;
+    };
 
     //Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
     //a circular dependency for requirejs) can both be required at the same time

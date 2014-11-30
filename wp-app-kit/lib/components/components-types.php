@@ -61,7 +61,7 @@ class WpakComponentsTypes {
 		return $data;
 	}
 
-	public static function get_options_to_display( $component ) {
+	public static function get_options_to_display( WpakComponent $component ) {
 		$options = array();
 		if ( self::component_type_exists( $component->type ) ) {
 			$options = self::factory( $component->type )->get_options_to_display( $component );
@@ -124,3 +124,4 @@ class WpakComponentsTypes {
 require_once(dirname( __FILE__ ) . '/components-types/posts-list.php');
 require_once(dirname( __FILE__ ) . '/components-types/page.php');
 require_once(dirname( __FILE__ ) . '/components-types/hooks.php');
+require_once(dirname( __FILE__ ) . '/components-types/favorites.php');

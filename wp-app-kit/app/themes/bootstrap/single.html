@@ -1,5 +1,7 @@
-<div id="single">
+<div id="single" class="post-<%= post.id %>">
 	<h1><%= post.title %></h1>
+	<a class="favorite remove <%= TemplateTags.isFavorite( post.id ) ? '' : 'hidden' %>" <%= TemplateTags.getPostDataAttributes( post.id ) %> href="#">Remove from favorites</a>
+	<a class="favorite add <%= TemplateTags.isFavorite( post.id ) ? 'hidden' : '' %>" <%= TemplateTags.getPostDataAttributes( post.id ) %> href="#">Add to favorites</a>
 	<%= TemplateTags.formatDate(post.date,'d/m/Y') %>
 	<% if( post.nb_comments > 0 ){ %>
 		- <a class="comments" href="<%= TemplateTags.getCommentsLink(post.id) %>"><% print(post.nb_comments) %>&nbsp;comment<% post.nb_comments > 1 ? print('s') : '' %></a>
