@@ -1,5 +1,5 @@
 define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/lib/storage', 'theme/js/bootstrap.min' ], function( $, App, TemplateTags, Storage ) {
-		
+
 	/**
 	 * Launch app contents refresh when clicking the refresh button :
 	 */
@@ -21,10 +21,10 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/lib/storage',
 	 * - scroll to top
 	 * - stop refresh button animation
 	 * - display success or error message
-	 * 
-	 * Callback param : result : object { 
-	 *		ok: boolean : true if refresh is successful, 
-	 *		message: string : empty if success, error message if refresh fails, 
+	 *
+	 * Callback param : result : object {
+	 *		ok: boolean : true if refresh is successful,
+	 *		message: string : empty if success, error message if refresh fails,
 	 *		data: object : empty if success, error object if refresh fails :
 	 *					   use result.data to get more info about the error
 	 *					   if needed.
@@ -99,7 +99,7 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/lib/storage',
 
 	/**
 	 * Do something before leaving a screen.
-	 * Here, if we're leaving a post list, we memorize the current scroll position, to 
+	 * Here, if we're leaving a post list, we memorize the current scroll position, to
 	 * get back to it when coming back to this list.
 	 */
 	App.on( 'screen:leave', function( current_screen, queried_screen, view ) {
@@ -126,7 +126,46 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/lib/storage',
 			scrollTop();
 		}
 	} );
-	
+
+	/**
+	 * Toggle the display for both 'add' and 'remove' favorites links.
+	 * Called after a post has been added or removed to favorites list, so that the user can have a visual feedback.
+	 *
+	 * @param 	bool 	saved 		True or false whether the favorites list update has been made or not.
+	 * @param 	int 	post_id 	ID of the post that has been added or removed from the favorites list.
+	 */
+	function toggleFavoriteLinks( saved, post_id ) {
+		if( saved ) {
+			$( '.post-' + post_id + ' .favorite' ).toggleClass( 'hidden' );
+		}
+	}
+
+	/**
+	 * Add/Remove from favorites buttons
+	 */
+	$( '#container' ).on( 'click', '.favorite', function( e ) {
+		e.preventDefault();
+		var $link = $( this );
+		var id = $link.data( 'id' );
+
+		if( TemplateTags.isFavorite( id ) ) {
+			App.removeFromFavorites( id, toggleFavoriteLinks );
+		}
+		else {
+			App.addToFavorites( id, toggleFavoriteLinks );
+		}
+	});
+
+	/**
+	 * Reset favorites button
+	 */
+	$( '#container' ).on( 'click', '.favorite-reset', function( e ) {
+		e.preventDefault();
+		App.resetFavorites( function() {
+			// @TODO: Refresh the archive view, but how?
+		});
+	});
+
 	/**
 	 * Example of how to react to network state changes :
 	 */
@@ -134,7 +173,7 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/lib/storage',
 	App.on( 'network:online', function(event) {
 		$( '#feedback' ).removeClass( 'error' ).html( "Internet connexion ok :)" ).slideDown();
 	} );
-	
+
 	App.on( 'network:offline', function(event) {
 		$( '#feedback' ).addClass( 'error' ).html( "Internet connexion lost :(" ).slideDown();
 	} );
