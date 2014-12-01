@@ -608,7 +608,7 @@ define(function (require) {
       	if( '' == global ) {
       		var post = app.favorites.get( id );
       		if( undefined !== post ) {
-      			global = post.global;
+      			global = post.get( 'global' );
       		}
       	}
 
