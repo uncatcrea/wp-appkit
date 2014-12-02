@@ -10,7 +10,7 @@ define(function(require, exports) {
             Config = require('root/config'),
             App = require('core/app'),
 			Stats = require('core/stats'), 
-			Addons = require( 'core/addons' ),
+			Addons = require( 'core/addons-internal' ),
             ThemeApp = require('core/theme-app');
 
     var themeTplTags = {};

@@ -6,7 +6,7 @@ define(function (require) {
         _                   = require('underscore'),
         Backbone            = require('backbone'),
         Config              = require('root/config'),
-		Addons              = require('core/addons'),
+		Addons              = require('core/addons-internal'),
         Tpl                 = require('text!theme/layout.html'),
 		ThemeTplTags		= require('core/theme-tpl-tags');
 

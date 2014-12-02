@@ -16,7 +16,7 @@ define(function (require) {
           Utils               = require('core/app-utils'),
           Hooks               = require('core/lib/hooks'),
 		  Stats               = require('core/stats'),
-		  Addons              = require('core/addons'),
+		  Addons              = require('core/addons-internal'),
           Sha256              = require('core/lib/sha256');
 
 	  var app = {};
@@ -462,6 +462,8 @@ define(function (require) {
 
 								  app.options.set( { id: 'last_updated', value: Date.now() }, { remove: false } );
 								  app.options.saveAll();
+
+								  Addons.setDynamicDataFromWebService( data.addons );
 
 								  Utils.log('Components, navigation and globals retrieved from online.',{components:app.components,navigation:app.navigation,globals:app.globals});
 

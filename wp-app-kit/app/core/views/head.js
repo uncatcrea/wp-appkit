@@ -6,7 +6,7 @@ define(function (require) {
         _                   = require('underscore'),
         Backbone            = require('backbone'),
         Config              = require('root/config'),
-		Addons              = require('core/addons'),
+		Addons              = require('core/addons-internal'),
         Tpl                 = require('text!theme/head.html');
 
     return Backbone.View.extend({

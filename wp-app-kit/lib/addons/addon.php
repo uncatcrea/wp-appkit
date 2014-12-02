@@ -9,8 +9,10 @@ class WpakAddon {
 	protected $js_files = array();
 	protected $css_files = array();
 	protected $html_files = array();
-	protected $app_data_callback = null;
-	protected $app_data = null;
+	protected $app_static_data_callback = null;
+	protected $app_static_data = null;
+	protected $app_dynamic_data_callback = null;
+	protected $app_dynamic_data = null;
 
 	public function __construct( $name, $slug = '' ) {
 		$this->name = $name;
@@ -119,18 +121,37 @@ class WpakAddon {
 	}
 	
 	/**
-	 * Set the addon callback that will retrieve additionnal addon data specific to a given app.
+	 * Set the addon callback that will retrieve additionnal addon static data 
+	 * (added to config.js) specific to a given app.
 	 * @param type $callback Should be a function that takes $app_id as argument and returns an associative array
 	 */
-	public function add_app_data( $callback ){
-		$this->app_data_callback = $callback;
+	public function add_app_static_data( $callback ){
+		$this->app_static_data_callback = $callback;
 	}
 	
-	public function set_app_data( $app_id ){
-		if( $this->app_data_callback !== null && is_callable($this->app_data_callback) ){
-			$app_data = call_user_func( $this->app_data_callback, $app_id );
+	public function set_app_static_data( $app_id ){
+		if( $this->app_static_data_callback !== null && is_callable($this->app_static_data_callback) ){
+			$app_data = call_user_func( $this->app_static_data_callback, $app_id );
 			if( $app_data !== false && is_array($app_data) ){
-				$this->app_data = $app_data;
+				$this->app_static_data = $app_data;
+			}
+		}
+	}
+	
+	/**
+	 * Set the addon callback that will retrieve additionnal addon dynamic data 
+	 * (added to the synchronization web service) specific to a given app.
+	 * @param type $callback Should be a function that takes $app_id as argument and returns an associative array
+	 */
+	public function add_app_dynamic_data( $callback ){
+		$this->app_dynamic_data_callback = $callback;
+	}
+	
+	public function set_app_dynamic_data( $app_id ){
+		if( $this->app_dynamic_data_callback !== null && is_callable($this->app_dynamic_data_callback) ){
+			$app_data = call_user_func( $this->app_dynamic_data_callback, $app_id );
+			if( $app_data !== false && is_array($app_data) ){
+				$this->app_dynamic_data = $app_data;
 			}
 		}
 	}
@@ -156,6 +177,9 @@ class WpakAddon {
 		return file_exists( $this->directory );
 	}
 
+	/**
+	 * Export data for config.js file
+	 */
 	public function to_config_object() {
 		return ( object ) array(
 			'name' => $this->name,
@@ -164,8 +188,14 @@ class WpakAddon {
 			'js_files' => $this->js_files,
 			'css_files' => $this->css_files,
 			'html_files' => $this->html_files,
-			'app_data' => $this->app_data
+			'app_data' => $this->app_static_data
 		);
 	}
 
+	/**
+	 * Retrieves dynamic data to be passed to the synchronization web service
+	 */
+	public function get_dynamic_data() {
+		return ( object ) $this->app_dynamic_data;
+	}
 }

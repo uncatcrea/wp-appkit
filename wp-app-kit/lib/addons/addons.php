@@ -144,7 +144,8 @@ class WpakAddons {
 				foreach ( $app_addons_raw as $addon_slug ) {
 					if ( array_key_exists( $addon_slug, $all_addons ) ) {
 						$addon = $all_addons[$addon_slug];
-						$addon->set_app_data( $app_id );
+						$addon->set_app_static_data( $app_id );
+						$addon->set_app_dynamic_data( $app_id );
 						$app_addons[$addon_slug] = $addon;
 					}
 				}
@@ -159,6 +160,11 @@ class WpakAddons {
 		return array_key_exists( $addon_slug, $app_addons_raw );
 	}
 
+	/**
+	 * Retrieves app data to add to the config.js file.
+	 * @param int|string $app_id_or_slug
+	 * @return array Array of addons
+	 */
 	public static function get_app_addons_for_config( $app_id_or_slug ) {
 		$app_addons = array();
 
@@ -170,6 +176,24 @@ class WpakAddons {
 		}
 
 		return $app_addons;
+	}
+	
+	/**
+	 * Retrieves app data to add to the synchronization web service.
+	 * @param int|string $app_id_or_slug
+	 * @return array Array of addons dynamic data
+	 */
+	public static function get_app_addons_dynamic_data( $app_id_or_slug ){
+		$app_addons_dyn_data = array();
+		
+		$app_addons_raw = self::get_app_addons( $app_id_or_slug );
+		if ( !empty( $app_addons_raw ) ) {
+			foreach ( $app_addons_raw as $addon_slug => $app_addon_raw ) {
+				$app_addons_dyn_data[$addon_slug] = $app_addon_raw->get_dynamic_data();
+			}
+		}
+		
+		return $app_addons_dyn_data;
 	}
 
 	protected static function load_addons( $force_reload = false ) {
@@ -230,7 +254,7 @@ class WpakAddons {
 			delete_post_meta( $post_id, self::meta_id );
 		}
 	}
-
+	
 }
 
 WpakAddons::hooks();
