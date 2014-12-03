@@ -191,6 +191,30 @@ class WpakAddon {
 			'app_data' => $this->app_static_data
 		);
 	}
+	
+	public function get_all_files( $indexed_by_type = false ) {
+		$all_files = array();
+
+		$file_types = array( 'js', 'css', 'html' );
+
+		foreach ( $file_types as $file_type ) {
+			if ( isset( $this->{$file_type . '_files'} ) ) {
+				foreach ( $this->{$file_type . '_files'} as $file ) {
+					$file_full_path = $this->directory . '/' . $file['file'];
+					if ( file_exists( $file_full_path ) ) {
+						$file_paths = array( 'full' => $file_full_path, 'relative' => $file['file'] );
+						if ( $indexed_by_type ) {
+							$all_files[$file_type] = $file_paths;
+						} else {
+							$all_files[] = $file_paths;
+						}
+					}
+				}
+			}
+		}
+
+		return $all_files;
+	}
 
 	/**
 	 * Retrieves dynamic data to be passed to the synchronization web service
