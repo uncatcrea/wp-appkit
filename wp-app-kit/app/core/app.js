@@ -601,8 +601,8 @@ define(function (require) {
     	  }
       };
 
-      app.getPostGlobal = function( id ) {
-      	var global = app.getCurrentScreenGlobal();
+      app.getPostGlobal = function( id, global_default ) {
+      	var global = app.getCurrentScreenGlobal( global_default );
 
       	// If global isn't returned by app.getCurrentScreenGlobal, it could be in favorites list
       	if( '' == global ) {

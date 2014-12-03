@@ -493,10 +493,12 @@ define( function( require, exports ) {
 	 * Add a post to the favorites list.
 	 * Refresh the current view in order to reflect this addition (the link/button should be updated).
 	 *
-	 * @param 	int 	id 				The post id.
+	 * @param 	int 	 	id 				The post id.
+	 * @param 	callable 	callback 		The callback to call after favorite has been added.
+	 * @param 	string 		default_global 	The default value to use as global key for this post id.
 	 */
-	themeApp.addToFavorites = function( id, callback ) {
-		var item_global = App.getPostGlobal( id );
+	themeApp.addToFavorites = function( id, callback, default_global ) {
+		var item_global = App.getPostGlobal( id, default_global );
 		var item = App.getGlobalItem( item_global, id );
 		var saved = false;
 

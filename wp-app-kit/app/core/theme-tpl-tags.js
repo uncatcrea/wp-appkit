@@ -504,7 +504,10 @@ define(function(require, exports) {
      * @return  string                  The completed "data-xxx" attributes.
      */
     themeTplTags.getPostDataAttributes = function( post_id ) {
-        var attributes = ['data-id="' + post_id + '"'];
+        var attributes = [
+            'data-id="' + post_id + '"',
+            'data-global="' + App.getPostGlobal( post_id ) + '"'
+        ];
 
         attributes = Hooks.applyFilter( 'post-data-attributes', attributes, [post_id] );
 
