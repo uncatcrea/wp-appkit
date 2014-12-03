@@ -136,7 +136,14 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/lib/storage',
 	 */
 	function toggleFavoriteLinks( saved, post_id ) {
 		if( saved ) {
-			$( '.post-' + post_id + ' .favorite' ).toggleClass( 'hidden' );
+			if( TemplateTags.isFavorite( post_id ) ) {
+				$( '.post-' + post_id + ' .favorite.add' ).addClass( 'hidden' );
+				$( '.post-' + post_id + ' .favorite.remove' ).removeClass( 'hidden' );
+			}
+			else {
+				$( '.post-' + post_id + ' .favorite.remove' ).addClass( 'hidden' );
+				$( '.post-' + post_id + ' .favorite.add' ).removeClass( 'hidden' );
+			}
 		}
 	}
 
@@ -147,12 +154,13 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/lib/storage',
 		e.preventDefault();
 		var $link = $( this );
 		var id = $link.data( 'id' );
+		var global = $link.data( 'global' );
 
 		if( TemplateTags.isFavorite( id ) ) {
 			App.removeFromFavorites( id, toggleFavoriteLinks );
 		}
 		else {
-			App.addToFavorites( id, toggleFavoriteLinks );
+			App.addToFavorites( id, toggleFavoriteLinks, global );
 		}
 	});
 
