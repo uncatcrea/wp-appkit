@@ -15,6 +15,7 @@ define(function (require) {
 
     		this.setTemplate('archive-favorites');
 
+            this.posts.bind( 'sort', this.render );
             this.posts.bind( 'reset', this.render );
         },
 
