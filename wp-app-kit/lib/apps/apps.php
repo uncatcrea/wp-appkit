@@ -149,7 +149,7 @@ class WpakApps {
 			<label><?php _e( 'Application versionCode (Android only)', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_version_code" value="<?php echo $main_infos['version_code'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Phonegap version', WpAppKit::i18n_domain ) ?></label> : <br/>
+			<label><?php _e( 'PhoneGap version', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_phonegap_version" value="<?php echo $main_infos['phonegap_version'] ?>" />
 			<br/><br/>
 			<label><?php _e( 'Application author', WpAppKit::i18n_domain ) ?></label> : <br/>
