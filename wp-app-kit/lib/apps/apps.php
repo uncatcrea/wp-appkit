@@ -140,7 +140,7 @@ class WpakApps {
 			<label><?php _e( 'Application description', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<textarea name="wpak_app_desc"><?php echo $main_infos['desc'] ?></textarea>
 			<br/><br/>
-			<label><?php _e( 'Application id', WpAppKit::i18n_domain ) ?></label> : <br/>
+			<label><?php _e( 'Application ID', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_phonegap_id" value="<?php echo $main_infos['app_phonegap_id'] ?>" />
 			<br/><br/>
 			<label><?php _e( 'Version', WpAppKit::i18n_domain ) ?></label> : <br/>
