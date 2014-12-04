@@ -132,7 +132,7 @@ class WpakApps {
 		$main_infos = self::get_app_main_infos( $post->ID );
 		?>
 		<div class="wpak_settings">
-			<span class="description"><?php _e( 'PhoneGap config.xml information that is going to be displayed on App Stores.<br/>They are required when exporting the App to Phonegap, but are not used for App debug and simulation in browsers.', WpAppKit::i18n_domain ) ?></span>
+			<span class="description"><?php _e( 'PhoneGap config.xml information that is going to be displayed on App Stores.<br/>They are required when exporting the App to PhoneGap, but are not used for App debug and simulation in browsers.', WpAppKit::i18n_domain ) ?></span>
 			<br/><br/>
 			<label><?php _e( 'Application name', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_name" value="<?php echo $main_infos['name'] ?>" />
