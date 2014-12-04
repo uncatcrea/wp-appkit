@@ -80,7 +80,7 @@ class WpakBuild {
 			<?php endforeach ?>
 		</select>
 		<label for="wpak_download_after_build"><?php _e( 'Download after export', WpAppKit::i18n_domain ) ?></label> <input type="checkbox" id="wpak_download_after_build" checked="checked" />
-		<a id="wpak_export_link" href="#" class="button button-primary button-large"><?php _e( 'Export as PhoneGap App sources', WpAppKit::i18n_domain ) ?>!</a>
+		<a id="wpak_export_link" href="#" class="button button-primary button-large"><?php _e( 'Export as PhoneGap App sources', WpAppKit::i18n_domain ) ?></a>
 		<div id="wpak_export_feedback"></div>
 
 			<?php $previous_exports = self::get_available_app_exports( $app_id ) ?>
