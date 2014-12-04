@@ -57,8 +57,7 @@ class WpakBuild {
 		<br/>
 		<br/>
 		<div style="word-wrap: break-word;">
-			<label><?php _e( 'Web services', WpAppKit::i18n_domain ) ?> :</label><br/>
-			<?php _e( 'Synchronization', WpAppKit::i18n_domain ) ?> : <a href="<?php echo $wp_ws_url ?>"><?php echo $wp_ws_url ?></a>
+			<label><?php _e( 'Web Services Synchronization', WpAppKit::i18n_domain ) ?> :</label><a href="<?php echo $wp_ws_url ?>"><?php echo $wp_ws_url ?></a>
 		</div>
 		<?php wp_nonce_field( 'wpak-simulation-data-' . $post->ID, 'wpak-nonce-simulation-data' ) ?>
 		<?php
