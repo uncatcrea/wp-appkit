@@ -44,7 +44,7 @@ class WpakBuild {
 			<option value="off" <?php echo $debug_mode == 'off' ? 'selected="selected"' : '' ?>><?php _e( 'Off', WpAppKit::i18n_domain ) ?></option>
 			<option value="wp" <?php echo $debug_mode == 'wp' ? 'selected="selected"' : '' ?>><?php _e( 'Same as WordPress WP_DEBUG', WpAppKit::i18n_domain ) ?></option>
 		</select>
-		<br/><span class="description"><?php _e( 'If activated, echoes debug infos in the browser javascript console while simulating the app.', WpAppKit::i18n_domain ) ?></span>
+		<br/><span class="description"><?php _e( 'If activated, echoes debug infos in the browser JavaScript console while simulating the app.', WpAppKit::i18n_domain ) ?></span>
 		<br/>
 		<br/>
 		<a href="<?php echo WpakSimulator::get_simulator_url( $post->ID ) ?>" class="button button-large"><?php _e( 'View application in simulator', WpAppKit::i18n_domain ) ?></a>
