@@ -139,7 +139,7 @@ msgstr "Email de l'auteur"
 
 # @ wp-app-kit
 #: ../lib/apps/apps.php:164
-msgid "Phonegap plugins"
+msgid "Phonegap Plugins"
 msgstr "Plugins Phonegap"
 
 # @ wp-app-kit
