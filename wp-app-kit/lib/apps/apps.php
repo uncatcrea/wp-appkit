@@ -91,7 +91,7 @@ class WpakApps {
 
 		add_meta_box(
 			'wpak_app_phonegap_data',
-			__( 'Phonegap config.xml data', WpAppKit::i18n_domain ),
+			__( 'PhoneGap config.xml Data', WpAppKit::i18n_domain ),
 			array( __CLASS__, 'inner_phonegap_infos_box' ),
 			'wpak_apps',
 			'normal',
