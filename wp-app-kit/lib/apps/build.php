@@ -91,7 +91,7 @@ class WpakBuild {
 					<option value="<?php echo str_replace( '.zip', '', $entry ) ?>"><?php echo get_date_from_gmt( date( 'Y-m-d H:i:s', $timestamp ), 'F j, Y H:i:s' ) ?></option>
 				<?php endforeach ?>
 			</select>
-			<a id="wpak_download_existing_link" href="#" class="button button-large"><?php _e( 'Download', WpAppKit::i18n_domain ) ?>!</a>
+			<a id="wpak_download_existing_link" href="#" class="button button-large"><?php _e( 'Download', WpAppKit::i18n_domain ) ?></a>
 		<?php endif ?>
 
 		<?php wp_nonce_field( 'wpak-export-data-' . $post->ID, 'wpak-nonce-export-data' ) ?>
