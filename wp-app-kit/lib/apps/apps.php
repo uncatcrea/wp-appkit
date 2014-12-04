@@ -161,7 +161,7 @@ class WpakApps {
 			<label><?php _e( 'Application author email', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_author_email" value="<?php echo $main_infos['author_email'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Phonegap Plugins', WpAppKit::i18n_domain ) ?></label> : <br/>
+			<label><?php _e( 'PhoneGap Plugins', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<textarea name="wpak_app_phonegap_plugins"><?php echo $main_infos['phonegap_plugins'] ?></textarea>
 			<span class="description"><?php _e( 'Write the PhoneGap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a PhoneGap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
 			<br/><br/>
