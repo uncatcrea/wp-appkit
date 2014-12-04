@@ -163,7 +163,7 @@ class WpakApps {
 			<br/><br/>
 			<label><?php _e( 'Phonegap plugins', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<textarea name="wpak_app_phonegap_plugins"><?php echo $main_infos['phonegap_plugins'] ?></textarea>
-			<span class="description"><?php _e( 'Write the PhoneGap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
+			<span class="description"><?php _e( 'Write the PhoneGap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a PhoneGap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
 			<br/><br/>
 			<label><?php _e( 'Icons and splashscreens', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<textarea name="wpak_app_icons"><?php echo $main_infos['icons'] ?></textarea>
