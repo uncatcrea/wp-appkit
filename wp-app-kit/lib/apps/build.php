@@ -25,7 +25,7 @@ class WpakBuild {
 
 		add_meta_box(
 			'wpak_export_box',
-			__( 'Phonegap ready App export', WpAppKit::i18n_domain ),
+			__( 'PhoneGap ready App export', WpAppKit::i18n_domain ),
 			array( __CLASS__, 'inner_export_box' ),
 			'wpak_apps',
 			'side',
@@ -69,7 +69,7 @@ class WpakBuild {
 		$available_themes = WpakThemes::get_available_themes();
 		$current_theme = WpakThemesStorage::get_current_theme( $app_id );
 		?>
-		<span class="description wpak_export_infos"><?php _e( 'Phonegap exports are Zip files created in the WordPress uploads directory', WpAppKit::i18n_domain ) ?> : <br/><strong><?php echo str_replace( ABSPATH, '', self::get_export_files_path() ) ?></strong></span>
+		<span class="description wpak_export_infos"><?php _e( 'PhoneGap exports are Zip files created in the WordPress uploads directory', WpAppKit::i18n_domain ) ?> : <br/><strong><?php echo str_replace( ABSPATH, '', self::get_export_files_path() ) ?></strong></span>
 		<br/><span class="description"><?php echo sprintf( __( "The %s last App exports are memorized in this directory.", WpAppKit::i18n_domain ), self::export_file_memory ) ?></span>
 		<br/><br/>
 		<label><?php _e( 'Themes to include in app export', WpAppKit::i18n_domain ) ?> : </label><br/>
