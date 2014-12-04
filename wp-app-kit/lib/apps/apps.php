@@ -44,7 +44,7 @@ class WpakApps {
 					'add_new' => __( 'Add', WpAppKit::i18n_domain ),
 					'add_new_item' => __( 'Add an application', WpAppKit::i18n_domain ),
 					'edit' => __( 'Edit', WpAppKit::i18n_domain ),
-					'edit_item' => __( 'Edit application', WpAppKit::i18n_domain ),
+					'edit_item' => __( 'Edit Application', WpAppKit::i18n_domain ),
 					'new_item' => __( 'New application', WpAppKit::i18n_domain ),
 					'not_found' => __( 'No application found', WpAppKit::i18n_domain ),
 				)
