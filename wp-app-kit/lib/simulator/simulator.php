@@ -91,9 +91,6 @@ class WpakSimulator {
 
         <br/><br/>
         <h3>
-          <?php _e( 'Web services', WpAppKit::i18n_domain ) ?> :
-        </h3>
-        <h3>
         <?php _e( 'Web Services Synchronization', WpAppKit::i18n_domain ) ?> :</h3> <a href=""
           <?php echo $wp_ws_url ?>"><?php echo $wp_ws_url ?>
         </a>
