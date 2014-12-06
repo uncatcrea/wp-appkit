@@ -237,7 +237,7 @@ class WpakWebServices {
 			$service_answer->{$result_attribute} = $result_info;
 		}
 
-		$timestamp = time();
+		$timestamp = current_time( 'timestamp' );
 		if ( is_array( $service_answer ) ) {
 			$final_answer = ( object ) array( 'items' => $service_answer, 'last-update' => $timestamp );
 		} else {
