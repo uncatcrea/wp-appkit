@@ -530,6 +530,19 @@ define(function(require, exports) {
         return isFavorite;
     };
 
+    /**
+     * Return true or false whether the given type of component is inluded into the app or not.
+     *
+     * @param   string  type    The type of component.
+     *
+     * @return  bool            True if the type of component is included, false otherwise.
+     */
+    themeTplTags.isComponentTypeLoaded = function( type ) {
+        var components = App.components.where( { type: type } );
+
+        return components.length > 0;
+    };
+
     //Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
     //a circular dependency for requirejs) can both be required at the same time
     //(in theme functions.js for example) :
