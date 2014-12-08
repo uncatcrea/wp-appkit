@@ -109,3 +109,7 @@ li.media{
 ol.breadcrumb{
 	margin-top:1em;
 }
+
+#theme-modal .modal-dialog{
+    z-index: 1100;
+}
