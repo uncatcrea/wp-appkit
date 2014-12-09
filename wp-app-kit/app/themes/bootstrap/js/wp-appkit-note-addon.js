@@ -12,11 +12,12 @@ define( [ 'jquery', 'core/theme-app', 'theme/js/bootstrap.min' ], function( $, A
 		var $modal_header = $('#theme-modal-header');
 		var $modal_body = $('#theme-modal-body');
 		var $modal_footer = $('#theme-modal-footer');
+		var $modal_close = $('#theme-modal-close');
 
-		/*
-		//TODO : add close button :
-		<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-		*/
+		var hide_modal = function(){
+			$modal_close.removeClass('wpak-note-close');
+			$modal.modal('hide');
+		};
 
 		WpakNote.setActions({
 			display_first_box: function(){
@@ -28,6 +29,7 @@ define( [ 'jquery', 'core/theme-app', 'theme/js/bootstrap.min' ], function( $, A
 					'<button id="first-box-later" type="button" class="btn btn-default btn-sm" >'+ $('#wpak-note-first-box-later').html() +'</button>'+
 					'<button id="first-box-dont-ask-again" type="button" class="btn btn-default btn-sm" >'+ $('#wpak-note-first-box-dont-ask-again').html() +'</button>'	
 				);
+				$modal_close.addClass('wpak-note-close'); //To know that we close the modal in the Wpak Note context
 				$modal.modal();
 			},
 			display_satisfied_box: function(){
@@ -45,22 +47,25 @@ define( [ 'jquery', 'core/theme-app', 'theme/js/bootstrap.min' ], function( $, A
 				);
 			},
 			answer_to_first_box_later: function(){
-				$modal.modal('hide');
+				hide_modal();
 			},
 			answer_to_first_box_dont_ask_again: function(){
-				$modal.modal('hide');
+				hide_modal();
 			},
 			ok_to_vote: function(){
-				$modal.modal('hide');
+				hide_modal();
 			},
 			not_ok_to_vote: function(){
-				$modal.modal('hide');
+				hide_modal();
 			},
 			ok_to_email: function(){
-				$modal.modal('hide');
+				hide_modal();
 			},
 			not_ok_to_email: function(){
-				$modal.modal('hide');
+				hide_modal();
+			},
+			closed_box: function(){
+				hide_modal();
 			}
 		});
 
@@ -110,6 +115,10 @@ define( [ 'jquery', 'core/theme-app', 'theme/js/bootstrap.min' ], function( $, A
 			WpakNote.answerToNotSatisfiedBox('no');
 		});
 		
+		$modal.on('click','button.wpak-note-close',function(e){
+			e.preventDefault();
+			WpakNote.closeBox();
+		});
 	});
 	
 });
