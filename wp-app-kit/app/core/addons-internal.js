@@ -105,19 +105,23 @@ define( function( require ) {
 				
 				//Remove addons that are not in config.js : 
 				//Can happen if we add an addon on Wordpress side
-				//after the app compilation.
+				//after the app compilation, or if we deactivate an addon.
+				
 				var to_remove = [];
 				
 				addons_dynamic_data.each(function(addon){
 					if( !config_addons.hasOwnProperty(addon.get('id')) ){
-						to_remove.push(addon.slug);
+						to_remove.push(addon.get('id'));
 					}
 				});
 				
 				if( to_remove.length > 0 ){
 					_.each(to_remove, function(addon_slug){
-						addons_dynamic_data_instance.at(addon_slug).destroy();
-						addons_dynamic_data_instance.remove(addon_slug);
+						var addon = addons_dynamic_data_instance.get(addon_slug);
+						if( addon ){
+							addon.destroy();
+							addons_dynamic_data_instance.remove(addon_slug);
+						}
 					});
 				}
 				
