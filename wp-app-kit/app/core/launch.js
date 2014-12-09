@@ -98,11 +98,11 @@ require(['root/config'],function(Config){
 													false //true to force refresh local storage at each app launch.
 												);
 
-											},
-											function(error){
-												Utils.log('Error : theme/js/functions.js not found', error);
 											}
 										);
+									},
+									function(error){
+										Utils.log('Error : theme/js/functions.js not found', error);
 									});
 								});
 							});
