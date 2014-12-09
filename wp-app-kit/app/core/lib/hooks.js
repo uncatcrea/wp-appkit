@@ -30,7 +30,8 @@ define(function (require) {
 	  hooks.doAction = function(action,params,context){
 		  var deferred = $.Deferred();
     	  if( actions.hasOwnProperty(action) ){
-    		  params.unshift(deferred);
+			  //A deferred is passed so that we can do asynchrone actions : 
+    		  params.push(deferred);
     		  actions[action].apply(context,params);
     	  }
     	  return deferred.promise();
