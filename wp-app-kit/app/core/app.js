@@ -808,14 +808,15 @@ define(function (require) {
 
 		fetchOptions(function(){
 			
-			if( Config.debug_mode == 'on' ) {
-      			require( ['core/views/debug', 'jquery.velocity'], function( DebugView ) {
-      				var debugView = new DebugView();
-      				debugView.render();
-      			});
-      		}
-			
 			Addons.initialize( function(){
+				
+				if( Config.debug_mode == 'on' ) {
+					require( ['core/views/debug', 'jquery.velocity'], function( DebugView ) {
+						var debugView = new DebugView();
+						debugView.render();
+					});
+				}
+				
 				// If a callback was passed, call it
 				if( undefined !== callback ) {
 					callback();
