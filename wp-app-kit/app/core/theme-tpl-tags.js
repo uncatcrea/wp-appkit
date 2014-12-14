@@ -79,10 +79,11 @@ define(function(require, exports) {
 	 * @param object screen : Optional : use only if you want data from a different screen than the current one
 	 * @returns boolean
 	 */
-    themeTplTags.isSingle = function(post_id, screen) {
-        var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
-        var is_single = screen_data.screen_type == 'single';
-        if (is_single && post_id != undefined) {
+    themeTplTags.isSingle = function(post_id, screen, global) {
+        var screen_data = screen !== undefined && !_.isEmpty(screen) ? screen : App.getCurrentScreenData();
+		global = global !== undefined ? global : 'posts';
+        var is_single = screen_data.screen_type == 'single' && screen_data.global == global;
+        if (is_single && post_id != undefined && post_id != '' && post_id != 0 ) {
             is_single = parseInt(post_id) == screen_data.item_id;
         }
         return is_single == true;
@@ -100,7 +101,7 @@ define(function(require, exports) {
         var is_post_type = (screen_data.screen_type == 'single');
         if (is_post_type && post_type != undefined) {
             is_post_type = (screen_data.data.post.post_type == post_type);
-            if (is_post_type && !_.isEmpty(post_id) ) {
+            if (is_post_type && post_id != undefined && post_id != '' && post_id != 0 ) {
                 is_post_type = is_post_type && (parseInt(post_id) == screen_data.item_id);
             }
         }
@@ -180,6 +181,10 @@ define(function(require, exports) {
     themeTplTags.getMoreLinkNbLeft = function() {
         var get_more_link_display = ThemeApp.getGetMoreLinkDisplay();
         return get_more_link_display.nb_left;
+    };
+
+	themeTplTags.getComponent = function(component_id) {
+        return App.getComponentData(component_id);
     };
 
     themeTplTags.formatDate = function(date_timestamp, format) {

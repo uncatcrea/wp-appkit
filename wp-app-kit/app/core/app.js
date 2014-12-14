@@ -791,7 +791,14 @@ define(function (require) {
 		        						  data: data
 			        				  };
 			    				  }
-			    			  }
+			    			  }else{
+									//We have a global, but no ids : it's just as if we had no global :
+									component_data = {
+										type: 'hooks-no-global',
+										view_data: data,
+										data: data
+									};
+							  }
 		    			  }else{
 		    				  Utils.log('app.js warning : custom component has a global but no ids : the global will be ignored.');
 		    				  component_data = {
@@ -806,7 +813,7 @@ define(function (require) {
   			    			  {type:'wrong-data',where:'app::getComponentData',message: 'Custom component has no data attribute',data:{component:component}},
   			    			  cb_error
   			    		  );
-    		  		  }sy
+    		  		  }
 	    			  break;
     		  }
     	  };
