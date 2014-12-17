@@ -117,7 +117,7 @@ define(function (require) {
 		/**
 		 * Hook : filter 'default-route' : use this to define your own default route
 		 */
-		default_route = Hooks.applyFilter('default-route',default_route,[Stats.getStats(),is_app_launch]);
+		default_route = Hooks.applyFilters('default-route',default_route,[Stats.getStats(),is_app_launch]);
 		  
 		if( default_route != '' ){
 			app.router.setDefaultRoute(default_route);
@@ -138,9 +138,9 @@ define(function (require) {
 		 * navigation to launch route is canceled. Then you should navigate manually
 		 * to a choosen page in the "info:app-ready" event for example.
 		 */
-		launch_route = Hooks.applyFilter('launch-route',launch_route,[Stats.getStats()]);
+		launch_route = Hooks.applyFilters('launch-route',launch_route,[Stats.getStats()]);
 		
-		Hooks.doAction('pre-start-router',[launch_route,Stats.getStats()]);
+		Hooks.doActions('pre-start-router',[launch_route,Stats.getStats()]);
 		
 		if( launch_route.length > 0 ){
 			Backbone.history.start();
@@ -358,7 +358,7 @@ define(function (require) {
 	    	  token = window.btoa(hash);
 		  }
 
-		  token = Hooks.applyFilter('get-token',token,[key,web_service]);
+		  token = Hooks.applyFilters('get-token',token,[key,web_service]);
 
 		  if( token.length ){
 			  token = '/'+ token;

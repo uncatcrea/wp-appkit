@@ -169,12 +169,12 @@ define( function( require, exports ) {
 	/************************************************
 	 * Filters, actions and Params management
 	 */
-	themeApp.filter = function( filter, callback ) {
-		Hooks.addFilter( filter, callback );
+	themeApp.filter = function( filter, callback, priority ) {
+		Hooks.addFilter( filter, callback, priority );
 	}
 
-	themeApp.action = function( action, callback ) {
-		Hooks.addAction( action, callback );
+	themeApp.action = function( action, callback, priority ) {
+		Hooks.addAction( action, callback, priority );
 	}
 
 	themeApp.setParam = function( param, value ) {

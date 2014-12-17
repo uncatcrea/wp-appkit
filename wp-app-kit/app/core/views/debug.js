@@ -67,7 +67,7 @@ define(function (require) {
             $( "#reset-options" )
                 .on( "touchend", self.resetOptions );
 
-			Hooks.doAction('debug-panel-render',[self]);
+			Hooks.doActions('debug-panel-render',[self]);
 
             return $el;
         },
