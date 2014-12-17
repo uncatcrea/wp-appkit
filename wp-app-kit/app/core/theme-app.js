@@ -29,6 +29,15 @@ define( function( require, exports ) {
 	var vent = _.extend( { }, Backbone.Events );
 
 	/**
+	 * Allows themes (and addons) to trigger events
+	 * @param string event Event id
+	 * @param JSON object data
+	 */
+	themeApp.trigger = function( event, data ) {
+		vent.trigger( event, data );
+	};
+	
+	/**
 	 * Aggregate App and RegionManager events
 	 */
 	themeApp.on = function( event, callback ) {
@@ -160,12 +169,12 @@ define( function( require, exports ) {
 	/************************************************
 	 * Filters, actions and Params management
 	 */
-	themeApp.filter = function( filter, callback ) {
-		Hooks.addFilter( filter, callback );
+	themeApp.filter = function( filter, callback, priority ) {
+		Hooks.addFilter( filter, callback, priority );
 	}
 
-	themeApp.action = function( action, callback ) {
-		Hooks.addAction( action, callback );
+	themeApp.action = function( action, callback, priority ) {
+		Hooks.addAction( action, callback, priority );
 	}
 
 	themeApp.setParam = function( param, value ) {

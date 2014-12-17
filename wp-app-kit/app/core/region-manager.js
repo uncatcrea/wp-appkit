@@ -183,15 +183,17 @@ define(function (require) {
 				
 				var custom_rendering = App.getParam('custom-screen-rendering');
 				if( custom_rendering ){
-					Hooks.doAction(
+					Hooks.doActions(
 						'screen-transition',
 						[$el,$('div:first-child',$el),$(view.el),App.getCurrentScreenData(),App.getPreviousScreenMemoryData()]
 					).done(function(){
 						 renderSubRegions();
 						 vent.trigger('screen:showed',App.getCurrentScreenData(),currentView);
 					}).fail(function(){
-						 renderSubRegions();
-						 vent.trigger('screen:showed:failed',App.getCurrentScreenData(),currentView);
+						//Note : Hooks.doActions doesn't handle a fail case for now,
+						//but it may in the future!
+						renderSubRegions();
+						vent.trigger('screen:showed:failed',App.getCurrentScreenData(),currentView);
 					});
 				}else{
 					$el.empty().append(view.el);

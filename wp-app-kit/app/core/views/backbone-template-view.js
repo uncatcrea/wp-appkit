@@ -72,7 +72,7 @@ define(function (require) {
         	
         	var template = default_template != undefined ? default_template : '';
         	
-    		template = Hooks.applyFilter('template',template,[App.getQueriedScreen()]);
+    		template = Hooks.applyFilters('template',template,[App.getQueriedScreen()]);
 
     		if( template != ''){
     			this.template_name = template;

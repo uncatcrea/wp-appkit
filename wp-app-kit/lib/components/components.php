@@ -33,6 +33,8 @@ class WpakComponents {
 			$components_data['navigation'] = $navigation_items;
 			$components_data['components'] = $components;
 			$components_data['globals'] = $globals;
+			
+			$components_data['addons'] = WpakAddons::get_app_addons_dynamic_data( $app_id );
 		}
 
 		return $components_data;
