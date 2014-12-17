@@ -10,9 +10,7 @@ class WpakSettings {
 	const option_id = 'wpak_settings_option';
 
 	public static function hooks() {
-		if ( is_admin() ) {
-			add_action( 'admin_menu', array( __CLASS__, 'add_settings_panels' ), 20 ); //20 to pass after Simulator
-		}
+		add_action( 'admin_menu', array( __CLASS__, 'add_settings_panels' ), 20 ); //20 to pass after Simulator
 	}
 
 	public static function add_settings_panels() {

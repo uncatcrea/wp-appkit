@@ -9,10 +9,8 @@ class WpakOptionsBoSettings {
 	 * Adds needed callbacks to some hooks.
 	 */
 	public static function hooks() {
-		if( is_admin() ){
-			add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
-			add_action( 'save_post', array( __CLASS__, 'save_post' ) );
-		}
+		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
+		add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 	}
 
 	/**

@@ -8,9 +8,7 @@ class WpakUploadThemes {
 	const menu_item = 'wpak_bo_upload_themes';
 
 	public static function hooks() {
-		if ( is_admin() ) {
-			add_action( 'admin_menu', array( __CLASS__, 'add_settings_panels' ), 30 ); //30 to pass after Settings
-		}
+		add_action( 'admin_menu', array( __CLASS__, 'add_settings_panels' ), 30 ); //30 to pass after Settings
 	}
 
 	public static function add_settings_panels() {

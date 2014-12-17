@@ -5,12 +5,10 @@ class WpakNavigationBoSettings{
 	const menu_item = 'wpak_navigation_bo_settings';
 	
 	public static function hooks(){
-		if( is_admin() ){
-			add_action('add_meta_boxes', array(__CLASS__,'add_meta_boxes'));
-			add_action('admin_enqueue_scripts', array(__CLASS__,'admin_enqueue_scripts'));
-			add_action('wp_ajax_wpak_edit_navigation', array(__CLASS__,'ajax_wpak_edit_navigation'));
-			add_action('wp_ajax_wpak_update_available_components', array(__CLASS__,'ajax_wpak_update_available_components'));
-		}
+		add_action('add_meta_boxes', array(__CLASS__,'add_meta_boxes'));
+		add_action('admin_enqueue_scripts', array(__CLASS__,'admin_enqueue_scripts'));
+		add_action('wp_ajax_wpak_edit_navigation', array(__CLASS__,'ajax_wpak_edit_navigation'));
+		add_action('wp_ajax_wpak_update_available_components', array(__CLASS__,'ajax_wpak_update_available_components'));
 	}
 	
 	public static function admin_enqueue_scripts(){

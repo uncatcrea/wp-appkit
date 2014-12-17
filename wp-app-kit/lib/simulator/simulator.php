@@ -6,10 +6,8 @@ class WpakSimulator {
 	const menu_item = 'wpak_simulator_bo_settings';
 
 	public static function hooks() {
-		if ( is_admin() ) {
-			add_action( 'admin_menu', array( __CLASS__, 'add_settings_panels' ) );
-			add_filter( 'post_row_actions', array( __CLASS__, 'add_action_link' ), 10, 2 );
-		}
+		add_action( 'admin_menu', array( __CLASS__, 'add_settings_panels' ) );
+		add_filter( 'post_row_actions', array( __CLASS__, 'add_action_link' ), 10, 2 );
 	}
 
 	public static function add_settings_panels() {

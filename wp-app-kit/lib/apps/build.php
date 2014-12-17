@@ -5,12 +5,10 @@ class WpakBuild {
 	const export_file_memory = 10;
 
 	public static function hooks() {
-		if ( is_admin() ) {
-			add_action( 'wp_ajax_wpak_build_app_sources', array( __CLASS__, 'build_app_sources' ) );
-			add_action( 'admin_action_wpak_download_app_sources', array( __CLASS__, 'download_app_sources' ) );
-			add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ), 20 );
-			add_action( 'save_post', array( __CLASS__, 'save_post' ) );
-		}
+		add_action( 'wp_ajax_wpak_build_app_sources', array( __CLASS__, 'build_app_sources' ) );
+		add_action( 'admin_action_wpak_download_app_sources', array( __CLASS__, 'download_app_sources' ) );
+		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ), 20 );
+		add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 	}
 
 	public static function add_meta_boxes() {
