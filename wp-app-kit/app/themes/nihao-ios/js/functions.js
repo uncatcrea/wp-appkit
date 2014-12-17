@@ -1,4 +1,4 @@
-define(['jquery','core/theme-app','core/lib/storage','core/theme-tpl-tags','theme/js/jquery.velocity.min'],function($,App,Storage,TplTags){
+define(['jquery','core/theme-app','core/modules/storage','core/theme-tpl-tags','theme/js/jquery.velocity.min'],function($,App,Storage,TplTags){
 
 	/* App Events */
 

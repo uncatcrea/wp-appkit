@@ -6,8 +6,10 @@ define(function (require) {
         _                   = require('underscore'),
         Backbone            = require('backbone'),
         Config              = require('root/config'),
+		Addons              = require('core/addons-internal'),
         Tpl                 = require( 'text!root/debug.html' ),
-        App                 = require( 'core/app' );
+        App                 = require( 'core/app' ),
+		Hooks               = require('core/lib/hooks');
 
     var self = null;
 
@@ -16,7 +18,19 @@ define(function (require) {
     	initialize : function(args) {
             self = this;
 
-            self.template = _.template( Tpl );
+			//We add addons "debug_pane" html to div#app-debug-content :
+			var $Tpl = $('<div/>').html(Tpl);
+			
+			$('#app-debug-content',$Tpl).prepend(Addons.getHtml('debug_panel','before'))
+										.append(Addons.getHtml('debug_panel','after'));
+			
+			//jQuery parsing escapes underscore's templating tags : 
+			//we restore them manually :
+			var tpl_html = $Tpl.html();
+			tpl_html = tpl_html.replace(/&lt;%/g,'<%');
+			tpl_html = tpl_html.replace(/%&gt;/g,'%>');
+
+            self.template = _.template( tpl_html );
 
             // Register events here as backbone events don't seem to work...
             $( "#app-debug-button" )
@@ -30,7 +44,12 @@ define(function (require) {
 
         renderPanel : function() {
             var $el = $( "#app-debug-panel" );
-            var renderedContent = self.template();
+			
+			var data = {};
+			
+			var addons_data = Addons.getHtmlData('debug_panel');
+			data = _.extend(data, addons_data);
+            var renderedContent = self.template(data);
 
             $el.html( renderedContent );
 
@@ -47,6 +66,8 @@ define(function (require) {
             // Reset options
             $( "#reset-options" )
                 .on( "touchend", self.resetOptions );
+
+			Hooks.doActions('debug-panel-render',[self]);
 
             return $el;
         },
@@ -160,18 +181,31 @@ define(function (require) {
             var $panel = self.renderPanel();
 
             // Display a confirmation message
-            // TODO: style this feedback message
+            self.displayFeedback('Options successfully reset')
+        },
+		
+		displayFeedback : function( message, type, timeout ) {
+			
+			if( _.isUndefined( type ) || _.isEmpty( type ) ) {
+				type = 'info';
+			}
+			
+			if( _.isUndefined( timeout ) ) {
+				timeout = 3000;
+			}
+			
+			// TODO: style this feedback message
             // TODO: add an error feedback type
             var $feedback = $( '#app-debug-feedback' );
             $feedback
                 // .removeClass( 'app-debug-error' )
-                .html( 'Options successfully reset' )
+                .html( message )
                 .slideDown();
 
             setTimeout( function() {
                 $feedback.slideUp();
-            }, 3 * 1000 );
-        }
+            }, timeout );
+		}
 
     });
 

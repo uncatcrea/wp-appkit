@@ -11,6 +11,7 @@ define(function(require, exports) {
         App           = require('core/app'),
         RegionManager = require( 'core/region-manager' ),
 		Stats         = require('core/stats'),
+		Addons        = require('core/addons-internal'),
         ThemeApp      = require('core/theme-app'),
         Hooks         = require('core/lib/hooks');
 
@@ -228,6 +229,19 @@ define(function(require, exports) {
 		}
 
 		return menu_items;
+	};
+	
+	/**********************************************
+	 * Addons
+	 */
+	
+	/**
+	 * Checks if an addon is active
+	 * @param string addon_slug
+	 * @returns Boolean True if the addon is active
+	 */
+	themeTplTags.addonIsActive = function( addon_slug ) {
+		return Addons.isActive( addon_slug );
 	};
 
     /**********************************************
@@ -514,7 +528,7 @@ define(function(require, exports) {
             'data-global="' + App.getPostGlobal( post_id ) + '"'
         ];
 
-        attributes = Hooks.applyFilter( 'post-data-attributes', attributes, [post_id] );
+        attributes = Hooks.applyFilters( 'post-data-attributes', attributes, [post_id] );
 
         return attributes.join( ' ' );
     };
