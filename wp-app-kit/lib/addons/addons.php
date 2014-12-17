@@ -227,7 +227,7 @@ class WpakAddons {
 			return;
 		}
 
-		if ( !check_admin_referer( 'wpak-addons-' . $post_id, 'wpak-nonce-addons' ) ) {
+		if ( isset( $_POST['wpak-addons'] ) && !check_admin_referer( 'wpak-addons-' . $post_id, 'wpak-nonce-addons' ) ) {
 			return;
 		}
 
