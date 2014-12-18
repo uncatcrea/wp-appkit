@@ -76,25 +76,15 @@ class WpakSimulator {
 					<iframe src="<?php echo $appli_url ?>" width="320" height="550"></iframe>
 				</div>
 
-      <div id="debug-infos">
-        <h3>
-          <a href=""
-            <?php echo $appli_url ?>" target="_blank"><?php _e( 'Preview in browser', WpAppKit::i18n_domain ) ?>
-          </a>
-        </h3>
+				<div id="debug-infos">
+					<h3><a href="<?php echo $appli_url ?>" target="_blank"><?php _e( 'Preview in browser', WpAppKit::i18n_domain ) ?></a></h3>
 
-        <h3>
-          <a href=""
-            <?php echo $appli_dir_url . '/config.js?wpak_app_id=' . $app_id ?>" target="_blank"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?>
-          </a>
-        </h3>
+					<h3><a href="<?php echo $appli_dir_url . '/config.js?wpak_app_id=' . $app_id ?>" target="_blank"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a></h3>
 
-        <br/><br/>
-        <h3>
-        <?php _e( 'Web Services Synchronization', WpAppKit::i18n_domain ) ?> :</h3> <a href=""
-          <?php echo $wp_ws_url ?>"><?php echo $wp_ws_url ?>
-        </a>
-      </div>
+					<br/><br/>
+					<h3><?php _e( 'Web Services', WpAppKit::i18n_domain ) ?> :</h3>
+					<?php _e( 'Synchronization', WpAppKit::i18n_domain ) ?> : <a href="<?php echo $wp_ws_url ?>"><?php echo $wp_ws_url ?></a>
+				</div>
 
 				<style>
 					#simulator{ float:left; background-image:url('<?php echo plugins_url( 'images/iphone5.png', dirname( dirname( __FILE__ ) ) ) ?>');background-repeat:no-repeat;margin: 0px 0px 0px 0px;padding: 145px 0px 0px 27px;width:375px;height:690px; }
