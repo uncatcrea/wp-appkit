@@ -7,11 +7,13 @@ define(function (require) {
         Backbone            = require('backbone'),
         Config              = require('root/config'),
 		ThemeTplTags		= require('core/theme-tpl-tags'),
+		Addons              = require('core/addons-internal'),
         Tpl                 = require('text!theme/head.html');
 
     return Backbone.View.extend({
     	
     	initialize : function(args) {
+			Tpl = Addons.getCss('before') + Tpl + Addons.getCss('after');
     		this.template = _.template(Tpl);
         },
 

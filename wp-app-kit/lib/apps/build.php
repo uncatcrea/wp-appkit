@@ -266,7 +266,7 @@ class WpakBuild {
 		$export_filename = $export_filename_base . '-' . date( 'YmdHis' );
 		$export_filename_full = self::get_export_files_path() . "/" . $export_filename . '.zip';
 
-		$answer = self::build_zip( $app_id, $appli_dir, $export_filename_full, $themes );
+		$answer = self::build_zip( $app_id, $appli_dir, $export_filename_full, $themes, WpakAddons::get_app_addons( $addons ) );
 
 		$maintenance_answer = self::export_files_maintenance( $app_id );
 		if ( $maintenance_answer['ok'] == 0 ) {
@@ -311,7 +311,7 @@ class WpakBuild {
 		return $ok;
 	}
 
-	private static function build_zip( $app_id, $source, $destination, $themes ) {
+	private static function build_zip( $app_id, $source, $destination, $themes, $addons ) {
 
 		$answer = array( 'ok' => 1, 'msg' => '' );
 
@@ -373,6 +373,16 @@ class WpakBuild {
 							$answer['ok'] = 0;
 							return $answer;
 						}
+					}
+				}
+			}
+			
+			//Add addons files :
+			if ( !empty( $addons ) ) {
+				foreach ( $addons as $addon ) {
+					$addon_files = $addon->get_all_files();
+					foreach ( $addon_files as $addon_file ) {
+						$zip->addFile( $addon_file['full'], 'addons/'. $addon->slug .'/'. $addon_file['relative'] );
 					}
 				}
 			}

@@ -11,6 +11,7 @@ define(function(require, exports) {
         App           = require('core/app'),
         RegionManager = require( 'core/region-manager' ),
 		Stats         = require('core/stats'),
+		Addons        = require('core/addons-internal'),
         ThemeApp      = require('core/theme-app'),
         Hooks         = require('core/lib/hooks');
 
@@ -79,10 +80,11 @@ define(function(require, exports) {
 	 * @param object screen : Optional : use only if you want data from a different screen than the current one
 	 * @returns boolean
 	 */
-    themeTplTags.isSingle = function(post_id, screen) {
-        var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
-        var is_single = screen_data.screen_type == 'single';
-        if (is_single && post_id != undefined) {
+    themeTplTags.isSingle = function(post_id, screen, global) {
+        var screen_data = screen !== undefined && !_.isEmpty(screen) ? screen : App.getCurrentScreenData();
+		global = global !== undefined ? global : 'posts';
+        var is_single = screen_data.screen_type == 'single' && screen_data.global == global;
+        if (is_single && post_id != undefined && post_id != '' && post_id != 0 ) {
             is_single = parseInt(post_id) == screen_data.item_id;
         }
         return is_single == true;
@@ -100,7 +102,7 @@ define(function(require, exports) {
         var is_post_type = (screen_data.screen_type == 'single');
         if (is_post_type && post_type != undefined) {
             is_post_type = (screen_data.data.post.post_type == post_type);
-            if (is_post_type && !_.isEmpty(post_id) ) {
+            if (is_post_type && post_id != undefined && post_id != '' && post_id != 0 ) {
                 is_post_type = is_post_type && (parseInt(post_id) == screen_data.item_id);
             }
         }
@@ -182,6 +184,10 @@ define(function(require, exports) {
         return get_more_link_display.nb_left;
     };
 
+	themeTplTags.getComponent = function(component_id) {
+        return App.getComponentData(component_id);
+    };
+
     themeTplTags.formatDate = function(date_timestamp, format) {
 
         //TODO : this is really really basic, incomplete and not robust date formating... improve this!
@@ -223,6 +229,19 @@ define(function(require, exports) {
 		}
 
 		return menu_items;
+	};
+	
+	/**********************************************
+	 * Addons
+	 */
+	
+	/**
+	 * Checks if an addon is active
+	 * @param string addon_slug
+	 * @returns Boolean True if the addon is active
+	 */
+	themeTplTags.addonIsActive = function( addon_slug ) {
+		return Addons.isActive( addon_slug );
 	};
 
     /**********************************************
@@ -509,7 +528,7 @@ define(function(require, exports) {
             'data-global="' + App.getPostGlobal( post_id ) + '"'
         ];
 
-        attributes = Hooks.applyFilter( 'post-data-attributes', attributes, [post_id] );
+        attributes = Hooks.applyFilters( 'post-data-attributes', attributes, [post_id] );
 
         return attributes.join( ' ' );
     };
@@ -528,6 +547,19 @@ define(function(require, exports) {
         }
 
         return isFavorite;
+    };
+
+    /**
+     * Return true or false whether the given type of component is inluded into the app or not.
+     *
+     * @param   string  type    The type of component.
+     *
+     * @return  bool            True if the type of component is included, false otherwise.
+     */
+    themeTplTags.isComponentTypeLoaded = function( type ) {
+        var components = App.components.where( { type: type } );
+
+        return components.length > 0;
     };
 
     //Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating

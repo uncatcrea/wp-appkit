@@ -16,7 +16,8 @@ define( function( require ) {
 			last_version: '',
 			count_open: 0,
 			last_open_time: 0,
-			current_open_time: 0
+			current_open_time: 0,
+			last_sync: 0
 		}
 	} );
 
@@ -93,16 +94,17 @@ define( function( require ) {
 	var Stats = {
 		getStats: function(stat) {
 			var stats = {};
-			
+
 			stats.count_open = Stats.getCountOpen();
 			stats.last_open_date = Stats.getLastOpenDate();
 			stats.version_diff = Stats.getVersionDiff();
 			stats.version = stats.version_diff.current_version;
-			
+			stats.last_sync = Stats.getContentLastUpdated();
+
 			if( stat !== undefined && stats.hasOwnProperty(stat) ){
 				stats = stats[stat];
 			}
-			
+
 			return stats;
 		},
 		incrementCountOpen: function() {
@@ -116,7 +118,6 @@ define( function( require ) {
 			StatsInstance.set( 'last_open_time', StatsInstance.get( 'current_open_time' ) );
 			StatsInstance.set( 'current_open_time', new Date().getTime() );
 			StatsInstance.save();
-
 		},
 		getLastOpenDate: function() {
 			return convert_time_to_date( StatsInstance.get( 'last_open_time' ) );
@@ -133,6 +134,13 @@ define( function( require ) {
 			var diff = version_compare( current_version, last_version, { lexicographical: false, zeroExtend: true } );
 			return { current_version: current_version, last_version: last_version, diff: diff };
 		},
+		getContentLastUpdated: function() {
+			return StatsInstance.get( 'last_sync' );
+		},
+		incrementContentLastUpdate: function() {
+			StatsInstance.set( 'last_sync', Date.now() );
+			StatsInstance.save();
+		}
 	};
 
 	return Stats;

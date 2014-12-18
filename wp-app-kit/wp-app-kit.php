@@ -24,6 +24,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 		}
 
 		protected static function lib_require() {
+			require_once(dirname( __FILE__ ) . '/lib/addons/addons.php');
 			require_once(dirname( __FILE__ ) . '/lib/web-services/web-services.php');
 			require_once(dirname( __FILE__ ) . '/lib/apps/apps.php');
 			require_once(dirname( __FILE__ ) . '/lib/apps/build.php');

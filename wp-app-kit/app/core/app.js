@@ -17,6 +17,7 @@ define(function (require) {
           Utils               = require('core/app-utils'),
           Hooks               = require('core/lib/hooks'),
 		  Stats               = require('core/stats'),
+		  Addons              = require('core/addons-internal'),
           Sha256              = require('core/lib/sha256');
 
 	  var app = {};
@@ -116,8 +117,8 @@ define(function (require) {
 		/**
 		 * Hook : filter 'default-route' : use this to define your own default route
 		 */
-		default_route = Hooks.applyFilter('default-route',default_route,[Stats.getStats(),is_app_launch]);
-
+		default_route = Hooks.applyFilters('default-route',default_route,[Stats.getStats(),is_app_launch]);
+		  
 		if( default_route != '' ){
 			app.router.setDefaultRoute(default_route);
 		}
@@ -137,10 +138,10 @@ define(function (require) {
 		 * navigation to launch route is canceled. Then you should navigate manually
 		 * to a choosen page in the "info:app-ready" event for example.
 		 */
-		launch_route = Hooks.applyFilter('launch-route',launch_route,[Stats.getStats()]);
-
-		Hooks.doAction('pre-start-router',[launch_route,Stats.getStats()]);
-
+		launch_route = Hooks.applyFilters('launch-route',launch_route,[Stats.getStats()]);
+		
+		Hooks.doActions('pre-start-router',[launch_route,Stats.getStats()]);
+		
 		if( launch_route.length > 0 ){
 			Backbone.history.start();
 			//Navigate to the launch_route :
@@ -380,7 +381,7 @@ define(function (require) {
 	    	  token = window.btoa(hash);
 		  }
 
-		  token = Hooks.applyFilter('get-token',token,[key,web_service]);
+		  token = Hooks.applyFilters('get-token',token,[key,web_service]);
 
 		  if( token.length ){
 			  token = '/'+ token;
@@ -491,8 +492,9 @@ define(function (require) {
 								  });
 								  globals_keys.saveAll();
 
-								  app.options.set( { id: 'last_updated', value: Date.now() }, { remove: false } );
-								  app.options.saveAll();
+								  Stats.incrementContentLastUpdate();
+
+								  Addons.setDynamicDataFromWebService( data.addons );
 
 								  Utils.log('Components, navigation and globals retrieved from online.',{components:app.components,navigation:app.navigation,globals:app.globals});
 
@@ -792,7 +794,14 @@ define(function (require) {
 		        						  data: data
 			        				  };
 			    				  }
-			    			  }
+			    			  }else{
+									//We have a global, but no ids : it's just as if we had no global :
+									component_data = {
+										type: 'hooks-no-global',
+										view_data: data,
+										data: data
+									};
+							  }
 		    			  }else{
 		    				  Utils.log('app.js warning : custom component has a global but no ids : the global will be ignored.');
 		    				  component_data = {
@@ -807,7 +816,7 @@ define(function (require) {
   			    			  {type:'wrong-data',where:'app::getComponentData',message: 'Custom component has no data attribute',data:{component:component}},
   			    			  cb_error
   			    		  );
-    		  		  }sy
+    		  		  }
 	    			  break;
     		  }
     	  };
@@ -847,37 +856,23 @@ define(function (require) {
     	  return item;
       };
 
-      /**
-       * App init:
-       *  - set options
+	  /**
+       * App options:
        */
-      app.initialize = function ( callback ) {
-      	var nextOps = function() {
-      		if( Config.debug_mode == 'on' ) {
-      			require( ['core/views/debug', 'jquery.velocity'], function( DebugView ) {
-      				var debugView = new DebugView();
-      				debugView.render();
-      			});
-      		}
-
-		  	// If a callback was passed, call it
-		  	if( undefined !== callback ) {
-		  		callback();
-		  	}
-      	}
-
-      	// Retrieve all existing options
+	  
+	  // Retrieve all existing options
+	  var fetchOptions = function( callback ){
       	app.options.fetch( {
       		'success': function( appOptions, response, options ) {
 				Utils.log( 'Options retrieved from local storage.', { options: appOptions } );
-				app.saveOptions( nextOps );
+				app.saveOptions( callback );
 	      	},
 	      	'error': function( appOptions, response, options ) {
-	      		app.saveOptions( nextOps );
+	      		app.saveOptions( callback );
 	      	}
       	});
-      };
-
+	  };
+	  
       app.saveOptions = function( callback ) {
       	// Retrieve options from Config and store them locally
       	_.each( Config.options, function( value, key, list ) {
@@ -894,7 +889,35 @@ define(function (require) {
 	  		callback();
 	  	}
       };
+	  
+	  /**
+       * App init:
+       *  - set options
+	   *  - initialize addons
+       */
+      app.initialize = function ( callback ) {
 
+		fetchOptions(function(){
+			
+			Addons.initialize( function(){
+				
+				if( Config.debug_mode == 'on' ) {
+					require( ['core/views/debug', 'jquery.velocity'], function( DebugView ) {
+						var debugView = new DebugView();
+						debugView.render();
+					});
+				}
+				
+				// If a callback was passed, call it
+				if( undefined !== callback ) {
+					callback();
+				}
+			});
+			
+		});
+      	
+      };
+	  
 	//--------------------------------------------------------------------------
 	//Network : handle network state if the Network PhoneGap plugin is available
 

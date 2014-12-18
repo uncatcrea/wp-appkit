@@ -24,10 +24,18 @@ define(function (require) {
         },
 
         render : function() {
-        	var renderedContent = this.template({ 
-				post : this.item.toJSON(), 
-				TemplateTags : ThemeTplTags 
-			});
+			var template_args = {};
+			
+			if( this.global == 'posts' || this.global == 'pages' ){
+				template_args.post = this.item.toJSON();
+			}else{
+				template_args.item = this.item.toJSON();
+			}	
+			
+			template_args.TemplateTags = ThemeTplTags;
+			
+        	var renderedContent = this.template(template_args);
+			
             $(this.el).html(renderedContent); 
             return this;
         }
