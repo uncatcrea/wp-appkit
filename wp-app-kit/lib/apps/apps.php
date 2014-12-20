@@ -44,7 +44,7 @@ class WpakApps {
 					'add_new' => __( 'Add', WpAppKit::i18n_domain ),
 					'add_new_item' => __( 'Add an application', WpAppKit::i18n_domain ),
 					'edit' => __( 'Edit', WpAppKit::i18n_domain ),
-					'edit_item' => __( 'Edit application', WpAppKit::i18n_domain ),
+					'edit_item' => __( 'Edit Application', WpAppKit::i18n_domain ),
 					'new_item' => __( 'New application', WpAppKit::i18n_domain ),
 					'not_found' => __( 'No application found', WpAppKit::i18n_domain ),
 				)
@@ -91,7 +91,7 @@ class WpakApps {
 
 		add_meta_box(
 			'wpak_app_phonegap_data',
-			__( 'Phonegap config.xml data', WpAppKit::i18n_domain ),
+			__( 'PhoneGap config.xml Data', WpAppKit::i18n_domain ),
 			array( __CLASS__, 'inner_phonegap_infos_box' ),
 			'wpak_apps',
 			'normal',
@@ -132,7 +132,7 @@ class WpakApps {
 		$main_infos = self::get_app_main_infos( $post->ID );
 		?>
 		<div class="wpak_settings">
-			<span class="description"><?php _e( 'PhoneGap config.xml informations that are going to be displayed on App Stores.<br/>They are required when exporting the App to Phonegap, but are not used for App debug and simulation in browsers.', WpAppKit::i18n_domain ) ?></span>
+			<span class="description"><?php _e( 'PhoneGap config.xml information that is going to be displayed on App Stores.<br/>They are required when exporting the App to PhoneGap, but are not used for App debug and simulation in browsers.', WpAppKit::i18n_domain ) ?></span>
 			<br/><br/>
 			<label><?php _e( 'Application name', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_name" value="<?php echo $main_infos['name'] ?>" />
@@ -140,7 +140,7 @@ class WpakApps {
 			<label><?php _e( 'Application description', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<textarea name="wpak_app_desc"><?php echo $main_infos['desc'] ?></textarea>
 			<br/><br/>
-			<label><?php _e( 'Application id', WpAppKit::i18n_domain ) ?></label> : <br/>
+			<label><?php _e( 'Application ID', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_phonegap_id" value="<?php echo $main_infos['app_phonegap_id'] ?>" />
 			<br/><br/>
 			<label><?php _e( 'Version', WpAppKit::i18n_domain ) ?></label> : <br/>
@@ -149,7 +149,7 @@ class WpakApps {
 			<label><?php _e( 'Application versionCode (Android only)', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_version_code" value="<?php echo $main_infos['version_code'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Phonegap version', WpAppKit::i18n_domain ) ?></label> : <br/>
+			<label><?php _e( 'PhoneGap version', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_phonegap_version" value="<?php echo $main_infos['phonegap_version'] ?>" />
 			<br/><br/>
 			<label><?php _e( 'Application author', WpAppKit::i18n_domain ) ?></label> : <br/>
@@ -161,9 +161,9 @@ class WpakApps {
 			<label><?php _e( 'Application author email', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input type="text" name="wpak_app_author_email" value="<?php echo $main_infos['author_email'] ?>" />
 			<br/><br/>
-			<label><?php _e( 'Phonegap plugins', WpAppKit::i18n_domain ) ?></label> : <br/>
+			<label><?php _e( 'PhoneGap Plugins', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<textarea name="wpak_app_phonegap_plugins"><?php echo $main_infos['phonegap_plugins'] ?></textarea>
-			<span class="description"><?php _e( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
+			<span class="description"><?php _e( 'Write the PhoneGap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a PhoneGap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
 			<br/><br/>
 			<label><?php _e( 'Icons and splashscreens', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<textarea name="wpak_app_icons"><?php echo $main_infos['icons'] ?></textarea>

@@ -83,7 +83,7 @@ msgstr ""
 #: ../lib/apps/apps.php:131
 msgid ""
 "PhoneGap config.xml informations that are going to be displayed on App "
-"Stores.<br/>They are required when exporting the App to Phonegap, but are "
+"Stores.<br/>They are required when exporting the App to PhoneGap, but are "
 "not used for App debug and simulation in browsers."
 msgstr ""
 
@@ -114,7 +114,7 @@ msgstr ""
 
 # @ wp-app-kit
 #: ../lib/apps/apps.php:148
-msgid "Phonegap version"
+msgid "PhoneGap version"
 msgstr ""
 
 # @ wp-app-kit
@@ -134,14 +134,14 @@ msgstr ""
 
 # @ wp-app-kit
 #: ../lib/apps/apps.php:160
-msgid "Phonegap plugins"
+msgid "PhoneGap plugins"
 msgstr ""
 
 # @ wp-app-kit
 #: ../lib/apps/apps.php:162
 msgid ""
-"Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/"
-">Example : to include the \"In App Browser\" plugin for a Phonegap Build "
+"Write the PhoneGap plugins tags as defined in the PhoneGap documentation.<br/"
+">Example : to include the \"In App Browser\" plugin for a PhoneGap Build "
 "compilation, enter &lt;gap:plugin name=\"org.apache.cordova.inappbrowser\" "
 "version=\"0.3.3\" /&gt; directly in the textarea."
 msgstr ""
@@ -212,7 +212,7 @@ msgstr ""
 
 # @ wp-app-kit
 #: ../lib/apps/build.php:28
-msgid "Phonegap ready App export"
+msgid "PhoneGap ready App export"
 msgstr ""
 
 # @ wp-app-kit
@@ -270,7 +270,7 @@ msgstr ""
 # @ wp-app-kit
 #: ../lib/apps/build.php:72
 msgid ""
-"Phonegap exports are Zip files created in the WordPress uploads directory"
+"PhoneGap exports are Zip files created in the WordPress uploads directory"
 msgstr ""
 
 # @ wp-app-kit

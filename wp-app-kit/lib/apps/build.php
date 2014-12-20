@@ -25,7 +25,7 @@ class WpakBuild {
 
 		add_meta_box(
 			'wpak_export_box',
-			__( 'Phonegap ready App export', WpAppKit::i18n_domain ),
+			__( 'PhoneGap ready App export', WpAppKit::i18n_domain ),
 			array( __CLASS__, 'inner_export_box' ),
 			'wpak_apps',
 			'side',
@@ -44,7 +44,7 @@ class WpakBuild {
 			<option value="off" <?php echo $debug_mode == 'off' ? 'selected="selected"' : '' ?>><?php _e( 'Off', WpAppKit::i18n_domain ) ?></option>
 			<option value="wp" <?php echo $debug_mode == 'wp' ? 'selected="selected"' : '' ?>><?php _e( 'Same as WordPress WP_DEBUG', WpAppKit::i18n_domain ) ?></option>
 		</select>
-		<br/><span class="description"><?php _e( 'If activated, echoes debug infos in the browser javascript console while simulating the app.', WpAppKit::i18n_domain ) ?></span>
+		<br/><span class="description"><?php _e( 'If activated, echoes debug infos in the browser JavaScript console while simulating the app.', WpAppKit::i18n_domain ) ?></span>
 		<br/>
 		<br/>
 		<a href="<?php echo WpakSimulator::get_simulator_url( $post->ID ) ?>" class="button button-large"><?php _e( 'View application in simulator', WpAppKit::i18n_domain ) ?></a>
@@ -57,8 +57,7 @@ class WpakBuild {
 		<br/>
 		<br/>
 		<div style="word-wrap: break-word;">
-			<label><?php _e( 'Web services', WpAppKit::i18n_domain ) ?> :</label><br/>
-			<?php _e( 'Synchronization', WpAppKit::i18n_domain ) ?> : <a href="<?php echo $wp_ws_url ?>"><?php echo $wp_ws_url ?></a>
+			<label><?php _e( 'Web Services Synchronization', WpAppKit::i18n_domain ) ?> : </label><a href="<?php echo $wp_ws_url ?>"><?php echo $wp_ws_url ?></a>
 		</div>
 		<?php wp_nonce_field( 'wpak-simulation-data-' . $post->ID, 'wpak-nonce-simulation-data' ) ?>
 		<?php
@@ -69,7 +68,7 @@ class WpakBuild {
 		$available_themes = WpakThemes::get_available_themes();
 		$current_theme = WpakThemesStorage::get_current_theme( $app_id );
 		?>
-		<span class="description wpak_export_infos"><?php _e( 'Phonegap exports are Zip files created in the WordPress uploads directory', WpAppKit::i18n_domain ) ?> : <br/><strong><?php echo str_replace( ABSPATH, '', self::get_export_files_path() ) ?></strong></span>
+		<span class="description wpak_export_infos"><?php _e( 'PhoneGap exports are Zip files created in the WordPress uploads directory', WpAppKit::i18n_domain ) ?> : <br/><strong><?php echo str_replace( ABSPATH, '', self::get_export_files_path() ) ?></strong></span>
 		<br/><span class="description"><?php echo sprintf( __( "The %s last App exports are memorized in this directory.", WpAppKit::i18n_domain ), self::export_file_memory ) ?></span>
 		<br/><br/>
 		<label><?php _e( 'Themes to include in app export', WpAppKit::i18n_domain ) ?> : </label><br/>
@@ -80,7 +79,7 @@ class WpakBuild {
 			<?php endforeach ?>
 		</select>
 		<label for="wpak_download_after_build"><?php _e( 'Download after export', WpAppKit::i18n_domain ) ?></label> <input type="checkbox" id="wpak_download_after_build" checked="checked" />
-		<a id="wpak_export_link" href="#" class="button button-primary button-large"><?php _e( 'Export as PhoneGap App sources', WpAppKit::i18n_domain ) ?>!</a>
+		<a id="wpak_export_link" href="#" class="button button-primary button-large"><?php _e( 'Export as PhoneGap App sources', WpAppKit::i18n_domain ) ?></a>
 		<div id="wpak_export_feedback"></div>
 
 			<?php $previous_exports = self::get_available_app_exports( $app_id ) ?>
@@ -91,7 +90,7 @@ class WpakBuild {
 					<option value="<?php echo str_replace( '.zip', '', $entry ) ?>"><?php echo get_date_from_gmt( date( 'Y-m-d H:i:s', $timestamp ), 'F j, Y H:i:s' ) ?></option>
 				<?php endforeach ?>
 			</select>
-			<a id="wpak_download_existing_link" href="#" class="button button-large"><?php _e( 'Download', WpAppKit::i18n_domain ) ?>!</a>
+			<a id="wpak_download_existing_link" href="#" class="button button-large"><?php _e( 'Download', WpAppKit::i18n_domain ) ?></a>
 		<?php endif ?>
 
 		<?php wp_nonce_field( 'wpak-export-data-' . $post->ID, 'wpak-nonce-export-data' ) ?>
