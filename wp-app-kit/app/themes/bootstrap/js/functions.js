@@ -1,5 +1,5 @@
 define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/modules/storage', 'theme/js/bootstrap.min', 'theme/js/wp-appkit-note-addon' ], function( $, App, TemplateTags, Storage ) {
-		
+
 	/**
 	 * Launch app contents refresh when clicking the refresh button :
 	 */
@@ -36,7 +36,7 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/modules/stora
 		$( '#refresh-button' ).removeClass( 'refreshing' );
 		if ( result.ok ) {
 			$( '#feedback' ).removeClass( 'error' ).html( 'Content updated successfully :)' ).slideDown();
-		}else{
+		} else {
 			$( '#feedback' ).addClass( 'error' ).html( result.message ).slideDown();
 		}
 	} );
@@ -81,6 +81,14 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/modules/stora
 	 */
 	$( '#navbar-collapse' ).on( 'click', 'a', function( e ) {
 		closeMenu();
+	} );
+
+	/**
+	 * Open all links inside single content with the inAppBrowser
+	 */
+	$( "#container" ).on( "click", "#single a, .page-content", function( e ) {
+		e.preventDefault();
+		openWithInAppBrowser( e.target.href );
 	} );
 
 	/**
@@ -135,8 +143,8 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/modules/stora
 	 * @param 	int 	post_id 	ID of the post that has been added or removed from the favorites list.
 	 */
 	function toggleFavoriteLinks( saved, post_id ) {
-		if( saved ) {
-			if( TemplateTags.isFavorite( post_id ) ) {
+		if ( saved ) {
+			if ( TemplateTags.isFavorite( post_id ) ) {
 				$( '.post-' + post_id + ' .favorite.add' ).addClass( 'hidden' );
 				$( '.post-' + post_id + ' .favorite.remove' ).removeClass( 'hidden' );
 			}
@@ -156,13 +164,13 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/modules/stora
 		var id = $link.data( 'id' );
 		var global = $link.data( 'global' );
 
-		if( TemplateTags.isFavorite( id ) ) {
+		if ( TemplateTags.isFavorite( id ) ) {
 			App.removeFromFavorites( id, toggleFavoriteLinks );
 		}
 		else {
 			App.addToFavorites( id, toggleFavoriteLinks, global );
 		}
-	});
+	} );
 
 	/**
 	 * Reset favorites button
@@ -171,21 +179,21 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/modules/stora
 		e.preventDefault();
 		App.resetFavorites( function() {
 			// @TODO: Refresh the archive view, but how?
-		});
-	});
+		} );
+	} );
 
 	/**
 	 * Example of how to react to network state changes :
 	 */
 	/*
-	App.on( 'network:online', function(event) {
-		$( '#feedback' ).removeClass( 'error' ).html( "Internet connexion ok :)" ).slideDown();
-	} );
-
-	App.on( 'network:offline', function(event) {
-		$( '#feedback' ).addClass( 'error' ).html( "Internet connexion lost :(" ).slideDown();
-	} );
-	*/
+	 App.on( 'network:online', function(event) {
+	 $( '#feedback' ).removeClass( 'error' ).html( "Internet connexion ok :)" ).slideDown();
+	 } );
+	 
+	 App.on( 'network:offline', function(event) {
+	 $( '#feedback' ).addClass( 'error' ).html( "Internet connexion lost :(" ).slideDown();
+	 } );
+	 */
 
 	/**
 	 * Manually close the bootstrap navbar
@@ -202,6 +210,13 @@ define( [ 'jquery', 'core/theme-app', 'core/theme-tpl-tags', 'core/modules/stora
 	 */
 	function scrollTop() {
 		window.scrollTo( 0, 0 );
+	}
+
+	/**
+	 * Opens the given url using the inAppBrowser
+	 */
+	function openWithInAppBrowser( url ) {
+		window.open( url, "_blank", "location=yes" );
 	}
 
 } );
