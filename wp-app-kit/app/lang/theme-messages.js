@@ -7,7 +7,7 @@ define( function ( require ) {
 
 	return {
 		error_remote_connexion_failed : 'Remote connection to website failed',
-		error_occured_undefined : 'Oops, an error occured...',
+		error_occured_undefined : 'Oops, an error occurred...',
 		info_no_content : "The application couldn't retrieve any content, please check your internet connection!",
 		info_network_online : "Internet connection ok",
 		info_network_offline : "Internet connection lost",

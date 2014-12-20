@@ -919,7 +919,7 @@ define(function (require) {
       };
 	  
 	//--------------------------------------------------------------------------
-	//Network : handle network state if the Network phonegap plugin is available
+	//Network : handle network state if the Network PhoneGap plugin is available
 
 	app.onOnline = function(){
 		vent.trigger('network:online');

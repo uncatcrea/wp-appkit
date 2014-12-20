@@ -82,7 +82,7 @@ class WpakSimulator {
 					<h3><a href="<?php echo $appli_dir_url . '/config.js?wpak_app_id=' . $app_id ?>" target="_blank"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a></h3>
 
 					<br/><br/>
-					<h3><?php _e( 'Web services', WpAppKit::i18n_domain ) ?> :</h3>
+					<h3><?php _e( 'Web Services', WpAppKit::i18n_domain ) ?> :</h3>
 					<?php _e( 'Synchronization', WpAppKit::i18n_domain ) ?> : <a href="<?php echo $wp_ws_url ?>"><?php echo $wp_ws_url ?></a>
 				</div>
 

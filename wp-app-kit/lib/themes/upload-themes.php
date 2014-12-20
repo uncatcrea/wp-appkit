@@ -15,7 +15,7 @@ class WpakUploadThemes {
 
 	public static function add_settings_panels() {
 		$capability_required = current_user_can( 'wpak_edit_apps' ) ? 'wpak_edit_apps' : 'manage_options';
-		add_submenu_page( WpakApps::menu_item, __( 'Upload themes', WpAppKit::i18n_domain ), __( 'Upload themes', WpAppKit::i18n_domain ), $capability_required, self::menu_item, array( __CLASS__, 'settings_panel' ) );
+		add_submenu_page( WpakApps::menu_item, __( 'Upload Themes', WpAppKit::i18n_domain ), __( 'Upload themes', WpAppKit::i18n_domain ), $capability_required, self::menu_item, array( __CLASS__, 'settings_panel' ) );
 	}
 	
 	public static function settings_panel() {
