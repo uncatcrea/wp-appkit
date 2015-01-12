@@ -5,16 +5,16 @@ require_once(dirname( __FILE__ ) . '/themes-bo-settings.php');
 
 class WpakThemes {
 
-	const appli_theme_directory = 'app/themes';
+	const appli_theme_directory = 'themes-wp-appkit';
 
 	public static function get_theme_directory(){
-		return plugin_dir_path( dirname( dirname( __FILE__ ) ) ) . self::appli_theme_directory;
+		return WP_CONTENT_DIR .'/'. self::appli_theme_directory;
 	}
 	
 	public static function get_available_themes() {
 		$available_themes = array();
 
-		$directory = plugin_dir_path( dirname( dirname( __FILE__ ) ) ) . self::appli_theme_directory;
+		$directory = self::get_theme_directory();
 
 		if ( file_exists( $directory ) && is_dir( $directory ) ) {
 			if ( $handle = opendir( $directory ) ) {
@@ -36,7 +36,7 @@ class WpakThemes {
 	public static function include_app_theme_php( $app_id ) {
 		$app_theme = WpakThemesStorage::get_current_theme( $app_id );
 		if ( !empty( $app_theme ) ) {
-			$themes_dir = plugin_dir_path( dirname( dirname( __FILE__ ) ) ) . self::appli_theme_directory .'/' . $app_theme . '/php';
+			$themes_dir = self::get_theme_directory() .'/' . $app_theme . '/php';
 			if ( file_exists( $themes_dir ) && is_dir( $themes_dir ) ) {
 				foreach ( glob( $themes_dir . "/*.php" ) as $file ) {
 					include_once($file);
