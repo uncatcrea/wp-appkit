@@ -13,7 +13,8 @@ define(function(require, exports) {
 		Stats         = require('core/stats'),
 		Addons        = require('core/addons-internal'),
         ThemeApp      = require('core/theme-app'),
-        Hooks         = require('core/lib/hooks');
+        Hooks         = require('core/lib/hooks'),
+		Utils         = require('core/app-utils');
 
     var themeTplTags = {};
 
@@ -214,6 +215,40 @@ define(function(require, exports) {
 	 */
 	themeTplTags.getThemePath = function() {
 		return 'themes/'+ Config.theme;
+	};
+	
+	/**
+	 * Adds GET params needed for app simulation in browser and cache busting 
+	 * to the given asset file url.
+	 * 
+	 * @param {string} theme_asset_url Asset file url RELATIVE to the theme directory
+	 * @param {type} bust True to add a cache busting param to the url
+	 * @returns {String} modified theme asset url
+	 */
+	themeTplTags.getThemeAssetUrl = function( theme_asset_url, bust ) {
+		
+		if( bust === undefined || bust !== true ) {
+			bust = false;
+		}
+		
+		//For app simulation in browser :
+		var query = window.location.search.substring(1);
+		if( query.length ){
+			//query = wpak_app_id=[app_slug]
+			var query_key_value = query.split('=');
+			var query_key = query_key_value[0];
+			var query_value = query_key_value[1];
+			theme_asset_url = Utils.addParamToUrl(theme_asset_url, query_key, query_value);
+		}
+		
+		if( bust ) {
+			var time = new Date().getTime();
+			theme_asset_url = Utils.addParamToUrl(theme_asset_url, 'bust', time);
+		}
+		
+		theme_asset_url = themeTplTags.getThemePath() +'/'+ theme_asset_url;
+		
+		return theme_asset_url;
 	};
 
 	/**
