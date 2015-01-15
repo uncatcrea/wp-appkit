@@ -5,15 +5,16 @@ require_once(dirname( __FILE__ ) . '/themes-bo-settings.php');
 
 class WpakThemes {
 
-	const appli_theme_directory = 'themes-wp-appkit';
+	const themes_directory = 'themes-wp-appkit';
 
 	public static function hooks() {
 		add_action( 'init', array( __CLASS__, 'rewrite_rules' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'template_redirect' ), 5 );
+		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 	}
 	
 	public static function get_theme_directory(){
-		return WP_CONTENT_DIR .'/'. self::appli_theme_directory;
+		return WP_CONTENT_DIR .'/'. self::themes_directory;
 	}
 	
 	public static function rewrite_rules() {
@@ -27,6 +28,32 @@ class WpakThemes {
 		}
 	}
 	
+	public static function admin_notices() {
+		if( !is_dir( self::get_theme_directory() ) ) {
+			if( !self::create_theme_directory() ) {
+				?>
+				<div class="error">
+					<p>
+						<?php 
+							echo sprintf( __( 'The WP AppKit themes directory %s can\'t be created. <br/>Please check that your WordPress install has the permissions to create this directory.', WpAppKit::i18n_domain ), 
+										  basename(WP_CONTENT_DIR) .'/'. self::themes_directory 
+							); 
+						?>
+					</p>
+				</div>
+				<?php
+			}
+		}
+	}
+	
+	public static function create_theme_directory() {
+		$theme_directory_ok = true;
+		if( !is_dir( self::get_theme_directory() ) ) {
+			$theme_directory_ok = mkdir( self::get_theme_directory() );
+		}
+		return $theme_directory_ok;
+	}
+				
 	public static function template_redirect() {
 		global $wp_query;
 

@@ -47,7 +47,10 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			self::lib_require();
 			WpakWebServices::add_rewrite_tags_and_rules();
 			WpakConfigFile::rewrite_rules();
+			WpakThemes::rewrite_rules();
 			flush_rewrite_rules();
+			
+			WpakThemes::create_theme_directory();
 		}
 
 		public static function on_deactivation() {

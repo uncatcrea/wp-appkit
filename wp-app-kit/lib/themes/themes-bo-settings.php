@@ -24,13 +24,25 @@ class WpakThemesBoSettings {
 		$main_infos = WpakApps::get_app_main_infos( $post->ID );
 		?>
 
-		<label><?php _e( 'Choose theme', WpAppKit::i18n_domain ) ?> : </label>
-		<select name="wpak_app_theme_choice" id="wpak_app_theme_choice">
-			<?php foreach ( $available_themes as $theme_slug => $theme_data ): ?>
-				<?php $selected = $theme_slug == $current_theme ? 'selected="selected"' : '' ?>
-				<option value="<?php echo $theme_slug ?>" <?php echo $selected ?>><?php echo $theme_data['Name'] ?> </option>
-			<?php endforeach ?>
-		</select>
+		<?php if ( !empty($available_themes) ): ?>
+			<label><?php _e( 'Choose theme', WpAppKit::i18n_domain ) ?> : </label>
+			<select name="wpak_app_theme_choice" id="wpak_app_theme_choice">
+				<?php foreach ( $available_themes as $theme_slug => $theme_data ): ?>
+					<?php $selected = $theme_slug == $current_theme ? 'selected="selected"' : '' ?>
+					<option value="<?php echo $theme_slug ?>" <?php echo $selected ?>><?php echo $theme_data['Name'] ?> </option>
+				<?php endforeach ?>
+			</select>
+		<?php else: ?>
+			<div class="wpak_no_theme">
+				<strong><?php _e( 'No WP AppKit theme found!', WpAppKit::i18n_domain ) ?></strong>
+				<br/>
+				<?php echo  sprintf( __('Please upload a WP AppKit theme from the "<a href="%s" >Upload themes</a>" panel or copy a theme directly to the %s directory.', WpAppKit::i18n_domain ), 
+									'/wp-admin/admin.php?page=wpak_bo_upload_themes',  
+									basename(WP_CONTENT_DIR) .'/'. WpakThemes::themes_directory
+							) 
+				?>
+			</div>
+		<?php endif ?>
 		
 		<?php foreach ( $available_themes as $theme => $theme_data ): ?>
 			<div class="wpak-theme-data" id="wpak-theme-data-<?php echo $theme ?>" style="display:none">
@@ -76,6 +88,7 @@ class WpakThemesBoSettings {
 			.theme-data-content{ margin-top: 0 }
 			.wpak-app-title{ margin-top: 15px; border-top: 1px solid #ddd; padding-top:10px }
 			.theme-meta-data{ margin-top: 7px }
+			.wpak_no_theme{ text-align: center; font-size:120%; line-height: 2em; margin:30px }
 		</style>
 		
 		<script>
