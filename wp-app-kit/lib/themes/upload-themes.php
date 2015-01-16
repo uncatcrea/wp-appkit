@@ -45,7 +45,7 @@ class WpakUploadThemes {
 
 				$result = $upgrader->run( array(
 					'package' => $file_upload->package,
-					'destination' => WpakThemes::get_theme_directory() .'/'. $destination_folder_name,
+					'destination' => WpakThemes::get_themes_directory() .'/'. $destination_folder_name,
 					'clear_destination' => true, // overwrite files.
 					'clear_working' => true,
 					'hook_extra' => array()

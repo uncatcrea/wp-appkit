@@ -101,7 +101,7 @@ class WpakBuild {
 				e.preventDefault();
 				var themes = jQuery('#wpak_export_theme').val();
 				if (themes == null) {
-					jQuery('#wpak_export_feedback').addClass('error').html('<?php echo addslashes( __( 'Please select at least one theme', WpAppKit::i18n_domain ) ) ?>');
+					jQuery('#wpak_export_feedback').removeClass().addClass('error').html('<?php echo addslashes( __( 'Please select at least one theme', WpAppKit::i18n_domain ) ) ?>');
 				} else {
 					var data = {
 						action: 'wpak_build_app_sources',
@@ -117,7 +117,7 @@ class WpakBuild {
 							if (download) {
 								message += '<br/>' + '<?php echo addslashes( __( "Download should start automatically.", WpAppKit::i18n_domain ) ) ?>';
 							}
-							$feedback.addClass('updated').html(message);
+							$feedback.removeClass().addClass('updated').html(message);
 							if (response.ok == 2) {
 								$feedback.append('<br/><br/><strong><?php _e( "Warning!", WpAppKit::i18n_domain ) ?></strong> : ' + response.msg);
 							}
@@ -125,7 +125,7 @@ class WpakBuild {
 								window.location.href = '<?php echo add_query_arg( array( 'action' => 'wpak_download_app_sources' ), wp_nonce_url( admin_url(), 'wpak_download_app_sources' ) ) ?>&export=' + response['export'];
 							}
 						} else {
-							jQuery('#wpak_export_feedback').addClass('error').html(response.msg);
+							jQuery('#wpak_export_feedback').removeClass().addClass('error').html(response.msg);
 						}
 					});
 				}
@@ -267,7 +267,7 @@ class WpakBuild {
 		$export_filename = $export_filename_base . '-' . date( 'YmdHis' );
 		$export_filename_full = self::get_export_files_path() . "/" . $export_filename . '.zip';
 
-		$answer = self::build_zip( $app_id, $appli_dir, $export_filename_full, $themes, WpakAddons::get_app_addons( $addons ) );
+		$answer = self::build_zip( $app_id, $appli_dir, $export_filename_full, $themes, WpakAddons::get_app_addons( $app_id ) );
 
 		$maintenance_answer = self::export_files_maintenance( $app_id );
 		if ( $maintenance_answer['ok'] == 0 ) {
@@ -337,19 +337,11 @@ class WpakBuild {
 				$filename = str_replace( $source, '', $file );
 				$filename = ltrim( $filename, '/\\' );
 
-				//Filter themes :
+				//Themes are included separately from the wpak themes directory
 				if ( preg_match( '|themes[/\\\].+|', $filename ) ) {
-					$theme = preg_replace( '|themes[/\\\]([^/\\\]*).*|', '$1', $filename );
-					if ( !in_array( $theme, $themes ) ) {
-						continue;
-					}
-				}
-
-				//Filter php directory
-				if ( preg_match( '|themes[/\\\].+?[/\\\]php|', $filename ) ) {
 					continue;
 				}
-
+				
 				if ( is_dir( $file ) === true ) {
 					if ( !$zip->addEmptyDir( $filename ) ) {
 						$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), filename );
@@ -373,6 +365,48 @@ class WpakBuild {
 							$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), filename );
 							$answer['ok'] = 0;
 							return $answer;
+						}
+					}
+				}
+			}
+			
+			//Add themes files :
+			if( !empty( $themes ) ) {
+				
+				$themes_directory = WpakThemes::get_themes_directory();
+				if( is_dir( $themes_directory ) ) {
+					
+					$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $themes_directory ), RecursiveIteratorIterator::SELF_FIRST );
+
+					foreach ( $files as $file ) {
+						$filename = str_replace( $themes_directory, '', $file );
+						$filename = ltrim( $filename, '/\\' );
+
+						//Filter themes :
+						$theme = preg_replace( '|([^/\\\]*)[/\\\].*|', '$1', $filename );
+						
+						if ( !in_array( $theme, $themes ) ) {
+							continue;
+						}
+						
+						//Filter php directory
+						if ( preg_match( '|'. $theme .'[/\\\]php|', $filename ) ) {
+							continue;
+						}
+						
+						$filename = 'themes/'. $filename;
+						if ( is_dir( $file ) === true ) {
+							if ( !$zip->addEmptyDir( $filename ) ) {
+								$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), filename );
+								$answer['ok'] = 0;
+								return $answer;
+							}
+						} elseif ( is_file( $file ) === true ) {
+							if ( !$zip->addFile( $file, $filename ) ) {
+								$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), filename );
+								$answer['ok'] = 0;
+								return $answer;
+							}
 						}
 					}
 				}

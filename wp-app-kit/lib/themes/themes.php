@@ -13,7 +13,7 @@ class WpakThemes {
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 	}
 	
-	public static function get_theme_directory(){
+	public static function get_themes_directory(){
 		return WP_CONTENT_DIR .'/'. self::themes_directory;
 	}
 	
@@ -29,7 +29,7 @@ class WpakThemes {
 	}
 	
 	public static function admin_notices() {
-		if( !is_dir( self::get_theme_directory() ) ) {
+		if( !is_dir( self::get_themes_directory() ) ) {
 			if( !self::create_theme_directory() ) {
 				?>
 				<div class="error">
@@ -48,8 +48,8 @@ class WpakThemes {
 	
 	public static function create_theme_directory() {
 		$theme_directory_ok = true;
-		if( !is_dir( self::get_theme_directory() ) ) {
-			$theme_directory_ok = mkdir( self::get_theme_directory() );
+		if( !is_dir( self::get_themes_directory() ) ) {
+			$theme_directory_ok = mkdir( self::get_themes_directory() );
 		}
 		return $theme_directory_ok;
 	}
@@ -131,12 +131,12 @@ class WpakThemes {
 	public static function get_available_themes($with_data = false) {
 		$available_themes = array();
 
-		$directory = self::get_theme_directory();
+		$directory = self::get_themes_directory();
 
 		if ( file_exists( $directory ) && is_dir( $directory ) ) {
 			if ( $handle = opendir( $directory ) ) {
 				while ( false !== ($entry = readdir( $handle )) ) {
-					if ( $entry != '.' && $entry != '..' ) {
+					if ( $entry != '.' && $entry != '..' && strpos( $entry, '.' ) !== 0 ) {
 						$entry_full_path = $directory . '/' . $entry;
 						if ( is_dir( $entry_full_path ) ) {
 							if( $with_data ){
@@ -158,7 +158,7 @@ class WpakThemes {
 	public static function include_app_theme_php( $app_id ) {
 		$app_theme = WpakThemesStorage::get_current_theme( $app_id );
 		if ( !empty( $app_theme ) ) {
-			$themes_dir = self::get_theme_directory() .'/' . $app_theme . '/php';
+			$themes_dir = self::get_themes_directory() .'/' . $app_theme . '/php';
 			if ( file_exists( $themes_dir ) && is_dir( $themes_dir ) ) {
 				foreach ( glob( $themes_dir . "/*.php" ) as $file ) {
 					include_once($file);
@@ -183,7 +183,7 @@ class WpakThemes {
 			$theme_data[$key] = '';
 		}
 		
-		$themes_dir = self::get_theme_directory() .'/' . $theme_folder;
+		$themes_dir = self::get_themes_directory() .'/' . $theme_folder;
 		$theme_readme = $themes_dir . '/readme.md';
 		
 		if ( file_exists($theme_readme) ) {
@@ -199,7 +199,7 @@ class WpakThemes {
 	
 	public static function get_theme_file( $theme_slug, $file_relative_to_theme ) {
 		
-		$theme_file = self::get_theme_directory() .'/' . $theme_slug .'/'. $file_relative_to_theme;
+		$theme_file = self::get_themes_directory() .'/' . $theme_slug .'/'. $file_relative_to_theme;
 		
 		return file_exists( $theme_file ) ? $theme_file : false;
 	}
