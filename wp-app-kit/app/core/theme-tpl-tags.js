@@ -218,17 +218,25 @@ define(function(require, exports) {
 	};
 	
 	/**
-	 * Adds GET params needed for app simulation in browser and cache busting 
-	 * to the given asset file url.
+	 * This allows to add theme path and cache busting (and GET params that may be needed 
+	 * for app simulation in browser) to the given asset file url.
+	 * 
+	 * For example, to include a CSS in the head.html template you can use one
+	 * of the following according to your needs :
+	 * - <%= TemplateTags.getThemePath() %>/css/my-styles.css
+	 * - <%= TemplateTags.getThemeAssetUrl('css/my-styles.css') %> : adds cache busting if in debug mode
+	 * - <%= TemplateTags.getThemeAssetUrl('css/my-styles.css', true) %> : to force cache busting in any case
 	 * 
 	 * @param {string} theme_asset_url Asset file url RELATIVE to the theme directory
-	 * @param {type} bust True to add a cache busting param to the url
-	 * @returns {String} modified theme asset url
+	 * @param Optional {type} bust True to add a cache busting param to the url. Defaults to Config.debug_mode == 'on'.
+	 * @returns {String} modified theme asset url with cache busting
 	 */
 	themeTplTags.getThemeAssetUrl = function( theme_asset_url, bust ) {
 		
-		if( bust === undefined || bust !== true ) {
-			bust = false;
+		if( bust === undefined ) {
+			bust = Config.debug_mode == 'on';
+		}else{
+			bust = bust === true;
 		}
 		
 		//For app simulation in browser :
