@@ -64,8 +64,10 @@ class WpakThemes {
 			$file = $wp_query->query_vars['wpak_theme_file'];
 
 			//For assets files like fonts, images or css we can't 
-			//be sure that the wpak_app_id GET arg is there, so we can't 
-			//check it > we serve the file directly
+			//be sure that the wpak_app_id GET arg is there, because they can
+			//be included directly in themes sources where the WP AppKit API can't
+			//be used. So, we can't check that the file come from the right app 
+			//or theme > we serve the file directly
 			if( self::is_asset_file( $file ) ) {
 				if ( preg_match( '/([^\/]+?)\/(.+)$/', $file, $matches ) ) {
 					$theme_slug = $matches[1];
@@ -76,6 +78,8 @@ class WpakThemes {
 				}
 			}
 			
+			//For non asset files (like JS) we check that the file is asked for
+			//the correct app and a valid theme :
 			if ( !empty( $_GET['wpak_app_id'] ) ) {
 
 				$app_id = esc_attr( $_GET['wpak_app_id'] ); //can be ID or slug
@@ -312,12 +316,23 @@ class WpakThemes {
 	
 	protected static function is_asset_file( $file ) {
 		$mime_type = self::get_file_mime_type( $file );
+		
+		$is_asset_file = strpos( $mime_type, 'text/css' ) !== false
+			|| strpos( $mime_type, 'image' ) !== false
+			|| strpos( $mime_type, 'font' ) !== false 
+			|| strpos( $mime_type, 'video' ) !== false;
+		
+		/**
+		 * Use this 'wpak_theme_is_asset_file' filter to make
+		 * a file or a mime type accessible by the app without 
+		 * checking the app id and the app theme. 
+		 * @see self::template_redirect()
+		 */
 		return apply_filters(
 			'wpak_theme_is_asset_file', 
-			strpos( $mime_type, 'image' ) !== false
-			|| strpos( $mime_type, 'font' ) !== false 
-			|| strpos( $mime_type, 'video' ) !== false,
-			$file
+			$is_asset_file,
+			$file,
+			$mime_type
 		);
 	}
 
