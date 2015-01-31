@@ -65,22 +65,35 @@ class WpakThemes {
 
 			//For assets files like fonts, images or css we can't 
 			//be sure that the wpak_app_id GET arg is there, because they can
-			//be included directly in themes sources where the WP AppKit API can't
-			//be used. So, we can't check that the file come from the right app 
-			//or theme > we serve the file directly
+			//be included directly in themes sources (CSS/HTML) where the WP AppKit API can't
+			//be used. So, we can't check that the file comes from the right app 
+			//or theme > we just check that the theme the asset belongs to is a real 
+			//WP AppKit theme and that at least one app uses this theme :
 			if( self::is_asset_file( $file ) ) {
 				if ( preg_match( '/([^\/]+?)\/(.+)$/', $file, $matches ) ) {
 					$theme_slug = $matches[1];
 					$theme_file = $matches[2];
-					if ( $file_full_path = self::get_theme_file( $theme_slug, $theme_file ) ) {
-						self::exit_send_theme_file($file_full_path);
+					
+					if ( self::is_theme( $theme_slug ) && self::theme_is_used( $theme_slug ) ) {
+						if ( $file_full_path = self::get_theme_file( $theme_slug, $theme_file ) ) {
+							self::exit_send_theme_file( $file_full_path );
+						}
+					} else {
+						header("HTTP/1.0 404 Not Found");
+						_e( 'Not a valid theme file', WpAppKit::i18n_domain );
+						exit();
 					}
+					
+				}else {
+					header("HTTP/1.0 404 Not Found");
+					_e( 'Not a valid theme file path', WpAppKit::i18n_domain );
+					exit();
 				}
-			}
+				
+			}else if ( !empty( $_GET['wpak_app_id'] ) ) {
 			
-			//For non asset files (like JS) we check that the file is asked for
-			//the correct app and a valid theme :
-			if ( !empty( $_GET['wpak_app_id'] ) ) {
+				//For non considered asset files (like JS) we check that the file is 
+				//asked for the correct app and for the theme of the app:
 
 				$app_id = esc_attr( $_GET['wpak_app_id'] ); //can be ID or slug
 
@@ -211,8 +224,9 @@ class WpakThemes {
 	/**
 	 * Serve theme files for app browser simulation.
 	 * 
-	 * This is not really nice to serve those files via PHP with readfile, 
-	 * we could use X-Sendfile, but it requires a specific server config.
+	 * This is not really nice to serve those files via PHP with readfile(), 
+	 * but it seems to be the only way that it works on all platforms.
+	 * We could use X-Sendfile, but it requires a specific server config.
 	 */
 	protected static function exit_send_theme_file( $file ) {
 		
@@ -237,7 +251,10 @@ class WpakThemes {
 			exit();
 		}
 		
-		readfile($file);
+		//Security note : before serving this file with readfile() we checked :
+		//- that its mime type is authorized
+		//- that it belongs to a valid WP AppKit Theme currently used by an app
+		readfile( $file );
 		
 		exit();
 	}
@@ -256,6 +273,10 @@ class WpakThemes {
 	}
 	
 	protected static function get_allowed_theme_mime_types() {
+		/**
+		 * Use this filter to set file types that are allowed to be served
+		 * to themes for the app simulation in browser :
+		 */
 		return apply_filters(
 			'wpak_theme_allowed_mime_types', 
 			array(
@@ -293,13 +314,8 @@ class WpakThemes {
 				'3gp|3gpp' => 'video/3gpp', // Can also be audio
 				'3g2|3gp2' => 'video/3gpp2', // Can also be audio
 				// Text formats.
-				'txt|asc|c|cc|h|srt' => 'text/plain',
+				'txt' => 'text/plain',
 				'csv' => 'text/csv',
-				'tsv' => 'text/tab-separated-values',
-				'ics' => 'text/calendar',
-				'rtx' => 'text/richtext',
-				'vtt' => 'text/vtt',
-				'dfxp' => 'application/ttaf+xml',
 				'md' => 'text/x-markdown',
 				// Audio formats.
 				'mp3|m4a|m4b' => 'audio/mpeg',
@@ -334,6 +350,27 @@ class WpakThemes {
 			$file,
 			$mime_type
 		);
+	}
+	
+	/**
+	 * Checks if the given theme exists and has the mandatory themes files
+	 */
+	public static function is_theme( $theme_slug ) {
+		$is_theme = false;
+		$theme_path = self::get_themes_directory() . '/' . $theme_slug .'/';
+		if ( is_dir( $theme_path ) ) {
+			$is_theme = file_exists($theme_path . 'layout.html') 
+						&& file_exists($theme_path . 'js/functions.js');
+		}
+		return $is_theme;
+	}
+
+	/**
+	 * Checks if the given theme is used at least by one app
+	 */
+	public static function theme_is_used( $theme_slug ) {
+		$used_themes = WpakThemesStorage::get_used_themes();
+		return in_array( $theme_slug, $used_themes );
 	}
 
 }
