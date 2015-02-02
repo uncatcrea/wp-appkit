@@ -3,7 +3,7 @@
 /*
   Plugin Name: WP App Kit
   Description: Build Phonegap Mobile apps based on your WordPress contents
-  Version: 0.1
+  Version: 0.2
  */
 
 if ( !class_exists( 'WpAppKit' ) ) {
