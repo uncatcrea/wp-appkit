@@ -204,7 +204,7 @@ define(function (require) {
         		var current_custom_page = App.getCurrentCustomPage();
         		if( current_custom_page !== null ){
 					if( check_route('custom-page') ){
-						App.setQueriedScreen({screen_type:'custom-page',component_id:'',item_id:0,data:current_custom_page});
+						App.setQueriedScreen({screen_type:'custom-page',component_id:'',item_id:current_custom_page.get('id'),data:{custom_page:current_custom_page}});
 						var view = new CustomPageView({custom_page:current_custom_page});
 						view.checkTemplate(function(){
 							RegionManager.show(view);
@@ -242,7 +242,7 @@ define(function (require) {
 				var custom_route = App.getCustomRoute(fragment);
 				if( !_.isEmpty(custom_route) ){
 					fragment_not_found = '';
-					App.showCustomPage(custom_route.template,custom_route.data);
+					App.showCustomPage(custom_route.template,custom_route.data,fragment);
 				}
 
 				if( fragment_not_found.length ){

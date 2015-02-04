@@ -55,8 +55,12 @@ define(function (require) {
 	   * Displays a custom page using the given template.
 	   * @param data see models/custom-page.js for data fields
 	   */
-	  app.showCustomPage = function(template,data){
-		  current_custom_page = new CustomPage({template: template, data: data});
+	  app.showCustomPage = function(template,data,id){
+		  var args = {template: template, data: data};
+		  if( id !== undefined ){
+			  args.id = id;
+		  }
+		  current_custom_page = new CustomPage(args);
 		  app.router.navigate('#custom-page',{trigger: true});
 	  };
 
