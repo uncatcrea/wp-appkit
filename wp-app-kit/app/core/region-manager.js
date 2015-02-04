@@ -113,6 +113,7 @@ define(function (require) {
 		    				menuView.addItem(component.get('id'),component.get('type'),component.get('label'),element.get('options'));
 		    			}
 		   		  	});
+					menuView = Hooks.applyFilters('menu-items', menuView, [App.navigation]);
 		    		showMenu(force_reload);
 		    		cb();
 	    		});
