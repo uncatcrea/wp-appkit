@@ -488,7 +488,7 @@ define( function( require, exports ) {
 	};
 
 	/************************************************
-	 * App infos management
+	 * App custom pages and custom routes management
 	 */
 
 	themeApp.showCustomPage = function( template, data ) {
@@ -496,6 +496,20 @@ define( function( require, exports ) {
 			template = 'custom';
 		}
 		App.showCustomPage( template, data );
+	};
+
+	
+	themeApp.addCustomRoute = function( fragment, template, data ) {
+		fragment = fragment.replace('#','');
+		if ( template === undefined ) {
+			template = 'custom';
+		}
+		App.addCustomRoute( fragment, template, data );
+	};
+	
+	themeApp.removeCustomRoute = function( fragment ) {
+		fragment = fragment.replace('#','');
+		App.removeCustomRoute( fragment );
 	};
 
 	/**

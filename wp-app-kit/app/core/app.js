@@ -42,10 +42,11 @@ define(function (require) {
 	  };
 
 	  //--------------------------------------------------------------------------
-	  //Custom pages handling
+	  //Custom pages and routes handling
 
 	  var current_custom_page = null;
-
+	  var custom_routes = {};
+	  
 	  app.getCurrentCustomPage = function(){
 		  return current_custom_page;
 	  };
@@ -59,6 +60,24 @@ define(function (require) {
 		  app.router.navigate('#custom-page',{trigger: true});
 	  };
 
+	  app.addCustomRoute = function( fragment, template, data ) {
+		  custom_routes[fragment] = { template: template, data: data };
+	  };
+	  
+	  app.removeCustomRoute = function( fragment ) {
+		  if( custom_routes.hasOwnProperty(fragment) ) {
+			  delete custom_routes[fragment];
+		  }
+	  };
+	
+	  app.getCustomRoute = function( fragment ) {
+		  var route = {};
+		  if( custom_routes.hasOwnProperty(fragment) ) {
+			  route = custom_routes[fragment];
+		  }
+		  return route;
+	  };
+	  
 	  //--------------------------------------------------------------------------
 	  //App params :
 	  //Params that can be changed by themes dynamically : themes can freely change
