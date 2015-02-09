@@ -15,7 +15,7 @@ define( function( require, exports ) {
 			App = require( 'core/app' ),
 			Hooks = require( 'core/lib/hooks' ),
 			TemplateTags = require( 'core/theme-tpl-tags' ),
-			PhoneGap = require( 'core/phonegap-utils' );
+			PhoneGap = require( 'core/phonegap/utils' );
 
 	var themeApp = { };
 
