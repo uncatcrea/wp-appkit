@@ -212,7 +212,7 @@ define(function (require) {
 	  app.getQueriedScreen = function(){
 		  return queried_screen_data;
 	  };
-
+	  
 	  /**
 	   * Pushes the queried screen to the history stack according to the screen type and where we're from.
 	   */

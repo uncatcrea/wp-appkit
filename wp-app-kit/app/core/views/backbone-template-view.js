@@ -28,6 +28,7 @@ define(function (require) {
     	template_name: 'default',
     	fallback_template_name: '',
     	template: null,
+		is_static: false,
     	
     	/**
     	 * Called in router to validate the view's template before showing the screen.
