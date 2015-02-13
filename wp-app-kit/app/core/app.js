@@ -255,24 +255,23 @@ define(function (require) {
 				  history_stack = [];
 			  }
 
+			  var history_action = '';
+
 			  if( queried_screen_data.screen_type == 'list' ){
-				  history_stack = [];
-				  history_push(queried_screen_data);
+				  history_action = 'empty-then-push';
 			  }else if( queried_screen_data.screen_type == 'single' ){
 				  if( current_screen.screen_type == 'list' ){
-					  history_push(queried_screen_data);
+					  history_action = 'push';
 				  }else if( current_screen.screen_type == 'custom-component' ){
-					  history_push(queried_screen_data);
+					  history_action = 'push';
 				  }else if( current_screen.screen_type == 'comments' ){
 					  if( previous_screen.screen_type == 'single' && previous_screen.item_id == queried_screen_data.item_id ){
-						  history_stack.pop();
+						  history_action = 'pop';
 					  }else{
-						  history_stack = [];
-						  history_push(queried_screen_data);
+						  history_action = 'empty-then-push';
 					  }
 				  }else{
-					  history_stack = [];
-					  history_push(queried_screen_data);
+					  history_action = 'empty-then-push';
 				  }
 			  }else if( queried_screen_data.screen_type == 'page' ){
 				  if( current_screen.screen_type == 'page'
@@ -283,30 +282,44 @@ define(function (require) {
 						  && previous_screen.component_id == queried_screen_data.component_id
 						  && previous_screen.item_id == queried_screen_data.item_id
 						  ){
-						  history_stack.pop();
+						  history_action = 'pop';
 					  }else{
-						  history_push(queried_screen_data);
+						  history_action = 'push';
 					  }
 
 				  }else{
-					  history_stack = [];
-					  history_push(queried_screen_data);
+					  history_action = 'empty-then-push';
 				  }
 			  }else if( queried_screen_data.screen_type == 'comments' ){
 				  //if( current_screen.screen_type == 'single' && current_screen.item_id == item_id ){
-					  history_push(queried_screen_data);
+					  history_action = 'push';
 				  //}
 			  }else if( queried_screen_data.screen_type == 'custom-page' ){
-				  history_stack = [];
-				  history_push(queried_screen_data);
+				  history_action = 'empty-then-push';
 			  }else if( queried_screen_data.screen_type == 'custom-component' ){
-				  history_stack = [];
-				  history_push(queried_screen_data);
+				  history_action = 'empty-then-push';
 			  }else{
-				  history_stack = [];
+				  history_action = 'empty';
 			  }
-
-		  }
+			}
+			
+			history_action = Hooks.applyFilters( 'make-history', history_action, [ history_stack, queried_screen_data, current_screen, previous_screen ] );
+			
+			switch ( history_action ) {
+				case 'empty-then-push':
+					history_stack = [];
+					history_push( queried_screen_data );
+					break;
+				case 'empty':
+					history_stack = [];
+					break;
+				case 'push':
+					history_push( queried_screen_data );
+					break;
+				case 'pop':
+					history_stack.pop();
+					break;
+			}
 
 	  };
 
