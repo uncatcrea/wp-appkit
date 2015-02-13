@@ -154,12 +154,14 @@ define(function (require) {
 	    
 	    var closeView = function (view) {
 	        if( view ){
-	        	if( view.isStatic ){
-	        		var static_screens_wrapper = $('#app-static-screens');
+	        	if( view.is_static ){
+					//Static views are memorized in screen_static_views now.
+					//Backbone memorizes the DOM element, so we don't need to keep a copy of it!
+	        		/*var static_screens_wrapper = $('#app-static-screens');
 	        		if( !static_screens_wrapper.find('[data-viewid='+ view.cid +']').length ){
 	        			$(view.el).attr('data-viewid',currentView.cid);
 	        			static_screens_wrapper.append(view.el);
-	        		}
+	        		}*/
 	        	}else{
 		        	if( view.close ){
 		        		view.close();
@@ -169,80 +171,68 @@ define(function (require) {
 	    };
 	 
 	    var openView = function (view) {
+	    	var first_static_opening = false;
 	    	
-	    	if( !view.isStatic || !$(view.el).html().length ){
-	    		if( view.isStatic != undefined && view.isStatic ){
+			var custom_rendering = App.getParam('custom-screen-rendering');
+			
+			if( !view.is_static || !$(view.el).html().length ){
+	    		if( view.is_static != undefined && view.is_static ){
+					first_static_opening = true;
 	    			Utils.log('Open static view',{screen_data:App.getCurrentScreenData(),view:view});
 	    		}else{
 	    			Utils.log('Open view',{screen_data:App.getCurrentScreenData(),view:view});
 	    		}
 				view.render();
+			} else {
+				Utils.log('Re-open existing static view',{view:view});
+			}
 				
-				var $el = $(el);
-				
-				vent.trigger('screen:before-transition',App.getCurrentScreenData(),currentView);
-				
-				var custom_rendering = App.getParam('custom-screen-rendering');
-				if( custom_rendering ){
-					Hooks.doActions(
-						'screen-transition',
-						[$el,$('div:first-child',$el),$(view.el),App.getCurrentScreenData(),App.getPreviousScreenMemoryData()]
-					).done(function(){
-						 renderSubRegions();
-						 vent.trigger('screen:showed',App.getCurrentScreenData(),currentView);
-					}).fail(function(){
-						//Note : Hooks.doActions doesn't handle a fail case for now,
-						//but it may in the future!
-						renderSubRegions();
-						vent.trigger('screen:showed:failed',App.getCurrentScreenData(),currentView);
-					});
-				}else{
-					$el.empty().append(view.el);
+			var $el = $(el);
+
+			vent.trigger('screen:before-transition',App.getCurrentScreenData(),currentView,custom_rendering);
+
+			if( custom_rendering ){
+				Hooks.doActions(
+					'screen-transition',
+					[$el,$('div:first-child',$el),$(view.el),App.getCurrentScreenData(),App.getPreviousScreenMemoryData()]
+				).done(function(){
+					 renderSubRegions();
+					 vent.trigger('screen:showed',App.getCurrentScreenData(),currentView,first_static_opening);
+				}).fail(function(){
+					//Note : Hooks.doActions doesn't handle a fail case for now,
+					//but it may in the future!
 					renderSubRegions();
-					vent.trigger('screen:showed',App.getCurrentScreenData(),currentView);
-				}
-				
-				if(view.onShow) {
-	     	        view.onShow();
-	     	   	}
-	    	}else{
-	    		//TODO : we should apply custom rendering logic here too...
-	    		Utils.log('Re-open existing static view',{view:view});
-	    		$(el).empty().append(view.el);
-	    		renderSubRegions();
-				vent.trigger('screen:showed',App.getCurrentScreenData(),currentView);
-	    	}
-	    	
+					vent.trigger('screen:showed:failed',App.getCurrentScreenData(),currentView,first_static_opening);
+				});
+			}else{
+				$el.empty().append(view.el);
+				renderSubRegions();
+				vent.trigger('screen:showed',App.getCurrentScreenData(),currentView,first_static_opening);
+			}
+
+			if(view.onShow) {
+				view.onShow();
+			}
 	    };
 	    
 	    var showView = function(view,force_no_waiting){
 	    	
 	    	var no_waiting = force_no_waiting != undefined && force_no_waiting == true;
 
-	    	if( !view.isStatic || !$(view.el).html().length ){
+	    	if( !view.is_static || !$(view.el).html().length ){
 
 	    		if( !no_waiting ){
 	    			region.startWaiting();
 	    		}
 		    	
-		    	if( view.loadViewData ){
-			    	view.loadViewData(function(){
-			    		showSimple(view);
-			    		if( !no_waiting ){
-			    			region.stopWaiting();
-			    		}
-			    	});
-		    	}else{
-		    		showSimple(view);
-		    		if( !no_waiting ){
-		    			region.stopWaiting();
-		    		}
-		    	}
+				showSimple(view);
+				
+				if( !no_waiting ){
+					region.stopWaiting();
+				}
 		    	
 	    	}else{
-	    		if( !no_waiting ){
-	    			showSimple(view);
-	    		}
+	    		showSimple(view);
 	    	}
 	    };
 	    
@@ -251,22 +241,121 @@ define(function (require) {
 	    	var custom_rendering = App.getParam('custom-screen-rendering');
 	    	
 	    	if( currentView ){
-	    		if( !custom_rendering ){ //Custom rendering must handle views closing by itself (on screen:leave)
-	    			closeView(currentView);
-	    		}
+				if( !custom_rendering ){ //Custom rendering must handle views closing by itself (on screen:leave)
+					closeView(currentView);
+				}
 	    	}
 	    	
 	    	currentView = view;
 		    openView(currentView);
 	    };
+		
+		var screen_static_views = { };
+
+		var getScreenId = function( screen ) {
+			return screen.fragment + '-' + String( screen.item_id );
+		};
+
+		var getScreenStaticView = function( screen ) {
+			var screen_id = getScreenId( screen );
+			return screen_static_views.hasOwnProperty( screen_id ) ? screen_static_views[screen_id] : null;
+		};
+
+		var memorizeScreenStaticView = function( screen, view ) {
+			screen_static_views[getScreenId( screen )] = view;
+		};
 	    
-	    region.show = function(view,force_flush,force_no_waiting) {
-	    	vent.trigger('screen:leave',App.getCurrentScreenData(),App.getQueriedScreen(),currentView);
-	    	
-			App.addQueriedScreenToHistory(force_flush);
+	    var switchScreen = function( view, force_flush, force_no_waiting ) {
+			var queried_screen = App.getQueriedScreen();
+			vent.trigger( 'screen:leave', App.getCurrentScreenData(), queried_screen, currentView );
+
+			App.addQueriedScreenToHistory( force_flush );
+			if ( view.is_static ) {
+				memorizeScreenStaticView( queried_screen, view );
+			}
+
+			showView( view, force_no_waiting );
+		};
+		
+		var createNewView = function( view_type, view_data, is_static, callback ) {
 			
-	    	showView(view,force_no_waiting);
-	    };
+			var return_view = function( view ){
+				view.is_static = is_static;
+				callback( view );
+			};
+			
+			switch ( view_type ) {
+				case 'single':
+					require( [ "core/views/single" ], function( SingleView ) {
+						return_view( new SingleView( view_data ) );
+					} );
+					break;
+				case 'page':
+					require( [ "core/views/page" ], function( PageView ) {
+						return_view( new PageView( view_data ) );
+					} );
+					break;
+				case 'posts-list':
+					require( [ "core/views/archive" ], function( ArchiveView ) {
+						return_view( new ArchiveView( view_data ) );
+					} );
+					break;
+				case 'favorites':
+					require( [ "core/views/favorites" ], function( FavoritesView ) {
+						return_view( new FavoritesView( view_data ) );
+					} );
+					break;
+				case 'hooks':
+					require( [ "core/views/custom-component" ], function( CustomComponentView ) {
+						return_view( new CustomComponentView( view_data ) );
+					} );
+					break;
+				case 'comments':
+					require( [ "core/views/comments" ], function( CommentsView ) {
+						return_view( new CommentsView( view_data ) );
+					} );
+					break;
+				case 'custom-page':
+					require( [ "core/views/custom-page" ], function( CustomPageView ) {
+						return_view( new CustomPageView( view_data ) );
+					} );
+					break;
+			}
+			
+		};
+		
+		region.show = function( view_type, view_data, screen_data ) {
+			App.setQueriedScreen( screen_data );
+			var queried_screen = App.getQueriedScreen();
+
+			/**
+			 * Use this 'is-static-screen' filter to decide whether a screen
+			 * is static or not. A static screen is never refreshed or re-rendered
+			 * by the app core.
+			 */
+			var is_static = Hooks.applyFilters( 'is-static-screen', false, [ queried_screen ] )
+
+			if ( is_static ) {
+				var screen_view = getScreenStaticView( queried_screen );
+				if ( screen_view !== null ) {
+					screen_view.checkTemplate( function() {
+						switchScreen( screen_view );
+					} );
+				} else {
+					createNewView( view_type, view_data, is_static, function( newview ) {
+						newview.checkTemplate( function() {
+							switchScreen( newview );
+						} );
+					} );
+				}
+			} else {
+				createNewView( view_type, view_data, is_static, function( newview ) {
+					newview.checkTemplate( function() {
+						switchScreen( newview );
+					} );
+				} );
+			}
+		}
 	    
 	    region.getCurrentView = function(){
 	    	return currentView;
