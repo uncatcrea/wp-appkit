@@ -9,6 +9,7 @@ class WpakAddon {
 	protected $js_files = array();
 	protected $css_files = array();
 	protected $html_files = array();
+	protected $template_files = array();
 	protected $app_static_data_callback = null;
 	protected $app_static_data = null;
 	protected $app_dynamic_data_callback = null;
@@ -120,6 +121,32 @@ class WpakAddon {
 		}
 	}
 	
+	public function add_template( $template_file ) {
+
+		$file_type = pathinfo( $template_file, PATHINFO_EXTENSION );
+		if( $file_type !== 'html' ){
+			return;
+		}
+		
+		$full_template_file = '';
+
+		if ( strpos( $template_file, $this->directory ) !== false ) {
+			$full_template_file = $template_file;
+			$template_file = ltrim( str_replace( $this->directory, '', $template_file ), '/\\' );
+		} else {
+			$template_file = ltrim( $template_file, '/\\' );
+			$full_template_file = $this->directory . '/' . $template_file;
+		}
+
+		if ( file_exists( $full_template_file ) ) {
+			if ( !in_array( $template_file, $this->template_files ) ) {
+				$this->template_files[] = array( 
+					'file' => $template_file
+				);
+			}
+		}
+	}
+	
 	/**
 	 * Set the addon callback that will retrieve additionnal addon static data 
 	 * (added to config.js) specific to a given app.
@@ -158,6 +185,8 @@ class WpakAddon {
 
 	public function get_asset_file( $file_relative_to_addon ) {
 
+		$found = false;
+				
 		$file_type = pathinfo( $file_relative_to_addon, PATHINFO_EXTENSION );
 		if ( isset( $this->{$file_type . '_files'} ) ) {
 			foreach ( $this->{$file_type . '_files'} as $file ) {
@@ -168,6 +197,16 @@ class WpakAddon {
 			}
 		}
 
+		//html files can also be templates :
+		if( !$found && $file_type == 'html' ) {
+			foreach ( $this->{'template_files'} as $file ) {
+				if ( $file_relative_to_addon == $file['file'] ) {
+					$found = true;
+					break;
+				}
+			}
+		}
+		
 		$file_full_path = $this->directory . '/' . $file_relative_to_addon;
 
 		return $found && file_exists( $file_full_path ) ? $file_full_path : false;
@@ -188,6 +227,7 @@ class WpakAddon {
 			'js_files' => $this->js_files,
 			'css_files' => $this->css_files,
 			'html_files' => $this->html_files,
+			'template_files' => $this->template_files,
 			'app_data' => $this->app_static_data
 		);
 	}
@@ -195,7 +235,7 @@ class WpakAddon {
 	public function get_all_files( $indexed_by_type = false ) {
 		$all_files = array();
 
-		$file_types = array( 'js', 'css', 'html' );
+		$file_types = array( 'js', 'css', 'html', 'template' );
 
 		foreach ( $file_types as $file_type ) {
 			if ( isset( $this->{$file_type . '_files'} ) ) {

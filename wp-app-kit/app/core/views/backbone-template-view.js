@@ -34,7 +34,18 @@ define(function (require) {
     	 */
     	checkTemplate : function(cb_ok,cb_error){
         	var _this = this;
-        	require(['text!theme/'+ this.template_name +'.html'],
+			
+			var template_file = 'text!';
+			
+			if( this.template_name.match(/^addons\//g) ) {
+				template_file += this.template_name;
+			} else {
+				template_file += 'theme/'+ this.template_name;
+			}
+					
+			template_file += '.html';
+			
+        	require([template_file],
   					function(tpl){
   						_this.template = _.template(tpl);
   						cb_ok();

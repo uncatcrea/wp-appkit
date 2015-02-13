@@ -15,7 +15,7 @@ define( function( require, exports ) {
 			App = require( 'core/app' ),
 			Hooks = require( 'core/lib/hooks' ),
 			TemplateTags = require( 'core/theme-tpl-tags' ),
-			PhoneGap = require( 'core/phonegap-utils' );
+			PhoneGap = require( 'core/phonegap/utils' );
 
 	var themeApp = { };
 
@@ -488,14 +488,36 @@ define( function( require, exports ) {
 	};
 
 	/************************************************
-	 * App infos management
+	 * App custom pages and custom routes management
 	 */
 
-	themeApp.showCustomPage = function( template, data ) {
+	themeApp.showCustomPage = function( template, data, id ) {
 		if ( template === undefined ) {
 			template = 'custom';
 		}
-		App.showCustomPage( template, data );
+		if ( data === undefined ) {
+			data = {};
+		}
+		if ( id === undefined ) {
+			id = 'auto-custom-page';
+		}
+		App.showCustomPage( template, data, id );
+	};
+	
+	themeApp.addCustomRoute = function( fragment, template, data ) {
+		fragment = fragment.replace('#','');
+		if ( template === undefined ) {
+			template = 'custom';
+		}
+		if ( data === undefined ) {
+			data = {};
+		}
+		App.addCustomRoute( fragment, template, data );
+	};
+	
+	themeApp.removeCustomRoute = function( fragment ) {
+		fragment = fragment.replace('#','');
+		App.removeCustomRoute( fragment );
 	};
 
 	/**
