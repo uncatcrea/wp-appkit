@@ -11,8 +11,16 @@ class WpakAddons {
 		add_action( 'init', array( __CLASS__, 'rewrite_rules' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'template_redirect' ), 5 );
 		if ( is_admin() ) {
+			add_action( 'load-post.php', array( __CLASS__, 'include_app_addons_php' ) );
 			add_action( 'add_meta_boxes', array( __CLASS__, 'add_main_meta_box' ), 20 );
 			add_action( 'save_post', array( __CLASS__, 'save_post' ) );
+		}
+	}
+
+	public static function include_app_addons_php() {
+		global $typenow;
+		if ( $typenow == 'wpak_apps' && !empty( $_GET['post'] ) ) {
+			self::require_app_addons_php_files( intval( $_GET['post'] ) );
 		}
 	}
 
@@ -190,6 +198,19 @@ class WpakAddons {
 		if ( !empty( $app_addons_raw ) ) {
 			foreach ( $app_addons_raw as $addon_slug => $app_addon_raw ) {
 				$app_addons_dyn_data[$addon_slug] = $app_addon_raw->get_dynamic_data();
+			}
+		}
+		
+		return $app_addons_dyn_data;
+	}
+	
+	public static function require_app_addons_php_files( $app_id_or_slug ){
+		$app_addons_dyn_data = array();
+		
+		$app_addons_raw = self::get_app_addons( $app_id_or_slug );
+		if ( !empty( $app_addons_raw ) ) {
+			foreach ( $app_addons_raw as $addon_slug => $app_addon_raw ) {
+				$app_addon_raw->require_php_files();
 			}
 		}
 		

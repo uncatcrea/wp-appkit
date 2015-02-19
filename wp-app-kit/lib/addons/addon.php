@@ -9,6 +9,7 @@ class WpakAddon {
 	protected $js_files = array();
 	protected $css_files = array();
 	protected $html_files = array();
+	protected $php_files = array();
 	protected $template_files = array();
 	protected $app_static_data_callback = null;
 	protected $app_static_data = null;
@@ -147,6 +148,44 @@ class WpakAddon {
 		}
 	}
 	
+	/**
+	 * PHP files that are included only if the addon is activated
+	 * for a given app.
+	 */
+	public function require_php( $php_file ) {
+		$file_type = pathinfo( $php_file, PATHINFO_EXTENSION );
+		if( $file_type !== 'php' ){
+			return;
+		}
+		
+		$full_php_file = '';
+
+		if ( strpos( $php_file, $this->directory ) !== false ) {
+			$full_php_file = $php_file;
+			$php_file = ltrim( str_replace( $this->directory, '', $php_file ), '/\\' );
+		} else {
+			$php_file = ltrim( $php_file, '/\\' );
+			$full_php_file = $this->directory . '/' . $php_file;
+		}
+		
+		if ( file_exists( $full_php_file ) ) {
+			if ( !in_array( $php_file, $this->php_files ) ) {
+				$this->php_files[] = array( 
+					'file' => $php_file
+				);
+			}
+		}
+	}
+	
+	public function require_php_files() {
+		foreach ( $this->php_files as $php_file ) {
+			$full_php_file = $this->directory . '/' . $php_file['file'];
+			if ( file_exists( $full_php_file ) ) {
+				require_once( $full_php_file );
+			}
+		}
+	}
+
 	/**
 	 * Set the addon callback that will retrieve additionnal addon static data 
 	 * (added to config.js) specific to a given app.

@@ -16,6 +16,8 @@ class WpakComponents {
 		$components = array();
 		$components_data = array();
 
+		WpakAddons::require_app_addons_php_files( $app_id );
+		
 		$components_raw = WpakComponentsStorage::get_components( $app_id );
 
 		if ( !empty( $components_raw ) ) {

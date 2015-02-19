@@ -185,6 +185,8 @@ class WpakComponentsBoSettings {
 		$action = $_POST['wpak_action'];
 		$params = $_POST['params'];
 
+		WpakAddons::require_app_addons_php_files( intval($_POST['post_id']) );
+		
 		echo WpakComponentsTypes::get_ajax_action_html_answer( $component_type, $action, $params );
 		exit();
 	}
@@ -197,6 +199,8 @@ class WpakComponentsBoSettings {
 			exit();
 		}
 
+		WpakAddons::require_app_addons_php_files( intval($_POST['post_id']) );
+		
 		WpakComponentsTypes::echo_form_fields( $component_type );
 		exit();
 	}
@@ -211,6 +215,8 @@ class WpakComponentsBoSettings {
 
 		$action = $_POST['wpak_action'];
 		$data = $_POST['data'];
+		
+		WpakAddons::require_app_addons_php_files( intval($_POST['post_id']) );
 
 		if ( $action == 'add_or_update' ) {
 
