@@ -320,6 +320,8 @@ define(function (require) {
 						return_view( new CustomPageView( view_data ) );
 					} );
 					break;
+				//TODO : we could add a filter here to allow using a 
+				//customized not native view type created by an addon.
 			}
 			
 		};

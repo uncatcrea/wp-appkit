@@ -48,7 +48,6 @@ define(function (require) {
 			route_asked = 'component-'+ component_id;
         	require(["core/app"],function(App){
         		var component = App.getComponentData(component_id);
-
         		if( component ) {
 					if( check_route('component-'+ component_id) ){
 						switch( component.type ){
@@ -77,6 +76,21 @@ define(function (require) {
 									{component:component},
 									{screen_type:'custom-component',component_id:component_id,item_id:0,global:component.global,data:component.data,label:component.label}
 								);
+								break;
+							default:
+								var screen_view_data = {
+									view_type: '',
+									view_data: {},
+									screen_data: {}
+								};
+								screen_view_data = Hooks.applyFilters('component-custom-type',screen_view_data,[component]);
+								if( screen_view_data.view_type !== '' ) {
+									RegionManager.show(
+										screen_view_data.view_type,
+										screen_view_data.view_data,
+										screen_view_data.screen_data
+									);
+								}
 								break;
 						}
 					}

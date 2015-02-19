@@ -576,6 +576,29 @@ define( function( require, exports ) {
     	}
     };
 
+	/**************************************************
+	 * Retrieve internal app data that can be useful in themes
+	 */
+
+	themeApp.getGlobalItems = function( global_key, items_ids, result_type ) {
+		var items = null;
+		
+		if( result_type === undefined ) {
+			result_type = 'slice';
+		}
+		
+		switch( result_type ) {
+			case 'slice' :
+				items = App.getGlobalItemsSlice( global_key, items_ids );
+				break;
+			case 'array' :
+				items = App.getGlobalItems( global_key, items_ids );
+				break;
+		}
+		
+		return items;
+	};
+	
 	//Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
 	//a circular dependency for requirejs) can both be required at the same time
 	//(in theme functions.js for example) :

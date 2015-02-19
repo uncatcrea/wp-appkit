@@ -756,6 +756,7 @@ define(function (require) {
     	  var component_data = null;
 
     	  var component = app.components.get(component_id);
+		  
     	  if( component ){
     		  var component_type = component.get('type');
     		  switch(component_type){
@@ -854,6 +855,17 @@ define(function (require) {
   			    		  );
     		  		  }
 	    			  break;
+				  default:
+						component_data = {
+							type: '',
+							view_data: {},
+							data: {}
+						};
+						component_data = Hooks.applyFilters('component-data',component_data,[component]);
+						if( component_data.type == '' ) {
+							component_data = null;
+						}
+						break;
     		  }
     	  };
 
@@ -864,19 +876,48 @@ define(function (require) {
     	  return component_data;
       };
 
-      app.getGlobalItems = function(global_key,items_ids){
+      app.getGlobalItems = function(global_key,items_ids,raw_items){
     	  var items = []; //Must be an array (and not JSON object) to keep items order.
+
+		  raw_items = raw_items === undefined ? false : ( raw_items === true );
 
     	  if( _.has(app.globals,global_key) ){
 			  var global = app.globals[global_key];
-			  _.each(items_ids,function(item_id, index){
-				  var item = global.get(item_id);
-				  items.push(item ? item.toJSON() : null);
-			  });
+			  if( items_ids !== undefined && items_ids.length ) {
+				_.each(items_ids,function(item_id, index){
+					var item = global.get(item_id);
+					if( item ) {
+						items.push( raw_items ? item : item.toJSON() );
+					}
+				});
+			  } else {
+				  global.each( function(item, key){
+					  items.push( raw_items ? item : item.toJSON() );
+				  });
+			  }
     	  }
 
     	  return items;
       };
+	  
+	  app.getGlobalItemsSlice = function( global_key, items_ids ) {
+			var items = new Items.ItemsSlice();
+
+			if ( _.has( app.globals, global_key ) ) {
+				var global = app.globals[global_key];
+				if ( items_ids !== undefined && items_ids.length ) {
+					_.each( items_ids, function( post_id ) {
+						items.add( global.get( post_id ) );
+					} );
+				} else {
+					global.each( function(item, key){
+					  items.add( item );
+				  });
+				}
+			}
+
+			return items;
+	  }
 
       app.getGlobalItem = function(global_key,item_id){
     	  var item = null;
