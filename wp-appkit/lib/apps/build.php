@@ -16,7 +16,7 @@ class WpakBuild {
 	public static function add_meta_boxes() {
 		add_meta_box(
 			'wpak_simulation_box',
-			__( 'App Simulation', WpAppKit::i18n_domain ),
+			__( 'Dev tools', WpAppKit::i18n_domain ),
 			array( __CLASS__, 'inner_simulation_box' ),
 			'wpak_apps',
 			'side',
@@ -62,6 +62,7 @@ class WpakBuild {
 		</div>
 		<?php wp_nonce_field( 'wpak-simulation-data-' . $post->ID, 'wpak-nonce-simulation-data' ) ?>
 		<?php
+		do_action( 'wpak_inner_simulation_box', $post, $current_box );
 	}
 
 	public static function inner_export_box( $post, $current_box ) {
@@ -411,7 +412,7 @@ class WpakBuild {
 					}
 				}
 			}
-			
+
 			//Add addons files :
 			if ( !empty( $addons ) ) {
 				foreach ( $addons as $addon ) {
