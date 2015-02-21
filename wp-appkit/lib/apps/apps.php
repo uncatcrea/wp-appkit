@@ -76,6 +76,16 @@ class WpakApps {
 	}
 
 	public static function add_main_meta_box() {
+		remove_meta_box( 'submitdiv', 'wpak_apps', 'side' );
+
+		add_meta_box(
+			'wpak_app_publish',
+			__( 'Publish', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_publish_box' ),
+			'wpak_apps',
+			'side',
+			'high'
+		);
 
 		add_meta_box(
 			'wpak_app_main_infos',
@@ -99,6 +109,44 @@ class WpakApps {
 			'default'
 		);
 
+	}
+
+	public static function inner_publish_box( $post, $current_box ) {
+		?>
+		<div class="submitbox" id="submitpost">
+			<div style="display:none;">
+				<?php submit_button( __( 'Save' ), 'button', 'save' ); ?>
+			</div>
+
+			<div id="major-publishing-actions">
+				<div id="delete-action">
+					<?php
+					if ( current_user_can( "delete_post", $post->ID ) ) {
+						if ( !EMPTY_TRASH_DAYS )
+							$delete_text = __( 'Delete Permanently' );
+						else
+							$delete_text = __( 'Move to Trash' );
+						?>
+					<a class="submitdelete deletion" href="<?php echo get_delete_post_link( $post->ID ); ?>"><?php echo $delete_text; ?></a><?php
+					} ?>
+				</div>
+
+				<div id="publishing-action">
+					<span class="spinner"></span>
+					<?php
+					if ( !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID ) { ?>
+						<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Publish' ) ?>" />
+						<?php submit_button( __( 'Save' ), 'primary button-large', 'publish', false, array( 'accesskey' => 'p' ) );
+					} else { ?>
+						<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Update' ) ?>" />
+						<?php submit_button( __( 'Update' ), 'primary button-large', 'save', false, array( 'accesskey' => 'p', 'id' => 'publish' ) ); ?>
+					<?php
+					} ?>
+				</div>
+				<div class="clear"></div>
+			</div>
+		</div>
+		<?php
 	}
 
 	public static function inner_main_infos_box( $post, $current_box ) {
