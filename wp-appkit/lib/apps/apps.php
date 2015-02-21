@@ -8,8 +8,9 @@ class WpakApps {
 		add_action( 'init', array( __CLASS__, 'apps_custom_post_type' ) );
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array( __CLASS__, 'add_settings_panels' ) );
-			add_action( 'add_meta_boxes', array( __CLASS__, 'add_main_meta_box' ), 10 );
+			add_action( 'add_meta_boxes', array( __CLASS__, 'add_main_meta_box' ), 29 );
 			add_action( 'add_meta_boxes', array( __CLASS__, 'add_phonegap_meta_box' ), 30 ); //30 to pass after the "Simulation" and "Export" boxes (see WpakBuild)
+			add_action( 'wpak_inner_simulation_box', array( __CLASS__, 'inner_security_box' ), 10, 2 );
 			add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 			add_filter( 'post_row_actions', array( __CLASS__, 'remove_quick_edit' ), 10, 2 );
 			add_action( 'admin_head', array( __CLASS__, 'add_icon' ) );
@@ -98,15 +99,6 @@ class WpakApps {
 			'default'
 		);
 
-		add_meta_box(
-			'wpak_app_security',
-			__( 'Security', WpAppKit::i18n_domain ),
-			array( __CLASS__, 'inner_security_box' ),
-			'wpak_apps',
-			'side',
-			'default'
-		);
-
 	}
 
 	public static function inner_main_infos_box( $post, $current_box ) {
@@ -179,13 +171,7 @@ class WpakApps {
 		$secured = self::get_app_is_secured( $post->ID );
 		$simulation_secured = self::get_app_simulation_is_secured( $post->ID );
 		?>
-		<label><?php _e( 'Secured web services', WpAppKit::i18n_domain ) ?></label> : <br/>
-		<span class="description"><?php _e( "If activated, adds a security token to web services urls.", WpAppKit::i18n_domain ) ?></span><br/>
-		<select name="wpak_app_secured">
-			<option value="1" <?php echo $secured ? 'selected="selected"' : '' ?>><?php _e( 'Yes', WpAppKit::i18n_domain ) ?></option>
-			<option value="0" <?php echo!$secured ? 'selected="selected"' : '' ?>><?php _e( 'No', WpAppKit::i18n_domain ) ?></option>
-		</select>
-		<br/><br/>
+		<br/>
 		<label><?php _e( 'Private App simulation', WpAppKit::i18n_domain ) ?></label> : <br/>
 		<span class="description"><?php _e( 'If activated, only connected users with right permissions can access the app simulation in web browser.<br/>If deactivated, the app simulation is publicly available in any browser, including the config.js and config.xml files, that can contain sensitive data.', WpAppKit::i18n_domain ) ?></span>
 		<br/>
@@ -273,10 +259,6 @@ class WpakApps {
 		if ( isset( $_POST['wpak_app_icons'] ) ) {
 			$app_icons = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $_POST['wpak_app_icons'] );
 			update_post_meta( $post_id, '_wpak_app_icons', trim( $app_icons ) );
-		}
-
-		if ( isset( $_POST['wpak_app_secured'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_secured', sanitize_text_field( $_POST['wpak_app_secured'] ) );
 		}
 
 		if ( isset( $_POST['wpak_app_simulation_secured'] ) ) {
@@ -412,9 +394,7 @@ class WpakApps {
 	}
 
 	public static function get_app_is_secured( $post_id ) {
-		$secured_raw = get_post_meta( $post_id, '_wpak_app_secured', true );
-		$secured_raw = $secured_raw === '' || $secured_raw === false ? 1 : $secured_raw;
-		return intval( $secured_raw ) == 1;
+		return apply_filters( 'wpak_app_secured', true );
 	}
 
 	public static function get_app_simulation_is_secured( $post_id ) {
