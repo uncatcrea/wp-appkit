@@ -8,6 +8,7 @@ class WpakApps {
 		add_action( 'init', array( __CLASS__, 'apps_custom_post_type' ) );
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array( __CLASS__, 'add_settings_panels' ) );
+			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
 			add_action( 'admin_print_styles', array( __CLASS__, 'admin_print_styles' ) );
 			add_action( 'add_meta_boxes', array( __CLASS__, 'add_main_meta_box' ), 29 );
 			add_action( 'add_meta_boxes', array( __CLASS__, 'add_phonegap_meta_box' ), 30 ); //30 to pass after the "Simulation" and "Export" boxes (see WpakBuild)
@@ -15,6 +16,13 @@ class WpakApps {
 			add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 			add_filter( 'post_row_actions', array( __CLASS__, 'remove_quick_edit' ), 10, 2 );
 			add_action( 'admin_head', array( __CLASS__, 'add_icon' ) );
+		}
+	}
+
+	public static function admin_enqueue_scripts() {
+		global $pagenow, $typenow;
+		if ( ($pagenow == 'post.php' || $pagenow == 'post-new.php') && $typenow == 'wpak_apps' ) {
+			wp_enqueue_script( 'wpak_apps_js', plugins_url( 'lib/apps/apps.js', dirname( dirname( __FILE__ ) ) ), array( 'jquery' ), WpAppKit::resources_version );
 		}
 	}
 

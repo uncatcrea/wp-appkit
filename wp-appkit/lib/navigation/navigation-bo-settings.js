@@ -1,11 +1,12 @@
 var WpakNavigation = (function ($){
-		
+
 		var wpak = {};
-		
+		var subject = new Subject();
+
 		var get_parent_form_id = function(element){
 			return $(element).closest('div.navigation-item-form').attr('id');
 		};
-		
+
 		wpak.ajax_add_or_edit_navigation_row = function(data,callback){
 
 			var data = {
@@ -15,22 +16,23 @@ var WpakNavigation = (function ($){
 				post_id: wpak_navigation.post_id,
 				nonce: wpak_navigation.nonce
 			};
-			
+
 			$.ajax({
 			  type: "POST",
 			  url: ajaxurl,
 			  data: data,
 			  success: function(answer) {
 				  callback(answer);
+				  subject.notify( answer );
 			  },
 			  error: function(jqXHR, textStatus, errorThrown){
 				  callback({'ok':0,'type':'error','message':'Error submitting data'}); //TODO translate js messages
 			  },
 			  dataType: 'json'
 			});
-			
+
 		};
-		
+
 		wpak.ajax_delete_navigation_row = function(post_id,navigation_item_id,callback){
 
 			var data = {
@@ -40,13 +42,14 @@ var WpakNavigation = (function ($){
 				post_id: wpak_navigation.post_id,
 				nonce: wpak_navigation.nonce
 			};
-			
+
 			$.ajax({
 				  type: "POST",
 				  url: ajaxurl,
 				  data: data,
 				  success: function(answer) {
 					  callback(answer);
+				  	  subject.notify( answer );
 				  },
 				  error: function(jqXHR, textStatus, errorThrown){
 					  callback({'ok':0,'type':'error','message':'Error deleting navigation item'}); //TODO translate js messages
@@ -54,7 +57,7 @@ var WpakNavigation = (function ($){
 				  dataType: 'json'
 			});
 		};
-		
+
 		wpak.ajax_move_navigation_row = function(post_id,positions,callback){
 
 			var data = {
@@ -64,7 +67,7 @@ var WpakNavigation = (function ($){
 				post_id: wpak_navigation.post_id,
 				nonce: wpak_navigation.nonce
 			};
-			
+
 			$.ajax({
 				  type: "POST",
 				  url: ajaxurl,
@@ -78,7 +81,7 @@ var WpakNavigation = (function ($){
 				  dataType: 'json'
 			});
 		};
-		
+
 		wpak.ajax_edit_navigation_item_option = function(navigation_item_id,option,value,callback){
 
 			var data = {
@@ -88,7 +91,7 @@ var WpakNavigation = (function ($){
 				post_id: wpak_navigation.post_id,
 				nonce: wpak_navigation.nonce
 			};
-			
+
 			$.ajax({
 				  type: "POST",
 				  url: ajaxurl,
@@ -102,17 +105,17 @@ var WpakNavigation = (function ($){
 				  dataType: 'json'
 			});
 		};
-		
+
 		//Called hereunder AND from components-bo-settings.js to refresh available components for navigation
 		//when adding/editing components :
 		wpak.refresh_available_components = function(post_id){
-			
+
 			var data = {
 				action: 'wpak_update_available_components',
 				post_id: wpak_navigation.post_id,
 				nonce: wpak_navigation.nonce
 			};
-			
+
 			$.ajax({
 				  type: "POST",
 				  url: ajaxurl,
@@ -128,14 +131,22 @@ var WpakNavigation = (function ($){
 				  dataType: 'json'
 			});
 		};
-		
+
+		wpak.addObserver = function( newObserver ) {
+			subject.observe( newObserver );
+		};
+
+		wpak.removeObserver = function( deleteObserver ) {
+			subject.unobserve( deleteObserver );
+		};
+
 		return wpak;
-		
+
 })(jQuery);
 
 jQuery().ready(function(){
 	var $ = jQuery;
-	
+
 	function serializeObject(a){
 	    var o = {};
 	    $.each(a, function() {
@@ -150,15 +161,15 @@ jQuery().ready(function(){
 	    });
 	    return o;
 	};
-	
+
 	function display_feedback(type,message){
 		$('#navigation-feedback').removeClass().addClass(type).html(message).show();
-	}; 
-	
+	};
+
 	function hide_feedback(){
 		$('#navigation-feedback').hide();
-	}; 
-	
+	};
+
 	$('#navigation-wrapper').on('click','a.navigation-form-submit',function(e){
 		e.preventDefault();
 		$('#navigation-feedback').hide();
@@ -185,7 +196,7 @@ jQuery().ready(function(){
 			});
 		}
 	});
-	
+
 	$('#navigation-wrapper').on('click','a.delete_navigation_item',function(e){
 		e.preventDefault();
 		$('#navigation-feedback').hide();
@@ -201,7 +212,7 @@ jQuery().ready(function(){
 			});
 		}
 	});
-	
+
 	$('table#navigation-items-table tbody').sortable({
 		axis: "y",
 		stop: function( event, ui ) {
@@ -223,17 +234,17 @@ jQuery().ready(function(){
 			return ui;
 		}
 	});
-	
+
 	$('#add-new-item').click(function(e){
 		e.preventDefault();
 		$('#new-item-form').slideToggle();
 	});
-	
+
 	$('#navigation-wrapper').on('click','#cancel-new-item',function(e){
 		e.preventDefault();
 		$('#new-item-form').slideUp();
 	});
-	
+
 	$('#navigation-wrapper').on('click','.change-icon-slug',function(e){
 		e.preventDefault();
 		var nav_item_id = $(this).data('id');
@@ -242,7 +253,7 @@ jQuery().ready(function(){
 		var value = $('#span-'+ nav_item_id).html();
 		$('#icon-'+ nav_item_id).val(value !== 'none' ? value : '').focus();
 	});
-	
+
 	$('#navigation-wrapper').on('click','.change-icon-slug-ok',function(e){
 		e.preventDefault();
 		var nav_item_id = $(this).data('id');
@@ -257,14 +268,14 @@ jQuery().ready(function(){
 			display_feedback(answer.type,answer.message);
 		});
 	});
-	
+
 	$('#navigation-wrapper').on('click','.change-icon-slug-cancel',function(e){
 		e.preventDefault();
 		var nav_item_id = $(this).data('id');
 		$('#nav-item-input-'+ nav_item_id).hide();
 		$('#nav-item-value-'+ nav_item_id).show();
 	});
-	
+
 	$('.menu-item-icon-input').bind('keypress', function(e){
 		if ( e.keyCode == 13 ) {
 			var nav_item_id = $(this).data('id');
@@ -272,5 +283,5 @@ jQuery().ready(function(){
 			e.preventDefault();
 		}
 	});
-	
+
 });
