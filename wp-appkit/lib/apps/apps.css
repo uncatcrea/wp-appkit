@@ -1,0 +1,14 @@
+#wpak_app_publish .inside {
+    margin: 0;
+    padding: 0;
+}
+
+#wpak_app_wizard li.ok {
+    font-weight:400;
+    color:#0f0;
+}
+
+#wpak_app_wizard li.nok {
+    font-weight:700;
+    color:#f00;
+}
