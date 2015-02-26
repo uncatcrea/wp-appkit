@@ -120,18 +120,34 @@ class WpakApps {
 	}
 
 	public static function inner_publish_box( $post, $current_box ) {
+		$first_save = !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID;
+		$classes = array(
+			'title' => ( !empty( $post->post_title ) ? 'ok' : 'nok' ),
+			'components' => ( !empty( WpakComponents::get_app_components( $post->ID ) ) ? 'ok' : 'nok' ),
+			'navigation' => ( !empty( WpakNavigation::get_app_navigation( $post->ID ) ) ? 'ok' : 'nok' ),
+			'save' => ( !$first_save ? 'ok' : 'nok' ),
+		);
 		?>
 		<div class="submitbox" id="submitpost">
 			<div style="display:none;">
 				<?php submit_button( __( 'Save' ), 'button', 'save' ); ?>
 			</div>
 
+			<div id="minor-publishing">
+				<div id="minor-publishing-actions">
+					<div id="preview-action">
+						<a href="<?php echo WpakBuild::get_appli_index_url( $post->ID ); ?>" class="preview button" target="_blank"><?php _e( 'Preview', WpAppKit::i18n_domain ) ?></a>
+					</div>
+					<div class="clear"></div>
+				</div>
+			</div>
+
 			<div id="wpak_publish_box">
-				<ol id="">
-					<li class=""><?php _e( 'Define a title', WpAppKit::i18n_domain ); ?></li>
-					<li class=""><?php _e( 'Add components', WpAppKit::i18n_domain ); ?></li>
-					<li class=""><?php _e( 'Setup appearance and navigation', WpAppKit::i18n_domain ); ?></li>
-					<li class=""><?php _e( 'Save your app', WpAppKit::i18n_domain ); ?></li>
+				<ol id="wpak_app_wizard">
+					<li id="wpak_app_wizard_title" class="<?php echo $classes['title']; ?>"><?php _e( 'Define a title', WpAppKit::i18n_domain ); ?></li>
+					<li id="wpak_app_wizard_components" class="<?php echo $classes['components']; ?>"><?php _e( 'Add components', WpAppKit::i18n_domain ); ?></li>
+					<li id="wpak_app_wizard_navigation" class="<?php echo $classes['navigation']; ?>"><?php _e( 'Setup appearance and navigation', WpAppKit::i18n_domain ); ?></li>
+					<li id="wpak_app_wizard_save" class="<?php echo $classes['save']; ?>"><?php _e( 'Save your app', WpAppKit::i18n_domain ); ?></li>
 				</ol>
 			</div>
 
@@ -151,7 +167,7 @@ class WpakApps {
 				<div id="publishing-action">
 					<span class="spinner"></span>
 					<?php
-					if ( !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID ) { ?>
+					if ( $first_save ) { ?>
 						<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Publish' ) ?>" />
 						<?php submit_button( __( 'Save' ), 'primary button-large', 'publish', false, array( 'accesskey' => 'p' ) );
 					} else { ?>
