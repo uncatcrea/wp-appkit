@@ -133,6 +133,7 @@ class WpakApps {
 			'title' => ( !empty( $post->post_title ) ? 'ok' : 'nok' ),
 			'components' => ( !empty( WpakComponents::get_app_components( $post->ID ) ) ? 'ok' : 'nok' ),
 			'navigation' => ( !empty( WpakNavigation::get_app_navigation( $post->ID ) ) ? 'ok' : 'nok' ),
+			'phonegap' => 'nok',
 			'save' => ( !$first_save ? 'ok' : 'nok' ),
 		);
 		?>
@@ -155,6 +156,7 @@ class WpakApps {
 					<li id="wpak_app_wizard_title" class="<?php echo $classes['title']; ?>"><?php _e( 'Define a title', WpAppKit::i18n_domain ); ?></li>
 					<li id="wpak_app_wizard_components" class="<?php echo $classes['components']; ?>"><?php _e( 'Add components', WpAppKit::i18n_domain ); ?></li>
 					<li id="wpak_app_wizard_navigation" class="<?php echo $classes['navigation']; ?>"><?php _e( 'Setup appearance and navigation', WpAppKit::i18n_domain ); ?></li>
+					<li id="wpak_app_wizard_phonegap" class="<?php echo $classes['phonegap']; ?>"><?php _e( 'Setup PhoneGap config', WpAppKit::i18n_domain ); ?></li>
 					<li id="wpak_app_wizard_save" class="<?php echo $classes['save']; ?>"><?php _e( 'Save your app', WpAppKit::i18n_domain ); ?></li>
 				</ol>
 			</div>
