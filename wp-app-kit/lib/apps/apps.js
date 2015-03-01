@@ -34,6 +34,7 @@ jQuery().ready(function(){
         wizard_title = $( '#wpak_app_wizard_title' ),
         wizard_components = $( '#wpak_app_wizard_components' ),
         wizard_navigation = $( '#wpak_app_wizard_navigation' ),
+        wizard_phonegap = $( '#wpak_app_wizard_phonegap' ),
         wizard_save = $( '#wpak_app_wizard_save' ),
         title = $( '#title' ),
         app_title = $( '#wpak_app_title' );
@@ -81,11 +82,40 @@ jQuery().ready(function(){
                     .addClass( 'nok' );
             }
         }
+    };
+
+    function phonegap_ok() {
+        var ret = true;
+        Apps.phonegap_mandatory.map( function( key ) {
+            var input = $( '#wpak_app_' + key );
+            if( input.length && !input.val().length ) {
+                ret = false;
+                return;
+            }
+        });
+
+        return ret;
     }
+
+    var wizard_phonegap_observer = {
+        update: function() {
+            if( phonegap_ok() ) {
+                wizard_phonegap
+                    .removeClass( 'nok' )
+                    .addClass( 'ok' );
+            }
+            else {
+                wizard_phonegap
+                    .removeClass( 'ok' )
+                    .addClass( 'nok' );
+            }
+        }
+    };
 
     WpakComponents.addObserver( wizard_components_observer );
     WpakNavigation.addObserver( wizard_navigation_observer );
     app_title.on( 'keyup', wizard_navigation_observer.update )
     title.on( 'keyup', wizard_title_observer.update );
+    $( 'input, textarea', '#wpak_app_phonegap_data' ).on( 'keyup', wizard_phonegap_observer.update );
 
 });
