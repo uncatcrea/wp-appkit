@@ -127,13 +127,30 @@ class WpakApps {
 
 	}
 
+	public static function get_phonegap_mandatory_fields() {
+		return array(
+			// TODO: Determine which fields are mandatory
+		);
+	}
+
 	public static function inner_publish_box( $post, $current_box ) {
 		$first_save = !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID;
+		$main_infos = self::get_app_main_infos( $post->ID );
+		$mandatory = self::get_phonegap_mandatory_fields();
+		$phonegap = 'ok';
+
+		foreach( $mandatory as $key ) {
+			if( '' === $main_infos[$key] ) {
+				$phonegap = 'nok';
+				break;
+			}
+		}
+
 		$classes = array(
 			'title' => ( !empty( $post->post_title ) ? 'ok' : 'nok' ),
 			'components' => ( !empty( WpakComponents::get_app_components( $post->ID ) ) ? 'ok' : 'nok' ),
 			'navigation' => ( !empty( WpakNavigation::get_app_navigation( $post->ID ) ) ? 'ok' : 'nok' ),
-			'phonegap' => 'nok',
+			'phonegap' => $phonegap,
 			'save' => ( !$first_save ? 'ok' : 'nok' ),
 		);
 		?>
