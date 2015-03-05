@@ -42,12 +42,11 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			load_plugin_textdomain( self::i18n_domain, false, dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
 			self::lib_require();
 		}
-
+		
 		public static function on_activation() {
 			self::lib_require();
-			WpakWebServices::add_rewrite_tags_and_rules();
-			WpakConfigFile::rewrite_rules();
-			WpakThemes::rewrite_rules();
+			
+			self::add_rewrite_rules();
 			flush_rewrite_rules();
 			
 			WpakThemes::create_theme_directory();
@@ -58,28 +57,21 @@ if ( !class_exists( 'WpAppKit' ) ) {
 		}
 
 		public static function init() {
-			WpakWebServices::add_rewrite_tags_and_rules();
-			
-			//Handle specific mobile images sizes :
-			$mobile_images_sizes_default = array(
-				//Example : array( 'name' => 'mobile-featured-thumb', 'width' => 327, 'height' => 218 )
-			);
-
-			/**
-			 * Use this 'wpak_mobile_images_sizes' filter to add custom mobile images sizes
-			 */
-			$mobile_images_sizes = apply_filters( 'wpak_mobile_images_sizes', $mobile_images_sizes_default );
-			if ( !empty( $mobile_images_sizes ) ) {
-				foreach ( $mobile_images_sizes as $image_size ) {
-					add_image_size( $image_size['name'], $image_size['width'], $image_size['height'] );
-				}
-			}
+			self::add_rewrite_rules();
+			WpakComponents::handle_images_sizes();
 		}
 
 		public static function template_redirect() {
 			WpakWebServices::template_redirect();
 		}
+		
+		protected static function add_rewrite_rules() {
+			WpakWebServices::add_rewrite_tags_and_rules();
+			WpakConfigFile::rewrite_rules();
+			WpakThemes::rewrite_rules();
+		}
 
+		
 	}
 
 	WpAppKit::hooks();

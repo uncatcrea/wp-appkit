@@ -55,6 +55,26 @@ class WpakComponents {
 		return $component_data;
 	}
 
+	/**
+	 * Adds custom mobile image sizes only if activated via hook
+	 */
+	public static function handle_images_sizes() {
+		
+		//Handle specific mobile images sizes :
+		$mobile_images_sizes_default = array(
+			//Example : array( 'name' => 'mobile-featured-thumb', 'width' => 327, 'height' => 218 )
+		);
+
+		/**
+		 * Use this 'wpak_mobile_images_sizes' filter to add custom mobile images sizes
+		 */
+		$mobile_images_sizes = apply_filters( 'wpak_mobile_images_sizes', $mobile_images_sizes_default );
+		if ( !empty( $mobile_images_sizes ) ) {
+			foreach ( $mobile_images_sizes as $image_size ) {
+				add_image_size( $image_size['name'], $image_size['width'], $image_size['height'] );
+			}
+		}
+	}
 }
 
 class WpakComponent {
