@@ -21,6 +21,8 @@ if ( !class_exists( 'WpAppKit' ) ) {
 
 			add_action( 'init', array( __CLASS__, 'init' ) );
 			add_action( 'template_redirect', array( __CLASS__, 'template_redirect' ), 5 );
+			
+			add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 		}
 
 		protected static function lib_require() {
@@ -71,7 +73,26 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			WpakThemes::rewrite_rules();
 		}
 
-		
+		/**
+		 * If permalinks are not activated, send an admin notice
+		 */
+		public static function admin_notices() {
+			if ( !get_option( 'permalink_structure' ) ) {
+				?>
+				<div class="error">
+					<p>
+						<?php 
+							_e( 'WP AppKit requires WordPress permalinks to be activated : '
+								. 'see the <a href="http://codex.wordpress.org/Using_Permalinks#Choosing_your_permalink_structure">"Using permalink" Codex section</a> '
+								. 'for more info about how to activate permalinks.', 
+								WpAppKit::i18n_domain 
+							); 
+						?>
+					</p>
+				</div>
+				<?php
+			}
+		}
 	}
 
 	WpAppKit::hooks();
