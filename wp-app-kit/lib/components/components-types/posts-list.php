@@ -172,7 +172,15 @@ class WpakComponentTypePostsList extends WpakComponentType {
 
 		$post_featured_img_id = get_post_thumbnail_id( $post->ID );
 		if ( !empty( $post_featured_img_id ) ) {
-			$featured_img_src = wp_get_attachment_image_src( $post_featured_img_id, 'mobile-featured-thumb' );
+			
+			/**
+			 * Use this 'wpak_post_featured_image_size' to define a specific image
+			 * size to pass to the web service for posts.
+			 * By default the full (original) image size is used.
+			 */
+			$featured_image_size = apply_filters( 'wpak_post_featured_image_size', 'full', $post, $component );
+			
+			$featured_img_src = wp_get_attachment_image_src( $post_featured_img_id, $featured_image_size );
 			@$post_data['thumbnail']['src'] = $featured_img_src[0];
 			$post_data['thumbnail']['width'] = $featured_img_src[1];
 			$post_data['thumbnail']['height'] = $featured_img_src[2];
