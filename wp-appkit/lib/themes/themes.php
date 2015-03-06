@@ -23,7 +23,7 @@ class WpakThemes {
 		$url_to_theme_files = plugins_url( 'app/themes', dirname( dirname( __FILE__ ) ) );
 		$wp_content_pos = strpos( $url_to_theme_files, $wp_content );
 		if ( $wp_content_pos !== false ) {
-			$theme_file_prefix = substr( $url_to_theme_files, $wp_content_pos ); //Something like "wp-content/plugins/wp-app-kit/app/themes"
+			$theme_file_prefix = substr( $url_to_theme_files, $wp_content_pos ); //Something like "wp-content/plugins/wp-appkit/app/themes"
 			add_rewrite_rule( '^' . $theme_file_prefix . '/(.*)$', 'index.php?wpak_theme_file=$matches[1]', 'top' );
 		}
 	}

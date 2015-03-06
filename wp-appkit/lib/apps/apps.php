@@ -71,7 +71,7 @@ class WpakApps {
 
 	public static function add_settings_panels() {
 		$capability_required = current_user_can( 'wpak_edit_apps' ) ? 'wpak_edit_apps' : 'manage_options';
-		add_menu_page( __( 'WP App Kit', WpAppKit::i18n_domain ), __( 'WP App Kit', WpAppKit::i18n_domain ), $capability_required, self::menu_item, array( __CLASS__, 'settings_panel' ) );
+		add_menu_page( __( 'WP AppKit', WpAppKit::i18n_domain ), __( 'WP AppKit', WpAppKit::i18n_domain ), $capability_required, self::menu_item, array( __CLASS__, 'settings_panel' ) );
 	}
 
 	public static function add_main_meta_box() {

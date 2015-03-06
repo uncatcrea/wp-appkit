@@ -138,7 +138,7 @@ class WpakComponentTypePage extends WpakComponentType {
 		/**
 		 * Filter a page content into a page component. Use this to format app pages content your own way.
 		 *
-		 * To apply the default App Kit formating to the content and add only minor modifications to it,
+		 * To apply the default AppKit formating to the content and add only minor modifications to it,
 		 * use the "wpak_post_content_format" filter instead.
 		 *
 		 * @see WpakComponentsUtils::get_formated_content()

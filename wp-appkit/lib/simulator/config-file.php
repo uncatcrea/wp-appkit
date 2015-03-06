@@ -13,7 +13,7 @@ class WpakConfigFile {
 		$url_to_config_file = plugins_url( 'app', dirname( dirname( __FILE__ ) ) );
 		$wp_content_pos = strpos( $url_to_config_file, $wp_content );
 		if ( $wp_content_pos !== false ) {
-			$config_file_prefix = substr( $url_to_config_file, $wp_content_pos ); //Something like "wp-content/plugins/wp-app-kit/app"
+			$config_file_prefix = substr( $url_to_config_file, $wp_content_pos ); //Something like "wp-content/plugins/wp-appkit/app"
 			add_rewrite_rule( '^' . $config_file_prefix . '/(config\.js)$', 'index.php?wpak_appli_file=$matches[1]', 'top' );
 			add_rewrite_rule( '^' . $config_file_prefix . '/(config\.xml)$', 'index.php?wpak_appli_file=$matches[1]', 'top' );
 		}
@@ -46,7 +46,7 @@ class WpakConfigFile {
 					switch ( $file ) {
 						case 'config.js':
 							header( "Content-type: text/javascript;  charset=utf-8" );
-							echo "/* Wp App Kit simulator config.js */\n";
+							echo "/* Wp AppKit simulator config.js */\n";
 							self::get_config_js( $app_id, true );
 							exit();
 						case 'config.xml':

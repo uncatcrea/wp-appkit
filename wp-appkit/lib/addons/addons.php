@@ -35,7 +35,7 @@ class WpakAddons {
 		$url_to_addons_files = plugins_url( 'app/addons', dirname( dirname( __FILE__ ) ) );
 		$wp_content_pos = strpos( $url_to_addons_files, $wp_content );
 		if ( $wp_content_pos !== false ) {
-			$addons_file_prefix = substr( $url_to_addons_files, $wp_content_pos ); //Something like "wp-content/plugins/wp-app-kit/app/addons"
+			$addons_file_prefix = substr( $url_to_addons_files, $wp_content_pos ); //Something like "wp-content/plugins/wp-appkit/app/addons"
 			add_rewrite_rule( '^' . $addons_file_prefix . '/(.*[\.js|\.css|\.html])$', 'index.php?wpak_addon_file=$matches[1]', 'top' );
 		}
 	}

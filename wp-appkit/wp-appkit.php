@@ -1,7 +1,7 @@
 <?php
 
 /*
-  Plugin Name: WP App Kit
+  Plugin Name: WP AppKit
   Description: Build Phonegap Mobile apps based on your WordPress contents
   Version: 0.2
  */
@@ -11,7 +11,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 	class WpAppKit {
 
 		const resources_version = '0.4';
-		const i18n_domain = 'wp-app-kit';
+		const i18n_domain = 'wp-appkit';
 
 		public static function hooks() {
 			add_action( 'plugins_loaded', array( __CLASS__, 'plugins_loaded' ) );
