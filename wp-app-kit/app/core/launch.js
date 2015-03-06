@@ -136,7 +136,9 @@ require(['root/config'],function(Config){
 	//Check if we are simulating in browser :
 	var query = window.location.search.substring(1);
 	if( query.length && query.indexOf('wpak_app_id') != -1 ){
-		message = 'Please check that you are connected to your WordPress back office.';
+		message = 'Please check that : ';
+		message += '<br/> - you are connected to your WordPress back office,';
+		message += '<br/> - WordPress permalinks are activated';
 		console && console.log(message);
 		document.write('<br>'+ message);
 	}
