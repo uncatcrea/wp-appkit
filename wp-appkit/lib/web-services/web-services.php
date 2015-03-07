@@ -16,10 +16,10 @@ class WpakWebServices {
 		add_rewrite_tag( '%wpak_action%', '([^&]+)' );
 		add_rewrite_tag( '%wpak_token%', '([^&]+)' );
 
-		add_rewrite_rule( '^app-kit-api/public/(.+?)/(.+?)/(.+?)/?$', 'index.php?wpak=1&wpak_app_id=$matches[1]&wpak_slug=$matches[2]&wpak_id=$matches[3]&wpak_action=one', 'top' );
-		add_rewrite_rule( '^app-kit-api/public/(.+?)/(.+?)/?$', 'index.php?wpak=1&wpak_app_id=$matches[1]&wpak_slug=$matches[2]&wpak_action=list', 'top' );
-		add_rewrite_rule( '^app-kit-api/(.+?)/(.+?)/(.+?)/(.+?)/?$', 'index.php?wpak=2&wpak_app_id=$matches[1]&wpak_token=$matches[2]&wpak_slug=$matches[3]&wpak_id=$matches[4]&wpak_action=one', 'top' );
-		add_rewrite_rule( '^app-kit-api/(.+?)/(.+?)/(.+?)/?$', 'index.php?wpak=2&wpak_app_id=$matches[1]&wpak_token=$matches[2]&wpak_slug=$matches[3]&wpak_action=list', 'top' );
+		add_rewrite_rule( '^wp-appkit-api/public/(.+?)/(.+?)/(.+?)/?$', 'index.php?wpak=1&wpak_app_id=$matches[1]&wpak_slug=$matches[2]&wpak_id=$matches[3]&wpak_action=one', 'top' );
+		add_rewrite_rule( '^wp-appkit-api/public/(.+?)/(.+?)/?$', 'index.php?wpak=1&wpak_app_id=$matches[1]&wpak_slug=$matches[2]&wpak_action=list', 'top' );
+		add_rewrite_rule( '^wp-appkit-api/(.+?)/(.+?)/(.+?)/(.+?)/?$', 'index.php?wpak=2&wpak_app_id=$matches[1]&wpak_token=$matches[2]&wpak_slug=$matches[3]&wpak_id=$matches[4]&wpak_action=one', 'top' );
+		add_rewrite_rule( '^wp-appkit-api/(.+?)/(.+?)/(.+?)/?$', 'index.php?wpak=2&wpak_app_id=$matches[1]&wpak_token=$matches[2]&wpak_slug=$matches[3]&wpak_action=list', 'top' );
 
 		//To define rewrite rules specific to a web service created via hooks (see web-services-crud.php) :
 		do_action( 'wpak_add_rewrite_rules' );
@@ -371,7 +371,7 @@ class WpakWebServices {
 	}
 
 	public static function get_app_web_service_base_url( $app_id_or_slug ) {
-		$url = get_bloginfo( 'wpurl' ) . '/app-kit-api';
+		$url = get_bloginfo( 'wpurl' ) . '/wp-appkit-api';
 
 		$app_slug = WpakApps::get_app_slug( $app_id_or_slug );
 		$app_id = WpakApps::get_app_id( $app_id_or_slug );
