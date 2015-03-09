@@ -1,0 +1,379 @@
+define(function (require) {
+
+	"use strict";
+
+	var $                   = require('jquery'), 
+		_                   = require('underscore'),
+		Backbone            = require('backbone'),
+		App            		= require('core/app'),
+		Hooks               = require('core/lib/hooks'),
+		Utils               = require('core/app-utils');
+      
+	Backbone.View.prototype.close = function(){
+		
+		//We also have to remove Views Models and Collections events by hand + handle closing subviews :
+		// > use onClose for this.
+		if( this.onClose ){
+			this.onClose();
+		}
+		
+		this.unbind(); // this will unbind all listeners to events from this view. This is probably not necessary because this view will be garbage collected.
+		this.remove(); // uses the default Backbone.View.remove() method which removes this.el from the DOM and removes DOM events.
+	};
+	
+	var RegionManager = (function (Backbone, $, _) {
+	    
+		var headView = null;
+		
+		var layoutView = null;
+		var elLayout = "#app-layout";
+		
+		var headerView = null;
+		var elHeader = "#app-header";
+		
+		var currentView = null;
+	    var el = "#app-content-wrapper";
+	    
+	    var elMenu = "#app-menu";
+	    var menuView= null; 
+	    
+	    var region = {};
+	    
+	    var vent = _.extend({}, Backbone.Events);
+	    region.on = function(event,callback){
+	    	vent.on(event,callback);
+	    };
+	    region.off = function(event,callback){
+	    	vent.off(event,callback);
+	    };
+	 
+	    region.buildHead = function(cb){
+	    	if( headView === null ){
+	    		require(['core/views/head'],function(HeadView){
+	    			headView = new HeadView();
+					headView.render();
+					cb();
+	    		});
+	    	}else{
+	    		cb();
+	    	}
+	    };
+	    
+	    region.buildLayout = function(cb){
+	    	if( layoutView === null ){
+	    		require(['core/views/layout'],function(LayoutView){
+		    		layoutView = new LayoutView({el:elLayout});
+		    		layoutView.render();
+		    		cb();
+	    		});
+	    	}else{
+	    		cb();
+	    	}
+	    };
+	    
+	    region.buildHeader = function(cb){
+	    	if( layoutView.containsHeader() ){
+		    	if( headerView === null ){
+		    		require(['core/views/header'],
+		    				function(HeaderView){
+					    		headerView = new HeaderView({
+					    			el:elHeader,
+					    			do_if_template_exists:function(view){
+						    			if( layoutView.containsHeader() ){
+						    				view.render();
+						    			}
+					    				cb();
+						    		},
+						    		do_if_no_template:function(){
+						    			cb();
+						    		}
+						    	});
+		    				}
+		    		);
+		    	}else{
+		    		cb();
+		    	}
+	    	}else{
+	    		cb();
+	    	}
+	    };
+	    
+	    region.buildMenu = function(cb,force_reload){
+	    	
+	    	force_reload = (force_reload!=undefined && force_reload);
+	    	
+	    	if( menuView === null || force_reload ){
+	    		require(['core/views/menu'],function(MenuView){
+	    			var menu_el = $(elMenu).length ? {el:elMenu} : {}; 
+		    		menuView = new MenuView(menu_el);
+	    			menuView.resetAll();
+		    		App.navigation.each(function(element, index){
+		    			var component = App.components.get(element.get('component_id'));
+		    			if( component ){
+		    				menuView.addItem(component.get('id'),component.get('type'),component.get('label'),element.get('options'));
+		    			}
+		   		  	});
+					menuView = Hooks.applyFilters('menu-items', menuView, [App.navigation]);
+		    		showMenu(force_reload);
+		    		cb();
+	    		});
+	    	}else{
+	    		cb();
+	    	}
+	    };
+	    
+	    var showMenu = function(force_reload){
+	    	if( menuView ){
+	    		if( $(elMenu).length 
+	    			&& (!$(elMenu).html().length || (force_reload!=undefined && force_reload) ) ){
+		    		menuView.render();
+		    		vent.trigger('menu:refresh',App.getCurrentScreenData(),menuView);
+		    		Utils.log('Render navigation',{menu_view:menuView,force_reload:force_reload});
+	    		}
+	    	}else{
+	    		if( $(elMenu).html().length ){
+	    			$(elMenu).empty();
+	    		}
+	    	}
+	    };
+	    
+	    region.getMenuView = function(){
+	    	return menuView;
+	    };
+	    
+	    var renderSubRegions = function(){
+	    	if( headerView && headerView.templateExists() && layoutView.containsHeader() ){
+		    	headerView.render();
+		    	Utils.log('Render header',{header_view:headerView});
+		    	if( headerView.containsMenu() ){
+		    		showMenu(true);
+		    	}
+			    vent.trigger('header:render',App.getCurrentScreenData(),headerView);
+	    	}
+	    };
+	    
+	    var closeView = function (view) {
+	        if( view ){
+	        	if( view.is_static ){
+					//Static views are memorized in screen_static_views now.
+					//Backbone memorizes the DOM element, so we don't need to keep a copy of it!
+	        		/*var static_screens_wrapper = $('#app-static-screens');
+	        		if( !static_screens_wrapper.find('[data-viewid='+ view.cid +']').length ){
+	        			$(view.el).attr('data-viewid',currentView.cid);
+	        			static_screens_wrapper.append(view.el);
+	        		}*/
+	        	}else{
+		        	if( view.close ){
+		        		view.close();
+		        	}
+	        	}
+	        }
+	    };
+	 
+	    var openView = function (view) {
+	    	var first_static_opening = false;
+	    	
+			var custom_rendering = App.getParam('custom-screen-rendering');
+			
+			if( !view.is_static || !$(view.el).html().length ){
+	    		if( view.is_static != undefined && view.is_static ){
+					first_static_opening = true;
+	    			Utils.log('Open static view',{screen_data:App.getCurrentScreenData(),view:view});
+	    		}else{
+	    			Utils.log('Open view',{screen_data:App.getCurrentScreenData(),view:view});
+	    		}
+				view.render();
+			} else {
+				Utils.log('Re-open existing static view',{view:view});
+			}
+				
+			var $el = $(el);
+
+			vent.trigger('screen:before-transition',App.getCurrentScreenData(),currentView,custom_rendering);
+
+			if( custom_rendering ){
+				Hooks.doActions(
+					'screen-transition',
+					[$el,$('div:first-child',$el),$(view.el),App.getCurrentScreenData(),App.getPreviousScreenMemoryData()]
+				).done(function(){
+					 renderSubRegions();
+					 vent.trigger('screen:showed',App.getCurrentScreenData(),currentView,first_static_opening);
+				}).fail(function(){
+					//Note : Hooks.doActions doesn't handle a fail case for now,
+					//but it may in the future!
+					renderSubRegions();
+					vent.trigger('screen:showed:failed',App.getCurrentScreenData(),currentView,first_static_opening);
+				});
+			}else{
+				$el.empty().append(view.el);
+				renderSubRegions();
+				vent.trigger('screen:showed',App.getCurrentScreenData(),currentView,first_static_opening);
+			}
+
+			if(view.onShow) {
+				view.onShow();
+			}
+	    };
+	    
+	    var showView = function(view,force_no_waiting){
+	    	
+	    	var no_waiting = force_no_waiting != undefined && force_no_waiting == true;
+
+	    	if( !view.is_static || !$(view.el).html().length ){
+
+	    		if( !no_waiting ){
+	    			region.startWaiting();
+	    		}
+		    	
+				showSimple(view);
+				
+				if( !no_waiting ){
+					region.stopWaiting();
+				}
+		    	
+	    	}else{
+	    		showSimple(view);
+	    	}
+	    };
+	    
+	    var showSimple = function(view) {
+			
+	    	var custom_rendering = App.getParam('custom-screen-rendering');
+	    	
+	    	if( currentView ){
+				if( !custom_rendering ){ //Custom rendering must handle views closing by itself (on screen:leave)
+					closeView(currentView);
+				}
+	    	}
+	    	
+	    	currentView = view;
+		    openView(currentView);
+	    };
+		
+		var screen_static_views = { };
+
+		var getScreenId = function( screen ) {
+			return screen.fragment + '-' + String( screen.item_id );
+		};
+
+		var getScreenStaticView = function( screen ) {
+			var screen_id = getScreenId( screen );
+			return screen_static_views.hasOwnProperty( screen_id ) ? screen_static_views[screen_id] : null;
+		};
+
+		var memorizeScreenStaticView = function( screen, view ) {
+			screen_static_views[getScreenId( screen )] = view;
+		};
+	    
+	    var switchScreen = function( view, force_flush, force_no_waiting ) {
+			var queried_screen = App.getQueriedScreen();
+			vent.trigger( 'screen:leave', App.getCurrentScreenData(), queried_screen, currentView );
+
+			App.addQueriedScreenToHistory( force_flush );
+			if ( view.is_static ) {
+				memorizeScreenStaticView( queried_screen, view );
+			}
+
+			showView( view, force_no_waiting );
+		};
+		
+		var createNewView = function( view_type, view_data, is_static, callback ) {
+			
+			var return_view = function( view ){
+				view.is_static = is_static;
+				callback( view );
+			};
+			
+			switch ( view_type ) {
+				case 'single':
+					require( [ "core/views/single" ], function( SingleView ) {
+						return_view( new SingleView( view_data ) );
+					} );
+					break;
+				case 'page':
+					require( [ "core/views/page" ], function( PageView ) {
+						return_view( new PageView( view_data ) );
+					} );
+					break;
+				case 'posts-list':
+					require( [ "core/views/archive" ], function( ArchiveView ) {
+						return_view( new ArchiveView( view_data ) );
+					} );
+					break;
+				case 'favorites':
+					require( [ "core/views/favorites" ], function( FavoritesView ) {
+						return_view( new FavoritesView( view_data ) );
+					} );
+					break;
+				case 'hooks':
+					require( [ "core/views/custom-component" ], function( CustomComponentView ) {
+						return_view( new CustomComponentView( view_data ) );
+					} );
+					break;
+				case 'comments':
+					require( [ "core/views/comments" ], function( CommentsView ) {
+						return_view( new CommentsView( view_data ) );
+					} );
+					break;
+				case 'custom-page':
+					require( [ "core/views/custom-page" ], function( CustomPageView ) {
+						return_view( new CustomPageView( view_data ) );
+					} );
+					break;
+				//TODO : we could add a filter here to allow using a 
+				//customized not native view type created by an addon.
+			}
+			
+		};
+		
+		region.show = function( view_type, view_data, screen_data ) {
+			App.setQueriedScreen( screen_data );
+			var queried_screen = App.getQueriedScreen();
+
+			/**
+			 * Use this 'is-static-screen' filter to decide whether a screen
+			 * is static or not. A static screen is never refreshed or re-rendered
+			 * by the app core.
+			 */
+			var is_static = Hooks.applyFilters( 'is-static-screen', false, [ queried_screen ] )
+
+			if ( is_static ) {
+				var screen_view = getScreenStaticView( queried_screen );
+				if ( screen_view !== null ) {
+					screen_view.checkTemplate( function() {
+						switchScreen( screen_view );
+					} );
+				} else {
+					createNewView( view_type, view_data, is_static, function( newview ) {
+						newview.checkTemplate( function() {
+							switchScreen( newview );
+						} );
+					} );
+				}
+			} else {
+				createNewView( view_type, view_data, is_static, function( newview ) {
+					newview.checkTemplate( function() {
+						switchScreen( newview );
+					} );
+				} );
+			}
+		}
+	    
+	    region.getCurrentView = function(){
+	    	return currentView;
+	    };
+	    
+	    region.startWaiting = function(){
+	    	vent.trigger('waiting:start',App.getCurrentScreenData(),currentView);
+	    };
+	    
+	    region.stopWaiting = function(){
+	    	vent.trigger('waiting:stop',App.getCurrentScreenData(),currentView);
+	    };
+	    
+	    return region;
+	    
+	})(Backbone, $, _);
+	
+	return RegionManager;
+});
