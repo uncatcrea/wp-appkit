@@ -296,6 +296,7 @@ class WpakThemes {
 				'eot' => 'application/vnd.ms-fontobject',
 				'ttf' => 'font/truetype',
 				'woff' => 'application/x-font-woff',
+				'woff2' => 'application/font-woff2',
 				'otf' => 'font/opentype',
 				// Video formats.
 				'asf|asx' => 'video/x-ms-asf',
