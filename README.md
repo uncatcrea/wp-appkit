@@ -6,7 +6,8 @@ Create mobile apps and connect them to WordPress.
 
 ## News
 * 03/08/2015: Version 0.2 is here!
-* To know about changes in this version, read the changelog
+* To know about changes in this version, read the [changelog](https://github.com/uncatcrea/wp-app-kit/blob/master/CHANGELOG.md)
+
 ### Migrating from 0.1 to 0.2
 * Backup your theme (located in the /wp-content/plugins/wp-app-kit/app/themes)
 * Deactivate version 0.1 in WordPress
