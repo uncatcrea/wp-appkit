@@ -24,11 +24,9 @@ class WpakSimulator {
 			if ( array_key_exists( 'trash', $actions ) ) {
 				$trash_mem = $actions['trash'];
 				unset( $actions['trash'] );
-				$actions['wpak-simulate-app'] = '<a href="' . self::get_simulator_url( $post->ID ) . '">' . __( 'View in simulator', WpAppKit::i18n_domain ) . '</a>';
 				$actions['wpak-view-app-in-browser'] = '<a href="' . WpakBuild::get_appli_index_url( $post->ID ) . '" target="_blank">' . __( 'View in browser', WpAppKit::i18n_domain ) . '</a>';
 				$actions['trash'] = $trash_mem;
 			}else{
-				$actions['wpak-simulate-app'] = '<a href="' . self::get_simulator_url( $post->ID ) . '">' . __( 'View in simulator', WpAppKit::i18n_domain ) . '</a>';
 				$actions['wpak-view-app-in-browser'] = '<a href="' . WpakBuild::get_appli_index_url( $post->ID ) . '" target="_blank">' . __( 'View in browser', WpAppKit::i18n_domain ) . '</a>';
 			}
 		}
