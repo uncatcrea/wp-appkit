@@ -34,6 +34,7 @@ class WpakNavigationBoSettings{
 		$nav_items = WpakNavigationItemsStorage::get_navigation_items($post->ID);
 		?>
 		<div id="navigation-wrapper">
+			<p>Menu</p>
 			<a href="#" class="add-new-h2" id="add-new-item"><?php _e('Add new component to navigation',WpAppKit::i18n_domain) ?></a>
 
 			<div id="navigation-feedback" style="display:none"></div>

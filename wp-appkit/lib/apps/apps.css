@@ -12,3 +12,7 @@
     font-weight:700;
     color:#f00;
 }
+
+#navigation-wrapper {
+    border-top: 1px solid #ddd;
+}
