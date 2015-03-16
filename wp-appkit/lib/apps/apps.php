@@ -59,7 +59,7 @@ class WpakApps {
 					'name' => __( 'Applications', WpAppKit::i18n_domain ),
 					'singular_name' => __( 'Application', WpAppKit::i18n_domain ),
 					'menu_name' => __( 'Applications', WpAppKit::i18n_domain ),
-					'add_new' => __( 'Add', WpAppKit::i18n_domain ),
+					'add_new' => __( 'Add New', WpAppKit::i18n_domain ),
 					'add_new_item' => __( 'Add an application', WpAppKit::i18n_domain ),
 					'edit' => __( 'Edit', WpAppKit::i18n_domain ),
 					'edit_item' => __( 'Edit Application', WpAppKit::i18n_domain ),
