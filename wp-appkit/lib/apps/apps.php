@@ -162,6 +162,9 @@ class WpakApps {
 
 			<div id="minor-publishing">
 				<div id="minor-publishing-actions">
+					<div id="export-action">
+						<a id="wpak_export_link" href="#" class="button"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+					</div>
 					<div id="preview-action">
 						<a href="<?php echo WpakBuild::get_appli_index_url( $post->ID ); ?>" class="preview button" target="_blank"><?php _e( 'Preview', WpAppKit::i18n_domain ) ?></a>
 					</div>

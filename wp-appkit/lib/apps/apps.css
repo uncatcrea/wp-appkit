@@ -16,3 +16,7 @@
 #navigation-wrapper {
     border-top: 1px solid #ddd;
 }
+
+#wpak_export_link {
+    float:left;
+}
