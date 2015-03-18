@@ -327,8 +327,25 @@ define(function (require) {
 		};
 		
 		region.show = function( view_type, view_data, screen_data ) {
+			
 			App.setQueriedScreen( screen_data );
 			var queried_screen = App.getQueriedScreen();
+
+			/**
+			 * Use this 'redirect' filter to redirect to a different screen than the queried one, 
+			 * just before it is showed.
+			 * 
+			 * To redirect to a different screen from the filter callback (in themes) : 
+			 * - call App.navigate('your_screen_route');
+			 * - return true
+			 * 
+			 * Implementation note : This has to be a filter (not action) so that we 
+			 * can stop the showing process if true is returned.
+			 */
+			var redirect = Hooks.applyFilters( 'redirect', false, [queried_screen, App.getCurrentScreenData()] );
+			if( redirect ) {
+				return;
+			}
 
 			/**
 			 * Use this 'is-static-screen' filter to decide whether a screen
