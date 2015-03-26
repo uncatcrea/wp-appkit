@@ -107,14 +107,35 @@ define(function (require) {
 	    			var menu_el = $(elMenu).length ? {el:elMenu} : {}; 
 		    		menuView = new MenuView(menu_el);
 	    			menuView.resetAll();
+					
+					var menu_items = [];
+					
 		    		App.navigation.each(function(element, index){
 		    			var component = App.components.get(element.get('component_id'));
 		    			if( component ){
-		    				menuView.addItem(component.get('id'),component.get('type'),component.get('label'),element.get('options'));
+							menu_items.push({id:component.get('id'),label:component.get('label'),type:component.get('type'),link:'#component-'+ component.get('id'),options:element.get('options')});
 		    			}
 		   		  	});
-					menuView = Hooks.applyFilters('menu-items', menuView, [App.navigation]);
-		    		showMenu(force_reload);
+					
+					/**
+					 * Use this "menu-items" filter to add or remove menu items.
+					 * Menu item format :
+					 * { 
+					 *	 id:slug, //unique slug identifier for the menu item
+					 *	 label:label, //displayed menu item label
+					 *	 type:type, //page, posts-list, favorites etc or custom
+					 *	 link:fragment, //screen fragment
+					 *	 options:options //Optional : json object to pass additionnal data to the menu item
+					 * }
+					 */
+					menu_items = Hooks.applyFilters('menu-items', menu_items, [App.navigation]);
+		    		
+					_.each(menu_items,function( menu_item ){
+						var options = menu_item.options ? menu_item.options : {};
+						menuView.addItem( menu_item.id, menu_item.type, menu_item.label, menu_item.link, options );
+					});
+					
+					showMenu(force_reload);
 		    		cb();
 	    		});
 	    	}else{
