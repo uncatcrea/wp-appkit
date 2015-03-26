@@ -21,8 +21,8 @@ define(function (require) {
   			
   	    },
 
-  	    addItem : function(id,type,label,options){
-  	    	this.menu.add(_.extend({id:id,label:label,type:type,link: '#component-'+id},options));
+  	    addItem : function(id,type,label,link,options){
+  	    	this.menu.add(_.extend({id:id,label:label,type:type,link:link},options));
   	    },
   	    
   	    resetAll : function(){
