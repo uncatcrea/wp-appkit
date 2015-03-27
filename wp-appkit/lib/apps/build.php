@@ -35,7 +35,6 @@ class WpakBuild {
 
 	public static function inner_simulation_box( $post, $current_box ) {
 		$debug_mode = self::get_app_debug_mode_raw( $post->ID );
-		$wp_ws_url = WpakWebServices::get_app_web_service_url( $post->ID, 'synchronization' );
 		?>
 		<label><?php _e( 'Debug Mode', WpAppKit::i18n_domain ) ?> : </label>
 		<select name="wpak_app_debug_mode">
@@ -47,12 +46,6 @@ class WpakBuild {
 		<br/>
 		<br/>
 		<a href="<?php echo self::get_appli_dir_url() . '/config.js?wpak_app_id=' . WpakApps::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a>
-		<br/>
-		<br/>
-		<div style="word-wrap: break-word;">
-			<label><?php _e( 'Web services', WpAppKit::i18n_domain ) ?> :</label><br/>
-			<?php _e( 'Synchronization', WpAppKit::i18n_domain ) ?> : <a href="<?php echo $wp_ws_url ?>"><?php echo $wp_ws_url ?></a>
-		</div>
 		<?php wp_nonce_field( 'wpak-simulation-data-' . $post->ID, 'wpak-nonce-simulation-data' ) ?>
 		<?php
 		do_action( 'wpak_inner_simulation_box', $post, $current_box );
