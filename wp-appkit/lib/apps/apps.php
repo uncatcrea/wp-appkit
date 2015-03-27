@@ -225,10 +225,6 @@ class WpakApps {
 			</select>
 			<?php wp_nonce_field( 'wpak-main-infos-' . $post->ID, 'wpak-nonce-main-infos' ) ?>
 		</div>
-		<style>
-			.wpak_settings input[type=text]{ width:100% }
-			.wpak_settings textarea{ width:100%;height:5em }
-		</style>
 		<?php
 	}
 

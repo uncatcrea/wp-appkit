@@ -20,3 +20,20 @@
 #wpak_export_link {
     float:left;
 }
+
+.link {
+    word-wrap: break-word;
+}
+
+.field-group {
+    margin:10px 0;
+}
+
+.wpak_settings input[type=text] {
+    width:100%;
+}
+
+.wpak_settings textarea{
+    width:100%;
+    height:5em;
+}
