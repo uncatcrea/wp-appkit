@@ -6,7 +6,7 @@ class WpakBuild {
 
 	public static function hooks() {
 		if ( is_admin() ) {
-			add_action( 'wp_ajax_wpak_build_app_sources', array( __CLASS__, 'build_app_sources' ) );
+			add_action( 'wp_ajax_wpak_build_app_sources', array( __CLASS__, 'ajax_build_app_sources' ) );
 			add_action( 'admin_action_wpak_download_app_sources', array( __CLASS__, 'download_app_sources' ) );
 			add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ), 20 );
 			add_action( 'save_post', array( __CLASS__, 'save_post' ) );
@@ -18,15 +18,6 @@ class WpakBuild {
 			'wpak_simulation_box',
 			__( 'Dev tools', WpAppKit::i18n_domain ),
 			array( __CLASS__, 'inner_simulation_box' ),
-			'wpak_apps',
-			'side',
-			'default'
-		);
-
-		add_meta_box(
-			'wpak_export_box',
-			__( 'Phonegap ready App export', WpAppKit::i18n_domain ),
-			array( __CLASS__, 'inner_export_box' ),
 			'wpak_apps',
 			'side',
 			'default'
@@ -51,94 +42,6 @@ class WpakBuild {
 		do_action( 'wpak_inner_simulation_box', $post, $current_box );
 	}
 
-	public static function inner_export_box( $post, $current_box ) {
-		$app_id = $post->ID;
-		$available_themes = WpakThemes::get_available_themes();
-		$current_theme = WpakThemesStorage::get_current_theme( $app_id );
-		?>
-		<span class="description wpak_export_infos"><?php _e( 'Phonegap exports are Zip files created in the WordPress uploads directory', WpAppKit::i18n_domain ) ?> : <br/><strong><?php echo str_replace( ABSPATH, '', self::get_export_files_path() ) ?></strong></span>
-		<br/><span class="description"><?php echo sprintf( __( "The %s last App exports are memorized in this directory.", WpAppKit::i18n_domain ), self::export_file_memory ) ?></span>
-		<br/><br/>
-		<label><?php _e( 'Themes to include in app export', WpAppKit::i18n_domain ) ?> : </label><br/>
-		<select id="wpak_export_theme" multiple>
-			<?php foreach ( $available_themes as $theme ): ?>
-				<?php $selected = $theme == $current_theme ? 'selected="selected"' : '' ?>
-				<option value="<?php echo $theme ?>" <?php echo $selected ?>><?php echo ucfirst( $theme ) ?> </option>
-			<?php endforeach ?>
-		</select>
-		<label for="wpak_download_after_build"><?php _e( 'Download after export', WpAppKit::i18n_domain ) ?></label> <input type="checkbox" id="wpak_download_after_build" checked="checked" />
-		<div id="wpak_export_feedback"></div>
-
-			<?php $previous_exports = self::get_available_app_exports( $app_id ) ?>
-			<?php if ( !empty( $previous_exports ) ): ?>
-			<label><?php _e( 'Download a previous export', WpAppKit::i18n_domain ) ?> : </label>
-			<select id="wpak_available_exports">
-				<?php foreach ( $previous_exports as $timestamp => $entry ): ?>
-					<option value="<?php echo str_replace( '.zip', '', $entry ) ?>"><?php echo get_date_from_gmt( date( 'Y-m-d H:i:s', $timestamp ), 'F j, Y H:i:s' ) ?></option>
-				<?php endforeach ?>
-			</select>
-			<a id="wpak_download_existing_link" href="#" class="button button-large"><?php _e( 'Download', WpAppKit::i18n_domain ) ?>!</a>
-		<?php endif ?>
-
-		<?php wp_nonce_field( 'wpak-export-data-' . $post->ID, 'wpak-nonce-export-data' ) ?>
-
-		<script>
-			jQuery("#wpak_export_link").click(function(e) {
-				e.preventDefault();
-				var themes = jQuery('#wpak_export_theme').val();
-				if (themes == null) {
-					jQuery('#wpak_export_feedback').removeClass().addClass('error').html('<?php echo addslashes( __( 'Please select at least one theme', WpAppKit::i18n_domain ) ) ?>');
-				} else {
-					var data = {
-						action: 'wpak_build_app_sources',
-						app_id: '<?php echo $app_id ?>',
-						nonce: '<?php echo wp_create_nonce( 'wpak_build_app_sources_' . $app_id ) ?>',
-						themes: themes
-					}
-					jQuery.post(ajaxurl, data, function(response) {
-						if (response.ok == 1 || response.ok == 2) {
-							var $feedback = jQuery('#wpak_export_feedback');
-							var message = '<?php echo addslashes( __( "Zip export created successfully.", WpAppKit::i18n_domain ) ) ?>';
-							var download = jQuery('#wpak_download_after_build')[0].checked;
-							if (download) {
-								message += '<br/>' + '<?php echo addslashes( __( "Download should start automatically.", WpAppKit::i18n_domain ) ) ?>';
-							}
-							$feedback.removeClass().addClass('updated').html(message);
-							if (response.ok == 2) {
-								$feedback.append('<br/><br/><strong><?php _e( "Warning!", WpAppKit::i18n_domain ) ?></strong> : ' + response.msg);
-							}
-							if (download) {
-								window.location.href = '<?php echo add_query_arg( array( 'action' => 'wpak_download_app_sources' ), wp_nonce_url( admin_url(), 'wpak_download_app_sources' ) ) ?>&export=' + response['export'];
-							}
-						} else {
-							jQuery('#wpak_export_feedback').removeClass().addClass('error').html(response.msg);
-						}
-					});
-				}
-			});
-			jQuery("#wpak_download_existing_link").click(function(e) {
-				e.preventDefault();
-				var existing_export = jQuery('#wpak_available_exports').val();
-				window.location.href = '<?php echo add_query_arg( array( 'action' => 'wpak_download_app_sources' ), wp_nonce_url( admin_url(), 'wpak_download_app_sources' ) ) ?>&export=' + existing_export;
-			});
-		</script>
-		<style>
-			#wpak_download_existing_link{
-				margin:10px 0;
-			}
-			div#wpak_export_feedback{
-				padding:5px;
-			}
-			select#wpak_export_theme,#wpak_available_exports{
-				width:100%;
-			}
-			select#wpak_export_theme{
-				margin:10px;
-			}
-		</style>
-		<?php
-	}
-
 	public static function save_post( $post_id ) {
 
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
@@ -153,8 +56,7 @@ class WpakBuild {
 			return;
 		}
 
-		if ( !check_admin_referer( 'wpak-simulation-data-' . $post_id, 'wpak-nonce-simulation-data' ) || !check_admin_referer( 'wpak-export-data-' . $post_id, 'wpak-nonce-export-data' )
-		) {
+		if ( !check_admin_referer( 'wpak-simulation-data-' . $post_id, 'wpak-nonce-simulation-data' ) ) {
 			return;
 		}
 
@@ -183,13 +85,27 @@ class WpakBuild {
 
 	public static function download_app_sources() {
 
-		if ( !check_admin_referer( 'wpak_download_app_sources' ) ) {
+		if ( !check_admin_referer( 'wpak_download_app_sources' ) || !isset( $_GET['post'] ) ) {
 			return;
 		}
 
-		$export = addslashes( $_GET['export'] );
-		$filename = $export . '.zip';
-		$filename_full = self::get_export_files_path() . "/" . $filename;
+		$app_id = intval( $_GET['post'] );
+
+		if( $app_id <= 0 ) {
+			return;
+		}
+
+		// Re-build sources
+		$answer = self::build_app_sources( $app_id );
+
+		if( !empty( $answer['export'] ) ) {
+			$filename = $answer['export'] . '.zip';
+			$filename_full = self::get_export_files_path() . "/" . $filename;
+		}
+		else {
+			echo $answer['msg'];
+			exit;
+		}
 
 		if ( file_exists( $filename_full ) ) {
 			header( "Pragma: public" );
@@ -203,15 +119,51 @@ class WpakBuild {
 			header( "Content-Length: " . filesize( $filename_full ) );
 			ob_end_flush();
 			@readfile( $filename_full );
-			exit();
+			exit;
 		} else {
 			echo sprintf( __( 'Error: Could not find zip export file [%s]', WpAppKit::i18n_domain ), $filename_full );
-			echo ' <a href="' . $_SERVER['HTTP_REFERER'] . '">' . __( 'Back to app edition', WpAppKit::i18n_domain ) . '</a>';
-			exit();
+			exit;
 		}
 	}
 
-	public static function build_app_sources() {
+	public static function build_app_sources( $app_id ) {
+		$answer = array();
+
+		if ( !extension_loaded( 'zip' ) ) {
+			$answer['ok'] = 0;
+			$answer['msg'] = __( 'Zip PHP extension is required to run file export. See http://www.php.net/manual/fr/book.zip.php.', WpAppKit::i18n_domain );
+			return $answer;
+		}
+
+		if ( !self::create_export_directory_if_doesnt_exist() ) {
+			$export_directory = self::get_export_files_path();
+			$answer['ok'] = 0;
+			$answer['msg'] = sprintf( __( 'The export directory [%s] could not be created. Please check that you have the right permissions to create this directory.', WpAppKit::i18n_domain ), $export_directory );
+			return $answer;
+		}
+
+		$current_theme = WpakThemesStorage::get_current_theme( $app_id );
+
+		$plugin_dir = plugin_dir_path( dirname( dirname( __FILE__ ) ) );
+		$appli_dir = $plugin_dir . 'app';
+
+		$export_filename = self::get_export_file_base_name( $app_id );
+		$export_filename_full = self::get_export_files_path() . "/" . $export_filename . '.zip';
+
+		$answer = self::build_zip( $app_id, $appli_dir, $export_filename_full, array( $current_theme ), WpakAddons::get_app_addons( $app_id ) );
+
+		$maintenance_answer = self::export_files_maintenance( $app_id );
+		if ( $maintenance_answer['ok'] == 0 ) {
+			$answer['ok'] = $answer['ok'] == 1 ? 2 : $answer['ok'];
+			$answer['msg'] .= "<br/>" . $maintenance_answer['msg'];
+		}
+
+		$answer['export'] = $export_filename;
+
+		return $answer;
+	}
+
+	public static function ajax_build_app_sources() {
 		$answer = array( 'ok' => 1, 'msg' => '' );
 
 		if ( empty( $_POST ) || empty( $_POST['app_id'] ) || !is_numeric( $_POST['app_id'] ) ) {
@@ -226,42 +178,7 @@ class WpakBuild {
 			return;
 		}
 
-		if ( !extension_loaded( 'zip' ) ) {
-			$answer['ok'] = 0;
-			$answer['msg'] = __( 'Zip PHP extension is required to run file export. See http://www.php.net/manual/fr/book.zip.php.', WpAppKit::i18n_domain );
-			self::exit_sending_json( $answer );
-		}
-
-		if ( !self::create_export_directory_if_doesnt_exist() ) {
-			$export_directory = self::get_export_files_path();
-			$answer['ok'] = 0;
-			$answer['msg'] = sprintf( __( 'The export directory [%s] could not be created. Please check that you have the right permissions to create this directory.', WpAppKit::i18n_domain ), $export_directory );
-			self::exit_sending_json( $answer );
-		}
-
-		$themes = !empty( $_POST['themes'] ) && is_array( $_POST['themes'] ) ? $_POST['themes'] : null;
-		if ( $themes == null ) {
-			$answer['ok'] = 0;
-			$answer['msg'] = __( 'Please choose at least one theme for the export', WpAppKit::i18n_domain );
-			self::exit_sending_json( $answer );
-		}
-
-		$plugin_dir = plugin_dir_path( dirname( dirname( __FILE__ ) ) );
-		$appli_dir = $plugin_dir . 'app';
-
-		$export_filename_base = self::get_export_file_base_name( $app_id );
-		$export_filename = $export_filename_base . '-' . date( 'YmdHis' );
-		$export_filename_full = self::get_export_files_path() . "/" . $export_filename . '.zip';
-
-		$answer = self::build_zip( $app_id, $appli_dir, $export_filename_full, $themes, WpakAddons::get_app_addons( $app_id ) );
-
-		$maintenance_answer = self::export_files_maintenance( $app_id );
-		if ( $maintenance_answer['ok'] == 0 ) {
-			$answer['ok'] = $answer['ok'] == 1 ? 2 : $answer['ok'];
-			$answer['msg'] .= "<br/>" . $maintenance_answer['msg'];
-		}
-
-		$answer['export'] = $export_filename;
+		$answer = self::build_app_sources( $app_id );
 
 		self::exit_sending_json( $answer );
 	}
