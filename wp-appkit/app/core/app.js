@@ -426,6 +426,9 @@ define(function (require) {
     	  return token;
 	  };
 
+	  //--------------------------------------------------------------------------
+	  //App synchronization :
+	  
 	  app.sync = function(cb_ok,cb_error,force_reload){
 
 		  var force = force_reload != undefined && force_reload;
@@ -486,15 +489,23 @@ define(function (require) {
 		  }});
 
       };
-
+	  
 	  var syncWebService = function(cb_ok,cb_error,force_reload){
 		  var token = getToken('synchronization');
     	  var ws_url = token +'/synchronization/';
+
+		  /**
+		  * Filter 'synchronization-params' : use this to send custom key/value formated  
+		  * data to the synchronization web service. Those data are passed to the server 
+		  * ($_GET) when calling the synchronization web service.
+		  */
+		  var sync_params = Hooks.applyFilters('synchronization-params',{},[]);
 
 		  $.ajax({
 				url : Config.wp_ws_url + ws_url,
 				timeout : 40000,
 				dataType : 'json',
+				data : sync_params,
 				success : function(data) {
 				  	  if( data.hasOwnProperty('result') && data.result.hasOwnProperty('status') ){
 				  		  if( data.result.status == 1 ){
