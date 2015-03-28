@@ -7,7 +7,8 @@ define(function (require) {
       	  Backbone            = require('backbone'),
       	  Tpl                 = require('text!theme/menu.html'),
 		  ThemeTplTags		  = require('core/theme-tpl-tags'),
-      	  MenuItems           = require('core/models/menu-items');
+      	  MenuItems           = require('core/models/menu-items'),
+		  Hooks               = require('core/lib/hooks');
       	  
       return Backbone.View.extend({
     	  
@@ -30,10 +31,26 @@ define(function (require) {
   	    },
   	    
   	    render : function( ) {
-  	    	var renderedContent = this.template({
+			
+			var template_args = {
 				menu_items : this.menu.toJSON(), 
 				TemplateTags : ThemeTplTags 
-			});
+			};
+			
+			/**
+			* Use this 'template-args' filter to pass custom data to your
+			* templates.
+			* 
+			* @param template_args : JSON object : the default template data to filter
+			* Params passed to the filter : 
+			* - view type : String
+			* - template name : String
+			* - view object : Backbone view object
+			*/
+			template_args = Hooks.applyFilters( 'template-args', template_args, ['menu','menu',this] );
+			
+  	    	var renderedContent = this.template(template_args);
+			
   	        $(this.el).html(renderedContent);
   	        return this;
   	    }
