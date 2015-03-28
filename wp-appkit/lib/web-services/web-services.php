@@ -52,7 +52,7 @@ class WpakWebServices {
 		}
 	}
 
-	private static function exit_handle_request( $app_id, $service_slug, $action, $id = 0 ) {
+	private static function exit_handle_request( $app_id_or_slug, $service_slug, $action, $id = 0 ) {
 		global $wp_query;
 
 		self::log( $_SERVER['REQUEST_METHOD'] . ' : ' . $action . ' : ' . print_r( $_REQUEST, true ) );
@@ -69,6 +69,18 @@ class WpakWebServices {
 			  } */
 		}
 
+		$app = WpakApps::get_app( $app_id_or_slug );
+		
+		//Check that the asked app exists :
+		if ( empty( $app ) ) {
+			header("HTTP/1.0 404 Not Found");
+			_e( 'App not found', WpAppKit::i18n_domain ) . ' : [' . $app_id_or_slug . ']';
+			exit();
+		}
+		
+		$app_id = $app->ID;
+		$app_slug = $app->post_name;
+		
 		//Some browsers or viewports on mobile devices cache HTTP resquests, we don't want this!
 		header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
 		header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" ); // Some time in the past
@@ -84,7 +96,7 @@ class WpakWebServices {
 
 		//If the app current theme has some PHP (hooks!) to be executed before the web
 		//service process, include it here :
-		WpakThemes::include_app_theme_php( WpakApps::get_app_id( $app_id ) );
+		WpakThemes::include_app_theme_php( $app_id );
 
 		$service_answer = null;
 
@@ -415,7 +427,7 @@ class WpakWebServices {
 		$token_type = 'url'; //TODO : type = 'get' + dynamise as BO option
 		return $token_type;
 	}
-
+	
 	/*
 	  //TODO_WPAK
 	 * Manually computes web services answers by web service slug : use this to manually reload a web service cache for example.
