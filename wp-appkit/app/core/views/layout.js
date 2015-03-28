@@ -8,7 +8,8 @@ define(function (require) {
         Config              = require('root/config'),
 		Addons              = require('core/addons-internal'),
         Tpl                 = require('text!theme/layout.html'),
-		ThemeTplTags		= require('core/theme-tpl-tags');
+		ThemeTplTags		= require('core/theme-tpl-tags'),
+		Hooks               = require('core/lib/hooks');
 
     var contains_header = false;
     
@@ -16,7 +17,7 @@ define(function (require) {
     	
     	initialize : function(args) {
 			Tpl = Addons.getHtml('layout','before') + Tpl + Addons.getHtml('layout','after');
-    		contains_header = Tpl.match(/<%=\s*header\s*%>/) !== null;
+			contains_header = Tpl.match(/<%=\s*header\s*%>/) !== null;
     		this.template = _.template(Tpl);
         },
         
@@ -31,9 +32,21 @@ define(function (require) {
         	};
 			
 			var addons_data = Addons.getHtmlData('layout');
-			data = _.extend(data, addons_data);
+			var template_args = _.extend(data, addons_data);
 			
-        	var rendered_content = this.template(data);
+			/**
+			* Use this 'template-args' filter to pass custom data to your
+			* templates.
+			* 
+			* @param template_args : JSON object : the default template data to filter
+			* Params passed to the filter : 
+			* - view type : String
+			* - template name : String
+			* - view object : Backbone view object
+			*/
+			template_args = Hooks.applyFilters( 'template-args', template_args, ['layout','layout',this] );
+			
+        	var rendered_content = this.template(template_args);
 			
             $(this.el).html(rendered_content); 
             return this;
