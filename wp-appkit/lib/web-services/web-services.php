@@ -3,6 +3,7 @@
 require_once( dirname( __FILE__ ) . '/web-services-crud.php' );
 require_once( dirname( __FILE__ ) . '/token.php' );
 require_once( dirname( __FILE__ ) . '/../cache/web-services-cache.php' );
+require_once( dirname( __FILE__ ) . '/web-service-context.php' );
 
 class WpakWebServices {
 
@@ -80,6 +81,8 @@ class WpakWebServices {
 		
 		$app_id = $app->ID;
 		$app_slug = $app->post_name;
+		WpakWebServiceContext::$current_app_id = $app_id;
+		WpakWebServiceContext::$current_app_slug = $app_slug;
 		
 		//Some browsers or viewports on mobile devices cache HTTP resquests, we don't want this!
 		header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
