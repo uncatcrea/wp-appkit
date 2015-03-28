@@ -118,4 +118,18 @@ jQuery().ready(function(){
     title.on( 'keyup', wizard_title_observer.update );
     $( 'input, textarea', '#wpak_app_phonegap_data' ).on( 'keyup', wizard_phonegap_observer.update );
 
+    $( '#poststuff' ).on( 'click', '.wpak_help', function( e ) {
+        e.preventDefault();
+        var $this = $(this);
+
+        $this.parent().find( '.description' ).toggle( 300 );
+
+        if( $this.text() == Apps.i18n.show_help ) {
+            $this.text( Apps.i18n.hide_help );
+        }
+        else {
+            $this.text( Apps.i18n.show_help );
+        }
+    });
+
 });

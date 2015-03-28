@@ -24,6 +24,7 @@ class WpakOptionsBoSettings {
 	public static function inner_synchronization_options_box( $post, $current_box ) {
 		$options = WpakOptions::get_app_options( $post->ID );
 		?>
+		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
 		<div class="wpak_settings field-group">
 			<label for="wpak_app_options_refresh_interval"><?php _e( 'Refresh interval (in seconds):', WpAppKit::i18n_domain ) ?></label>
 			<input id="wpak_app_options_refresh_interval" type="text" name="wpak_app_options[refresh_interval]" value="<?php echo $options['refresh_interval'] ?>" />

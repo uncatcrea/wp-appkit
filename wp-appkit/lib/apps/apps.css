@@ -29,6 +29,10 @@
     margin:10px 0;
 }
 
+.description {
+    display:none;
+}
+
 .wpak_settings input[type=text] {
     width:100%;
 }
@@ -36,4 +40,17 @@
 .wpak_settings textarea{
     width:100%;
     height:5em;
+}
+
+.wpak_help {
+    position:absolute;
+    right:20px;
+    top:-5px;
+    /*font-style:italic;*/
+    color:#777;
+    display:inline-block;
+}
+
+.wpak_help:focus, .wpak_help:hover {
+    color:#333;
 }

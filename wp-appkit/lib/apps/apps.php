@@ -23,7 +23,14 @@ class WpakApps {
 		global $pagenow, $typenow;
 		if ( ($pagenow == 'post.php' || $pagenow == 'post-new.php') && $typenow == 'wpak_apps' ) {
 			wp_enqueue_script( 'wpak_apps_js', plugins_url( 'lib/apps/apps.js', dirname( dirname( __FILE__ ) ) ), array( 'jquery' ), WpAppKit::resources_version );
-			wp_localize_script( 'wpak_apps_js', 'Apps', array( 'phonegap_mandatory' => self::get_phonegap_mandatory_fields() ) );
+			$localize = array(
+				'phonegap_mandatory' => self::get_phonegap_mandatory_fields(),
+				'i18n' => array(
+					'show_help' => esc_js( __( 'Help me', WpAppKit::i18n_domain ) ),
+					'hide_help' => esc_js( __( 'Hide help texts', WpAppKit::i18n_domain ) ),
+				),
+			);
+			wp_localize_script( 'wpak_apps_js', 'Apps', $localize );
 		}
 	}
 
@@ -231,45 +238,58 @@ class WpakApps {
 	public static function inner_phonegap_infos_box( $post, $current_box ) {
 		$main_infos = self::get_app_main_infos( $post->ID );
 		?>
+		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
 		<div class="wpak_settings">
-			<span class="description"><?php _e( 'PhoneGap config.xml informations that are going to be displayed on App Stores.<br/>They are required when exporting the App to Phonegap, but are not used for App debug and simulation in browsers.', WpAppKit::i18n_domain ) ?></span>
-			<br/><br/>
-			<label><?php _e( 'Application name', WpAppKit::i18n_domain ) ?></label> : <br/>
-			<input type="text" name="wpak_app_name" value="<?php echo esc_attr( $main_infos['name'] ) ?>" id="wpak_app_name" />
-			<br/><br/>
-			<label><?php _e( 'Application description', WpAppKit::i18n_domain ) ?></label> : <br/>
-			<textarea name="wpak_app_desc" id="wpak_app_desc"><?php echo esc_textarea( $main_infos['desc'] ) ?></textarea>
-			<br/><br/>
-			<label><?php _e( 'Application id', WpAppKit::i18n_domain ) ?></label> : <br/>
-			<input type="text" name="wpak_app_phonegap_id" value="<?php echo esc_attr( $main_infos['app_phonegap_id'] ) ?>" id="wpak_app_app_phonegap_id" />
-			<br/><br/>
-			<label><?php _e( 'Version', WpAppKit::i18n_domain ) ?></label> : <br/>
-			<input type="text" name="wpak_app_version" value="<?php echo esc_attr( $main_infos['version'] ) ?>" id="wpak_app_version" />
-			<br/><br/>
-			<label><?php _e( 'Application versionCode (Android only)', WpAppKit::i18n_domain ) ?></label> : <br/>
-			<input type="text" name="wpak_app_version_code" value="<?php echo esc_attr( $main_infos['version_code'] ) ?>" id="wpak_app_version_code" />
-			<br/><br/>
-			<label><?php _e( 'Phonegap version', WpAppKit::i18n_domain ) ?></label> : <br/>
-			<input type="text" name="wpak_app_phonegap_version" value="<?php echo esc_attr( $main_infos['phonegap_version'] ) ?>" id="wpak_app_phonegap_version" />
-			<br/><br/>
-			<label><?php _e( 'Application author', WpAppKit::i18n_domain ) ?></label> : <br/>
-			<input type="text" name="wpak_app_author" value="<?php echo esc_attr( $main_infos['author'] ) ?>" id="wpak_app_author" />
-			<br/><br/>
-			<label><?php _e( 'Application author website', WpAppKit::i18n_domain ) ?></label> : <br/>
-			<input type="text" name="wpak_app_author_website" value="<?php echo esc_attr( $main_infos['author_website'] ) ?>" id="wpak_app_author_website" />
-			<br/><br/>
-			<label><?php _e( 'Application author email', WpAppKit::i18n_domain ) ?></label> : <br/>
-			<input type="text" name="wpak_app_author_email" value="<?php echo esc_attr( $main_infos['author_email'] ) ?>" id="wpak_app_author_email" />
-			<br/><br/>
-			<label><?php _e( 'Phonegap plugins', WpAppKit::i18n_domain ) ?></label> : <br/>
-			<textarea name="wpak_app_phonegap_plugins" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
-			<span class="description"><?php _e( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
-			<br/><br/>
-			<label><?php _e( 'Icons and splashscreens', WpAppKit::i18n_domain ) ?></label> : <br/>
-			<textarea name="wpak_app_icons" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
-			<span class="description"><?php _e( 'Write the icons and spashscreens tags as defined in the PhoneGap documentation.<br/>Example : &lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;', WpAppKit::i18n_domain ) ?></span>
-			<br/><br/>
-			<a href="<?php echo WpakBuild::get_appli_dir_url() . '/config.xml?wpak_app_id=' . self::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.xml', WpAppKit::i18n_domain ) ?></a>
+			<p class="description"><?php _e( 'PhoneGap config.xml informations that are going to be displayed on App Stores.<br/>They are required when exporting the App to Phonegap, but are not used for App debug and simulation in browsers.', WpAppKit::i18n_domain ) ?></p>
+			<div class="field-group">
+				<label><?php _e( 'Application name:', WpAppKit::i18n_domain ) ?></label>
+				<input type="text" name="wpak_app_name" value="<?php echo esc_attr( $main_infos['name'] ) ?>" id="wpak_app_name" />
+			</div>
+			<div class="field-group">
+				<label><?php _e( 'Application description:', WpAppKit::i18n_domain ) ?></label>
+				<textarea name="wpak_app_desc" id="wpak_app_desc"><?php echo esc_textarea( $main_infos['desc'] ) ?></textarea>
+			</div>
+			<div class="field-group">
+				<label><?php _e( 'Application id:', WpAppKit::i18n_domain ) ?></label>
+				<input type="text" name="wpak_app_phonegap_id" value="<?php echo esc_attr( $main_infos['app_phonegap_id'] ) ?>" id="wpak_app_app_phonegap_id" />
+			</div>
+			<div class="field-group">
+				<label><?php _e( 'Version:', WpAppKit::i18n_domain ) ?></label>
+				<input type="text" name="wpak_app_version" value="<?php echo esc_attr( $main_infos['version'] ) ?>" id="wpak_app_version" />
+			</div>
+			<div class="field-group">
+				<label><?php _e( 'Application versionCode (Android only):', WpAppKit::i18n_domain ) ?></label>
+				<input type="text" name="wpak_app_version_code" value="<?php echo esc_attr( $main_infos['version_code'] ) ?>" id="wpak_app_version_code" />
+			</div>
+			<div class="field-group">
+				<label><?php _e( 'Phonegap version:', WpAppKit::i18n_domain ) ?></label>
+				<input type="text" name="wpak_app_phonegap_version" value="<?php echo esc_attr( $main_infos['phonegap_version'] ) ?>" id="wpak_app_phonegap_version" />
+			</div>
+			<div class="field-group">
+				<label><?php _e( 'Application author:', WpAppKit::i18n_domain ) ?></label>
+				<input type="text" name="wpak_app_author" value="<?php echo esc_attr( $main_infos['author'] ) ?>" id="wpak_app_author" />
+			</div>
+			<div class="field-group">
+				<label><?php _e( 'Application author website:', WpAppKit::i18n_domain ) ?></label>
+				<input type="text" name="wpak_app_author_website" value="<?php echo esc_attr( $main_infos['author_website'] ) ?>" id="wpak_app_author_website" />
+			</div>
+			<div class="field-group">
+				<label><?php _e( 'Application author email:', WpAppKit::i18n_domain ) ?></label>
+				<input type="text" name="wpak_app_author_email" value="<?php echo esc_attr( $main_infos['author_email'] ) ?>" id="wpak_app_author_email" />
+			</div>
+			<div class="field-group">
+				<label><?php _e( 'Phonegap plugins:', WpAppKit::i18n_domain ) ?></label>
+				<textarea name="wpak_app_phonegap_plugins" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
+				<span class="description"><?php _e( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
+			</div>
+			<div class="field-group">
+				<label><?php _e( 'Icons and splashscreens:', WpAppKit::i18n_domain ) ?></label>
+				<textarea name="wpak_app_icons" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
+				<span class="description"><?php _e( 'Write the icons and spashscreens tags as defined in the PhoneGap documentation.<br/>Example : &lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;', WpAppKit::i18n_domain ) ?></span>
+			</div>
+			<div class="field-group">
+				<a href="<?php echo WpakBuild::get_appli_dir_url() . '/config.xml?wpak_app_id=' . self::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.xml', WpAppKit::i18n_domain ) ?></a>
+			</div>
 			<?php wp_nonce_field( 'wpak-phonegap-infos-' . $post->ID, 'wpak-nonce-phonegap-infos' ) ?>
 		</div>
 		<?php
@@ -279,14 +299,16 @@ class WpakApps {
 		$secured = self::get_app_is_secured( $post->ID );
 		$simulation_secured = self::get_app_simulation_is_secured( $post->ID );
 		?>
-		<br/>
-		<label><?php _e( 'Private App simulation', WpAppKit::i18n_domain ) ?></label> : <br/>
-		<span class="description"><?php _e( 'If activated, only connected users with right permissions can access the app simulation in web browser.<br/>If deactivated, the app simulation is publicly available in any browser, including the config.js and config.xml files, that can contain sensitive data.', WpAppKit::i18n_domain ) ?></span>
-		<br/>
-		<select name="wpak_app_simulation_secured">
-			<option value="1" <?php echo $simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Private', WpAppKit::i18n_domain ) ?></option>
-			<option value="0" <?php echo!$simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Public', WpAppKit::i18n_domain ) ?></option>
-		</select>
+		<div class="field-group">
+			<label><?php _e( 'Private App simulation', WpAppKit::i18n_domain ) ?></label> : <br/>
+			<span class="description"><?php _e( 'If activated, only connected users with right permissions can access the app simulation in web browser.<br/>If deactivated, the app simulation is publicly available in any browser, including the config.js and config.xml files, that can contain sensitive data.', WpAppKit::i18n_domain ) ?></span>
+		</div>
+		<div class="field-group">
+			<select name="wpak_app_simulation_secured">
+				<option value="1" <?php echo $simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Private', WpAppKit::i18n_domain ) ?></option>
+				<option value="0" <?php echo!$simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Public', WpAppKit::i18n_domain ) ?></option>
+			</select>
+		</div>
 		<?php wp_nonce_field( 'wpak-security-infos-' . $post->ID, 'wpak-nonce-security-infos' ) ?>
 		<?php
 	}

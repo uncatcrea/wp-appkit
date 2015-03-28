@@ -27,16 +27,19 @@ class WpakBuild {
 	public static function inner_simulation_box( $post, $current_box ) {
 		$debug_mode = self::get_app_debug_mode_raw( $post->ID );
 		?>
-		<label><?php _e( 'Debug Mode', WpAppKit::i18n_domain ) ?> : </label>
-		<select name="wpak_app_debug_mode">
-			<option value="on" <?php echo $debug_mode == 'on' ? 'selected="selected"' : '' ?>><?php _e( 'On', WpAppKit::i18n_domain ) ?></option>
-			<option value="off" <?php echo $debug_mode == 'off' ? 'selected="selected"' : '' ?>><?php _e( 'Off', WpAppKit::i18n_domain ) ?></option>
-			<option value="wp" <?php echo $debug_mode == 'wp' ? 'selected="selected"' : '' ?>><?php _e( 'Same as WordPress WP_DEBUG', WpAppKit::i18n_domain ) ?></option>
-		</select>
-		<br/><span class="description"><?php _e( 'If activated, echoes debug infos in the browser javascript console while simulating the app.', WpAppKit::i18n_domain ) ?></span>
-		<br/>
-		<br/>
-		<a href="<?php echo self::get_appli_dir_url() . '/config.js?wpak_app_id=' . WpakApps::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a>
+		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
+		<div class="field-group">
+			<label><?php _e( 'Debug Mode', WpAppKit::i18n_domain ) ?> : </label>
+			<select name="wpak_app_debug_mode">
+				<option value="on" <?php echo $debug_mode == 'on' ? 'selected="selected"' : '' ?>><?php _e( 'On', WpAppKit::i18n_domain ) ?></option>
+				<option value="off" <?php echo $debug_mode == 'off' ? 'selected="selected"' : '' ?>><?php _e( 'Off', WpAppKit::i18n_domain ) ?></option>
+				<option value="wp" <?php echo $debug_mode == 'wp' ? 'selected="selected"' : '' ?>><?php _e( 'Same as WordPress WP_DEBUG', WpAppKit::i18n_domain ) ?></option>
+			</select>
+			<span class="description"><?php _e( 'If activated, echoes debug infos in the browser javascript console while simulating the app.', WpAppKit::i18n_domain ) ?></span>
+		</div>
+		<div class="field-group">
+			<a href="<?php echo self::get_appli_dir_url() . '/config.js?wpak_app_id=' . WpakApps::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a>
+		</div>
 		<?php wp_nonce_field( 'wpak-simulation-data-' . $post->ID, 'wpak-nonce-simulation-data' ) ?>
 		<?php
 		do_action( 'wpak_inner_simulation_box', $post, $current_box );

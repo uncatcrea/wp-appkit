@@ -4,7 +4,7 @@ require_once(dirname( __FILE__ ) . '/addon.php');
 class WpakAddons {
 
 	const meta_id = '_wpak_addons';
-	
+
 	protected static $addons = null;
 
 	public static function hooks() {
@@ -123,7 +123,7 @@ class WpakAddons {
 		$app_addons = self::get_app_addons( $post->ID );
 		?>
 		<div class="wpak_addons">
-			<span><?php _e( 'Addons activated for this App', WpAppKit::i18n_domain ) ?> :</span><br/>
+			<span><?php _e( 'Addons activated for this App:', WpAppKit::i18n_domain ) ?></span><br/>
 			<?php foreach ( self::get_addons() as $addon ): ?>
 				<?php $checked = array_key_exists( $addon->slug, $app_addons ) ? 'checked' : '' ?>
 					<input type="checkbox" name="wpak-addons[]" id="<?php echo $addon->slug ?>" value="<?php echo $addon->slug ?>" <?php echo $checked ?> />
@@ -131,9 +131,6 @@ class WpakAddons {
 			<?php endforeach ?>
 			<?php wp_nonce_field( 'wpak-addons-' . $post->ID, 'wpak-nonce-addons' ) ?>
 		</div>
-		<style>
-			.wpak_addons{}
-		</style>
 		<?php
 	}
 
@@ -144,7 +141,7 @@ class WpakAddons {
 		if ( !empty( $app_id ) ) {
 
 			$app_addons_raw = get_post_meta( $app_id, self::meta_id, true );
-			
+
 			if ( !empty( $app_addons_raw ) ) {
 				//Check if the app addons are still installed :
 				$all_addons = self::get_addons();
@@ -184,7 +181,7 @@ class WpakAddons {
 
 		return $app_addons;
 	}
-	
+
 	/**
 	 * Retrieves app data to add to the synchronization web service.
 	 * @param int|string $app_id_or_slug
@@ -192,27 +189,27 @@ class WpakAddons {
 	 */
 	public static function get_app_addons_dynamic_data( $app_id_or_slug ){
 		$app_addons_dyn_data = array();
-		
+
 		$app_addons_raw = self::get_app_addons( $app_id_or_slug );
 		if ( !empty( $app_addons_raw ) ) {
 			foreach ( $app_addons_raw as $addon_slug => $app_addon_raw ) {
 				$app_addons_dyn_data[$addon_slug] = $app_addon_raw->get_dynamic_data();
 			}
 		}
-		
+
 		return $app_addons_dyn_data;
 	}
-	
+
 	public static function require_app_addons_php_files( $app_id_or_slug ){
 		$app_addons_dyn_data = array();
-		
+
 		$app_addons_raw = self::get_app_addons( $app_id_or_slug );
 		if ( !empty( $app_addons_raw ) ) {
 			foreach ( $app_addons_raw as $addon_slug => $app_addon_raw ) {
 				$app_addon_raw->require_php_files();
 			}
 		}
-		
+
 		return $app_addons_dyn_data;
 	}
 
@@ -242,7 +239,7 @@ class WpakAddons {
 		if ( empty( $_POST['post_type'] ) || $_POST['post_type'] != 'wpak_apps' ) {
 			return;
 		}
-		
+
 		if ( !current_user_can( 'edit_post', $post_id ) && !current_user_can( 'wpak_edit_apps', $post_id ) ) {
 			return;
 		}
@@ -266,7 +263,7 @@ class WpakAddons {
 			} else {
 				delete_post_meta( $post_id, self::meta_id );
 			}
-			
+
 		}else{
 			//$_POST['wpak-addons'] is null if no addons checked.
 			//At this point, wpak-nonce-addons is ok so we can be sure that
@@ -274,8 +271,7 @@ class WpakAddons {
 			delete_post_meta( $post_id, self::meta_id );
 		}
 	}
-	
+
 }
 
 WpakAddons::hooks();
-	
