@@ -3,10 +3,12 @@ define(function (require) {
       "use strict";
 
       var _                   = require('underscore'),
+		  $                   = require('jquery'),
       	  Backbone            = require('backbone'),
       	  Config              = require('root/config'),
       	  ThemeTplTags	 	  = require('core/theme-tpl-tags'),
-      	  Utils               = require('core/app-utils');
+      	  Utils               = require('core/app-utils'),
+		  Hooks               = require('core/lib/hooks');
       
       var tpl = null;
       var contains_menu = false;
@@ -31,11 +33,25 @@ define(function (require) {
 
   	    render : function(){
   	    	if( tpl !== null ){
-	  	    	var renderedContent = this.template({
+				var template_args = {
 					title : Config.app_title, 
 					menu : '<div id="app-menu"></div>', 
 					TemplateTags : ThemeTplTags
-				});
+				};
+				
+				/**
+				 * Use this 'template-args' filter to pass custom data to your
+				 * templates.
+				 * 
+				 * @param template_args : JSON object : the default template data to filter
+				 * Params passed to the filter : 
+				 * - view type : String
+				 * - template name : String
+				 * - view object : Backbone view object
+				 */
+				template_args = Hooks.applyFilters( 'template-args', template_args, ['header','header',this] );
+				
+	  	    	var renderedContent = this.template(template_args);
 	  	        $(this.el).html(renderedContent);
   	    	}
   	        return this;

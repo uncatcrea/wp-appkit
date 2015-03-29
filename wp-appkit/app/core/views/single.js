@@ -5,7 +5,8 @@ define(function (require) {
     var $                   = require('jquery'),
 		_                   = require('underscore'),
         TemplateView        = require('core/views/backbone-template-view'),
-        ThemeTplTags		= require('core/theme-tpl-tags');
+        ThemeTplTags		= require('core/theme-tpl-tags'),
+		Hooks               = require('core/lib/hooks');
 
     return TemplateView.extend({
     	
@@ -33,6 +34,18 @@ define(function (require) {
 			}	
 			
 			template_args.TemplateTags = ThemeTplTags;
+			
+			/**
+			* Use this 'template-args' filter to pass custom data to your
+			* templates.
+			* 
+			* @param template_args : JSON object : the default template data to filter
+			* Params passed to the filter : 
+			* - view type : String
+			* - template name : String
+			* - view object : Backbone view object
+			*/
+			template_args = Hooks.applyFilters( 'template-args', template_args, ['single',this.template_name,this] );
 			
         	var renderedContent = this.template(template_args);
 			
