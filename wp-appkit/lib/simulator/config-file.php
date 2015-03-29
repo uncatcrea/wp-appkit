@@ -34,7 +34,7 @@ class WpakConfigFile {
 					$app_id = $app->ID;
 
 					$default_capability = current_user_can('wpak_edit_apps') ? 'wpak_edit_apps' : 'manage_options';
-					
+
 					$capability = apply_filters( 'wpak_private_simulation_capability', $default_capability, $app_id );
 
 					if ( WpakApps::get_app_simulation_is_secured( $app_id ) && !current_user_can( $capability ) ) {
@@ -61,7 +61,7 @@ class WpakConfigFile {
 					exit();
 				}
 			} else {
-				_e( 'App id not found in _GET parmeters', WpAppKit::i18n_domain );
+				_e( 'App id not found in _GET parameters', WpAppKit::i18n_domain );
 				exit();
 			}
 		}
@@ -75,7 +75,7 @@ class WpakConfigFile {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		$app_title = $app_main_infos['title'];
-		
+
 		$app_version = WpakApps::sanitize_app_version( $app_main_infos['version'] );
 
 		$debug_mode = WpakBuild::get_app_debug_mode( $app_id );
@@ -84,7 +84,7 @@ class WpakConfigFile {
 		//TODO : options to choose if the auth key is displayed in config.js.
 
 		$options = WpakOptions::get_app_options( $app_id );
-		
+
 		$addons = WpakAddons::get_app_addons_for_config( $app_id );
 
 		if ( !$echo ) {
@@ -110,7 +110,7 @@ define( function ( require ) {
 		?>,
 		options : <?php echo json_encode( $options ); ?>,
 		addons : <?php echo json_encode( $addons ) ?>
-		
+
 	};
 
 });
@@ -125,7 +125,7 @@ define( function ( require ) {
 	}
 
 	public static function get_config_xml( $app_id, $echo = false ) {
-		
+
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		$app_name = $app_main_infos['name'];
 		$app_description = $app_main_infos['desc'];
@@ -138,7 +138,7 @@ define( function ( require ) {
 		$app_author_website = $app_main_infos['author_website'];
 		$app_platform = $app_main_infos['platform'];
 		$app_icons = $app_main_infos['icons'];
-		
+
 		//Merge our default Phonegap Build plugins to those set in BO :
 		$app_phonegap_plugins = WpakApps::get_merged_phonegap_plugins_xml($app_id, $app_main_infos['phonegap_plugins']);
 
@@ -166,10 +166,10 @@ define( function ( require ) {
 
 	<gap:platform name="<?php echo $app_platform ?>" />
 <?php if( !empty( $app_phonegap_version ) ): ?>
-	
+
 	<preference name="phonegap-version" value="<?php echo $app_phonegap_version ?>" />
 <?php endif ?>
-<?php 
+<?php
 	/**
 	* Filter to handle the  "Webview bounce effect" on devices.
 	* Pass false to this filter to allow the "Webview bounce effect".
@@ -178,11 +178,11 @@ define( function ( require ) {
 	* @param int		$app_id		Application id
 	*/
 	if( apply_filters('wpak_config_xml_preference_disallow_overscroll', true, $app_id ) ): ?>
-	
+
 	<preference name="<?php echo $app_platform == 'android' ? 'd' : 'D' ?>isallowOverscroll" value="true" />
 	<preference name="webviewbounce" value="false" />
 <?php endif ?>
-	
+
 	<!-- Add Icon, Splash screen and any PhoneGap plugin declaration here -->
 <?php if( !empty( $app_icons ) ): ?>
 
