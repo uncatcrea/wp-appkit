@@ -54,3 +54,11 @@
 .wpak_help:focus, .wpak_help:hover {
     color:#333;
 }
+
+.wpak_phonegap_links {
+    line-height:28px;
+}
+
+.wpak_phonegap_export {
+    float:right;
+}
