@@ -287,8 +287,9 @@ class WpakApps {
 				<textarea name="wpak_app_icons" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
 				<span class="description"><?php _e( 'Write the icons and spashscreens tags as defined in the PhoneGap documentation.<br/>Example : &lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;', WpAppKit::i18n_domain ) ?></span>
 			</div>
-			<div class="field-group">
+			<div class="field-group wpak_phonegap_links">
 				<a href="<?php echo WpakBuild::get_appli_dir_url() . '/config.xml?wpak_app_id=' . self::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.xml', WpAppKit::i18n_domain ) ?></a>
+				<a href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ?>" class="button wpak_phonegap_export" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
 			</div>
 			<?php wp_nonce_field( 'wpak-phonegap-infos-' . $post->ID, 'wpak-nonce-phonegap-infos' ) ?>
 		</div>
