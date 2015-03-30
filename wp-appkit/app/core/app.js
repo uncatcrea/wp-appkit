@@ -491,102 +491,122 @@ define(function (require) {
       };
 	  
 	  var syncWebService = function(cb_ok,cb_error,force_reload){
-		  var token = getToken('synchronization');
-    	  var ws_url = token +'/synchronization/';
+			var token = getToken( 'synchronization' );
+			var ws_url = token + '/synchronization/';
 
-		  /**
-		  * Filter 'synchronization-params' : use this to send custom key/value formated  
-		  * data to the synchronization web service. Those data are passed to the server 
-		  * ($_GET) when calling the synchronization web service.
-		  */
-		  var sync_params = Hooks.applyFilters('synchronization-params',{},[]);
+			/**
+			 * Filter 'synchronization-params' : use this to send custom key/value formated  
+			 * data to the synchronization web service. Those data are passed to the server 
+			 * ($_GET) when calling the web service.
+			 */
+			var sync_params = Hooks.applyFilters( 'synchronization-params', {}, [] );
 
-		  $.ajax({
-				url : Config.wp_ws_url + ws_url,
-				timeout : 40000,
-				dataType : 'json',
-				data : sync_params,
-				success : function(data) {
-				  	  if( data.hasOwnProperty('result') && data.result.hasOwnProperty('status') ){
-				  		  if( data.result.status == 1 ){
-				  			  if( data.hasOwnProperty('components')
-				  				  && data.hasOwnProperty('navigation')
-				  				  && data.hasOwnProperty('globals')
-				  				  ){
+			var ajax_args = {
+				timeout: 40000,
+				data: sync_params
+			};
+			
+			/**
+			 * Filter 'ajax-args' : allows to customize the web service jQuery ajax call.
+			 * Any jQuery.ajax() arg can be passed here except for : 'url', 'type', 'dataType', 
+			 * 'success' and 'error' that are reserved by app core.
+			 * 
+			 * Filtered data : ajax_args : JSON object containing jQuery.ajax() arguments.
+			 * Filter arguments : 
+			 * - web_service_name : string : name of the current web service ('synchronization' here).
+			 */
+			ajax_args = Hooks.applyFilters( 'ajax-args', ajax_args, ['synchronization'] );
+			
+			ajax_args.url = Config.wp_ws_url + ws_url;
+			
+			ajax_args.type = 'GET';
+			
+			ajax_args.dataType = 'json';
 
-					  			  app.components.resetAll();
-								  _.each(data.components,function(value, key, list){
-									  app.components.add({id:key,label:value.label,type:value.type,data:value.data,global:value.global});
-								  });
-								  app.components.saveAll();
+			ajax_args.success = function( data ) {
+				if ( data.hasOwnProperty( 'result' ) && data.result.hasOwnProperty( 'status' ) ) {
+					if ( data.result.status == 1 ) {
+						if ( data.hasOwnProperty( 'components' )
+								&& data.hasOwnProperty( 'navigation' )
+								&& data.hasOwnProperty( 'globals' )
+								) {
 
-								  app.navigation.resetAll();
-								  _.each(data.navigation,function(options, key, list){
-									  app.navigation.add({id:key,component_id:key,options:options});
-								  });
-								  app.navigation.saveAll();
+							app.components.resetAll();
+							_.each( data.components, function( value, key, list ) {
+								app.components.add( { id: key, label: value.label, type: value.type, data: value.data, global: value.global } );
+							} );
+							app.components.saveAll();
 
-								  globals_keys.resetAll();
-								  _.each(data.globals,function(global, key, list){
-									  var items = new Items.Items({global:key});
-									  items.resetAll();
-									  _.each(global,function(item, id){
-										  items.add(_.extend({id:id},item));
-									  });
-									  items.saveAll();
-									  app.globals[key] = items;
-									  globals_keys.add({id:key});
-								  });
-								  globals_keys.saveAll();
+							app.navigation.resetAll();
+							_.each( data.navigation, function( options, key, list ) {
+								app.navigation.add( { id: key, component_id: key, options: options } );
+							} );
+							app.navigation.saveAll();
 
-								  Stats.incrementContentLastUpdate();
+							globals_keys.resetAll();
+							_.each( data.globals, function( global, key, list ) {
+								var items = new Items.Items( { global: key } );
+								items.resetAll();
+								_.each( global, function( item, id ) {
+									items.add( _.extend( { id: id }, item ) );
+								} );
+								items.saveAll();
+								app.globals[key] = items;
+								globals_keys.add( { id: key } );
+							} );
+							globals_keys.saveAll();
 
-								  Addons.setDynamicDataFromWebService( data.addons );
+							Stats.incrementContentLastUpdate();
 
-								  Utils.log('Components, navigation and globals retrieved from online.',{components:app.components,navigation:app.navigation,globals:app.globals});
+							Addons.setDynamicDataFromWebService( data.addons );
 
-								  cb_ok();
+							Utils.log( 'Components, navigation and globals retrieved from online.', { components: app.components, navigation: app.navigation, globals: app.globals } );
 
-								  // @TODO: find a better way to do this?
-								  addFavoritesToGlobals();
-				  			  }else{
-				  				  app.triggerError(
-				  						'synchro:wrong-answer',
-							  			{type:'ws-data',where:'app::syncWebService',message: 'Wrong "synchronization" web service answer',data: data},
-				    		  		    cb_error
-							  	  );
-				  			  }
+							cb_ok();
 
-				  		  }else if( data.result.status == 0 ){
-				  			  app.triggerError(
-				  					'synchro:ws-return-error',
-						  			{type:'ws-data',where:'app::syncWebService',message: 'Web service "synchronization" returned an error : ['+ data.result.message +']', data:data},
-			    		  		    cb_error
-						  	  );
-				  		  }else{
-				  			  app.triggerError(
-				  					'synchro:wrong-status',
-						  			{type:'ws-data',where:'app::syncWebService',message: 'Wrong web service answer status',data: data},
-			    		  		    cb_error
-						  	  );
-				  		  }
-				  	  }else{
-				  		  app.triggerError(
-				  				'synchro:wrong-format',
-					  			{type:'ws-data',where:'app::syncWebService',message: 'Wrong web service answer format',data: data},
-		    		  		    cb_error
-					  	  );
-				  	  }
+							// @TODO: find a better way to do this?
+							addFavoritesToGlobals();
+						} else {
+							app.triggerError(
+								'synchro:wrong-answer',
+								{ type: 'ws-data', where: 'app::syncWebService', message: 'Wrong "synchronization" web service answer', data: data },
+								cb_error
+							);
+						}
 
-				},
-			  	error : function(jqXHR, textStatus, errorThrown){
-			  		app.triggerError(
-			  			'synchro:ajax',
-			  			{type:'ajax',where:'app::syncWebService',message: textStatus + ': '+ errorThrown, data:{url: Config.wp_ws_url + ws_url, jqXHR:jqXHR, textStatus:textStatus, errorThrown:errorThrown}},
-    		  		    cb_error
-			  		);
-			  	}
-		  });
+					} else if ( data.result.status == 0 ) {
+						app.triggerError(
+							'synchro:ws-return-error',
+							{ type: 'ws-data', where: 'app::syncWebService', message: 'Web service "synchronization" returned an error : [' + data.result.message + ']', data: data },
+							cb_error
+						);
+					} else {
+						app.triggerError(
+							'synchro:wrong-status',
+							{ type: 'ws-data', where: 'app::syncWebService', message: 'Wrong web service answer status', data: data },
+							cb_error
+						);
+					}
+					
+				} else {
+					app.triggerError(
+						'synchro:wrong-format',
+						{ type: 'ws-data', where: 'app::syncWebService', message: 'Wrong web service answer format', data: data },
+						cb_error
+					);
+				}
+
+			};
+		  
+			ajax_args.error = function( jqXHR, textStatus, errorThrown ) {
+				app.triggerError(
+					'synchro:ajax',
+					{ type: 'ajax', where: 'app::syncWebService', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } },
+					cb_error
+				);
+			};
+		  
+			$.ajax( ajax_args );
 	  };
 
 	  /**
@@ -625,31 +645,51 @@ define(function (require) {
 
     	  if( post != undefined ){
 			  
-			  /**
-			  * Filter 'get-post-comments-params' : use this to send custom key/value formated  
-			  * data to the "get post comments" web service. Those data are passed to the server 
-			  * ($_GET) when calling the synchronization web service.
-			  */
-			  var get_post_comments_params = Hooks.applyFilters('get-post-comments-params',{},[]);
+			/**
+			* Filter 'get-post-comments-params' : use this to send custom key/value formated  
+			* data to the "get post comments" web service. Those data are passed to the server 
+			* ($_GET) when calling the web service.
+			*/
+			var get_post_comments_params = Hooks.applyFilters('get-post-comments-params',{},[]);
 			  
-	    	  $.ajax({
-	    		  type: 'GET',
-	    		  url: Config.wp_ws_url + ws_url,
-				  data: get_post_comments_params,
-	    		  success: function(data) {
-		    		  	_.each(data.items,function(value, key, list){
-		    		  		comments.add(value);
-		    	  		});
-		    		  	cb_ok(comments,post);
-		    	  },
-		    	  error: function(jqXHR, textStatus, errorThrown){
-		    		  app.triggerError(
-		    			  'comments:ajax',
-		    			  {type:'ajax',where:'app::getPostComments',message: textStatus + ': '+ errorThrown,data:{url: Config.wp_ws_url + ws_url, jqXHR:jqXHR, textStatus:textStatus, errorThrown:errorThrown}},
-	    		  		  cb_error
-	        		  );
-		    	  }
-	    	  });
+			var ajax_args = {
+				data: get_post_comments_params
+			};
+			
+			/**
+			 * Filter 'ajax-args' : allows to customize the web service jQuery ajax call.
+			 * Any jQuery.ajax() arg can be passed here except for : 'url', 'type', 'dataType', 
+			 * 'success' and 'error' that are reserved by app core.
+			 * 
+			 * Filtered data : ajax_args : JSON object containing jQuery.ajax() arguments.
+			 * Filter arguments : 
+			 * - web_service_name : string : name of the current web service ('get-post-comments' here).
+			 */
+			ajax_args = Hooks.applyFilters( 'ajax-args', ajax_args, ['get-post-comments'] );
+			
+			ajax_args.url = Config.wp_ws_url + ws_url;
+			
+			ajax_args.type = 'GET';
+			
+			ajax_args.dataType = 'json';
+
+			ajax_args.success = function( data ) {
+				_.each( data.items, function( value, key, list ) {
+					comments.add( value );
+				} );
+				cb_ok( comments, post );
+			};
+			
+			ajax_args.error = function( jqXHR, textStatus, errorThrown ) {
+				app.triggerError(
+					'comments:ajax',
+					{ type: 'ajax', where: 'app::getPostComments', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } },
+					cb_error
+				);
+			};
+			  
+	    	$.ajax( ajax_args );
+			
     	  }else{
     		  app.triggerError(
     			  'comments:post-not-found',
@@ -674,90 +714,109 @@ define(function (require) {
       }
 
       app.getMoreOfComponent = function(component_id,cb_ok,cb_error){
-    	  var component = app.components.get(component_id);
-    	  if( component ){
+			var component = app.components.get( component_id );
+			if ( component ) {
 
-    		  var component_data = component.get('data');
+				var component_data = component.get( 'data' );
 
-    		  if( component_data.hasOwnProperty('ids') ){
+				if ( component_data.hasOwnProperty( 'ids' ) ) {
 
-		    	  var token = getToken('component');
-		    	  var ws_url = token +'/component/'+ component_id;
+					var token = getToken( 'component' );
+					var ws_url = token + '/component/' + component_id;
 
-		    	  var last_item_id = _.last(component_data.ids);
-		    	  ws_url += '?before_item='+ last_item_id;
+					var last_item_id = _.last( component_data.ids );
+					ws_url += '?before_item=' + last_item_id;
 
-				  /**
-				  * Filter 'get-more-of-component-params' : use this to send custom key/value formated  
-				  * data to the "get more of component" web service. Those data are passed to the server 
-				  * ($_GET) when calling the synchronization web service.
-				  */
-				  var get_more_of_component_params = Hooks.applyFilters('get-more-of-component-params',{},[]);
+					/**
+					 * Filter 'get-more-of-component-params' : use this to send custom key/value formated  
+					 * data to the "get more of component" web service. Those data are passed to the server 
+					 * ($_GET) when calling the web service.
+					 */
+					var get_more_of_component_params = Hooks.applyFilters( 'get-more-of-component-params', {}, [] );
 
-		    	  $.ajax({
-		    		  type: 'GET',
-		    		  url: Config.wp_ws_url + ws_url,
-					  data: get_more_of_component_params,
-		    		  success: function(answer) {
-			    		  if( answer.result && answer.result.status == 1 ){
-			    			  if( answer.component.slug == component_id ){
-			    				  var global = answer.component.global;
-			    				  if( app.globals.hasOwnProperty(global) ){
+					var ajax_args = {
+						data: get_more_of_component_params
+					};
 
-			    					  var new_ids = _.difference(answer.component.data.ids,component_data.ids);
+					/**
+					 * Filter 'ajax-args' : allows to customize the web service jQuery ajax call.
+					 * Any jQuery.ajax() arg can be passed here except for : 'url', 'type', 'dataType', 
+					 * 'success' and 'error' that are reserved by app core.
+					 * 
+					 * Filtered data : ajax_args : JSON object containing jQuery.ajax() arguments.
+					 * Filter arguments : 
+					 * - web_service_name : string : name of the current web service ('get-more-of-component' here).
+					 */
+					ajax_args = Hooks.applyFilters( 'ajax-args', ajax_args, [ 'get-more-of-component' ] );
 
-			    					  component_data.ids = _.union(component_data.ids,answer.component.data.ids); //merge ids
-			    					  component.set('data',component_data);
+					ajax_args.url = Config.wp_ws_url + ws_url;
 
-				    				  var current_items = app.globals[global];
-									  _.each(answer.globals[global],function(item, id){
-										  current_items.add(_.extend({id:id},item)); //auto merges if "id" already in items
-									  });
+					ajax_args.type = 'GET';
 
-			    					  var new_items = [];
-									  _.each(new_ids,function(item_id){
-										  new_items.push(current_items.get(item_id));
-				          	  		  });
+					ajax_args.dataType = 'json';
 
-									  var nb_left = component_data.total - component_data.ids.length;
-									  var is_last = !_.isEmpty(answer.component.data.query.is_last_page) ? true : nb_left <= 0;
+					ajax_args.success = function( answer ) {
+						if ( answer.result && answer.result.status == 1 ) {
+							if ( answer.component.slug == component_id ) {
+								var global = answer.component.global;
+								if ( app.globals.hasOwnProperty( global ) ) {
 
-									  Utils.log('More content retrieved for component',{component_id:component_id,new_ids:new_ids,new_items:new_items,component:component});
+									var new_ids = _.difference( answer.component.data.ids, component_data.ids );
 
-									  cb_ok(new_items,is_last,{nb_left:nb_left,new_ids:new_ids,global:global,component:component});
+									component_data.ids = _.union( component_data.ids, answer.component.data.ids ); //merge ids
+									component.set( 'data', component_data );
 
-			    				  }else{
-				    				  app.triggerError(
-				    					  'getmore:global-not-found',
-				    					  {type:'not-found',where:'app::getMoreOfComponent',message:'Global not found : '+ global},
-								  		  cb_error
-						    		  );
-				    			  }
-			    			  }else{
-							  	  app.triggerError(
-							  		  'getmore:wrong-component-id',
-							  		  {type:'not-found',where:'app::getMoreOfComponent',message:'Wrong component id : '+ component_id},
-							  		  cb_error
-					    		  );
-			    			  }
-			    		  }else{
-						  	  app.triggerError(
-						  		  'getmore:ws-return-error',
-						  		  {type:'web-service',where:'app::getMoreOfComponent',message:'Web service "component" returned an error : ['+ answer.result.message +']'},
-						  		  cb_error
-				    		  );
-			    		  }
-			    	  },
-			    	  error: function(jqXHR, textStatus, errorThrown){
-			    		  app.triggerError(
-			    			  'getmore:ajax',
-			    			  {type:'ajax',where:'app::getMoreOfComponent',message: textStatus + ': '+ errorThrown,data:{url: Config.wp_ws_url + ws_url, jqXHR:jqXHR, textStatus:textStatus, errorThrown:errorThrown}},
-			    			  cb_error
-			    		  );
-			    	  }
-		    	  });
-    		  }
-    	  }
+									var current_items = app.globals[global];
+									_.each( answer.globals[global], function( item, id ) {
+										current_items.add( _.extend( { id: id }, item ) ); //auto merges if "id" already in items
+									} );
+
+									var new_items = [ ];
+									_.each( new_ids, function( item_id ) {
+										new_items.push( current_items.get( item_id ) );
+									} );
+
+									var nb_left = component_data.total - component_data.ids.length;
+									var is_last = !_.isEmpty( answer.component.data.query.is_last_page ) ? true : nb_left <= 0;
+
+									Utils.log( 'More content retrieved for component', { component_id: component_id, new_ids: new_ids, new_items: new_items, component: component } );
+
+									cb_ok( new_items, is_last, { nb_left: nb_left, new_ids: new_ids, global: global, component: component } );
+
+								} else {
+									app.triggerError(
+										'getmore:global-not-found',
+										{ type: 'not-found', where: 'app::getMoreOfComponent', message: 'Global not found : ' + global },
+										cb_error
+									);
+								}
+							} else {
+								app.triggerError(
+									'getmore:wrong-component-id',
+									{ type: 'not-found', where: 'app::getMoreOfComponent', message: 'Wrong component id : ' + component_id },
+									cb_error
+								);
+							}
+						} else {
+							app.triggerError(
+								'getmore:ws-return-error',
+								{ type: 'web-service', where: 'app::getMoreOfComponent', message: 'Web service "component" returned an error : [' + answer.result.message + ']' },
+								cb_error
+							);
+						}
+					};
+
+					ajax_args.error = function( jqXHR, textStatus, errorThrown ) {
+						app.triggerError(
+							'getmore:ajax',
+							{ type: 'ajax', where: 'app::getMoreOfComponent', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } },
+							cb_error
+						);
+					}
+
+					$.ajax( ajax_args );
+				}
+			}
       };
 
       app.sendInfo = function(info, data){
