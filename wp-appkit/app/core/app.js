@@ -624,9 +624,18 @@ define(function (require) {
     	  var post = app.globals['posts'].get(post_id);
 
     	  if( post != undefined ){
+			  
+			  /**
+			  * Filter 'get-post-comments-params' : use this to send custom key/value formated  
+			  * data to the "get post comments" web service. Those data are passed to the server 
+			  * ($_GET) when calling the synchronization web service.
+			  */
+			  var get_post_comments_params = Hooks.applyFilters('get-post-comments-params',{},[]);
+			  
 	    	  $.ajax({
 	    		  type: 'GET',
 	    		  url: Config.wp_ws_url + ws_url,
+				  data: get_post_comments_params,
 	    		  success: function(data) {
 		    		  	_.each(data.items,function(value, key, list){
 		    		  		comments.add(value);
