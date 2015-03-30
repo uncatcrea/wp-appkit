@@ -678,9 +678,17 @@ define(function (require) {
 		    	  var last_item_id = _.last(component_data.ids);
 		    	  ws_url += '?before_item='+ last_item_id;
 
+				  /**
+				  * Filter 'get-more-of-component-params' : use this to send custom key/value formated  
+				  * data to the "get more of component" web service. Those data are passed to the server 
+				  * ($_GET) when calling the synchronization web service.
+				  */
+				  var get_more_of_component_params = Hooks.applyFilters('get-more-of-component-params',{},[]);
+
 		    	  $.ajax({
 		    		  type: 'GET',
 		    		  url: Config.wp_ws_url + ws_url,
+					  data: get_more_of_component_params,
 		    		  success: function(answer) {
 			    		  if( answer.result && answer.result.status == 1 ){
 			    			  if( answer.component.slug == component_id ){
