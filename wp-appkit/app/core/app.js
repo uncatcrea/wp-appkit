@@ -495,15 +495,20 @@ define(function (require) {
 			var ws_url = token + '/synchronization/';
 
 			/**
-			 * Filter 'synchronization-params' : use this to send custom key/value formated  
-			 * data to the synchronization web service. Those data are passed to the server 
-			 * ($_GET) when calling the web service.
-			 */
-			var sync_params = Hooks.applyFilters( 'synchronization-params', {}, [] );
-
+			* Filter 'web-service-params' : use this to send custom key/value formated  
+			* data along with the web service. Those params are passed to the server 
+			* (via $_GET) when calling the web service.
+			* 
+			* Filtered data : web_service_params : JSON object where you can add your custom web service params
+			* Filter arguments : 
+			* - web_service_name : string : name of the current web service ('synchronization' here).
+			*/
+			var web_service_params = Hooks.applyFilters('web-service-params',{},['synchronization']);
+			  
+			//Build the ajax query :
 			var ajax_args = {
 				timeout: 40000,
-				data: sync_params
+				data: web_service_params
 			};
 			
 			/**
@@ -646,14 +651,19 @@ define(function (require) {
     	  if( post != undefined ){
 			  
 			/**
-			* Filter 'get-post-comments-params' : use this to send custom key/value formated  
-			* data to the "get post comments" web service. Those data are passed to the server 
-			* ($_GET) when calling the web service.
+			* Filter 'web-service-params' : use this to send custom key/value formated  
+			* data along with the web service. Those params are passed to the server 
+			* (via $_GET) when calling the web service.
+			* 
+			* Filtered data : web_service_params : JSON object where you can add your custom web service params
+			 * Filter arguments : 
+			 * - web_service_name : string : name of the current web service ('get-post-comments' here).
 			*/
-			var get_post_comments_params = Hooks.applyFilters('get-post-comments-params',{},[]);
+			var web_service_params = Hooks.applyFilters('web-service-params',{},['get-post-comments']);
 			  
+			//Build the ajax query :
 			var ajax_args = {
-				data: get_post_comments_params
+				data: web_service_params
 			};
 			
 			/**
@@ -728,14 +738,19 @@ define(function (require) {
 					ws_url += '?before_item=' + last_item_id;
 
 					/**
-					 * Filter 'get-more-of-component-params' : use this to send custom key/value formated  
-					 * data to the "get more of component" web service. Those data are passed to the server 
-					 * ($_GET) when calling the web service.
-					 */
-					var get_more_of_component_params = Hooks.applyFilters( 'get-more-of-component-params', {}, [] );
-
+					* Filter 'web-service-params' : use this to send custom key/value formated  
+					* data along with the web service. Those params are passed to the server 
+					* (via $_GET) when calling the web service.
+					* 
+					* Filtered data : web_service_params : JSON object where you can add your custom web service params
+					* Filter arguments : 
+					* - web_service_name : string : name of the current web service ('get-more-of-component' here).
+					*/
+					var web_service_params = Hooks.applyFilters('web-service-params',{},['get-more-of-component']);
+			  
+					//Build the ajax query :
 					var ajax_args = {
-						data: get_more_of_component_params
+						data: web_service_params
 					};
 
 					/**
