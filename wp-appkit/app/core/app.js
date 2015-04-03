@@ -827,12 +827,101 @@ define(function (require) {
 							{ type: 'ajax', where: 'app::getMoreOfComponent', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } },
 							cb_error
 						);
-					}
+					};
 
 					$.ajax( ajax_args );
 				}
 			}
       };
+	  
+	/**
+	 * Live query web service 
+	 * 
+	 * @param JSON Object args
+	 * @param callback cb_ok
+	 * @param callback cb_error
+	 * @param boolean auto_interpret_result If false, web service answer must be interpreted in the cb_ok callback.
+	 * @param string interpretation_type can be :
+	 * - "update" : merge new with existing component data, 
+	 * - "replace" : delete current component data and replace with new
+	 * - "replace-keep-global-items" : for list components : replace component ids and merge global items 
+	 * @param boolean persistent
+	 */
+	app.liveQuery = function( web_service_params, cb_ok, cb_error, auto_interpret_result, interpretation_type, persistent ) {
+		
+		auto_interpret_result = ( auto_interpret_result !== undefined ) && ( auto_interpret_result === true );
+		interpretation_type = ( interpretation_type !== undefined ) ? interpretation_type : 'replace';
+		persistent = ( persistent !== undefined ) && persistent === true;
+		
+		var token = getToken( 'live-query' );
+		var ws_url = token + '/live-query';
+		
+		/**
+		* Filter 'web-service-params' : use this to send custom key/value formated  
+		* data along with the web service. Those params are passed to the server 
+		* (via $_GET) when calling the web service.
+		* 
+		* Filtered data : web_service_params : JSON object where you can add your custom web service params
+		* Filter arguments : 
+		* - web_service_name : string : name of the current web service ('live-query' here).
+		*/
+		web_service_params = Hooks.applyFilters( 'web-service-params', web_service_params, [ 'live-query' ] );
+
+		//Build the ajax query :
+		var ajax_args = {
+			data: web_service_params
+		};
+
+		/**
+		 * Filter 'ajax-args' : allows to customize the web service jQuery ajax call.
+		 * Any jQuery.ajax() arg can be passed here except for : 'url', 'type', 'dataType', 
+		 * 'success' and 'error' that are reserved by app core.
+		 * 
+		 * Filtered data : ajax_args : JSON object containing jQuery.ajax() arguments.
+		 * Filter arguments : 
+		 * - web_service_name : string : name of the current web service ('get-more-of-component' here).
+		 */
+		ajax_args = Hooks.applyFilters( 'ajax-args', ajax_args, [ 'live-query' ] );
+
+		ajax_args.url = Config.wp_ws_url + ws_url;
+
+		ajax_args.type = 'GET';
+
+		ajax_args.dataType = 'json';
+
+		ajax_args.success = function( answer ) {
+
+			console.log( 'In liveQuery success : answer', answer );
+
+			if ( answer.result && answer.result.status == 1 ) {
+
+				if ( auto_interpret_result ) {
+					//TODO!
+				}
+
+				if ( cb_ok ) {
+					cb_ok( answer );
+				}
+
+			} else {
+				app.triggerError(
+					'live-query:ws-return-error',
+					{ type: 'web-service', where: 'app::liveQuery', message: 'Web service "liveQuery" returned an error : [' + answer.result.message + ']' },
+					cb_error
+				);
+			}
+		};
+		
+		ajax_args.error = function( jqXHR, textStatus, errorThrown ) {
+			app.triggerError(
+				'live-query:ajax',
+				{ type: 'ajax', where: 'app::liveQuery', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } },
+				cb_error
+			);
+		};
+
+		$.ajax( ajax_args );
+	};
 
       app.sendInfo = function(info, data){
 		  //Note : we want to control which info is sent by the app :
