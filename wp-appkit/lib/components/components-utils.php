@@ -70,7 +70,7 @@ class WpakComponentsUtils {
 	public static function get_unavailable_media_img() {
 
 		$params = array(
-			'src' => get_bloginfo( 'wpurl' ) . '/wp-content/uploads/wpak_unavailable_media.png',
+			'src' => site_url() . '/wp-content/uploads/wpak_unavailable_media.png',
 			'width' => 604,
 			'height' => 332
 		);

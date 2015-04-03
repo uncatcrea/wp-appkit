@@ -31,13 +31,12 @@ class WpakAddons {
 
 	public static function rewrite_rules() {
 		add_rewrite_tag( '%wpak_addon_file%', '([^&]+)' );
-		$wp_content = str_replace( ABSPATH, '', WP_CONTENT_DIR );
-		$url_to_addons_files = plugins_url( 'app/addons', dirname( dirname( __FILE__ ) ) );
-		$wp_content_pos = strpos( $url_to_addons_files, $wp_content );
-		if ( $wp_content_pos !== false ) {
-			$addons_file_prefix = substr( $url_to_addons_files, $wp_content_pos ); //Something like "wp-content/plugins/wp-appkit/app/addons"
-			add_rewrite_rule( '^' . $addons_file_prefix . '/(.*[\.js|\.css|\.html])$', 'index.php?wpak_addon_file=$matches[1]', 'top' );
-		}
+		
+		$home_url = home_url(); //Something like "http://my-site.com"
+		$url_to_addons_files = plugins_url( 'app/addons', dirname( dirname( __FILE__ ) ) ); //Something like "http://my-site.com/wp-content/plugins/wp-appkit/app/addons"
+		$addons_file_prefix = str_replace( trailingslashit($home_url), '', $url_to_addons_files ); //Something like "wp-content/plugins/wp-appkit/app/addons"
+		
+		add_rewrite_rule( '^' . $addons_file_prefix . '/(.*[\.js|\.css|\.html])$', 'index.php?wpak_addon_file=$matches[1]', 'top' );
 	}
 
 	public static function template_redirect() {
