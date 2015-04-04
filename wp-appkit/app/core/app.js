@@ -834,23 +834,166 @@ define(function (require) {
 			}
       };
 	  
+	 /**
+	 * Update a component
+	 * 
+	 * @param JSON object new_component Component containing new data
+	 * @param array new_globals Array of new items referenced by the new component
+	 * @param string type Type of update. Can be :
+	 * - "update" : merge new with existing component data, 
+	 * - "replace" : delete current component data and replace with new
+	 * - "replace-keep-global-items" (default) : for list components : replace component ids and merge global items 
+	 * @param boolean persistent (default false). If true, new data is stored in local storage.
+	 */
+	var update_component = function( new_component, new_globals, type, persistent ) {
+
+		type = ( type !== undefined ) ? type : 'replace-keep-global-items';
+		persistent = ( persistent !== undefined ) && persistent === true;
+		
+		var result = { ok:true, message:'', type: '', data: {} };
+
+		if ( !new_component.data || !new_component.slug ) {
+			//Passed object is not a well formated component
+			result.ok = false;
+			result.type = 'bad-format';
+			result.message = 'Wrong component format';
+			return result;
+		}
+		
+		if ( type !== 'update' && type !== 'replace' && type !== 'replace-keep-global-items' ) {
+			result.ok = false;
+			result.type = 'bad-format';
+			result.message = 'Wrong type : '+ type;
+			return result;
+		}
+
+		var existing_component = app.components.get( new_component.slug );
+    	if( existing_component ) {
+
+			var existing_component_data = existing_component.data;
+			var new_component_data = new_component.data;
+
+			if ( new_component_data.hasOwnProperty( 'ids' ) ) { //List component
+
+				if( new_component.global ) {
+					
+					var global = new_component.global;
+					if ( app.globals.hasOwnProperty( global ) ) {
+
+						var new_ids = [ ];
+						if ( type == "replace" || type == "replace-keep-global-items" ) {
+							new_ids = new_component_data.ids;
+						} else {
+							new_ids = _.difference( new_component_data.ids, existing_component_data.ids );
+							new_component_data.ids = _.union( existing_component_data.ids, new_component_data.ids ); //merge ids
+						}
+
+						existing_component.set( 'data', new_component_data );
+
+						var current_items = app.globals[global];
+						if ( type == "replace" ) {
+							current_items.resetAll();
+						}
+
+						_.each( new_globals[global], function( item, id ) {
+							current_items.add( _.extend( { id: id }, item ) ); //auto merges if "id" already in items
+						} );
+
+						var new_items = [ ];
+						_.each( new_ids, function( item_id ) {
+							new_items.push( current_items.get( item_id ) );
+						} );
+
+						if ( persistent ) {
+							existing_component.save();
+							current_items.saveAll();
+						}
+
+						result.data = { new_ids: new_ids, new_items: new_items, component: existing_component };
+
+					} else {
+						result.ok = false;
+						result.type = 'not-found';
+						result.message = 'Global not found : ' + global;
+					}
+					
+				} else {
+					//A list component must have a global
+					result.ok = false;
+					result.type = 'bad-format';
+					result.message = 'List component must have a global';
+				}
+				
+			} else { //Non list component
+
+				if ( type == "update" ) {
+					new_component_data = _.extend( existing_component_data, new_component_data );
+				} else { //replace or replace-keep-global-items
+					//nothing : new_component_data is ready to be set
+				}
+
+				existing_component.set( 'data', new_component_data );
+
+				if ( persistent ) {
+					existing_component.save();
+				}
+				
+				if( new_component.global ) { //Page component for example
+					
+					var global = new_component.global;
+					if ( app.globals.hasOwnProperty( global ) ) {
+						
+						var current_items = app.globals[global];
+						if ( type == "replace" ) {
+							current_items.resetAll();
+						}
+
+						_.each( new_globals[global], function( item, id ) {
+							current_items.add( _.extend( { id: id }, item ) ); //auto merges if "id" already in items
+						} );
+						
+						if ( persistent ) {
+							current_items.save();
+						}
+
+					} else {
+						result.ok = false;
+						result.type = 'not-found';
+						result.message = 'Global not found : ' + global;
+					}
+					
+				}
+
+				result.data = { component: existing_component };
+
+			}
+			
+		} else {
+			result.ok = false;
+			result.type = 'not-found';
+			result.message = 'Component not found : ' + new_component.slug;
+		}
+		
+		return result;
+	};
+	
 	/**
 	 * Live query web service 
 	 * 
 	 * @param JSON Object args
 	 * @param callback cb_ok
 	 * @param callback cb_error
-	 * @param boolean auto_interpret_result If false, web service answer must be interpreted in the cb_ok callback.
+	 * @param boolean auto_interpret_result (default true). If false, web service answer must be interpreted in the cb_ok callback.
 	 * @param string interpretation_type can be :
 	 * - "update" : merge new with existing component data, 
 	 * - "replace" : delete current component data and replace with new
-	 * - "replace-keep-global-items" : for list components : replace component ids and merge global items 
-	 * @param boolean persistent
+	 * - "replace-keep-global-items" (default) : for list components : replace component ids and merge global items 
+	 * @param boolean persistent (default false). If true, new data is stored in local storage.
 	 */
 	app.liveQuery = function( web_service_params, cb_ok, cb_error, auto_interpret_result, interpretation_type, persistent ) {
 		
-		auto_interpret_result = ( auto_interpret_result !== undefined ) && ( auto_interpret_result === true );
-		interpretation_type = ( interpretation_type !== undefined ) ? interpretation_type : 'replace';
+		auto_interpret_result = ( auto_interpret_result === undefined ) || ( auto_interpret_result === true );
+		interpretation_type = ( interpretation_type !== undefined ) ? interpretation_type : 'replace-keep-global-items';
 		persistent = ( persistent !== undefined ) && persistent === true;
 		
 		var token = getToken( 'live-query' );
@@ -891,18 +1034,59 @@ define(function (require) {
 
 		ajax_args.success = function( answer ) {
 
-			console.log( 'In liveQuery success : answer', answer );
-
 			if ( answer.result && answer.result.status == 1 ) {
 
+				//If we asked to auto interpret and the ws answer is correctly
+				//formated, we update the component(s) from ws data :
 				if ( auto_interpret_result ) {
-					//TODO!
-				}
+					
+					var new_components = {};
+					if ( answer.components ) {
+						new_components = answer.components;
+					} else if( answer.component ) {
+						new_components[answer.component.slug] = answer.component;
+					}
+					
+					if( !_.isEmpty( new_components ) ) {
+						
+						var error_message = '';
+						
+						_.each( new_components, function( component ) {
 
-				if ( cb_ok ) {
-					cb_ok( answer );
-				}
+							var result = update_component( component, answer.globals, interpretation_type, persistent );
 
+							if ( result.ok ) {
+								Utils.log( 'Live query : component "' + component.slug + '" updated ok', result.data, component, { type: interpretation_type, persistent: persistent, auto_interpret_result: auto_interpret_result } );
+							} else {
+								Utils.log( 'Error : Live query : update_component "' + component.slug + '"', result, component );
+								error_message += ( result.message + ' ' );
+							}
+						
+						} );
+						
+						if ( error_message === '' ) {
+							if ( cb_ok ) {
+								cb_ok( answer );
+							}
+						} else {
+							app.triggerError(
+								'live-query:update-component-error',
+								{ type: 'mixed', where: 'app::liveQuery', message: error_message },
+								cb_error
+							);
+						}
+					} 
+					
+				} else {
+					
+					Utils.log( 'Live query ok. Web Service answer : "', answer, ajax_args );
+					
+					if ( cb_ok ) {
+						cb_ok( answer );
+					}
+					
+				}
+				
 			} else {
 				app.triggerError(
 					'live-query:ws-return-error',

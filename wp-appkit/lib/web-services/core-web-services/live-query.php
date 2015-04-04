@@ -24,28 +24,28 @@ class WpakWebServiceLiveQuery {
 
 		$component_slug = WpakWebServiceContext::getClientAppParam( 'component_slug' );
 		if ( !empty( $component_slug ) ) {
-			
+
 			$args = WpakWebServiceContext::getClientAppParams();
-			
+
 			if ( is_array( $component_slug ) ) {
 				//Retrieve data for all given components and merge globals :
-				$service_answer['component'] = array();
-				foreach( $component_slug as $slug) {
+				unset( $service_answer['component'] );
+				$service_answer['components'] = array();
+				foreach ( $component_slug as $slug ) {
 					$component_data = WpakComponents::get_component_data( $app_id, $slug, $args );
-					if ( !empty($component_data) ) {
-						foreach( $component_data['globals'] as $global => $items ) {
-							foreach( $items as $k => $item ) {
+					if ( !empty( $component_data ) ) {
+						foreach ( $component_data['globals'] as $global => $items ) {
+							foreach ( $items as $k => $item ) {
 								@$service_answer['globals'][$global][$k] = $item;
 							}
 						}
-						$service_answer['component'][$slug] = $component_data['component'];
+						$service_answer['components'][$slug] = $component_data['component'];
 					}
 				}
 			} else {
 				//Only one component given : simply retrieve its data :
 				$service_answer = WpakComponents::get_component_data( $app_id, $component_slug, $args );
 			}
-			
 		}
 
 		$service_answer = apply_filters( 'wpak_live_query', $service_answer, $app_id, $query_vars );
