@@ -272,6 +272,19 @@ define( function( require, exports ) {
 	themeApp.navigateToDefaultRoute = function() {
 		App.router.default_route();
 	};
+	
+	/**
+	 * Reload current screen : re-trigger current route.
+	 */
+	themeApp.reloadCurrentScreen = function() {
+		//Directly navigate to current fragment doesn't work (Backbone sees that
+		//it is the same and doesn't re-trigger it!) : we have to navigate to a
+		//false dummy route (without triggering the navigation, so it is invisible) 
+		//and then renavigate to original current route :
+		var current_fragment = Backbone.history.getFragment();
+		App.router.navigate( 'WpakDummyRoute' ); //Route that does not exist
+		App.router.navigate( current_fragment, { trigger: true } );
+	};
 
 	/************************************************
 	 * Back button
