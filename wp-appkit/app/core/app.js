@@ -878,45 +878,42 @@ define(function (require) {
 				if( new_component.global ) {
 					
 					var global = new_component.global;
-					if ( app.globals.hasOwnProperty( global ) ) {
-
-						var new_ids = [ ];
-						if ( type == "replace" || type == "replace-keep-global-items" ) {
-							new_ids = new_component_data.ids;
-						} else {
-							new_ids = _.difference( new_component_data.ids, existing_component_data.ids );
-							new_component_data.ids = _.union( existing_component_data.ids, new_component_data.ids ); //merge ids
-						}
-
-						existing_component.set( 'data', new_component_data );
-
-						var current_items = app.globals[global];
-						if ( type == "replace" ) {
-							current_items.resetAll();
-						}
-
-						_.each( new_globals[global], function( item, id ) {
-							current_items.add( _.extend( { id: id }, item ) ); //auto merges if "id" already in items
-						} );
-
-						var new_items = [ ];
-						_.each( new_ids, function( item_id ) {
-							new_items.push( current_items.get( item_id ) );
-						} );
-
-						if ( persistent ) {
-							existing_component.save();
-							current_items.saveAll();
-						}
-
-						result.data = { new_ids: new_ids, new_items: new_items, component: existing_component };
-
-					} else {
-						result.ok = false;
-						result.type = 'not-found';
-						result.message = 'Global not found : ' + global;
+					if ( !app.globals.hasOwnProperty( global ) ) {
+						var items = new Items.Items( [], { global: global } );
+						app.globals[global] = items;
 					}
-					
+
+					var new_ids = [ ];
+					if ( type == "replace" || type == "replace-keep-global-items" ) {
+						new_ids = new_component_data.ids;
+					} else {
+						new_ids = _.difference( new_component_data.ids, existing_component_data.ids );
+						new_component_data.ids = _.union( existing_component_data.ids, new_component_data.ids ); //merge ids
+					}
+
+					existing_component.set( 'data', new_component_data );
+
+					var current_items = app.globals[global];
+					if ( type == "replace" ) {
+						current_items.resetAll();
+					}
+
+					_.each( new_globals[global], function( item, id ) {
+						current_items.add( _.extend( { id: id }, item ) ); //auto merges if "id" already in items
+					} );
+
+					var new_items = [ ];
+					_.each( new_ids, function( item_id ) {
+						new_items.push( current_items.get( item_id ) );
+					} );
+
+					if ( persistent ) {
+						existing_component.save();
+						current_items.saveAll();
+					}
+
+					result.data = { new_ids: new_ids, new_items: new_items, component: existing_component };
+
 				} else {
 					//A list component must have a global
 					result.ok = false;
@@ -941,25 +938,22 @@ define(function (require) {
 				if( new_component.global ) { //Page component for example
 					
 					var global = new_component.global;
-					if ( app.globals.hasOwnProperty( global ) ) {
+					if ( !app.globals.hasOwnProperty( global ) ) {
+						var items = new Items.Items( [], { global: global } );
+						app.globals[global] = items;
+					}
 						
-						var current_items = app.globals[global];
-						if ( type == "replace" ) {
-							current_items.resetAll();
-						}
+					var current_items = app.globals[global];
+					if ( type == "replace" ) {
+						current_items.resetAll();
+					}
 
-						_.each( new_globals[global], function( item, id ) {
-							current_items.add( _.extend( { id: id }, item ) ); //auto merges if "id" already in items
-						} );
-						
-						if ( persistent ) {
-							current_items.save();
-						}
+					_.each( new_globals[global], function( item, id ) {
+						current_items.add( _.extend( { id: id }, item ) ); //auto merges if "id" already in items
+					} );
 
-					} else {
-						result.ok = false;
-						result.type = 'not-found';
-						result.message = 'Global not found : ' + global;
+					if ( persistent ) {
+						current_items.save();
 					}
 					
 				}
