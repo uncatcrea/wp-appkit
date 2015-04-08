@@ -118,6 +118,25 @@ class WpakComponentTypePage extends WpakComponentType {
 		return !empty( $children ) ? array_map( 'intval', $children ) : array();
 	}
 
+	/**
+	 * To retrieve only pages given in $items_ids
+	 */
+	protected function get_items_data( $component, $options, $items_ids, $args = array() ) {
+		$items = array( 'pages' => array() );
+		
+		$posts_by_ids = array();
+		foreach ( $items_ids as $post_id ) {
+			$post = get_post( $post_id );
+			if( !empty($post) ) {
+				$posts_by_ids[$post_id] = self::get_page_data( $component, $post );
+			}
+		}
+		
+		$items['pages'] = $posts_by_ids;
+		
+		return $items;
+	}
+	
 	protected static function get_page_data( $component, $page, $tree_data = array() ) {
 		global $post;
 		$post = $page;

@@ -132,6 +132,29 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		$this->set_specific( 'query', $query );
 		$this->set_globals( 'posts', $posts_by_ids );
 	}
+	
+	/**
+	 * To retrieve only items given in $items_ids
+	 */
+	protected function get_items_data( $component, $options, $items_ids, $args = array() ) {
+		$items = array( 'posts' => array() );
+		
+		$posts_by_ids = array();
+		foreach ( $items_ids as $post_id ) {
+			$post = get_post( $post_id );
+			if( !empty($post) ) {
+				$posts_by_ids[$post_id] = self::get_post_data( $component, $post );
+			}
+		}
+		
+		if( $options['post-type'] == 'custom' ) {
+			$posts_by_ids = apply_filters( 'wpak_posts_list_custom_items-' . $options['hook'], $posts_by_ids, $component, $options, $items_ids, $args );
+		} 
+		
+		$items['posts'] = $posts_by_ids;
+		
+		return $items;
+	}
 
 	protected static function get_post_data( $component, $_post ) {
 		global $post;

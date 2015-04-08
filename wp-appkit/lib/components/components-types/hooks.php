@@ -36,6 +36,17 @@ class WpakComponentTypeHooks extends WpakComponentType {
 			$this->set_specific( $key, $value );
 		}
 	}
+	
+	/**
+	 * To retrieve only items given in $items_ids
+	 * If the component is linked to globals, must return an items array  
+	 * indexed on globals.
+	 */
+	protected function get_items_data( $component, $options, $items_ids, $args = array() ) {
+		$items = array();
+		$items = apply_filters( 'wpak_custom_component_get_items-' . $options['hook'], $items, $component, $options, $items_ids, $args );
+		return $items;
+	}
 
 	public function get_options_to_display( $component ) {
 

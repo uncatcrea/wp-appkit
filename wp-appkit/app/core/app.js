@@ -834,6 +834,72 @@ define(function (require) {
 			}
       };
 	  
+	/**
+	 * Update items for the given global
+	 * 
+	 * @param {string} global The global we want to update items for
+	 * @param {JSON Object} items Global items WITH ITEM ID AS KEY
+	 * @param {string} type 'update' to merge items, or 'replace' to delete then replace by new items
+	 * @param {boolean} persistent Set to true to save global items to Local Storage
+	 * @returns {JSON object} feedback data
+	 */
+	var update_global_items = function( global, items, type, persistent ) {
+		
+		type = ( type !== undefined ) ? type : 'update';
+		persistent = ( persistent !== undefined ) && persistent === true;
+		
+		var result = { ok: true, message: '', type: '', data: {} };
+
+		if ( type !== 'update' && type !== 'replace' ) {
+			result.ok = false;
+			result.type = 'bad-format';
+			result.message = 'Wrong type : '+ type;
+			return result;
+		}
+		
+		//Create the global if does not exist :
+		if ( !app.globals.hasOwnProperty( global ) ) {
+			app.globals[global] = new Items.Items( [], { global: global } );
+		}
+		
+		var current_items = app.globals[global];
+		
+		var original_ids = [ ];
+		_.each( current_items, function( item, id ) {
+			original_ids.push( id );
+		} );
+		
+		if ( type == "replace" ) {
+			current_items.resetAll();
+		}
+
+		var items_ids = [ ];
+		_.each( items, function( item, id ) {
+			items_ids.push( id );
+			current_items.add( _.extend( { id: id }, item ), { merge: true } ); //merge if "id" already in items
+		} );
+
+		var new_ids = [ ];
+		if ( type == "replace" ) {
+			new_ids = items_ids;
+		} else {
+			new_ids = _.difference( items_ids, original_ids );
+		}
+
+		var new_items = [ ];
+		_.each( new_ids, function( item_id ) {
+			new_items.push( current_items.get( item_id ) );
+		} );
+
+		if ( persistent ) {
+			current_items.saveAll();
+		}
+
+		result.data = { new_ids: new_ids, new_items: new_items, global: global, items: current_items };
+
+		return result;
+	};
+	
 	 /**
 	 * Update a component
 	 * 
@@ -844,6 +910,7 @@ define(function (require) {
 	 * - "replace" : delete current component data and replace with new
 	 * - "replace-keep-global-items" (default) : for list components : replace component ids and merge global items 
 	 * @param boolean persistent (default false). If true, new data is stored in local storage.
+	 * @returns {JSON object} feedback data
 	 */
 	var update_component = function( new_component, new_globals, type, persistent ) {
 
@@ -899,7 +966,7 @@ define(function (require) {
 					}
 
 					_.each( new_globals[global], function( item, id ) {
-						current_items.add( _.extend( { id: id }, item ) ); //auto merges if "id" already in items
+						current_items.add( _.extend( { id: id }, item ), { merge: true } ); //merge if "id" already in items
 					} );
 
 					var new_items = [ ];
@@ -949,7 +1016,7 @@ define(function (require) {
 					}
 
 					_.each( new_globals[global], function( item, id ) {
-						current_items.add( _.extend( { id: id }, item ) ); //auto merges if "id" already in items
+						current_items.add( _.extend( { id: id }, item ), { merge: true } ); //merge if "id" already in items
 					} );
 
 					if ( persistent ) {
@@ -986,8 +1053,13 @@ define(function (require) {
 	 */
 	app.liveQuery = function( web_service_params, cb_ok, cb_error, auto_interpret_result, interpretation_type, persistent ) {
 		
+		//auto_interpret_result defaults to true :
 		auto_interpret_result = ( auto_interpret_result === undefined ) || ( auto_interpret_result === true );
-		interpretation_type = ( interpretation_type !== undefined ) ? interpretation_type : 'replace-keep-global-items';
+		
+		//interpretation_type defaults to 'update' :
+		interpretation_type = ( interpretation_type !== undefined ) ? interpretation_type : 'update';
+		
+		//persistent defaults to false :
 		persistent = ( persistent !== undefined ) && persistent === true;
 		
 		var token = getToken( 'live-query' );
@@ -1031,9 +1103,11 @@ define(function (require) {
 			if ( answer.result && answer.result.status == 1 ) {
 
 				//If we asked to auto interpret and the ws answer is correctly
-				//formated, we update the component(s) from ws data :
+				//formated, we do the correct treatment according to answer fields : 
 				if ( auto_interpret_result ) {
 					
+					//See if components data were retured : if so, 
+					//update the corresponding component(s) :
 					var new_components = {};
 					if ( answer.components ) {
 						new_components = answer.components;
@@ -1050,7 +1124,7 @@ define(function (require) {
 							var result = update_component( component, answer.globals, interpretation_type, persistent );
 
 							if ( result.ok ) {
-								Utils.log( 'Live query : component "' + component.slug + '" updated ok', result.data, component, { type: interpretation_type, persistent: persistent, auto_interpret_result: auto_interpret_result } );
+								Utils.log( 'Live query update component "'+ component.slug +'" OK.', result );
 							} else {
 								Utils.log( 'Error : Live query : update_component "' + component.slug + '"', result, component );
 								error_message += ( result.message + ' ' );
@@ -1069,12 +1143,53 @@ define(function (require) {
 								cb_error
 							);
 						}
-					} 
+						
+					} else if ( answer.globals && !_.isEmpty( answer.globals ) ) {
+						
+						//No component returned, but some global items :
+						//update current global items with new items sent :
+						
+						var error_message = '';
+						
+						_.each( answer.globals, function( items, global ) {
+							
+							var result = update_global_items( global, items, interpretation_type, persistent );
+
+							if ( result.ok ) {
+								Utils.log( 'Live query update global "'+ global +'" OK.', result );
+							} else {
+								Utils.log( 'Error : Live query : update_global_items "' + global + '"', result, items );
+								error_message += ( result.message + ' ' );
+							}
+
+						} );
+						
+						if ( error_message === '' ) {
+							if ( cb_ok ) {
+								cb_ok( answer );
+							}
+						} else {
+							app.triggerError(
+								'live-query:update-global-items-error',
+								{ type: 'mixed', where: 'app::liveQuery', message: error_message },
+								cb_error
+							);
+						}
+						
+					} else {
+						app.triggerError(
+							'live-query:no-auto-interpret-action-found',
+							{ type: 'not-found', where: 'app::liveQuery', message: 'Live Query web service : could not auto interpret answer' },
+							cb_error
+						);
+					}
 					
 				} else {
 					
-					Utils.log( 'Live query ok. Web Service answer : "', answer, ajax_args );
+					Utils.log( 'Live query ok (no auto interpret). Web Service answer : "', answer, ajax_args );
 					
+					//The 'live-query' web service answer must be interpreted
+					//manually in cb_ok() :
 					if ( cb_ok ) {
 						cb_ok( answer );
 					}
