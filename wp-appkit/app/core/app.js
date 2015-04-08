@@ -1044,23 +1044,24 @@ define(function (require) {
 	 * @param JSON Object args
 	 * @param callback cb_ok
 	 * @param callback cb_error
-	 * @param boolean auto_interpret_result (default true). If false, web service answer must be interpreted in the cb_ok callback.
-	 * @param string interpretation_type can be :
-	 * - "update" : merge new with existing component data, 
-	 * - "replace" : delete current component data and replace with new
-	 * - "replace-keep-global-items" (default) : for list components : replace component ids and merge global items 
-	 * @param boolean persistent (default false). If true, new data is stored in local storage.
+	 * @param options JSON Object : allowed settings :
+	 * - auto_interpret_result Boolean (default true). If false, web service answer must be interpreted in the cb_ok callback.
+	 * - type String : can be one of :
+	 *       -- "update" : merge new with existing component data, 
+	 *       -- "replace" : delete current component data and replace with new
+	 *       -- "replace-keep-global-items" (default) : for list components : replace component ids and merge global items 
+	 * - persistent Boolean (default false). If true, new data is stored in local storage.
 	 */
-	app.liveQuery = function( web_service_params, cb_ok, cb_error, auto_interpret_result, interpretation_type, persistent ) {
+	app.liveQuery = function( web_service_params, cb_ok, cb_error, options ) {
 		
 		//auto_interpret_result defaults to true :
-		auto_interpret_result = ( auto_interpret_result === undefined ) || ( auto_interpret_result === true );
+		var auto_interpret_result = !options.hasOwnProperty('auto_interpret_result') || options.auto_interpret_result === true;
 		
 		//interpretation_type defaults to 'update' :
-		interpretation_type = ( interpretation_type !== undefined ) ? interpretation_type : 'update';
+		var interpretation_type = options.hasOwnProperty('type') ? options.type : 'update';
 		
 		//persistent defaults to false :
-		persistent = ( persistent !== undefined ) && persistent === true;
+		var persistent = options.hasOwnProperty('persistent') && options.persistent === true;
 		
 		var token = getToken( 'live-query' );
 		var ws_url = token + '/live-query';

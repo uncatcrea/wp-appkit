@@ -144,6 +144,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			$post = get_post( $post_id );
 			if( !empty($post) ) {
 				$posts_by_ids[$post_id] = self::get_post_data( $component, $post );
+				$posts_by_ids[$post_id]->title = 'heyhi '. $posts_by_ids[$post_id]->title;
 			}
 		}
 		
