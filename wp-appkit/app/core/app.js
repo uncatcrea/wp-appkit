@@ -1180,7 +1180,7 @@ define(function (require) {
 					} else {
 						app.triggerError(
 							'live-query:no-auto-interpret-action-found',
-							{ type: 'not-found', where: 'app::liveQuery', message: 'Live Query web service : could not auto interpret answer' },
+							{ type: 'not-found', where: 'app::liveQuery', message: 'Live Query web service : could not auto interpret answer', data: {answer : answer} },
 							cb_error
 						);
 					}
