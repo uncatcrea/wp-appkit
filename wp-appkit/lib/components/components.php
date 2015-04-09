@@ -42,7 +42,7 @@ class WpakComponents {
 		return $components_data;
 	}
 
-	public static function get_component_data( $app_id, $component_slug, $args ) {
+	public static function get_component_data( $app_id, $component_slug, $args = array() ) {
 		$component_data = array();
 
 		if ( WpakComponentsStorage::component_exists( $app_id, $component_slug ) ) {
@@ -55,7 +55,7 @@ class WpakComponents {
 		return $component_data;
 	}
 	
-	public static function get_component_items( $app_id, $component_slug, $items_ids, $args ) {
+	public static function get_component_items( $app_id, $component_slug, $items_ids, $args = array() ) {
 		$component_items = array();
 		
 		if ( WpakComponentsStorage::component_exists( $app_id, $component_slug ) ) {

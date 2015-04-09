@@ -38,8 +38,6 @@ class WpakWebServiceLiveQuery {
 		
 		if ( !empty( $component_slug ) ) {
 
-			$query_args = WpakWebServiceContext::getClientAppParams();
-
 			$service_answer = array(
 				'globals' => array(), //array of items with global ('posts', 'pages' etc...) as key
 				'component' => array(),
@@ -54,11 +52,11 @@ class WpakWebServiceLiveQuery {
 					unset( $service_answer['component'] );
 					$service_answer['components'] = array();
 					foreach ( $component_slug as $slug ) {
-						$component_data = WpakComponents::get_component_data( $app_id, $slug, $query_args );
+						$component_data = WpakComponents::get_component_data( $app_id, $slug );
 						if ( !empty( $component_data ) ) {
 							foreach ( $component_data['globals'] as $global => $items ) {
 								foreach ( $items as $k => $item ) {
-									@$service_answer['globals'][$global][$k] = $item;
+									$service_answer['globals'][$global][$k] = $item;
 								}
 							}
 							$service_answer['components'][$slug] = $component_data['component'];
@@ -71,20 +69,22 @@ class WpakWebServiceLiveQuery {
 				//Only one component given : simply retrieve its data :
 				switch ( $action ) {
 					case 'get-component' :
-						$service_answer = WpakComponents::get_component_data( $app_id, $component_slug, $query_args );
+						$service_answer = WpakComponents::get_component_data( $app_id, $component_slug );
 						break;
 					case 'get-items' :
 						$items_ids = WpakWebServiceContext::getClientAppParam( 'wpak_items_ids' );
 						if ( !empty( $items_ids ) ) {
 							$items_ids = !is_array( $items_ids ) && is_numeric( $items_ids ) ? array( intval( $items_ids ) ) : array_map( 'intval', $items_ids );
-							$service_answer = WpakComponents::get_component_items( $app_id, $component_slug, $items_ids, $query_args );
+							$service_answer = WpakComponents::get_component_items( $app_id, $component_slug, $items_ids );
 						}
 						break;
 				};
 			}
 		}
 
-		$service_answer = apply_filters( 'wpak_live_query', $service_answer, $query_args, $app_id, $query_vars );
+		$query_params = WpakWebServiceContext::getClientAppParams();
+
+		$service_answer = apply_filters( 'wpak_live_query', $service_answer, $query_params, $app_id, $query_vars );
 
 		return ( object ) $service_answer;
 	}
