@@ -396,6 +396,20 @@ define(function (require) {
 	  //collections of collections won't work :-(
 	  var globals_keys = new Globals;
 	  app.globals = {};
+	  
+	app.getComponents = function( filter ) {
+		var components = [];
+		
+		if ( _.isObject( filter ) ) {
+			if ( filter.type ) {
+				components = app.components.where( { type: filter.type } );
+			}
+		} else {
+			components = app.components.toJSON();
+		}
+
+		return components;
+	};
 
 	  var getToken = function(web_service){
 		  var token = '';
