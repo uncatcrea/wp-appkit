@@ -364,23 +364,25 @@ define(function (require) {
 	  app.getCurrentScreenGlobal = function( global ) {
         var screen_data = app.getCurrentScreenData();
 
-        var single_global = '';
+        var current_screen_global = '';
         if (global != undefined) {
-            single_global = global;
+            current_screen_global = global;
         } else {
             if (screen_data.screen_type == 'comments') {
                 var previous_screen_data = app.getPreviousScreenData();
                 if (previous_screen_data.screen_type == 'single') {
-                    single_global = previous_screen_data.global;
+                    current_screen_global = previous_screen_data.global;
                 }
             } else {
                 if (screen_data.hasOwnProperty('global') && screen_data.global != '') {
-                    single_global = screen_data.global;
+                    current_screen_global = screen_data.global;
                 }
             }
         }
+		
+		current_screen_global = Hooks.applyFilters( 'current-screen-global', current_screen_global, [screen_data, global] );
 
-        return single_global;
+        return current_screen_global;
 	  }
 
 	  //--------------------------------------------------------------------------
