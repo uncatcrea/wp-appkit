@@ -45,6 +45,10 @@ class WpakAddon {
 		if( $type == 'theme' && $position === '' ){
 			$position = 'after';
 		}
+		
+		if( $type == 'init' ){
+			$position = 'before'; //for now, only init+before is handled
+		}
 
 		if ( strpos( $js_file, $this->directory ) !== false ) {
 			$full_js_file = $js_file;
