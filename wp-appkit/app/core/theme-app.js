@@ -392,6 +392,42 @@ define( function( require, exports ) {
 	};
 
 	/************************************************
+	 * "Live Query" Web Service
+	 */
+	
+	/**
+	 * Call live query web service 
+	 * 
+	 * @param JSON Object args
+	 * @param options JSON Object : allowed settings :
+	 * - success Function Callback called on success
+	 * - error Function Callback called on error
+	 * - auto_interpret_result Boolean (default true). If false, web service answer must be interpreted in the cb_ok callback.
+	 * - type String : can be one of :
+	 *       -- "update" : merge new with existing component data, 
+	 *       -- "replace" : delete current component data and replace with new
+	 *       -- "replace-keep-global-items" (default) : for list components : replace component ids and merge global items 
+	 * - persistent Boolean (default false). If true, new data is stored in local storage.
+	 */
+	themeApp.liveQuery = function( web_service_params, options ){
+		
+		var cb_ok = null;
+		if( options.success ) {
+			cb_ok = options.success;
+			delete options.success;
+		}
+		
+		var cb_error = null;
+		if( options.error ) {
+			cb_error = options.error;
+			delete options.error;
+		}
+		
+		App.liveQuery( web_service_params, cb_ok, cb_error, options );
+		
+	};
+
+	/************************************************
 	 * DOM element auto class
 	 */
 
