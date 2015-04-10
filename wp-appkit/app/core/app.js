@@ -1055,6 +1055,17 @@ define(function (require) {
 	};
 	
 	/**
+	 * Deletes items for the given global.
+	 * 
+	 * @param {string} global
+	 * @param {boolean} persistent If true, will be stored in local storage
+	 */
+	app.resetGlobalItems = function( global, persistent) {
+		persistent = ( persistent !== undefined ) && persistent === true;
+		update_global_items( global, {}, 'replace', persistent );
+	};
+	
+	/**
 	 * Live query web service 
 	 * 
 	 * @param JSON Object args
