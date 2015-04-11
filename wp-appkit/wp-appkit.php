@@ -10,7 +10,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 
 	class WpAppKit {
 
-		const resources_version = '0.4';
+		const resources_version = '0.5';
 		const i18n_domain = 'wp-appkit';
 
 		public static function hooks() {
@@ -21,7 +21,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 
 			add_action( 'init', array( __CLASS__, 'init' ) );
 			add_action( 'template_redirect', array( __CLASS__, 'template_redirect' ), 5 );
-			
+
 			add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 		}
 
@@ -44,13 +44,13 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			load_plugin_textdomain( self::i18n_domain, false, dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
 			self::lib_require();
 		}
-		
+
 		public static function on_activation() {
 			self::lib_require();
-			
+
 			self::add_rewrite_rules();
 			flush_rewrite_rules();
-			
+
 			WpakThemes::create_theme_directory();
 		}
 
@@ -66,7 +66,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 		public static function template_redirect() {
 			WpakWebServices::template_redirect();
 		}
-		
+
 		protected static function add_rewrite_rules() {
 			WpakWebServices::add_rewrite_tags_and_rules();
 			WpakConfigFile::rewrite_rules();
@@ -81,12 +81,12 @@ if ( !class_exists( 'WpAppKit' ) ) {
 				?>
 				<div class="error">
 					<p>
-						<?php 
+						<?php
 							_e( 'WP AppKit requires WordPress permalinks to be activated : '
 								. 'see the <a href="http://codex.wordpress.org/Using_Permalinks#Choosing_your_permalink_structure">"Using permalink" Codex section</a> '
-								. 'for more info about how to activate permalinks.', 
-								WpAppKit::i18n_domain 
-							); 
+								. 'for more info about how to activate permalinks.',
+								WpAppKit::i18n_domain
+							);
 						?>
 					</p>
 				</div>
