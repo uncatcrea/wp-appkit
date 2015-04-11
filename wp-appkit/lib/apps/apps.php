@@ -145,22 +145,20 @@ class WpakApps {
 		$first_save = !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID;
 		$main_infos = self::get_app_main_infos( $post->ID );
 		$mandatory = self::get_phonegap_mandatory_fields();
-		$phonegap = 'ok';
+		$checked = array(
+			'title' => !empty( $post->post_title ),
+			'components' => !empty( WpakComponents::get_app_components( $post->ID ) ),
+			'navigation' => !empty( WpakNavigation::get_app_navigation( $post->ID ) ),
+			'phonegap' => true,
+			'save' => !$first_save,
+		);
 
 		foreach( $mandatory as $key ) {
 			if( '' === $main_infos[$key] ) {
-				$phonegap = 'nok';
+				$checked['phonegap'] = false;
 				break;
 			}
 		}
-
-		$classes = array(
-			'title' => ( !empty( $post->post_title ) ? 'ok' : 'nok' ),
-			'components' => ( !empty( WpakComponents::get_app_components( $post->ID ) ) ? 'ok' : 'nok' ),
-			'navigation' => ( !empty( WpakNavigation::get_app_navigation( $post->ID ) ) ? 'ok' : 'nok' ),
-			'phonegap' => $phonegap,
-			'save' => ( !$first_save ? 'ok' : 'nok' ),
-		);
 		?>
 		<div class="submitbox" id="submitpost">
 			<div style="display:none;">
@@ -180,13 +178,28 @@ class WpakApps {
 			</div>
 
 			<div id="wpak_publish_box">
-				<ol id="wpak_app_wizard">
-					<li id="wpak_app_wizard_title" class="<?php echo $classes['title']; ?>"><?php _e( 'Define a title', WpAppKit::i18n_domain ); ?></li>
-					<li id="wpak_app_wizard_components" class="<?php echo $classes['components']; ?>"><?php _e( 'Add components', WpAppKit::i18n_domain ); ?></li>
-					<li id="wpak_app_wizard_navigation" class="<?php echo $classes['navigation']; ?>"><?php _e( 'Setup appearance and navigation', WpAppKit::i18n_domain ); ?></li>
-					<li id="wpak_app_wizard_phonegap" class="<?php echo $classes['phonegap']; ?>"><?php _e( 'Setup PhoneGap config', WpAppKit::i18n_domain ); ?></li>
-					<li id="wpak_app_wizard_save" class="<?php echo $classes['save']; ?>"><?php _e( 'Save your app', WpAppKit::i18n_domain ); ?></li>
-				</ol>
+				<ul id="wpak_app_wizard" class="list-group">
+					<li id="wpak_app_wizard_title" class="list-group-item <?php echo $checked['title'] ? 'list-group-item-success' : ''; ?>">
+						<span class="glyphicon glyphicon-<?php echo $checked['title'] ? 'check' : 'unchecked'; ?>"></span>
+						<?php _e( 'Define a title', WpAppKit::i18n_domain ); ?>
+					</li>
+					<li id="wpak_app_wizard_components" class="list-group-item <?php echo $checked['components'] ? 'list-group-item-success' : ''; ?>">
+						<span class="glyphicon glyphicon-<?php echo $checked['components'] ? 'check' : 'unchecked'; ?>"></span>
+						<?php _e( 'Add components', WpAppKit::i18n_domain ); ?>
+					</li>
+					<li id="wpak_app_wizard_navigation" class="list-group-item <?php echo $checked['navigation'] ? 'list-group-item-success' : ''; ?>">
+						<span class="glyphicon glyphicon-<?php echo $checked['navigation'] ? 'check' : 'unchecked'; ?>"></span>
+						<?php _e( 'Setup appearance and navigation', WpAppKit::i18n_domain ); ?>
+					</li>
+					<li id="wpak_app_wizard_phonegap" class="list-group-item <?php echo $checked['phonegap'] ? 'list-group-item-success' : ''; ?>">
+						<span class="glyphicon glyphicon-<?php echo $checked['phonegap'] ? 'check' : 'unchecked'; ?>"></span>
+						<?php _e( 'Setup PhoneGap config', WpAppKit::i18n_domain ); ?>
+					</li>
+					<li id="wpak_app_wizard_save" class="list-group-item <?php echo $checked['save'] ? 'list-group-item-success' : ''; ?>">
+						<span class="glyphicon glyphicon-<?php echo $checked['save'] ? 'check' : 'unchecked'; ?>"></span>
+						<?php _e( 'Save your app', WpAppKit::i18n_domain ); ?>
+					</li>
+				</ul>
 			</div>
 
 			<div id="major-publishing-actions">

@@ -29,6 +29,17 @@ var Subject = ( function( window, undefined ) {
     return Subject;
 })( window );
 
+function wizard_update( uncheck ) {
+    if( !uncheck ) {
+        this.addClass( 'list-group-item-success' );
+        this.find( '.glyphicon' ).removeClass( 'glyphicon-unchecked' ).addClass( 'glyphicon-check' );
+    }
+    else {
+        this.removeClass( 'list-group-item-success' );
+        this.find( '.glyphicon' ).removeClass( 'glyphicon-check' ).addClass( 'glyphicon-unchecked' );
+    }
+}
+
 jQuery().ready(function(){
     var $ = jQuery,
         wizard_title = $( '#wpak_app_wizard_title' ),
@@ -41,46 +52,25 @@ jQuery().ready(function(){
 
     var wizard_components_observer = {
         update: function() {
-            if( $( '.component-row' ).length ) {
-                wizard_components
-                    .removeClass( 'nok' )
-                    .addClass( 'ok' );
-            }
-            else {
-                wizard_components
-                    .removeClass( 'ok' )
-                    .addClass( 'nok' );
-            }
+            var uncheck = $( '.component-row' ).length == 0;
+
+            wizard_update.apply( wizard_components, [uncheck] );
         }
     };
 
     var wizard_navigation_observer = {
         update: function() {
-            if( $( '#navigation-items-table tr > td' ).length && app_title.val().length ) {
-                wizard_navigation
-                    .removeClass( 'nok' )
-                    .addClass( 'ok' );
-            }
-            else {
-                wizard_navigation
-                    .removeClass( 'ok' )
-                    .addClass( 'nok' );
-            }
+            var uncheck = $( '#navigation-items-table tr > td' ).length == 0 || app_title.val().length == 0;
+
+            wizard_update.apply( wizard_navigation, [uncheck] );
         }
     };
 
     var wizard_title_observer = {
         update: function() {
-            if( title.val().length ) {
-                wizard_title
-                    .removeClass( 'nok' )
-                    .addClass( 'ok' );
-            }
-            else {
-                wizard_title
-                    .removeClass( 'ok' )
-                    .addClass( 'nok' );
-            }
+            var uncheck = title.val().length == 0;
+
+            wizard_update.apply( wizard_title, [uncheck] );
         }
     };
 
@@ -99,16 +89,9 @@ jQuery().ready(function(){
 
     var wizard_phonegap_observer = {
         update: function() {
-            if( phonegap_ok() ) {
-                wizard_phonegap
-                    .removeClass( 'nok' )
-                    .addClass( 'ok' );
-            }
-            else {
-                wizard_phonegap
-                    .removeClass( 'ok' )
-                    .addClass( 'nok' );
-            }
+            var uncheck = !phonegap_ok();
+
+            wizard_update.apply( wizard_phonegap, [uncheck] );
         }
     };
 
