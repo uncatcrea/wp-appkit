@@ -76,7 +76,7 @@ class WpakThemesBoSettings {
 			</div>
 		<?php endforeach ?>
 
-		<div class="wpak-app-title">
+		<div class="wpak-app-title wpak_settings">
 			<label><?php _e( 'Application title (displayed in app top bar)', WpAppKit::i18n_domain ) ?></label> : <br/>
 			<input id="wpak_app_title" type="text" name="wpak_app_title" value="<?php echo $main_infos['title'] ?>" />
 		</div>
