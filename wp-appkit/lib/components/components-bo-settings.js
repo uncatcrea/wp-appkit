@@ -1,11 +1,12 @@
 var WpakComponents = (function ($){
-		
+
 		var wpak = {};
-		
+		var subject = new Subject();
+
 		var get_parent_form_id = function(element){
 			return $(element).closest('div.component-form').attr('id');
 		};
-		
+
 		wpak.ajax_update_component_options = function(element,component_type,action,params){
 			var form_id = get_parent_form_id(element);
 			var data = {
@@ -20,7 +21,7 @@ var WpakComponents = (function ($){
 				$('.ajax-target',$('#'+form_id)).html(response);
 			});
 		};
-		
+
 		wpak.ajax_update_component_type = function(element,component_type){
 			var form_id = get_parent_form_id(element);
 			var data = {
@@ -33,7 +34,7 @@ var WpakComponents = (function ($){
 				$('.component-options-target',$('#'+form_id)).html(response);
 			});
 		};
-		
+
 		wpak.ajax_add_or_edit_component_row = function(data,callback){
 			var data = {
 				action: 'wpak_edit_component',
@@ -48,17 +49,18 @@ var WpakComponents = (function ($){
 			  data: data,
 			  success: function(answer) {
 				  callback(answer);
+				  subject.notify( answer );
 			  },
 			  error: function(jqXHR, textStatus, errorThrown){
 				  callback({'ok':0,'type':'error','message':'Error submitting data'}); //TODO translate js messages
 			  },
 			  dataType: 'json'
 			});
-			
+
 		};
-		
+
 		wpak.ajax_delete_component_row = function(post_id,component_id,callback){
-			
+
 			var data = {
 				action: 'wpak_edit_component',
 				wpak_action: 'delete',
@@ -66,13 +68,14 @@ var WpakComponents = (function ($){
 				post_id: post_id,
 				nonce: wpak_components.nonce
 			};
-			
+
 			$.ajax({
 				  type: "POST",
 				  url: ajaxurl,
 				  data: data,
 				  success: function(answer) {
 					  callback(answer);
+					  subject.notify( answer );
 				  },
 				  error: function(jqXHR, textStatus, errorThrown){
 					  callback({'ok':0,'type':'error','message':'Error deleting component'}); //TODO translate js messages
@@ -80,14 +83,22 @@ var WpakComponents = (function ($){
 				  dataType: 'json'
 			});
 		};
-		
+
+		wpak.addObserver = function( newObserver ) {
+			subject.observe( newObserver );
+		};
+
+		wpak.removeObserver = function( deleteObserver ) {
+			subject.unobserve( deleteObserver );
+		};
+
 		return wpak;
-		
+
 })(jQuery);
 
 jQuery().ready(function(){
 	var $ = jQuery;
-	
+
 	function serializeObject(a){
 	    var o = {};
 	    $.each(a, function() {
@@ -102,15 +113,15 @@ jQuery().ready(function(){
 	    });
 	    return o;
 	};
-	
+
 	function display_feedback(type,message){
 		$('#components-feedback').removeClass().addClass(type).html(message).show();
-	}; 
-	
+	};
+
 	function hide_feedback(){
 		$('#components-feedback').hide();
-	}; 
-	
+	};
+
 	$('#components-wrapper').on('click','a.component-form-submit',function(e){
 		e.preventDefault();
 		$('#components-feedback').hide();
@@ -137,7 +148,7 @@ jQuery().ready(function(){
 			});
 		}
 	});
-	
+
 	$('#components-wrapper').on('click','a.editinline',function(e){
 		e.preventDefault();
 		$('#new-component-form').slideUp();
@@ -145,14 +156,14 @@ jQuery().ready(function(){
 		$('#edit-component-wrapper-'+id).show();
 		$(this).parents('tr').eq(0).hide();
 	});
-	
+
 	$('#components-wrapper').on('click','tr.edit-component-wrapper a.cancel',function(e){
 		e.preventDefault();
 		var form_tr = $(this).parents('tr').eq(0);
 		form_tr.hide();
 		form_tr.prev('tr').show();
 	});
-	
+
 	$('#components-wrapper').on('click','a.delete_component',function(e){
 		e.preventDefault();
 		$('#components-feedback').hide();
@@ -170,23 +181,23 @@ jQuery().ready(function(){
 			});
 		//}
 	});
-	
+
 	$('#add-new-component').click(function(e){
 		e.preventDefault();
 		hide_feedback();
 		$('#new-component-form').slideToggle();
 	});
-	
+
 	$('#cancel-new-component').click(function(e){
 		e.preventDefault();
 		hide_feedback();
 		$('#new-component-form input.can-reset').attr('value','');
 		$('#new-component-form').slideUp();
 	});
-	
+
 	$('#components-wrapper').on('change','.component-type',function(e){
 		var type = $(this).find(":selected").val();
 		WpakComponents.ajax_update_component_type(this,type);
 	});
-	
+
 });

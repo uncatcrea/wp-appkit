@@ -31,11 +31,11 @@ class WpakComponentsBoSettings {
 
 	public static function add_meta_boxes() {
 		add_meta_box(
-			'wpak_app_components', 
-			__( 'App components', WpAppKit::i18n_domain ), 
-			array( __CLASS__, 'inner_components_box' ), 
-			'wpak_apps', 
-			'normal', 
+			'wpak_app_components',
+			__( 'Components', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_components_box' ),
+			'wpak_apps',
+			'normal',
 			'default'
 		);
 	}

@@ -1,6 +1,7 @@
 <?php
 
 require_once( dirname( __FILE__ ) . '/web-services-crud.php' );
+require_once( dirname( __FILE__ ) . '/web-services-bo-settings.php' );
 require_once( dirname( __FILE__ ) . '/token.php' );
 require_once( dirname( __FILE__ ) . '/../cache/web-services-cache.php' );
 require_once( dirname( __FILE__ ) . '/web-service-context.php' );
@@ -122,7 +123,7 @@ class WpakWebServices {
 					}
 
 					$service_answer = WpakWebServiceCrud::create( $app_id, $service_slug, $sent );
-					
+
 				} elseif ( $_SERVER['REQUEST_METHOD'] == 'GET' ) {
 
 					$service_answer = WpakWebServiceCrud::read( $app_id, $service_slug, $wp_query->query_vars );
@@ -419,10 +420,10 @@ class WpakWebServices {
 
 	private static function web_service_exists( $web_service_slug ) {
 		global $wp_filter;
-		return isset( $wp_filter['wpak_read_' . $web_service_slug] ) 
-				|| isset( $wp_filter['wpak_read_one_' . $web_service_slug] ) 
-				|| isset( $wp_filter['wpak_update_' . $web_service_slug] ) 
-				|| isset( $wp_filter['wpak_create_' . $web_service_slug] ) 
+		return isset( $wp_filter['wpak_read_' . $web_service_slug] )
+				|| isset( $wp_filter['wpak_read_one_' . $web_service_slug] )
+				|| isset( $wp_filter['wpak_update_' . $web_service_slug] )
+				|| isset( $wp_filter['wpak_create_' . $web_service_slug] )
 				|| isset( $wp_filter['wpak_delete_' . $web_service_slug] );
 	}
 

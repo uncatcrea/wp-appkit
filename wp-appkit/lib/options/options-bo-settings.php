@@ -10,25 +10,9 @@ class WpakOptionsBoSettings {
 	 */
 	public static function hooks() {
 		if( is_admin() ){
-			add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
+			add_action( 'wpak_inner_synchronization_box', array( __CLASS__, 'inner_synchronization_options_box' ), 10, 2 );
 			add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 		}
-	}
-
-	/**
-	 * Attached to 'add_meta_boxes' hook.
-	 *
-	 * Adds meta boxes to backoffice forms.
-	 */
-	public static function add_meta_boxes() {
-		add_meta_box(
-			'wpak_options',
-			__( 'Options', WpAppKit::i18n_domain ),
-			array( __CLASS__, 'inner_options_box' ),
-			'wpak_apps',
-			'side',
-			'default'
-		);
 	}
 
 	/**
@@ -37,27 +21,17 @@ class WpakOptionsBoSettings {
 	 * @param WP_Post				$post			The app object.
 	 * @param array					$current_box	The box settings.
 	 */
-	public static function inner_options_box( $post, $current_box ) {
+	public static function inner_synchronization_options_box( $post, $current_box ) {
 		$options = WpakOptions::get_app_options( $post->ID );
 		?>
-		<div class="wpak_settings">
-			<label for="wpak_app_options_refresh_interval"><?php _e( 'Refresh interval (in seconds)', WpAppKit::i18n_domain ) ?></label> : <br/>
+		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
+		<div class="wpak_settings field-group">
+			<label for="wpak_app_options_refresh_interval"><?php _e( 'Refresh interval (in seconds):', WpAppKit::i18n_domain ) ?></label>
 			<input id="wpak_app_options_refresh_interval" type="text" name="wpak_app_options[refresh_interval]" value="<?php echo $options['refresh_interval'] ?>" />
 			<span class="description"><?php _e( 'Use 0 to avoid intervals between refreshes. The content will be fetched from the server at each app launch (default value)', WpAppKit::i18n_domain ) ?></span>
-			<br/><br/>
 			<?php wp_nonce_field( 'wpak-options-' . $post->ID, 'wpak-nonce-options' ) ?>
 		</div>
 		<?php
-		/**
-		 * Fires when the options meta box is displayed, at the end of WpakOptionsBoSettings::inner_options_box().
-		 *
-		 * @see WpakOptionsBoSettings::inner_options_box()
-		 *
-		 * @param WP_Post 	$post 			The app object.
-		 * @param array 	$current_box 	The box settings.
-		 * @param array 	$options 		The app options.
-		 */
-		do_action( 'wpak_inner_options_box', $post, $current_box, $options );
 	}
 
 	/**

@@ -3,17 +3,17 @@
 class WpakThemesBoSettings {
 
 	public static function hooks() {
-		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ) );
+		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ), 11 );
 		add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 	}
 
 	public static function add_meta_boxes() {
 		add_meta_box(
-			'wpak_app_theme', 
-			__( 'Theme', WpAppKit::i18n_domain ), 
-			array( __CLASS__, 'inner_main_infos_box' ), 
-			'wpak_apps', 
-			'normal', 
+			'wpak_app_theme',
+			__( 'Appearance', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_main_infos_box' ),
+			'wpak_apps',
+			'normal',
 			'default'
 		);
 	}
@@ -36,19 +36,19 @@ class WpakThemesBoSettings {
 			<div class="wpak_no_theme">
 				<strong><?php _e( 'No WP AppKit theme found!', WpAppKit::i18n_domain ) ?></strong>
 				<br/>
-				<?php echo  sprintf( __('Please upload a WP AppKit theme from the "<a href="%s" >Upload themes</a>" panel or copy a theme directly to the %s directory.', WpAppKit::i18n_domain ), 
-									'/wp-admin/admin.php?page=wpak_bo_upload_themes',  
+				<?php echo  sprintf( __('Please upload a WP AppKit theme from the "<a href="%s" >Upload themes</a>" panel or copy a theme directly to the %s directory.', WpAppKit::i18n_domain ),
+									'/wp-admin/admin.php?page=wpak_bo_upload_themes',
 									basename(WP_CONTENT_DIR) .'/'. WpakThemes::themes_directory
-							) 
+							)
 				?>
 			</div>
 		<?php endif ?>
-		
+
 		<?php foreach ( $available_themes as $theme => $theme_data ): ?>
 			<div class="wpak-theme-data" id="wpak-theme-data-<?php echo $theme ?>" style="display:none">
 				<div class="theme-data-content">
 					<?php echo $theme_data['Description'] ?>
-					
+
 					<?php
 						$theme_meta = array();
 						if ( !empty( $theme_data['Version'] ) ) {
@@ -68,19 +68,19 @@ class WpakThemesBoSettings {
 							);
 						}
 					?>
-					
+
 					<?php if( !empty($theme_meta) ): ?>
 						<div class="theme-meta-data"><?php echo implode(' | ',$theme_meta) ?></div>
 					<?php endif ?>
 				</div>
 			</div>
 		<?php endforeach ?>
-		
-		<div class="wpak-app-title">
-			<label><?php _e( 'Application title (displayed in app top bar)', WpAppKit::i18n_domain ) ?></label> : <br/> 
-			<input type="text" name="wpak_app_title" value="<?php echo $main_infos['title'] ?>" />
+
+		<div class="wpak-app-title wpak_settings">
+			<label><?php _e( 'Application title (displayed in app top bar)', WpAppKit::i18n_domain ) ?></label> : <br/>
+			<input id="wpak_app_title" type="text" name="wpak_app_title" value="<?php echo $main_infos['title'] ?>" />
 		</div>
-		
+
 		<?php wp_nonce_field( 'wpak-theme-data-' . $post->ID, 'wpak-nonce-theme-data' ) ?>
 
 		<style>
@@ -90,7 +90,7 @@ class WpakThemesBoSettings {
 			.theme-meta-data{ margin-top: 7px }
 			.wpak_no_theme{ text-align: center; font-size:120%; line-height: 2em; margin:30px }
 		</style>
-		
+
 		<script>
 			(function(){
 				var $ = jQuery;
@@ -102,8 +102,9 @@ class WpakThemesBoSettings {
 				$('#wpak_app_theme_choice').change();
 			})();
 		</script>
-		
+
 		<?php
+		do_action( 'wpak_inner_main_infos_box', $post, $current_box );
 	}
 
 	public static function save_post( $post_id ) {
