@@ -410,6 +410,25 @@ define(function (require) {
 
 		return components;
 	};
+	
+	app.getNavigationComponents = function( filter ) {
+		var navigation_components = [];
+		
+		app.navigation.each( function( element ) {
+			var component = app.components.get( element.get( 'component_id' ) );
+			if ( component ) {
+				if ( filter.type ) {
+					if ( component.get( 'type' ) == filter.type ) {
+						navigation_components.push( component );
+					}
+				} else {
+					navigation_components.push( component );
+				}
+			}
+		} );
+		
+		return navigation_components;
+	};
 
 	  var getToken = function(web_service){
 		  var token = '';
