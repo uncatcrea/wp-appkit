@@ -285,6 +285,14 @@ define( function( require, exports ) {
 		App.router.navigate( 'WpakDummyRoute' ); //Route that does not exist
 		App.router.navigate( current_fragment, { trigger: true } );
 	};
+	
+	/**
+	 * Re-render current view WITHOUT re-triggering any route.
+	 */
+	themeApp.rerenderCurrentScreen = function() {
+		var current_view = RegionManager.getCurrentView();
+		current_view.render();
+	};
 
 	/************************************************
 	 * Back button
@@ -361,6 +369,7 @@ define( function( require, exports ) {
 		var get_more_link_data = { display: false, nb_left: 0 };
 
 		var current_screen = App.getCurrentScreenData();
+		
 		if ( current_screen.screen_type == 'list' ) {
 			var component = App.components.get( current_screen.component_id );
 			if ( component ) {
@@ -372,6 +381,8 @@ define( function( require, exports ) {
 				}
 			}
 		}
+
+		get_more_link_data = Hooks.applyFilters( 'get-more-link-display', get_more_link_data, [ current_screen ] );
 
 		return get_more_link_data;
 	};
@@ -388,6 +399,8 @@ define( function( require, exports ) {
 						do_after( is_last, new_items, data.nb_left );
 					}
 			);
+		} else {
+			Hooks.doActions( 'get-more-component-items', [ current_screen, do_after ] );
 		}
 	};
 
