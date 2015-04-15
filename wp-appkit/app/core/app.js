@@ -1087,7 +1087,11 @@ define(function (require) {
 	/**
 	 * Live query web service 
 	 * 
-	 * @param JSON Object args
+	 * @param JSON Object web_service_params Any params that you want to send to the server.
+	 *        The following params are automatically recognised and interpreted on server side :
+	 *        - wpak_component_slug : { string | Array of string } components to make query on
+	 *        - wpak_query_action : { string } 'get-component' to retrieve the full component, or 'get-items' to retrieve choosen component items
+	 *        - wpak_items_ids : { int | array of int } If wpak_query_action = 'get-items' : component items ids to retrieve
 	 * @param callback cb_ok
 	 * @param callback cb_error
 	 * @param options JSON Object : allowed settings :
@@ -1113,7 +1117,7 @@ define(function (require) {
 		var ws_url = token + '/live-query';
 		
 		/**
-		* Filter 'web-service-params' : use this to send custom key/value formated  
+		* Filter 'web-service-params' : use this to send custom key/value formatted  
 		* data along with the web service. Those params are passed to the server 
 		* (via $_GET) when calling the web service.
 		* 

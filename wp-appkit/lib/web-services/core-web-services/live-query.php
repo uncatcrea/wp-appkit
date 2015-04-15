@@ -45,7 +45,7 @@ class WpakWebServiceLiveQuery {
 			
 			if ( is_array( $component_slug ) ) {
 				
-				//The only valid action is 'get-component' if $component_slug is anarray :
+				//The only valid action is 'get-component' if $component_slug is an array :
 				if ( $action == 'get-component' ) {
 					
 					//Retrieve data for all given components and merge globals :
