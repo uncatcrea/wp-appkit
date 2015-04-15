@@ -1165,11 +1165,13 @@ define(function (require) {
 					if( !_.isEmpty( new_components ) ) {
 						
 						var error_message = '';
+						var update_results = {};
 						
 						_.each( new_components, function( component ) {
 
 							var result = update_component( component, answer.globals, interpretation_type, persistent );
-
+							update_results[component.slug] = result;
+							
 							if ( result.ok ) {
 								Utils.log( 'Live query update component "'+ component.slug +'" OK.', result );
 							} else {
@@ -1181,12 +1183,12 @@ define(function (require) {
 						
 						if ( error_message === '' ) {
 							if ( cb_ok ) {
-								cb_ok( answer );
+								cb_ok( answer, update_results );
 							}
 						} else {
 							app.triggerError(
 								'live-query:update-component-error',
-								{ type: 'mixed', where: 'app::liveQuery', message: error_message },
+								{ type: 'mixed', where: 'app::liveQuery', message: error_message, data: { results: update_results } },
 								cb_error
 							);
 						}
@@ -1197,11 +1199,13 @@ define(function (require) {
 						//update current global items with new items sent :
 						
 						var error_message = '';
+						var update_results = {};
 						
 						_.each( answer.globals, function( items, global ) {
 							
 							var result = update_global_items( global, items, interpretation_type, persistent );
-
+							update_results[global] = result;
+							
 							if ( result.ok ) {
 								Utils.log( 'Live query update global "'+ global +'" OK.', result );
 							} else {
@@ -1213,12 +1217,12 @@ define(function (require) {
 						
 						if ( error_message === '' ) {
 							if ( cb_ok ) {
-								cb_ok( answer );
+								cb_ok( answer, update_results );
 							}
 						} else {
 							app.triggerError(
 								'live-query:update-global-items-error',
-								{ type: 'mixed', where: 'app::liveQuery', message: error_message },
+								{ type: 'mixed', where: 'app::liveQuery', message: error_message, data: { results: update_results } },
 								cb_error
 							);
 						}
