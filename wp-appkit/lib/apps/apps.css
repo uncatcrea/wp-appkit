@@ -51,12 +51,15 @@
 }
 
 .wpak_help {
-    position:absolute;
-    right:20px;
-    top:-5px;
-    /*font-style:italic;*/
     color:#777;
     display:inline-block;
+    text-align:right;
+    width:100%;
+}
+
+.wpak_help:focus {
+    -webkit-box-shadow:none;
+    box-shadow:none;
 }
 
 /** Glyphicons styles taken from Bootstrap */

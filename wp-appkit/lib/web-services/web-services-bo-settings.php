@@ -22,6 +22,7 @@ class WpakWebServicesBoSettings {
     public static function inner_synchronization_box( $post, $current_box ) {
         $wp_ws_url = WpakWebServices::get_app_web_service_url( $post->ID, 'synchronization' );
         ?>
+        <a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
         <div class="link field-group">
             <?php _e( 'View Web Service Data: ', WpAppKit::i18n_domain ) ?><br /><a href="<?php echo $wp_ws_url ?>"><?php echo $wp_ws_url ?></a>
         </div>
