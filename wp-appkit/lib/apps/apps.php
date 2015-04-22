@@ -16,6 +16,7 @@ class WpakApps {
 			add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 			add_filter( 'post_row_actions', array( __CLASS__, 'remove_quick_edit' ), 10, 2 );
 			add_action( 'admin_head', array( __CLASS__, 'add_icon' ) );
+			add_filter( 'post_updated_messages', array( __CLASS__, 'updated_messages' ) );
 		}
 	}
 
@@ -75,6 +76,21 @@ class WpakApps {
 				)
 			)
 		);
+	}
+
+	public static function updated_messages( $messages ) {
+		$messages['wpak_apps'] = array(
+			 0 => '', // Unused. Messages start at index 1.
+			 1 => __( 'Application project saved.', WpAppKit::i18n_domain ),
+			 4 => __( 'Application project saved.', WpAppKit::i18n_domain ),
+			 6 => __( 'Application project saved.', WpAppKit::i18n_domain ),
+			 7 => __( 'Application project saved.', WpAppKit::i18n_domain ),
+			 8 => __( 'Application project saved.', WpAppKit::i18n_domain ),
+			 9 => __( 'Application project saved.', WpAppKit::i18n_domain ),
+			10 => __( 'Application project saved.', WpAppKit::i18n_domain ),
+		);
+
+		return $messages;
 	}
 
 	public static function add_icon() {
