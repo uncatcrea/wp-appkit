@@ -104,8 +104,17 @@ class WpakApps {
 
 		add_meta_box(
 			'wpak_app_publish',
-			__( 'Publish', WpAppKit::i18n_domain ),
+			__( 'Save & Preview', WpAppKit::i18n_domain ),
 			array( __CLASS__, 'inner_publish_box' ),
+			'wpak_apps',
+			'side',
+			'high'
+		);
+
+		add_meta_box(
+			'wpak_app_project',
+			__( 'My Project', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_project_box' ),
 			'wpak_apps',
 			'side',
 			'high'
@@ -143,6 +152,76 @@ class WpakApps {
 
 	public static function inner_publish_box( $post, $current_box ) {
 		$first_save = !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID;
+		?>
+		<div class="submitbox" id="submitpost">
+			<div style="display:none;">
+				<?php submit_button( __( 'Save' ), 'button', 'save' ); ?>
+			</div>
+
+			<div id="minor-publishing">
+				<div id="minor-publishing-actions">
+					<div id="preview-action">
+						<a href="<?php echo WpakBuild::get_appli_index_url( $post->ID ); ?>" class="preview button" target="_blank"><?php _e( 'Preview', WpAppKit::i18n_domain ) ?></a>
+					</div>
+					<div class="clear"></div>
+				</div>
+			</div>
+
+			<div id="misc-publishing-actions">
+				<?php
+				/* translators: Publish box date format, see http://php.net/date */
+				$datef = __( 'M j, Y @ G:i' );
+				if ( 0 != $post->ID ) {
+					if ( 'publish' == $post->post_status || 'private' == $post->post_status ) { // already published
+						$stamp = __( 'Last saved on: <b>%1$s</b>', WpAppKit::i18n_domain );
+					} else if ( '0000-00-00 00:00:00' == $post->post_date_gmt ) { // draft, 1 or more saves, no date specified
+						$stamp = __( 'Not saved yet', WpAppKit::i18n_domain );
+					}
+					$date = date_i18n( $datef, strtotime( $post->post_date ) );
+				} else { // draft (no saves, and thus no date specified)
+					$stamp = __( 'Not saved yet', WpAppKit::i18n_domain );
+					$date = date_i18n( $datef, strtotime( current_time('mysql') ) );
+				}
+				?>
+				<div class="misc-pub-section curtime misc-pub-curtime">
+					<span id="timestamp">
+					<?php printf($stamp, $date); ?></span>
+				</div>
+			</div>
+
+			<div id="major-publishing-actions">
+				<div id="delete-action">
+					<?php
+					if ( current_user_can( "delete_post", $post->ID ) ) {
+						if ( !EMPTY_TRASH_DAYS )
+							$delete_text = __( 'Delete Permanently' );
+						else
+							$delete_text = __( 'Move to Trash' );
+						?>
+					<a class="submitdelete deletion" href="<?php echo get_delete_post_link( $post->ID ); ?>"><?php echo $delete_text; ?></a><?php
+					} ?>
+				</div>
+
+				<div id="publishing-action">
+					<span class="spinner"></span>
+					<?php
+					if ( $first_save ) { ?>
+						<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Publish' ) ?>" />
+						<?php submit_button( __( 'Save' ), 'primary button-large', 'publish', false, array( 'accesskey' => 'p' ) );
+					} else { ?>
+						<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Update' ) ?>" />
+						<?php submit_button( __( 'Save' ), 'primary button-large', 'save', false, array( 'accesskey' => 'p', 'id' => 'publish' ) ); ?>
+					<?php
+					} ?>
+				</div>
+				<div class="clear"></div>
+			</div>
+		</div>
+		<?php
+	}
+
+	public static function inner_project_box( $post, $current_box ) {
+		$first_save = !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID;
 		$main_infos = self::get_app_main_infos( $post->ID );
 		$mandatory = self::get_phonegap_mandatory_fields();
 		$checked = array(
@@ -160,23 +239,8 @@ class WpakApps {
 			}
 		}
 		?>
-		<div class="submitbox" id="submitpost">
-			<div style="display:none;">
-				<?php submit_button( __( 'Save' ), 'button', 'save' ); ?>
-			</div>
 
-			<div id="minor-publishing">
-				<div id="minor-publishing-actions">
-					<div id="export-action">
-						<a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
-					</div>
-					<div id="preview-action">
-						<a href="<?php echo WpakBuild::get_appli_index_url( $post->ID ); ?>" class="preview button" target="_blank"><?php _e( 'Preview', WpAppKit::i18n_domain ) ?></a>
-					</div>
-					<div class="clear"></div>
-				</div>
-			</div>
-
+		<div class="submitbox">
 			<div id="wpak_publish_box">
 				<ul id="wpak_app_wizard" class="list-group">
 					<li id="wpak_app_wizard_title" class="list-group-item <?php echo $checked['title'] ? 'list-group-item-success' : ''; ?>">
@@ -202,34 +266,11 @@ class WpakApps {
 				</ul>
 			</div>
 
-			<div id="major-publishing-actions">
-				<div id="delete-action">
-					<?php
-					if ( current_user_can( "delete_post", $post->ID ) ) {
-						if ( !EMPTY_TRASH_DAYS )
-							$delete_text = __( 'Delete Permanently' );
-						else
-							$delete_text = __( 'Move to Trash' );
-						?>
-					<a class="submitdelete deletion" href="<?php echo get_delete_post_link( $post->ID ); ?>"><?php echo $delete_text; ?></a><?php
-					} ?>
-				</div>
-
-				<div id="publishing-action">
-					<span class="spinner"></span>
-					<?php
-					if ( $first_save ) { ?>
-						<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Publish' ) ?>" />
-						<?php submit_button( __( 'Save' ), 'primary button-large', 'publish', false, array( 'accesskey' => 'p' ) );
-					} else { ?>
-						<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Update' ) ?>" />
-						<?php submit_button( __( 'Update' ), 'primary button-large', 'save', false, array( 'accesskey' => 'p', 'id' => 'publish' ) ); ?>
-					<?php
-					} ?>
-				</div>
-				<div class="clear"></div>
+			<div id="export-action">
+				<?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
 			</div>
 		</div>
+
 		<?php
 	}
 
