@@ -162,6 +162,7 @@ class WpakBuild {
 		}
 
 		$answer['export'] = $export_filename;
+		$answer['export_full_name'] = $export_filename_full;
 
 		return $answer;
 	}
