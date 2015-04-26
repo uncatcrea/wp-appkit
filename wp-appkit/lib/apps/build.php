@@ -16,7 +16,7 @@ class WpakBuild {
 	public static function add_meta_boxes() {
 		add_meta_box(
 			'wpak_simulation_box',
-			__( 'Dev tools', WpAppKit::i18n_domain ),
+			__( 'Dev Tools', WpAppKit::i18n_domain ),
 			array( __CLASS__, 'inner_simulation_box' ),
 			'wpak_apps',
 			'side',

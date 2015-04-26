@@ -35,20 +35,20 @@ class WpakNavigationBoSettings{
 		?>
 		<div id="navigation-wrapper">
 			<p>Menu</p>
-			<a href="#" class="add-new-h2" id="add-new-item"><?php _e('Add new component to navigation',WpAppKit::i18n_domain) ?></a>
+			<a href="#" class="add-new-h2" id="add-new-item"><?php _e('Add Component to Menu',WpAppKit::i18n_domain) ?></a>
 
 			<div id="navigation-feedback" style="display:none"></div>
 
 			<div id="new-item-form" style="display:none">
-				<h4><?php _e('New navigation item',WpAppKit::i18n_domain) ?></h4>
+				<h4><?php _e('New Menu Item',WpAppKit::i18n_domain) ?></h4>
 				<div id="components-available-for-navigation"><?php self::echo_item_form($post->ID) ?></div>
 			</div>
 
 			<table class="wp-list-table widefat fixed" id="navigation-items-table" data-post-id="<?php echo $post->ID ?>">
 				<thead>
 					<tr>
-						<th><?php _e('Navigation components',WpAppKit::i18n_domain) ?></th>
-						<th><?php _e('Icon slug',WpAppKit::i18n_domain) ?></th>
+						<th><?php _e('Menu Item',WpAppKit::i18n_domain) ?></th>
+						<th><?php _e('Icon Slug',WpAppKit::i18n_domain) ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -58,7 +58,7 @@ class WpakNavigationBoSettings{
 						<?php echo self::get_navigation_row($post->ID,$i++,$nav_item_id,$nav_item) ?>
 					<?php endforeach ?>
 				<?php else: ?>
-					<tr class="no-component-yet"><td><?php _e('No navigation item yet!',WpAppKit::i18n_domain) ?></td></tr>
+					<tr class="no-component-yet"><td><?php _e('No menu item yet!',WpAppKit::i18n_domain) ?></td></tr>
 				<?php endif ?>
 				</tbody>
 			</table>
