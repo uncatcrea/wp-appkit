@@ -83,9 +83,9 @@ class WpakNavigationBoSettings{
 		<?php $alternate_class = $i%2 ? '' : 'alternate' ?>
 		<?php $component = WpakComponentsStorage::get_component($post_id,$nav_item->component_id) ?>
 		<?php if( !empty($component) ): ?>
-			<tr class="ui-state-default <?php echo $alternate_class ?>" data-id="<?php echo $nav_item_id ?>" id="navigation-item-row-<?php echo $nav_item_id ?>">
+			<tr class="ui-state-default <?php echo $alternate_class ?> navigation-item-component-<?php echo $nav_item->component_id; ?>" data-id="<?php echo $nav_item_id ?>" id="navigation-item-row-<?php echo $nav_item_id ?>">
 				<td>
-					<?php echo $component->label ?> (<?php echo $component->slug ?>)
+					<span class="label"><?php echo $component->label ?></span> (<span class="slug"><?php echo $component->slug ?></span>)
 					<input type="hidden" id="position-<?php echo $nav_item_id ?>" name="positions[<?php echo $nav_item_id ?>]" value="<?php echo $nav_item->position ?>" />
 					<div class="row-actions">
 						<span class="trash"><a class="submitdelete delete_navigation_item" href="#" data-post-id="<?php echo $post_id ?>" data-id="<?php echo $nav_item_id ?>"><?php _e('Delete',WpAppKit::i18n_domain)?></a></span>
