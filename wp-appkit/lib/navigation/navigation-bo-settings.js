@@ -106,7 +106,7 @@ var WpakNavigation = (function ($){
 			});
 		};
 
-		//Called hereunder AND from components-bo-settings.js to refresh available components for navigation
+		//Called hereunder AND from a "components observer" to refresh available components for navigation
 		//when adding/editing components :
 		wpak.refresh_available_components = function(post_id){
 
@@ -130,6 +130,15 @@ var WpakNavigation = (function ($){
 				  },
 				  dataType: 'json'
 			});
+		};
+
+		wpak.refresh_component = function( component ) {
+			if( undefined === typeof component.id || !$( '.navigation-item-component-' + component.id ).length ) {
+				return;
+			}
+
+			$( '.navigation-item-component-' + component.id + ' .label' ).text( component.label );
+			$( '.navigation-item-component-' + component.id + ' .slug' ).text( component.slug );
 		};
 
 		wpak.addObserver = function( newObserver ) {
@@ -283,5 +292,13 @@ jQuery().ready(function(){
 			e.preventDefault();
 		}
 	});
+
+	var navigation_observer = {
+		update: function( data ) {
+			WpakNavigation.refresh_available_components();
+			WpakNavigation.refresh_component( data.component );
+		}
+	}
+	WpakComponents.addObserver( navigation_observer );
 
 });

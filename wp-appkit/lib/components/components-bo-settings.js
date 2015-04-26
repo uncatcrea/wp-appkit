@@ -142,7 +142,6 @@ jQuery().ready(function(){
 						form_tr.prev('tr').replaceWith(answer.html);
 						form_tr.remove();
 					}
-					WpakNavigation.refresh_available_components();
 				}
 				display_feedback(answer.type,answer.message);
 			});
@@ -175,7 +174,6 @@ jQuery().ready(function(){
 				if( answer.ok == 1 ){
 					$('#components-table tr#component-row-'+component_id).remove();
 					$('#components-table tr#edit-component-wrapper-'+component_id).remove();
-					WpakNavigation.refresh_available_components();
 				}
 				display_feedback(answer.type,answer.message);
 			});

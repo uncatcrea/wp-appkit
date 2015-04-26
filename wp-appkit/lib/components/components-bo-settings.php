@@ -133,7 +133,7 @@ class WpakComponentsBoSettings {
 		$component_id = $edit ? WpakComponentsStorage::get_component_id( $post_id, $component ) : '0';
 
 		$components_types = WpakComponentsTypes::get_available_components_types();
-		
+
 		?>
 		<div id="component-form-<?php echo $component_id ?>" class="component-form">
 			<table class="form-table">
@@ -186,7 +186,7 @@ class WpakComponentsBoSettings {
 		$params = $_POST['params'];
 
 		WpakAddons::require_app_addons_php_files( intval($_POST['post_id']) );
-		
+
 		echo WpakComponentsTypes::get_ajax_action_html_answer( $component_type, $action, $params );
 		exit();
 	}
@@ -200,14 +200,14 @@ class WpakComponentsBoSettings {
 		}
 
 		WpakAddons::require_app_addons_php_files( intval($_POST['post_id']) );
-		
+
 		WpakComponentsTypes::echo_form_fields( $component_type );
 		exit();
 	}
 
 	public static function ajax_wpak_edit_component() {
 
-		$answer = array( 'ok' => 0, 'message' => '', 'type' => 'error', 'html' => '' );
+		$answer = array( 'ok' => 0, 'message' => '', 'type' => 'error', 'html' => '', 'component' => array() );
 
 		if ( empty( $_POST['post_id'] ) || empty( $_POST['nonce'] ) || !check_admin_referer( 'wpak-component-data-' . $_POST['post_id'], 'nonce' ) ) {
 			exit( 'bad nonce' );
@@ -215,7 +215,7 @@ class WpakComponentsBoSettings {
 
 		$action = $_POST['wpak_action'];
 		$data = $_POST['data'];
-		
+
 		WpakAddons::require_app_addons_php_files( intval($_POST['post_id']) );
 
 		if ( $action == 'add_or_update' ) {
@@ -276,6 +276,11 @@ class WpakComponentsBoSettings {
 			$component = new WpakComponent( $component_slug, $component_label, $component_type, $component_options );
 			$component_id = WpakComponentsStorage::add_or_update_component( $post_id, $component, $edit_id );
 
+			$answer['component'] = array(
+				'id' => $component_id,
+				'slug' => $component_slug,
+				'label' => $component_label,
+			);
 			$answer['html'] = self::get_component_row( $post_id, WpakComponentsStorage::get_nb_components( $post_id ), $component_id, $component );
 
 			if ( $edit ) {
