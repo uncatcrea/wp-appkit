@@ -162,7 +162,13 @@ class WpakApps {
 
 	public static function get_phonegap_mandatory_fields() {
 		return array(
-			// TODO: Determine which fields are mandatory
+			'name',
+			'app_phonegap_id',
+			'version',
+			'desc',
+			'author',
+			'author_website',
+			'author_email',
 		);
 	}
 
