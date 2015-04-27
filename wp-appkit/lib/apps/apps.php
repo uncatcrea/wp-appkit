@@ -192,7 +192,7 @@ class WpakApps {
 			<div id="misc-publishing-actions">
 				<?php
 				/* translators: Publish box date format, see http://php.net/date */
-				$datef = __( 'M j, Y @ G:i' );
+				$datef = __( 'M j, Y @ H:i' );
 				if ( 0 != $post->ID ) {
 					if ( 'publish' == $post->post_status || 'private' == $post->post_status ) { // already published
 						$stamp = __( 'Last saved on: <b>%1$s</b>', WpAppKit::i18n_domain );
