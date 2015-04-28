@@ -62,7 +62,7 @@ class WpakUploadThemes {
 					echo ' : '. $result->get_error_message();
 				}
 				
-				echo '<br/><br/><a href="'. remove_query_arg('wpak_action') .'">'. __('Back to theme upload form', WpAppKit::i18n_domain) .'</a>';
+				echo '<br/><br/><a href="'. esc_url ( remove_query_arg('wpak_action') ) .'">'. __('Back to theme upload form', WpAppKit::i18n_domain) .'</a>';
 				
 				echo '<br/><br/><a href="'. admin_url() .'/edit.php?post_type=wpak_apps">'. __('Go to my WP AppKit app list', WpAppKit::i18n_domain) .'</a>';
 				
