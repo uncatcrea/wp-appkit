@@ -10,13 +10,15 @@ class WpakComponentsUtils {
 		$replacement_image = self::get_unavailable_media_img();
 
 		//Convert dailymotion video
-		$content = preg_replace( '/\[dailymotion\](.*?)(\[\/dailymotion\])/is', '<div class="video">$1</div>', $content );
-		$content = preg_replace( '/<iframe (.*?)(src)="(.*?(www.dailymotion.com).*?)".*?>\s*<\/iframe>/is', '<div class="video">$3</div>', $content );
+		$content = preg_replace( '/\[dailymotion\](.*?)(\[\/dailymotion\])/is', $replacement_image, $content );
 
-		//Youtube and mp3 inserted via <a> :
+		//Youtube :
 		$content = preg_replace( '/<a[^>]*href="[^"]*youtube.com.*?".*?>.*?(<\/a>)/is', $replacement_image, $content );
+		$content = preg_replace( '/\[youtube\](.*?)(\[\/youtube\])/is', $replacement_image, $content );
+		
+		//Mp3 :
 		$content = preg_replace( '/<a[^>]*href="[^"]*(\.mp3).*?".*?>.*?(<\/a>)/is', $replacement_image, $content );
-
+		
 		//Delete [embed]
 		$content = preg_replace( '/\[embed .*?\](.*?)(\[\/embed\\])/is', $replacement_image, $content );
 
