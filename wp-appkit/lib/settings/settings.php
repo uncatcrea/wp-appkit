@@ -33,7 +33,7 @@ class WpakSettings {
 				<div class="<?php echo $result['type'] ?>" ><p><?php echo $result['message'] ?></p></div>
 			<?php endif ?>
 			
-			<form method="post" action="<?php echo add_query_arg( array() ) ?>">
+			<form method="post" action="<?php echo esc_url( add_query_arg( array() ) ) ?>">
 				
 				<table>
 					<tr>
