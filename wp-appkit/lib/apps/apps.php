@@ -246,10 +246,12 @@ class WpakApps {
 		$first_save = !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID;
 		$main_infos = self::get_app_main_infos( $post->ID );
 		$mandatory = self::get_phonegap_mandatory_fields();
+		$components = WpakComponents::get_app_components( $post->ID );
+		$navigation = WpakNavigation::get_app_navigation( $post->ID );
 		$checked = array(
 			'title' => !empty( $post->post_title ),
-			'components' => !empty( WpakComponents::get_app_components( $post->ID ) ),
-			'navigation' => !empty( WpakNavigation::get_app_navigation( $post->ID ) ),
+			'components' => !empty( $components ),
+			'navigation' => !empty( $navigation ),
 			'phonegap' => true,
 			'save' => !$first_save,
 		);
