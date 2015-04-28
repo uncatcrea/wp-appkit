@@ -202,7 +202,8 @@ class WpakBuild {
 	}
 
 	private static function get_export_files_path() {
-		return WP_CONTENT_DIR . '/uploads/wpak-export';
+		$upload_dir = wp_upload_dir();
+		return empty( $upload_dir['error'] ) ? $upload_dir['basedir'] . '/wpak-export' : '';
 	}
 
 	private static function get_export_file_base_name( $app_id ) {

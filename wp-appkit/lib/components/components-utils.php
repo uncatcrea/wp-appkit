@@ -71,8 +71,13 @@ class WpakComponentsUtils {
 
 	public static function get_unavailable_media_img() {
 
+		$upload_dir = wp_upload_dir();
+		if ( !empty( $upload_dir['error'] ) ) {
+			return '';
+		}
+
 		$params = array(
-			'src' => site_url() . '/wp-content/uploads/wpak_unavailable_media.png',
+			'src' => $upload_dir['baseurl'] . '/wpak_unavailable_media.png',
 			'width' => 604,
 			'height' => 332
 		);

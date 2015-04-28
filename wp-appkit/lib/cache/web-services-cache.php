@@ -207,7 +207,8 @@ class WpakCache {
 	}
 
 	private static function get_cache_files_path() {
-		return WP_CONTENT_DIR . '/uploads/web-services-cache'; //WP_CONTENT_DIR is defined even when WP API is not loaded yet.
+		$upload_dir = wp_upload_dir(); //TODO : check if this is defined even when WP API is not loaded yet...
+		return empty( $upload_dir['error'] ) ? $upload_dir['basedir'] . '/web-services-cache' : ''; 
 	}
 
 	private static function create_cache_directory_if_doesnt_exist() {
