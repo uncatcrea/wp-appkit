@@ -387,7 +387,7 @@ class WpakWebServices {
 	}
 
 	public static function get_app_web_service_base_url( $app_id_or_slug ) {
-		$url = home_url() . '/wp-appkit-api'; //TODO : check that it works on multisite
+		$url = home_url() . '/wp-appkit-api';
 
 		$app_slug = WpakApps::get_app_slug( $app_id_or_slug );
 		$app_id = WpakApps::get_app_id( $app_id_or_slug );
