@@ -1,4 +1,4 @@
-## 0.2 (2015-03-08)
+## 0.3 (2015-05-04)
 
 ### Features:
 - **Persistent storage** ([#48](https://github.com/uncatcrea/wp-app-kit/issues/48), [@mleroi](https://github.com/mleroi))
