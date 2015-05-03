@@ -242,6 +242,7 @@ class WpakBuild {
 
 			foreach ( $files as $file ) {
 				$filename = str_replace( $source, '', $file );
+				$filename = wp_normalize_path( $filename );
 				$filename = ltrim( $filename, '/\\' );
 
 				//Themes are included separately from the wpak themes directory
@@ -287,6 +288,7 @@ class WpakBuild {
 
 					foreach ( $files as $file ) {
 						$filename = str_replace( $themes_directory, '', $file );
+						$filename = wp_normalize_path( $filename );
 						$filename = ltrim( $filename, '/\\' );
 
 						//Filter themes :
