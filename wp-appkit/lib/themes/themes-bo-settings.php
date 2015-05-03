@@ -36,7 +36,7 @@ class WpakThemesBoSettings {
 			<div class="wpak_no_theme">
 				<strong><?php _e( 'No WP AppKit theme found!', WpAppKit::i18n_domain ) ?></strong>
 				<br/>
-				<?php echo  sprintf( __('Please upload a WP AppKit theme from the "<a href="%s" >Upload themes</a>" panel or copy a theme directly to the %s directory.', WpAppKit::i18n_domain ),
+				<?php echo  sprintf( __('Please upload a WP AppKit theme from the "<a href="%s" >Upload Themes</a>" panel or copy a theme directly to the %s directory.', WpAppKit::i18n_domain ),
 									'/wp-admin/admin.php?page=wpak_bo_upload_themes',
 									basename(WP_CONTENT_DIR) .'/'. WpakThemes::themes_directory
 							)
