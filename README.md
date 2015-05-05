@@ -5,25 +5,14 @@ Create mobile apps and connect them to WordPress.
 > All versions under 1.0 are beta versions
 
 ## News
-* 03/08/2015: Version 0.2 is here!
+* 05/04/2015: Version 0.3: discover its totally new revamped UI!
 * To know about changes in this version, read the [changelog](https://github.com/uncatcrea/wp-app-kit/blob/master/CHANGELOG.md)
-
-### Migrating from 0.1 to 0.2
-* Backup your theme (located in the /wp-content/plugins/wp-app-kit/app/themes)
-* Deactivate version 0.1 in WordPress
-* Uninstall version 0.1 (simply delete or delete the wp-app-kit plugin folder)
-* Don't worry, apps' configuration is preserved
-* Install version 0.2 (drop the wp-appkit folder in your plugins folder and acticate wp-appkit in WordPress)
-* It creates a new folder (themes-wp-appkit) in wp-content which is the new home for your app themes
-* Note that sample themes are not delivered any more with the plugin itself
-* You may find them in their own repository: https://github.com/uncatcrea/wp-appkit-themes
-* Finally you have to save at least one time any apps done with the 0.1 to migrate them
 
 ## What Is WP-AppKit?
 It's a WordPress plugin which provides:
 * An admin panel to configure your app
 * JSON web services to feed your app with WordPress content
-* A Javascript engine to create app's themes
+* A JavaScript engine to create app's themes
 * Sample themes to trigger your natural inclination to unbridled creativity
 
 WP-AppKit uses the [Cordova](http://cordova.apache.org/) technology for the app. It means that the app is developed with HTML, CSS and JavaScript but still can be distribued in app stores.
@@ -37,13 +26,11 @@ WP-AppKit adds a menu to the WordPress admin.
 * Use Chrome to simulate your app in the browser
 * Export the app's sources ready to be compiled with [PhoneGap Build](https://build.phonegap.com/)
 
-![WP-AppKit WordPress Panel Screenshot](https://cloud.githubusercontent.com/assets/6179747/6526510/ef87b228-c412-11e4-8c90-2753b6d1f4ef.png)
+![WP-AppKit WordPress Panel Screenshot](https://cloud.githubusercontent.com/assets/6179747/7479033/24fbf862-f35f-11e4-8c58-ceb823540c73.png)
 
 ![WP-AppKit WordPress Panel Screenshot](https://cloud.githubusercontent.com/assets/6179747/6472500/4d27fd6a-c1f3-11e4-90fb-df233d82a98b.png)
 
 ## App Themes
-> Starting with version 0.2, themes are located in /wp-content/themes-wp-appkit
-
 WP-AppKit allows to create themes for your apps. As we use the Cordova technology, app themes are build with HTML, CSS and JavaScript. WP-AppKit provides a JavaScript engine able to interact with the WP-AppKit web services. It also mimics WordPress themes with files such as single, archive... You will also be able to use template tags.
 
 However an app's theme *is not* a WordPress theme.
