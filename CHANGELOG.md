@@ -9,7 +9,7 @@
 - **Better menu items filtering : make "menu-items" js filter more general** ([#66](https://github.com/uncatcrea/wp-appkit/issues/66), [@mleroi](https://github.com/mleroi))
 - **Allow to pass any custom data along with web services from app themes and to filter server answer accordingly : new “web-service-params” js filter** ([#68](https://github.com/uncatcrea/wp-appkit/issues/68), [@mleroi](https://github.com/mleroi))
 - **Pass any custom param to app templates : new “template-args” js filter** ([#69](https://github.com/uncatcrea/wp-appkit/issues/69), [@mleroi](https://github.com/mleroi))
-- **Pass any custom param to app templates : new “template-args” js filter** ([#70](https://github.com/uncatcrea/wp-appkit/issues/70), [@mleroi](https://github.com/mleroi))
+- **Allow to customize web services jQuery ajax calls : new “ajax-args” js filter** ([#70](https://github.com/uncatcrea/wp-appkit/issues/70), [@mleroi](https://github.com/mleroi))
 - **WordPress 4.2 Compatibility** ([#72](https://github.com/uncatcrea/wp-appkit/issues/72), [@lpointet](https://github.com/lpointet))
 - **Feedback message when saving** ([#77](https://github.com/uncatcrea/wp-appkit/issues/77), [@lpointet](https://github.com/lpointet))
 - **New Appearance Metabox** ([#78](https://github.com/uncatcrea/wp-appkit/issues/78), [@lpointet](https://github.com/lpointet))
@@ -30,4 +30,4 @@
 - **Access rights problem when trying uploading a theme** ([#75](https://github.com/uncatcrea/wp-appkit/issues/75), [@lpointet](https://github.com/lpointet))
 
 ### Security
-- **More security for web services calls by checking that the corresponding app is valid** ([67](https://github.com/uncatcrea/wp-appkit/issues/67), [@mleroi(https://github.com/mleroi)])
+- **More security for web services calls by checking that the corresponding app is valid** ([67](https://github.com/uncatcrea/wp-appkit/issues/67), [@mleroi](https://github.com/mleroi))
