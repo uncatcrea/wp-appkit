@@ -2,15 +2,15 @@
 
 /*
   Plugin Name: WP AppKit
-  Description: Build Phonegap Mobile apps based on your WordPress contents
-  Version: 0.2
+  Description: Build Phonegap Mobile apps based on your WordPress content
+  Version: 0.3
  */
 
 if ( !class_exists( 'WpAppKit' ) ) {
 
 	class WpAppKit {
 
-		const resources_version = '0.5';
+		const resources_version = '0.3.0';
 		const i18n_domain = 'wp-appkit';
 
 		public static function hooks() {
