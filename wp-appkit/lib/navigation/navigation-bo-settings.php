@@ -83,7 +83,7 @@ class WpakNavigationBoSettings{
 		<?php $alternate_class = $i%2 ? '' : 'alternate' ?>
 		<?php $component = WpakComponentsStorage::get_component($post_id,$nav_item->component_id) ?>
 		<?php if( !empty($component) ): ?>
-			<tr class="ui-state-default <?php echo $alternate_class ?> navigation-item-component-<?php echo $nav_item->component_id; ?>" data-id="<?php echo $nav_item_id ?>" id="navigation-item-row-<?php echo $nav_item_id ?>">
+			<tr class="ui-state-default <?php echo $alternate_class ?> navigation-item navigation-item-component-<?php echo $nav_item->component_id; ?>" data-id="<?php echo $nav_item_id ?>" id="navigation-item-row-<?php echo $nav_item_id ?>">
 				<td>
 					<span class="label"><?php echo $component->label ?></span> (<span class="slug"><?php echo $component->slug ?></span>)
 					<input type="hidden" id="position-<?php echo $nav_item_id ?>" name="positions[<?php echo $nav_item_id ?>]" value="<?php echo $nav_item->position ?>" />
