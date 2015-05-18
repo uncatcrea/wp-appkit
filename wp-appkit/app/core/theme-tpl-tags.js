@@ -188,6 +188,22 @@ define(function(require, exports) {
 	themeTplTags.getComponent = function(component_id) {
         return App.getComponentData(component_id);
     };
+	
+	themeTplTags.getComponentItems = function( component_id, return_format ) {
+		return_format = return_format === undefined ? 'view_items' : return_format;
+		var items = [];
+		var component = themeTplTags.getComponent( component_id );
+		if ( component ) {
+			if ( return_format === 'view_items' ) {
+				if ( component.view_data.hasOwnProperty( 'posts' ) ) {
+					items = component.view_data.posts;
+				} else if ( component.view_data.hasOwnProperty( 'items' ) ) {
+					items = component.view_data.items;
+				}
+			}
+		}
+        return items;
+    };
 
     themeTplTags.formatDate = function(date_timestamp, format) {
 
