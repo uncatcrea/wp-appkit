@@ -204,6 +204,12 @@ class WpakThemes {
 		
 		if ( file_exists($theme_readme) ) {
 			$theme_data = get_file_data( $theme_readme, $file_headers, 'wp-appkit-theme' );
+		} else {
+			//Try with upper case :
+			$theme_readme = $themes_dir . '/README.md';
+			if ( file_exists($theme_readme) ) {
+				$theme_data = get_file_data( $theme_readme, $file_headers, 'wp-appkit-theme' );
+			} 
 		}
 		
 		if( empty($theme_data['Name']) ) {
