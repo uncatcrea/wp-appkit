@@ -42,7 +42,7 @@ class WpakComponents {
 		return $components_data;
 	}
 
-	public static function get_component_data( $app_id, $component_slug, $args ) {
+	public static function get_component_data( $app_id, $component_slug, $args = array() ) {
 		$component_data = array();
 
 		if ( WpakComponentsStorage::component_exists( $app_id, $component_slug ) ) {
@@ -53,6 +53,22 @@ class WpakComponents {
 		}
 
 		return $component_data;
+	}
+	
+	public static function get_component_items( $app_id, $component_slug, $items_ids, $args = array() ) {
+		$component_items = array();
+		
+		if ( WpakComponentsStorage::component_exists( $app_id, $component_slug ) ) {
+			$component = WpakComponentsStorage::get_component( $app_id, $component_slug );
+			$component_items_by_global = WpakComponentsTypes::get_component_items( $component, $items_ids, $args );
+			foreach( $component_items_by_global as $global => $items ) {
+				if ( is_string( $global ) ) { //to be sure that we did not forget to set a global as key
+					$component_items['globals'][$global] = $items;
+				}
+			}
+		}
+		
+		return $component_items;
 	}
 
 	/**

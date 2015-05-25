@@ -24,6 +24,19 @@ abstract class WpakComponentType {
 		$this->compute_data( $component, $component->options, $args );
 		return $this->data;
 	}
+	
+	/**
+	 * Retrieves a subset ($items_ids) of component items 
+	 */
+	public function get_items( WpakComponent $component, $items_ids, $args = array() ) {
+		$items_by_global = array();
+		if ( method_exists( $this, 'get_items_data' ) ) {
+			//The get_items_data() method is optionnal.
+			//It must return an array of component items indexed by global :
+			$items_by_global = $this->get_items_data( $component, $component->options, $items_ids, $args );
+		}
+		return $items_by_global;
+	}
 
 	protected function set_specific( $specific_key, $values ) {
 		@$this->data['specific']['data'][$specific_key] = $values;
@@ -59,6 +72,14 @@ class WpakComponentsTypes {
 			$data = self::factory( $component->type )->get_data( $component, $globals, $args );
 		}
 		return $data;
+	}
+	
+	public static function get_component_items( WpakComponent $component, $items_ids, $args = array() ) {
+		$items = null;
+		if ( self::component_type_exists( $component->type ) ) {
+			$items = self::factory( $component->type )->get_items( $component, $items_ids, $args );
+		}
+		return $items;
 	}
 
 	public static function get_options_to_display( WpakComponent $component ) {

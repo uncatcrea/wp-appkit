@@ -87,7 +87,7 @@ define( function( require ) {
 		}
 	};
 
-	hooks.doActions = function( action, params, context ) {
+	hooks.doActions = function( action, params, filtered_params, context) {
 		var action_deferred = $.Deferred();
 		if ( actions.hasOwnProperty( action ) ) {
 
@@ -97,22 +97,36 @@ define( function( require ) {
 			} );
 
 			var deferred_array = [];
+			
+			filtered_params = ( filtered_params === undefined || !_.isObject( filtered_params ) ) ? {} : filtered_params;
 
 			for ( var i = 0; i < actions_array.length; i++ ) {
 
 				//Pass a deferred to each action params so that we can do asynchrone actions : 
 				var deferred = $.Deferred();
-				deferred_array.push(deferred);
+				deferred_array.push( deferred );
 				params.push( deferred );
+				
+				params.push( filtered_params );
 
-				actions_array[i].callback.apply( context, params );
+				filtered_params = actions_array[i].callback.apply( context, params );
+				if ( filtered_params !== undefined && _.isObject( filtered_params ) ) {
+					//The action can return a special param called "break_actions" to stop actions execution :
+					if ( filtered_params.break_actions && filtered_params.break_actions === true ) {
+						//The action asked to be the last one executed. Respect that :
+						break;
+					}
+				}
 
 				params.pop(); //remove deferred
 			}
 
 			//Once all actions' deferred are done, resolve the main action deferred :
 			$.when.apply( $, deferred_array ).done( function() {
-				action_deferred.resolve();
+				action_deferred.resolve( filtered_params );
+				//NOTE : filtered_params will be usable here ONLY if actions callback are NOT ASYNCHRONE :
+				//TODO : see if there would be a way to set the filtering logic among
+				//the $.when.apply().done() chain...
 			} );
 			//TODO : see if we can handle a .fail here
 			

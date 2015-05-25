@@ -272,6 +272,27 @@ define( function( require, exports ) {
 	themeApp.navigateToDefaultRoute = function() {
 		App.router.default_route();
 	};
+	
+	/**
+	 * Reload current screen : re-trigger current route.
+	 */
+	themeApp.reloadCurrentScreen = function() {
+		//Directly navigate to current fragment doesn't work (Backbone sees that
+		//it is the same and doesn't re-trigger it!) : we have to navigate to a
+		//false dummy route (without triggering the navigation, so it is invisible) 
+		//and then renavigate to original current route :
+		var current_fragment = Backbone.history.getFragment();
+		App.router.navigate( 'WpakDummyRoute' ); //Route that does not exist
+		App.router.navigate( current_fragment, { trigger: true } );
+	};
+	
+	/**
+	 * Re-render current view WITHOUT re-triggering any route.
+	 */
+	themeApp.rerenderCurrentScreen = function() {
+		var current_view = RegionManager.getCurrentView();
+		current_view.render();
+	};
 
 	/************************************************
 	 * Back button
@@ -348,6 +369,7 @@ define( function( require, exports ) {
 		var get_more_link_data = { display: false, nb_left: 0 };
 
 		var current_screen = App.getCurrentScreenData();
+		
 		if ( current_screen.screen_type == 'list' ) {
 			var component = App.components.get( current_screen.component_id );
 			if ( component ) {
@@ -359,6 +381,8 @@ define( function( require, exports ) {
 				}
 			}
 		}
+
+		get_more_link_data = Hooks.applyFilters( 'get-more-link-display', get_more_link_data, [ current_screen ] );
 
 		return get_more_link_data;
 	};
@@ -375,6 +399,129 @@ define( function( require, exports ) {
 						do_after( is_last, new_items, data.nb_left );
 					}
 			);
+		} else {
+			Hooks.doActions( 'get-more-component-items', [ current_screen, do_after ] );
+		}
+	};
+
+	/************************************************
+	 * "Live Query" Web Service
+	 */
+	
+	/**
+	 * Call live query web service 
+	 * 
+	 * @param JSON Object web_service_params Any params that you want to send to the server.
+	 *        The following params are automatically recognised and interpreted on server side :
+	 *        - wpak_component_slug : { string | Array of string } components to make query on
+	 *        - wpak_query_action : { string } 'get-component' to retrieve the full component, or 'get-items' to retrieve choosen component items
+	 *        - wpak_items_ids : { int | array of int } If wpak_query_action = 'get-items' : component items ids to retrieve
+	 * @param options JSON Object : allowed settings :
+	 * - success Function Callback called on success
+	 * - error Function Callback called on error
+	 * - auto_interpret_result Boolean (default true). If false, web service answer must be interpreted in the cb_ok callback.
+	 * - type String : can be one of :
+	 *       -- "update" : merge new with existing component data, 
+	 *       -- "replace" : delete current component data and replace with new
+	 *       -- "replace-keep-global-items" (default) : for list components : replace component ids and merge global items 
+	 * - persistent Boolean (default false). If true, new data is stored in local storage.
+	 */
+	themeApp.liveQuery = function( web_service_params, options ){
+		
+		var cb_ok = null;
+		if( options.success ) {
+			cb_ok = options.success;
+			delete options.success;
+		}
+		
+		var cb_error = null;
+		if( options.error ) {
+			cb_error = options.error;
+			delete options.error;
+		}
+		
+		App.liveQuery( web_service_params, cb_ok, cb_error, options );
+		
+	};
+	
+	/**
+	 * Refresh component items from server.
+	 * 
+	 * @param {int} component_id
+	 * @param {int | array of int} items_ids. If none provided, will refresh all component items.
+	 * @param {JSON Object} options :
+	 *	- success {callback} 
+	 *	- error {callback}
+	 *	- autoformat_answer {boolean} If true (default), the answer returned to the success
+	 *	  callback is automatically formated to return significant data. If false, the full
+	 *	  liveQuery answer is returned no matter what.
+	 */
+	themeApp.refreshComponentItems = function ( component_id, items_ids, options ) {
+		var existing_component = App.components.get( component_id );
+    	if( existing_component ) {
+			
+			//If no item id provided, refresh all component items :
+			if ( items_ids === undefined || items_ids === '' || items_ids === 0 || ( _.isArray( items_ids ) && items_ids.length === 0 ) ) {
+				var component_data = existing_component.get('data');
+				if ( component_data && component_data.ids ) {
+					items_ids = component_data.ids;
+				} else {
+					items_ids = null;
+				}
+			}
+			
+			if ( items_ids !== null ) {
+				
+				themeApp.liveQuery( 
+					{
+						wpak_component_slug : component_id,
+						wpak_query_action : 'get-items',
+						wpak_items_ids : items_ids
+					}, 
+					{	//Those are default liveQuery options values, but we set
+						//them explicitly for more clarity :
+						type : 'update',
+						auto_interpret_result : true,
+						persistent : false,
+
+						//Callbacks :
+						success : function ( answer ) {
+							if ( options !== undefined && options.success ) {
+								//If no globals in answer, return full answer
+								var refreshed_items = answer;
+
+								if ( !options.hasOwnProperty( 'autoformat_answer' ) || options.autoformat_answer === true ) {
+									if ( answer.globals ) {
+										//If globals in answer, return items indexed on globals :
+										refreshed_items = answer.globals;
+										var globals = [];
+										_.each( answer.globals, function ( items, global ) {
+											globals.push( global );
+										} );
+										if ( globals.length === 1 ) {
+											//If only one global returned, return directly the corresponding items
+											if ( _.isArray( items_ids ) ) {
+												refreshed_items = answer.globals[globals[0]];
+											} else {
+												//If only one item asked, return only this item :
+												refreshed_items = _.first( _.toArray( answer.globals[globals[0]] ) );
+											}
+										}
+									}
+								}
+
+								options.success( refreshed_items );
+							}
+						},
+						error : function ( answer_error ) {
+							if ( options !== undefined && options.error ) {
+								options.error( answer_error );
+							}
+						}
+					} 
+				);
+		
+			}
 		}
 	};
 

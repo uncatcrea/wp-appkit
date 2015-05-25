@@ -141,71 +141,60 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		$this->set_specific( 'query', $query );
 		$this->set_globals( 'posts', $posts_by_ids );
 	}
+	
+	/**
+	 * To retrieve only items given in $items_ids
+	 */
+	protected function get_items_data( $component, $options, $items_ids, $args = array() ) {
+		$items = array( 'posts' => array() );
+		
+		$posts_by_ids = array();
+		foreach ( $items_ids as $post_id ) {
+			$post = get_post( $post_id );
+			if( !empty($post) ) {
+				$posts_by_ids[$post_id] = self::get_post_data( $component, $post );
+				$posts_by_ids[$post_id]->title = $posts_by_ids[$post_id]->title;
+			}
+		}
+		
+		if( $options['post-type'] == 'custom' ) {
+			$posts_by_ids = apply_filters( 'wpak_posts_list_custom_items-' . $options['hook'], $posts_by_ids, $component, $options, $items_ids, $args );
+		} 
+		
+		$items['posts'] = $posts_by_ids;
+		
+		return $items;
+	}
 
-	protected static function get_post_data( $component, $_post ) {
-		global $post;
-		$post = $_post;
-		setup_postdata( $post );
-
-		$post_data = array(
-			'id' => $post->ID,
-			'post_type' => $post->post_type,
-			'date' => strtotime( $post->post_date ),
-			'title' => $post->post_title,
-			'content' => '',
-			'excerpt' => '',
-			'thumbnail' => '',
-			'author' => get_the_author_meta( 'nickname' ),
-			'nb_comments' => ( int ) get_comments_number()
-		);
-
+	protected static function get_post_data( $component, $post ) {
+		
+		$post_data = WpakComponentsUtils::get_post_data( $post, $component );
+		
 		/**
-		 * Filter post content into a posts list component. Use this to format app posts content your own way.
+		 * Filter post content for posts list components. 
+		 * Use this to format app posts content your own way only for posts list component.
 		 *
-		 * To apply the default AppKit formating to the content and add only minor modifications to it,
-		 * use the "wpak_post_content_format" filter instead.
+		 * To apply a custom content to all component types, use the "wpak_post_data_post_content" filter instead.
 		 *
 		 * @see WpakComponentsUtils::get_formated_content()
 		 *
-		 * @param string 			''    			The post content: an empty string by default.
+		 * @param string 			$post_content   The default post content.
 		 * @param WP_Post 			$post 			The post object.
 		 * @param WpakComponent 	$component		The component object.
 		 */
-		$content = apply_filters( 'wpak_posts_list_post_content', '', $post, $component );
-		if ( empty( $content ) ) {
-			$content = WpakComponentsUtils::get_formated_content();
-		}
-		$post_data['content'] = $content;
-
-		$post_data['excerpt'] = WpakComponentsUtils::get_post_excerpt( $post );
-
-		$post_featured_img_id = get_post_thumbnail_id( $post->ID );
-		if ( !empty( $post_featured_img_id ) ) {
-			
-			/**
-			 * Use this 'wpak_post_featured_image_size' to define a specific image
-			 * size to pass to the web service for posts.
-			 * By default the full (original) image size is used.
-			 */
-			$featured_image_size = apply_filters( 'wpak_post_featured_image_size', 'full', $post, $component );
-			
-			$featured_img_src = wp_get_attachment_image_src( $post_featured_img_id, $featured_image_size );
-			@$post_data['thumbnail']['src'] = $featured_img_src[0];
-			$post_data['thumbnail']['width'] = $featured_img_src[1];
-			$post_data['thumbnail']['height'] = $featured_img_src[2];
-		}
+		$post_data['content'] = apply_filters( 'wpak_posts_list_post_content', $post_data['content'], $post, $component );
 
 		/**
-		 * Filter post data sent to the app from a posts list component.
+		 * Filter post data sent to the app from a post list component.
 		 *
-		 * Use this for example to add a post meta to the default post data.
+		 * Use this for example to add a post meta to the default post data only for posts list components.
 		 *
 		 * @param array 			$post_data    	The default post data sent to an app.
 		 * @param WP_Post 			$post 			The post object.
 		 * @param WpakComponent 	$component		The component object.
 		 */
-		$post_data = apply_filters( 'wpak_post_data', $post_data, $post, $component );
-
+		$post_data = apply_filters( 'wpak_posts_list_post_data', $post_data, $post, $component );
+		
 		return ( object ) $post_data;
 	}
 

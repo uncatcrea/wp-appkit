@@ -364,23 +364,25 @@ define(function (require) {
 	  app.getCurrentScreenGlobal = function( global ) {
         var screen_data = app.getCurrentScreenData();
 
-        var single_global = '';
+        var current_screen_global = '';
         if (global != undefined) {
-            single_global = global;
+            current_screen_global = global;
         } else {
             if (screen_data.screen_type == 'comments') {
                 var previous_screen_data = app.getPreviousScreenData();
                 if (previous_screen_data.screen_type == 'single') {
-                    single_global = previous_screen_data.global;
+                    current_screen_global = previous_screen_data.global;
                 }
             } else {
                 if (screen_data.hasOwnProperty('global') && screen_data.global != '') {
-                    single_global = screen_data.global;
+                    current_screen_global = screen_data.global;
                 }
             }
         }
+		
+		current_screen_global = Hooks.applyFilters( 'current-screen-global', current_screen_global, [screen_data, global] );
 
-        return single_global;
+        return current_screen_global;
 	  }
 
 	  //--------------------------------------------------------------------------
@@ -394,6 +396,39 @@ define(function (require) {
 	  //collections of collections won't work :-(
 	  var globals_keys = new Globals;
 	  app.globals = {};
+	  
+	app.getComponents = function( filter ) {
+		var components = [];
+		
+		if ( _.isObject( filter ) ) {
+			if ( filter.type ) {
+				components = app.components.where( { type: filter.type } );
+			}
+		} else {
+			components = app.components.toJSON();
+		}
+
+		return components;
+	};
+	
+	app.getNavigationComponents = function( filter ) {
+		var navigation_components = [];
+		
+		app.navigation.each( function( element ) {
+			var component = app.components.get( element.get( 'component_id' ) );
+			if ( component ) {
+				if ( filter.type ) {
+					if ( component.get( 'type' ) == filter.type ) {
+						navigation_components.push( component );
+					}
+				} else {
+					navigation_components.push( component );
+				}
+			}
+		} );
+		
+		return navigation_components;
+	};
 
 	  var getToken = function(web_service){
 		  var token = '';
@@ -827,12 +862,414 @@ define(function (require) {
 							{ type: 'ajax', where: 'app::getMoreOfComponent', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } },
 							cb_error
 						);
-					}
+					};
 
 					$.ajax( ajax_args );
 				}
 			}
       };
+	  
+	/**
+	 * Update items for the given global
+	 * 
+	 * @param {string} global The global we want to update items for
+	 * @param {JSON Object} items Global items WITH ITEM ID AS KEY
+	 * @param {string} type 'update' to merge items, or 'replace' to delete then replace by new items
+	 * @param {boolean} persistent Set to true to save global items to Local Storage
+	 * @returns {JSON object} feedback data
+	 */
+	var update_global_items = function( global, items, type, persistent ) {
+		
+		type = ( type !== undefined ) ? type : 'update';
+		persistent = ( persistent !== undefined ) && persistent === true;
+		
+		var result = { ok: true, message: '', type: '', data: {} };
+
+		if ( type !== 'update' && type !== 'replace' ) {
+			result.ok = false;
+			result.type = 'bad-format';
+			result.message = 'Wrong type : '+ type;
+			return result;
+		}
+		
+		//Create the global if does not exist :
+		if ( !app.globals.hasOwnProperty( global ) ) {
+			app.globals[global] = new Items.Items( [], { global: global } );
+		}
+		
+		var current_items = app.globals[global];
+		
+		var original_ids = [ ];
+		_.each( current_items, function( item, id ) {
+			original_ids.push( id );
+		} );
+		
+		if ( type == "replace" ) {
+			current_items.resetAll();
+		}
+
+		var items_ids = [ ];
+		_.each( items, function( item, id ) {
+			items_ids.push( id );
+			current_items.add( _.extend( { id: id }, item ), { merge: true } ); //merge if "id" already in items
+		} );
+
+		var new_ids = [ ];
+		if ( type == "replace" ) {
+			new_ids = items_ids;
+		} else {
+			new_ids = _.difference( items_ids, original_ids );
+		}
+
+		var new_items = [ ];
+		_.each( new_ids, function( item_id ) {
+			new_items.push( current_items.get( item_id ) );
+		} );
+
+		if ( persistent ) {
+			current_items.saveAll();
+		}
+
+		result.data = { new_ids: new_ids, new_items: new_items, global: global, items: current_items };
+
+		return result;
+	};
+	
+	 /**
+	 * Update a component
+	 * 
+	 * @param JSON object new_component Component containing new data
+	 * @param array new_globals Array of new items referenced by the new component
+	 * @param string type Type of update. Can be :
+	 * - "update" : merge new with existing component data, 
+	 * - "replace" : delete current component data and replace with new
+	 * - "replace-keep-global-items" (default) : for list components : replace component ids and merge global items 
+	 * @param boolean persistent (default false). If true, new data is stored in local storage.
+	 * @returns {JSON object} feedback data
+	 */
+	var update_component = function( new_component, new_globals, type, persistent ) {
+
+		type = ( type !== undefined ) ? type : 'replace-keep-global-items';
+		persistent = ( persistent !== undefined ) && persistent === true;
+		
+		var result = { ok:true, message:'', type: '', data: {} };
+
+		if ( !new_component.data || !new_component.slug ) {
+			//Passed object is not a well formated component
+			result.ok = false;
+			result.type = 'bad-format';
+			result.message = 'Wrong component format';
+			return result;
+		}
+		
+		if ( type !== 'update' && type !== 'replace' && type !== 'replace-keep-global-items' ) {
+			result.ok = false;
+			result.type = 'bad-format';
+			result.message = 'Wrong type : '+ type;
+			return result;
+		}
+
+		var existing_component = app.components.get( new_component.slug );
+    	if( existing_component ) {
+
+			var existing_component_data = existing_component.data;
+			var new_component_data = new_component.data;
+
+			if ( new_component_data.hasOwnProperty( 'ids' ) ) { //List component
+
+				if( new_component.global ) {
+					
+					var global = new_component.global;
+					if ( !app.globals.hasOwnProperty( global ) ) {
+						var items = new Items.Items( [], { global: global } );
+						app.globals[global] = items;
+					}
+
+					var new_ids = [ ];
+					if ( type == "replace" || type == "replace-keep-global-items" ) {
+						new_ids = new_component_data.ids;
+					} else {
+						new_ids = _.difference( new_component_data.ids, existing_component_data.ids );
+						new_component_data.ids = _.union( existing_component_data.ids, new_component_data.ids ); //merge ids
+					}
+
+					existing_component.set( 'data', new_component_data );
+
+					var current_items = app.globals[global];
+					if ( type == "replace" ) {
+						current_items.resetAll();
+					}
+
+					_.each( new_globals[global], function( item, id ) {
+						current_items.add( _.extend( { id: id }, item ), { merge: true } ); //merge if "id" already in items
+					} );
+
+					var new_items = [ ];
+					_.each( new_ids, function( item_id ) {
+						new_items.push( current_items.get( item_id ) );
+					} );
+
+					if ( persistent ) {
+						existing_component.save();
+						current_items.saveAll();
+					}
+
+					result.data = { new_ids: new_ids, new_items: new_items, component: existing_component };
+
+				} else {
+					//A list component must have a global
+					result.ok = false;
+					result.type = 'bad-format';
+					result.message = 'List component must have a global';
+				}
+				
+			} else { //Non list component
+
+				if ( type == "update" ) {
+					new_component_data = _.extend( existing_component_data, new_component_data );
+				} else { //replace or replace-keep-global-items
+					//nothing : new_component_data is ready to be set
+				}
+
+				existing_component.set( 'data', new_component_data );
+
+				if ( persistent ) {
+					existing_component.save();
+				}
+				
+				if( new_component.global ) { //Page component for example
+					
+					var global = new_component.global;
+					if ( !app.globals.hasOwnProperty( global ) ) {
+						var items = new Items.Items( [], { global: global } );
+						app.globals[global] = items;
+					}
+						
+					var current_items = app.globals[global];
+					if ( type == "replace" ) {
+						current_items.resetAll();
+					}
+
+					_.each( new_globals[global], function( item, id ) {
+						current_items.add( _.extend( { id: id }, item ), { merge: true } ); //merge if "id" already in items
+					} );
+
+					if ( persistent ) {
+						current_items.save();
+					}
+					
+				}
+
+				result.data = { component: existing_component };
+
+			}
+			
+		} else {
+			result.ok = false;
+			result.type = 'not-found';
+			result.message = 'Component not found : ' + new_component.slug;
+		}
+		
+		return result;
+	};
+	
+	/**
+	 * Deletes items for the given global.
+	 * 
+	 * @param {string} global
+	 * @param {boolean} persistent If true, will be stored in local storage
+	 */
+	app.resetGlobalItems = function( global, persistent) {
+		persistent = ( persistent !== undefined ) && persistent === true;
+		update_global_items( global, {}, 'replace', persistent );
+	};
+	
+	/**
+	 * Live query web service 
+	 * 
+	 * @param JSON Object web_service_params Any params that you want to send to the server.
+	 *        The following params are automatically recognised and interpreted on server side :
+	 *        - wpak_component_slug : { string | Array of string } components to make query on
+	 *        - wpak_query_action : { string } 'get-component' to retrieve the full component, or 'get-items' to retrieve choosen component items
+	 *        - wpak_items_ids : { int | array of int } If wpak_query_action = 'get-items' : component items ids to retrieve
+	 * @param callback cb_ok
+	 * @param callback cb_error
+	 * @param options JSON Object : allowed settings :
+	 * - auto_interpret_result Boolean (default true). If false, web service answer must be interpreted in the cb_ok callback.
+	 * - type String : can be one of :
+	 *       -- "update" : merge new with existing component data, 
+	 *       -- "replace" : delete current component data and replace with new
+	 *       -- "replace-keep-global-items" (default) : for list components : replace component ids and merge global items 
+	 * - persistent Boolean (default false). If true, new data is stored in local storage.
+	 */
+	app.liveQuery = function( web_service_params, cb_ok, cb_error, options ) {
+		
+		//auto_interpret_result defaults to true :
+		var auto_interpret_result = !options.hasOwnProperty('auto_interpret_result') || options.auto_interpret_result === true;
+		
+		//interpretation_type defaults to 'update' :
+		var interpretation_type = options.hasOwnProperty('type') ? options.type : 'update';
+		
+		//persistent defaults to false :
+		var persistent = options.hasOwnProperty('persistent') && options.persistent === true;
+		
+		var token = getToken( 'live-query' );
+		var ws_url = token + '/live-query';
+		
+		/**
+		* Filter 'web-service-params' : use this to send custom key/value formatted  
+		* data along with the web service. Those params are passed to the server 
+		* (via $_GET) when calling the web service.
+		* 
+		* Filtered data : web_service_params : JSON object where you can add your custom web service params
+		* Filter arguments : 
+		* - web_service_name : string : name of the current web service ('live-query' here).
+		*/
+		web_service_params = Hooks.applyFilters( 'web-service-params', web_service_params, [ 'live-query' ] );
+
+		//Build the ajax query :
+		var ajax_args = {
+			data: web_service_params
+		};
+
+		/**
+		 * Filter 'ajax-args' : allows to customize the web service jQuery ajax call.
+		 * Any jQuery.ajax() arg can be passed here except for : 'url', 'type', 'dataType', 
+		 * 'success' and 'error' that are reserved by app core.
+		 * 
+		 * Filtered data : ajax_args : JSON object containing jQuery.ajax() arguments.
+		 * Filter arguments : 
+		 * - web_service_name : string : name of the current web service ('get-more-of-component' here).
+		 */
+		ajax_args = Hooks.applyFilters( 'ajax-args', ajax_args, [ 'live-query' ] );
+
+		ajax_args.url = Config.wp_ws_url + ws_url;
+
+		ajax_args.type = 'GET';
+
+		ajax_args.dataType = 'json';
+
+		ajax_args.success = function( answer ) {
+
+			if ( answer.result && answer.result.status == 1 ) {
+
+				//If we asked to auto interpret and the ws answer is correctly
+				//formated, we do the correct treatment according to answer fields : 
+				if ( auto_interpret_result ) {
+					
+					//See if components data were retured : if so, 
+					//update the corresponding component(s) :
+					var new_components = {};
+					if ( answer.components ) {
+						new_components = answer.components;
+					} else if( answer.component ) {
+						new_components[answer.component.slug] = answer.component;
+					}
+					
+					if( !_.isEmpty( new_components ) ) {
+						
+						var error_message = '';
+						var update_results = {};
+						
+						_.each( new_components, function( component ) {
+
+							var result = update_component( component, answer.globals, interpretation_type, persistent );
+							update_results[component.slug] = result;
+							
+							if ( result.ok ) {
+								Utils.log( 'Live query update component "'+ component.slug +'" OK.', result );
+							} else {
+								Utils.log( 'Error : Live query : update_component "' + component.slug + '"', result, component );
+								error_message += ( result.message + ' ' );
+							}
+						
+						} );
+						
+						if ( error_message === '' ) {
+							if ( cb_ok ) {
+								cb_ok( answer, update_results );
+							}
+						} else {
+							app.triggerError(
+								'live-query:update-component-error',
+								{ type: 'mixed', where: 'app::liveQuery', message: error_message, data: { results: update_results } },
+								cb_error
+							);
+						}
+						
+					} else if ( answer.globals && !_.isEmpty( answer.globals ) ) {
+						
+						//No component returned, but some global items :
+						//update current global items with new items sent :
+						
+						var error_message = '';
+						var update_results = {};
+						
+						_.each( answer.globals, function( items, global ) {
+							
+							var result = update_global_items( global, items, interpretation_type, persistent );
+							update_results[global] = result;
+							
+							if ( result.ok ) {
+								Utils.log( 'Live query update global "'+ global +'" OK.', result );
+							} else {
+								Utils.log( 'Error : Live query : update_global_items "' + global + '"', result, items );
+								error_message += ( result.message + ' ' );
+							}
+
+						} );
+						
+						if ( error_message === '' ) {
+							if ( cb_ok ) {
+								cb_ok( answer, update_results );
+							}
+						} else {
+							app.triggerError(
+								'live-query:update-global-items-error',
+								{ type: 'mixed', where: 'app::liveQuery', message: error_message, data: { results: update_results } },
+								cb_error
+							);
+						}
+						
+					} else {
+						app.triggerError(
+							'live-query:no-auto-interpret-action-found',
+							{ type: 'not-found', where: 'app::liveQuery', message: 'Live Query web service : could not auto interpret answer', data: {answer : answer} },
+							cb_error
+						);
+					}
+					
+				} else {
+					
+					Utils.log( 'Live query ok (no auto interpret). Web Service answer : "', answer, ajax_args );
+					
+					//The 'live-query' web service answer must be interpreted
+					//manually in cb_ok() :
+					if ( cb_ok ) {
+						cb_ok( answer );
+					}
+					
+				}
+				
+			} else {
+				app.triggerError(
+					'live-query:ws-return-error',
+					{ type: 'web-service', where: 'app::liveQuery', message: 'Web service "liveQuery" returned an error : [' + answer.result.message + ']' },
+					cb_error
+				);
+			}
+		};
+		
+		ajax_args.error = function( jqXHR, textStatus, errorThrown ) {
+			app.triggerError(
+				'live-query:ajax',
+				{ type: 'ajax', where: 'app::liveQuery', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } },
+				cb_error
+			);
+		};
+
+		$.ajax( ajax_args );
+	};
 
       app.sendInfo = function(info, data){
 		  //Note : we want to control which info is sent by the app :
