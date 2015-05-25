@@ -96,4 +96,11 @@ if ( !class_exists( 'WpAppKit' ) ) {
 	}
 
 	WpAppKit::hooks();
+	
+	/**
+	 * WP AppKit WP CLI commands :
+	 */
+	if ( defined('WP_CLI') && WP_CLI ) {
+		require_once( dirname( __FILE__ ) .'/wp-cli-commands/wpak-commands.php' );
+	}
 }
