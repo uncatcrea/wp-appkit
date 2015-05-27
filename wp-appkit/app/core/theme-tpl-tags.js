@@ -53,6 +53,19 @@ define(function(require, exports) {
     themeTplTags.getPreviousScreen = function() {
         return App.getPreviousScreenData();
     };
+	
+	/**
+	 * Retrieves the name of the template used for the current screen.
+	 * @returns {String} Template name
+	 */
+	themeTplTags.getCurrentTemplate = function() {
+        var current_template = '';
+		var current_view = RegionManager.getCurrentView();
+		if ( current_view ) {
+			current_template = current_view.template_name;
+		}
+		return current_template;
+    };
 
     themeTplTags.getPreviousScreenLink = function() {
         return App.getPreviousScreenLink();
