@@ -230,7 +230,13 @@ class WpakBuild {
 		}
 
 		$zip = new ZipArchive();
-		if ( !$zip->open( $destination, ZIPARCHIVE::OVERWRITE ) ) {
+
+		//
+		// ZipArchive::open() returns TRUE on success and an error code on failure, not FALSE
+		// All other used ZipArchive methods return FALSE on failure
+		//
+
+		if ( true !== $zip->open( $destination, ZIPARCHIVE::OVERWRITE ) ) {
 			$answer['msg'] = sprintf( __( 'The Zip archive file [%s] could not be opened. Please check that you have the permissions to write to this directory.', WpAppKit::i18n_domain ), $destination );
 			$answer['ok'] = 0;
 			return $answer;
