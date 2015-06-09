@@ -101,7 +101,7 @@ class WpakBuild {
 		// Re-build sources
 		$answer = self::build_app_sources( $app_id );
 
-		if( !empty( $answer['export'] ) ) {
+		if( 1 === $answer['ok'] && !empty( $answer['export'] ) ) {
 			$filename = $answer['export'] . '.zip';
 			$filename_full = self::get_export_files_path() . "/" . $filename;
 		}
@@ -230,8 +230,47 @@ class WpakBuild {
 		}
 
 		$zip = new ZipArchive();
-		if ( !$zip->open( $destination, ZIPARCHIVE::OVERWRITE ) ) {
-			$answer['msg'] = sprintf( __( 'The Zip archive file [%s] could not be opened. Please check that you have the permissions to write to this directory.', WpAppKit::i18n_domain ), $destination );
+
+		//
+		// ZipArchive::open() returns TRUE on success and an error code on failure, not FALSE
+		// All other used ZipArchive methods return FALSE on failure
+		//
+		// Apparently ZipArchive::OVERWRITE is not sufficient for recent PHP versions (>= 5.2.8, cf. comments here: http://fr.php.net/manual/en/ziparchive.open.php)
+		//
+
+		if ( true !== ( $error_code = $zip->open( $destination, ZipArchive::CREATE | ZipArchive::OVERWRITE ) ) ) {
+			switch( $error_code ) {
+				case ZipArchive::ER_EXISTS:
+					$error = _x( 'File already exists', 'ZipArchive::ER_EXISTS error', WpAppKit::i18n_domain );
+					break;
+				case ZipArchive::ER_INCONS:
+					$error = _x( 'Zip archive inconsistent', 'ZipArchive::ER_INCONS error', WpAppKit::i18n_domain );
+					break;
+				case ZipArchive::ER_INVAL:
+					$error = _x( 'Invalid argument', 'ZipArchive::ER_INVAL error', WpAppKit::i18n_domain );
+					break;
+				case ZipArchive::ER_MEMORY:
+					$error = _x( 'Malloc failure', 'ZipArchive::ER_MEMORY error', WpAppKit::i18n_domain );
+					break;
+				case ZipArchive::ER_NOENT:
+					$error = _x( 'No such file', 'ZipArchive::ER_NOENT error', WpAppKit::i18n_domain );
+					break;
+				case ZipArchive::ER_NOZIP:
+					$error = _x( 'Not a zip archive', 'ZipArchive::ER_NOZIP error', WpAppKit::i18n_domain );
+					break;
+				case ZipArchive::ER_OPEN:
+					$error = _x( 'Can\'t open file', 'ZipArchive::ER_OPEN error', WpAppKit::i18n_domain );
+					break;
+				case ZipArchive::ER_READ:
+					$error = _x( 'Read error', 'ZipArchive::ER_READ error', WpAppKit::i18n_domain );
+					break;
+				case ZipArchive::ER_SEEK:
+					$error = _x( 'Seek error', 'ZipArchive::ER_SEEK error', WpAppKit::i18n_domain );
+					break;
+				default:
+					$error = '';
+			}
+			$answer['msg'] = sprintf( __( 'The Zip archive file [%s] could not be opened (%s). Please check that you have the permissions to write to this directory.', WpAppKit::i18n_domain ), $destination, $error );
 			$answer['ok'] = 0;
 			return $answer;
 		}
