@@ -1,3 +1,8 @@
+## 0.3.1 (2015-06-09)
+
+### Bugfixes:
+- **Export zip creation with PHP >= 5.2.8** ([#88](https://github.com/uncatcrea/wp-appkit/issues/88), [@lpointet](https://github.com/lpointet))
+
 ## 0.3 (2015-05-04)
 
 ### Features:
