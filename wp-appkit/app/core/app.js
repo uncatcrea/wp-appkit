@@ -461,6 +461,21 @@ define(function (require) {
     	  return token;
 	  };
 
+	  var fetch_favorites = function( components, response, options, deferred ) {
+		    app.favorites.fetch({
+	      		'success': function( appFavorites, response, options ) {
+					Utils.log( 'Favorites retrieved from local storage.', { favorites: appFavorites } );
+					deferred.resolve();
+				},
+		      	'error': function( appFavorites, response, options ) {
+					Utils.log( 'Error occured while retrieving favorites.', { favorites: appFavorites } );
+					deferred.resolve();
+		      	}}
+			);
+	  };
+	  
+	  Hooks.addAction( 'components-fetched', fetch_favorites );
+
 	  //--------------------------------------------------------------------------
 	  //App synchronization :
 	  
@@ -470,10 +485,10 @@ define(function (require) {
 
 		  app.components.fetch({'success': function(components, response, options){
 			  // @TODO: find a better place to fetch?
-			  app.favorites.fetch({
-	      		'success': function( appFavorites, response, options ) {
-					Utils.log( 'Favorites retrieved from local storage.', { favorites: appFavorites } );
-		    		 if( components.length == 0 || force ){
+			  
+				Hooks.doActions('components-fetched',[components, response, options]).done( function() {
+					
+					if( components.length == 0 || force ){
 		    			 syncWebService(cb_ok,cb_error);
 		    		 }else{
 		    			 Utils.log('Components retrieved from local storage.',{components:components});
@@ -516,12 +531,12 @@ define(function (require) {
 		    	    		 }
 		    			 }});
 		    		 }
-			      	},
-		      	'error': function( appFavorites, response, options ) {
-					Utils.log( 'Error occured while retrieving favorites.', { favorites: appFavorites } );
-		      	}
+				});
+				
+		    		 
+			    }
 	      	  });
-		  }});
+		 
 
       };
 	  
