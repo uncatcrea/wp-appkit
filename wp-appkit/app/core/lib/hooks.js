@@ -88,7 +88,11 @@ define( function( require ) {
 	};
 
 	hooks.doActions = function( action, params, filtered_params, context) {
+
+		filtered_params = ( filtered_params === undefined || !_.isObject( filtered_params ) ) ? {} : filtered_params;
+
 		var action_deferred = $.Deferred();
+		
 		if ( actions.hasOwnProperty( action ) ) {
 
 			var actions_array = actions[action];
@@ -98,8 +102,6 @@ define( function( require ) {
 
 			var deferred_array = [];
 			
-			filtered_params = ( filtered_params === undefined || !_.isObject( filtered_params ) ) ? {} : filtered_params;
-
 			for ( var i = 0; i < actions_array.length; i++ ) {
 
 				//Pass a deferred to each action params so that we can do asynchrone actions : 
@@ -130,7 +132,12 @@ define( function( require ) {
 			} );
 			//TODO : see if we can handle a .fail here
 			
+		} else {
+			
+			action_deferred.resolve( filtered_params );
+			
 		}
+		
 		return action_deferred.promise();
 	};
 
