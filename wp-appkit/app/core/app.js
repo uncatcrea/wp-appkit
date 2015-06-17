@@ -18,7 +18,8 @@ define(function (require) {
           Hooks               = require('core/lib/hooks'),
 		  Stats               = require('core/stats'),
 		  Addons              = require('core/addons-internal'),
-          Sha256              = require('core/lib/sha256');
+          Sha256              = require('core/lib/encryption/sha256'),
+		  WsToken             = require('core/lib/encryption/token');
 
 	  var app = {};
 
@@ -430,37 +431,6 @@ define(function (require) {
 		return navigation_components;
 	};
 
-	  var getToken = function(web_service){
-		  var token = '';
-		  var key = '';
-
-		  if( Config.hasOwnProperty('auth_key') ){
-			  key = Config.auth_key;
-			  var app_slug = Config.app_slug;
-	    	  var date = new Date();
-	    	  var month = date.getUTCMonth() + 1;
-	    	  var day = date.getUTCDate();
-	    	  var year = date.getUTCFullYear();
-	    	  if( month < 10 ){
-	    		  month = '0'+ month;
-	    	  }
-	    	  if( day < 10 ){
-	    		  day = '0'+ day;
-	    	  }
-	    	  var date_str = year +'-'+ month +'-'+ day;
-	    	  var hash = Sha256(key + app_slug + date_str);
-	    	  token = window.btoa(hash);
-		  }
-
-		  token = Hooks.applyFilters('get-token',token,[key,web_service]);
-
-		  if( token.length ){
-			  token = '/'+ token;
-		  }
-
-    	  return token;
-	  };
-
 	  //--------------------------------------------------------------------------
 	  //App synchronization :
 	  
@@ -526,7 +496,7 @@ define(function (require) {
       };
 	  
 	  var syncWebService = function(cb_ok,cb_error,force_reload){
-			var token = getToken( 'synchronization' );
+			var token = WsToken.getWebServiceUrlToken( 'synchronization' );
 			var ws_url = token + '/synchronization/';
 
 			/**
@@ -676,7 +646,7 @@ define(function (require) {
 	  };
 
 	  app.getPostComments = function(post_id,cb_ok,cb_error){
-    	  var token = getToken('comments-post');
+    	  var token = WsToken.getWebServiceUrlToken('comments-post');
     	  var ws_url = token +'/comments-post/'+ post_id;
 
     	  var comments = new Comments.Comments;
@@ -766,7 +736,7 @@ define(function (require) {
 
 				if ( component_data.hasOwnProperty( 'ids' ) ) {
 
-					var token = getToken( 'component' );
+					var token = WsToken.getWebServiceUrlToken( 'component' );
 					var ws_url = token + '/component/' + component_id;
 
 					var last_item_id = _.last( component_data.ids );
@@ -1113,7 +1083,7 @@ define(function (require) {
 		//persistent defaults to false :
 		var persistent = options.hasOwnProperty('persistent') && options.persistent === true;
 		
-		var token = getToken( 'live-query' );
+		var token = WsToken.getWebServiceUrlToken( 'live-query' );
 		var ws_url = token + '/live-query';
 		
 		/**
