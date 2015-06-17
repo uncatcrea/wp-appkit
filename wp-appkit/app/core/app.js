@@ -583,6 +583,16 @@ define(function (require) {
 							} );
 							app.navigation.saveAll();
 
+							//Delete all existing items from local storage :
+							globals_keys.each(function(value, key, list){
+								var global_id = value.get('id');
+								var items = new Items.Items({global:global_id});
+								items.resetAll();
+							});
+							
+							app.globals = {};
+							
+							//Then reload new items from web service :
 							globals_keys.resetAll();
 							_.each( data.globals, function( global, key, list ) {
 								var items = new Items.Items( { global: key } );
