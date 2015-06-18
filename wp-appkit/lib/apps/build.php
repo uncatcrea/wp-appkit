@@ -155,12 +155,6 @@ class WpakBuild {
 
 		$answer = self::build_zip( $app_id, $appli_dir, $export_filename_full, array( $current_theme ), WpakAddons::get_app_addons( $app_id ) );
 
-		$maintenance_answer = self::export_files_maintenance( $app_id );
-		if ( $maintenance_answer['ok'] == 0 ) {
-			$answer['ok'] = $answer['ok'] == 1 ? 2 : $answer['ok'];
-			$answer['msg'] .= "<br/>" . $maintenance_answer['msg'];
-		}
-
 		$answer['export'] = $export_filename;
 		$answer['export_full_name'] = $export_filename_full;
 
@@ -387,56 +381,6 @@ class WpakBuild {
 		}
 
 		return $answer;
-	}
-
-	private static function export_files_maintenance( $app_id ) {
-		$answer = array( 'ok' => 1, 'msg' => '' );
-
-		$export_directory = self::get_export_files_path();
-
-		$entries = self::get_available_app_exports( $app_id );
-
-		if ( !empty( $entries ) ) {
-			$i = 1;
-			foreach ( $entries as $entry ) {
-				if ( $i > self::export_file_memory ) {
-					if ( !unlink( $export_directory . '/' . $entry ) ) {
-						$answer['msg'] .= sprintf( __( "Couldn't delete old export [%s]", WpAppKit::i18n_domain ), $entry ) . "<br/>\n";
-						$answer['ok'] = 0;
-					}
-				}
-				$i++;
-			}
-		}
-
-		return $answer;
-	}
-
-	/**
-	 * Retrieves app export zip files ordered by date desc.
-	 */
-	private static function get_available_app_exports( $app_id ) {
-		$available_exports = array();
-
-		$export_filename_base = self::get_export_file_base_name( $app_id );
-		$export_directory = self::get_export_files_path();
-
-		if ( self::create_export_directory_if_doesnt_exist() ) {
-			if ( $handle = opendir( $export_directory ) ) {
-				while ( false !== ($entry = readdir( $handle )) ) {
-					if ( strpos( $entry, $export_filename_base ) !== false ) {
-						$entry_date = preg_replace( '/' . $export_filename_base . '-(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\.zip/', '$1-$2-$3 $4:$5:$6', $entry );
-						$available_exports[strtotime( $entry_date )] = $entry;
-					}
-				}
-				closedir( $handle );
-				if ( !empty( $available_exports ) ) {
-					krsort( $available_exports );
-				}
-			}
-		}
-
-		return $available_exports;
 	}
 
 	private static function filter_index( $index_content ) {
