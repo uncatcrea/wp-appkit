@@ -321,11 +321,6 @@ define(function (require) {
 						return_view( new ArchiveView( view_data ) );
 					} );
 					break;
-				case 'favorites':
-					require( [ "core/views/favorites" ], function( FavoritesView ) {
-						return_view( new FavoritesView( view_data ) );
-					} );
-					break;
 				case 'hooks':
 					require( [ "core/views/custom-component" ], function( CustomComponentView ) {
 						return_view( new CustomComponentView( view_data ) );

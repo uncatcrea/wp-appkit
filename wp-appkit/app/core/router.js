@@ -42,7 +42,7 @@ define(function (require) {
         default_route: function(){
         	this.navigate(default_route, {trigger: true});
         },
-		
+
         component: function (component_id) {
         	var _this = this;
 			route_asked = 'component-'+ component_id;
@@ -58,13 +58,6 @@ define(function (require) {
 									{screen_type:'list',component_id:component_id,item_id:0,global:component.global,data:component.data,label:component.label}
 								);
                                 break;
-                            case 'favorites':
-								RegionManager.show(
-									'favorites',
-									component.view_data,
-									{screen_type:'list',component_id:component_id,item_id:0,global:component.global,data:component.data,label:component.label}
-								);
-								break;
 							case 'page':
 								//Directly redirect to "page" route :
 								_this.navigate('page/'+ component_id +'/'+ component.data.root_id, {trigger: true});
@@ -219,31 +212,11 @@ define(function (require) {
         	});
         },
 
-        favorite: function( action, item_global, id ) {
-            require( ["core/app", "core/theme-app"], function( App, ThemeApp ) {
-                switch( action ) {
-                    case 'add':
-                        ThemeApp.addToFavorites( item_global, id );
-                        break;
-                    case 'remove':
-                        ThemeApp.removeFromFavorites( item_global, id );
-                        break;
-                }
-                App.favorites.saveAll();
-
-                var screen = App.getCurrentScreenData();
-
-                if( undefined !== screen.fragment ) {
-                    Backbone.history.loadUrl( screen.fragment );
-                }
-            });
-        },
-		
 		not_found: function(fragment){
 			var _this = this;
 			require(["core/app"],function(App){
 				var fragment_not_found = Hooks.applyFilters('fragment-not-found', '#', [fragment]);
-				
+
 				var custom_route = App.getCustomRoute(fragment);
 				if( !_.isEmpty(custom_route) ){
 					fragment_not_found = '';
@@ -254,7 +227,7 @@ define(function (require) {
 					_this.navigate(fragment_not_found, {trigger: true});
 				}
 			});
-			
+
         }
 
     });
