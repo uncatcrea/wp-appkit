@@ -79,12 +79,32 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	}
 	
 	protected function get_app_public_key( $app_id ) {
-		$public_key = '';
+		return $this->get_public_key_from_private_key( $this->get_app_private_key( $app_id ) );
+	}
+	
+	protected function get_app_private_key( $app_id ) {
+		$private_key = '';
 		$auth_settings = $this->get_authentication_settings( $app_id );
 		if ( !empty( $auth_settings['private_key'] ) ) {
-			$public_key = $this->get_public_key_from_private_key( $auth_settings['private_key'] );
+			$private_key = $auth_settings['private_key'];
 		}
-		return $public_key;
+		return $private_key;
+	}
+	
+	protected function decrypt( $app_id, $encrypted ) {
+		$decrypted = '';
+		
+		$encrypted = base64_decode( $encrypted );
+		
+		$private_key = openssl_pkey_get_private( $this->get_app_private_key( $app_id ) );
+		
+		if ( !openssl_private_decrypt( $encrypted, $decrypted, $private_key, OPENSSL_PKCS1_PADDING) ) {
+			$decrypted = false;
+		} else {
+			$decrypted = (array)json_decode($decrypted);
+		}
+		
+		return $decrypted;
 	}
 	
 	public function get_webservice_answer( $app_id ) {
@@ -93,6 +113,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		$auth_params = WpakWebServiceContext::getClientAppParams();
 		
 		switch( $auth_params['auth_action'] ) {
+			
 			case "get_public_key":
 				if ( !empty( $auth_params['user'] ) 
 					 && !empty( $auth_params['control'] )
@@ -110,7 +131,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 						
 						if ( $this->check_query_time( $timestamp ) ) {
 						
-							$public_key = self::get_app_public_key( $app_id );
+							$public_key = $this->get_app_public_key( $app_id );
 							if ( !empty( $public_key ) ) {
 								$service_answer = array( 'public_key' => $public_key );
 							}
@@ -119,6 +140,50 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 					}
 				}
 				break;
+				
+			case "connect_user":
+				if ( !empty( $auth_params['user'] ) 
+					 && !empty( $auth_params['control'] )
+					 && !empty( $auth_params['timestamp'] )
+					 && !empty( $auth_params['encrypted'] )
+					) {
+					
+					$user = $auth_params['user'];
+					$control = $auth_params['control'];
+					$timestamp = $auth_params['timestamp'];
+					$encrypted = $auth_params['encrypted'];
+					
+					//Decrypt data to retrieve user HMAC secret key :
+					$decrypted = $this->decrypt( $app_id, $encrypted );
+					
+					if ( is_array( $decrypted ) && !empty( $decrypted['secret'] ) ) {
+						
+						$control_key = $decrypted['secret'];
+						
+						if ( $this->check_hmac( $auth_params['auth_action'] . $user . $timestamp . $encrypted, $control_key, $control ) ) {
+							
+							if ( $this->check_query_time( $timestamp ) ) {
+								
+								//Check user login/pass
+								
+								//Memorize user as registered and store its secret control key
+								
+								//Get user permissions
+								
+								//Return authentication result to client :
+
+							}
+							
+						}
+					}
+					
+				}
+				break;
+				
+			default:
+				$service_answer = array( 'error' => 'wrong-action' );
+				break;
+				
 		}
 		
 		return $service_answer;
