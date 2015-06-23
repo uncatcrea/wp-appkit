@@ -395,6 +395,31 @@ define(function (require) {
 	  var globals_keys = new Globals;
 	  app.globals = {};
 
+	app.addGlobalType = function( type ) {
+		if( undefined === globals_keys.get( type ) ) {
+			Utils.log( 'app.addGlobalType info: adding a type to globals', { type: type } );
+			globals_keys.add( { id: type } );
+            app.globals[type] = new Items.Items( { global: type } );
+		}
+	};
+
+	app.addGlobalItem = function( type, item ) {
+		if( undefined === item.id ) {
+			Utils.log( 'app.addGlobalItem error: undefined item.id', { item: item } );
+			return;
+		}
+
+		if( undefined === globals_keys.get( type ) ) {
+			Utils.log( 'app.addGlobalItem info: ' + type + ' not known, adding it', { type: type, item: item } );
+			app.addGlobalType( type );
+		}
+
+		if( null === app.getGlobalItem( type, item.id ) ) {
+			Utils.log( 'app.addGlobalItem info: adding an item to globals', { type: type, item: item } );
+            app.globals[type].add( item );
+        }
+	};
+
 	app.getComponents = function( filter ) {
 		var components = [];
 
@@ -500,8 +525,6 @@ define(function (require) {
 		    	    	    				 syncWebService(cb_ok,cb_error);
 		    	    	    			 }else{
 		    	    	    				 Utils.log('Global items retrieved from local storage.',{globals:app.globals});
-						  					 // @TODO: find a better way to do this?
-		    	    	    				 // addFavoritesToGlobals();
 		    	    	    				 cb_ok();
 		    	    	    			 }
 	    	    	    		     });
@@ -604,9 +627,6 @@ define(function (require) {
 							Utils.log( 'Components, navigation and globals retrieved from online.', { components: app.components, navigation: app.navigation, globals: app.globals } );
 
 							cb_ok();
-
-							// @TODO: find a better way to do this?
-							// addFavoritesToGlobals();
 						} else {
 							app.triggerError(
 								'synchro:wrong-answer',
@@ -648,32 +668,6 @@ define(function (require) {
 			};
 
 			$.ajax( ajax_args );
-	  };
-
-	  /**
-	   * Add the list of favorites into the global list of items, if they don't already exist into it.
-	   *
-	   * Favorites list persists and is never reset unless the user requested it.
-	   * Global list is reset at each app launch.
-	   * This allows to use app routes and templates for favorites the same way that for other posts (single and archive views for instance).
-	   */
-	  var addFavoritesToGlobals = function() {
-		Utils.log( 'Adding favorites to globals' );
-	  	_.each( app.favorites.toJSON(), function( item, index ) {
-	  		if( undefined === globals_keys.get( item.global ) ) {
-	  			// Favorite type doesn't exist into globals keys
-				Utils.log( 'Favorite type doesn\'t exist into globals keys', { type: item.global, globals_keys: globals_keys } );
-	  			globals_keys.add( { id: item.global } );
-	  			app.globals[item.global] = new Items.Items( { global: item.global } );
-	  		}
-	  		if( null === app.getGlobalItem( item.global, item.id ) ) {
-	  			// Favorite item doesn't exist into global items
-				Utils.log( 'Favorite item doesn\'t exist into global items', { item: item, globals: app.globals } );
-	  			app.globals[item.global].add( item );
-	  		}
-	  	});
-
-	  	Utils.log( 'Favorites added to globals', { globals_keys: globals_keys, globals: app.globals } );
 	  };
 
 	  app.getPostComments = function(post_id,cb_ok,cb_error){
