@@ -10,24 +10,24 @@ define( function( require ) {
 	var Config = require( 'root/config' );
 	var Sha256 = require( 'core/lib/encryption/sha256' );
 	var WsToken = require( 'core/lib/encryption/token' );
-	var LocalStorage = require( 'core/modules/persistent-storage' );
 	require( 'core/lib/encryption/jsencrypt' );
-	
 	require( 'localstorage' );
 
 	var AuthenticationDataModel = Backbone.Model.extend( {
-		localStorage: new Backbone.LocalStorage( 'Authentication' ),
+		localStorage: new Backbone.LocalStorage( 'Authentication-' + Config.app_slug  ),
 		defaults: {
 			user_login: "",
 			secret: "",
 			public_key: "",
 			is_authenticated : false,
-			scope: {}
+			permissions: {}
 		}
 	} );
 
-	var authenticationData = new AuthenticationDataModel();
+	var authenticationData = new AuthenticationDataModel( { id: 'Authentication-' + Config.app_slug } );
 	authenticationData.fetch();
+	
+	console.log('Current user', authenticationData);
 	
 	var ws_url = WsToken.getWebServiceUrlToken( 'authentication' ) + '/authentication/';
 
@@ -47,6 +47,10 @@ define( function( require ) {
 			data = data + '|' + secret;
 		}
 		return Sha256( data );
+	};
+	
+	var checkHMAC = function( data, secret, to_check ) {
+		return generateHMAC( data, secret ) === to_check;
 	};
 	
 	var getTimestamp = function() {
@@ -161,14 +165,18 @@ define( function( require ) {
 			console.log( 'Public key returned', data );
 			if ( data.hasOwnProperty( 'result' ) && data.result.hasOwnProperty( 'status' ) ) {
 				if ( data.result.status == 1 ) {
-					if ( data.public_key && data.public_key.length ) {
+					if ( data.public_key && data.public_key.length && data.control ) {
 						
-						//TODO : do a HMAC check here
+						if ( checkHMAC( data.public_key + user, web_service_params.control_key, data.control ) ) {
 						
-						//Save public key to Local Storage :
-						authenticationData.set( 'public_key', data.public_key );
-						
-						cb_ok();
+							//Set public key to Local Storage :
+							authenticationData.set( 'public_key', data.public_key );
+							authenticationData.save();
+
+							cb_ok();
+						} else {
+							cb_error();
+						}
 						
 					} else {
 						cb_error();
@@ -199,13 +207,10 @@ define( function( require ) {
 		var public_key = authenticationData.get( 'public_key' );
 		if ( public_key.length ) {
 			
-			//Generate local app user secret key (for symetric encryption):
+			//Generate local app user secret key (for HMAC checking and potentially symetric encryption):
 			var user_secret = generateRandomSecret();
+			authenticationData.set( 'secret', user_secret ); //need to set it here to be retrieved in getAuthWebServicesParams();
 
-			//Store it in local storage :
-			authenticationData.set( 'secret', user_secret );
-			authenticationData.save();
-			
 			var encrypt = new JSEncrypt();
 			encrypt.setPublicKey( public_key );
 			
@@ -218,16 +223,37 @@ define( function( require ) {
 			var encrypted = encrypt.encrypt( JSON.stringify( to_encrypt ) );
 			
 			var web_service_params = getAuthWebServicesParams( 'connect_user', user, true, ['encrypted'], { encrypted: encrypted } );
-
+			
 			var success = function( data ) {
 				console.log( 'Authentication result', data );
 				if ( data.hasOwnProperty( 'result' ) && data.result.hasOwnProperty( 'status' ) ) {
 					if ( data.result.status == 1 ) {
-						if ( data.auth_result ) {
+						if ( data.hasOwnProperty( 'authenticated' ) && data.authenticated === 1 
+							 && data.hasOwnProperty( 'permissions' )
+							) {
 							
+							//Check control hmac :
+							if ( checkHMAC( 'authenticated' + user, user_secret, data.control ) ) {
+								
+								//Memorize current user login and secret : 
+								authenticationData.set( 'user_login', user );
+								authenticationData.set( 'secret', user_secret );
+								authenticationData.set( 'is_authenticated', true );
+								
+								//Memorize returned user permissions
+								authenticationData.set( 'permissions', data.permissions );
+								
+								//Save all this to local storage
+								authenticationData.save();
+								
+								console.log('User authenticated!', user, data.permissions, authenticationData);
+								
+								cb_ok( data.auth_result );
+								
+							} else {
+								cb_error();
+							}
 							
-							
-							cb_ok( data.auth_result );
 						} else {
 							cb_error();
 						}
@@ -304,7 +330,7 @@ define( function( require ) {
 	}
 
 	authentication.init = function() {
-		authentication.connectUser( 'admin', 'passadmin' );
+		authentication.connectUser( 'admin', 'admin' );
 	};
 
 	return authentication;

@@ -11,7 +11,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	}
 	
 	public function settings_meta_box_content( $post, $current_box ) {
-		
+		var_dump( $this->get_user_secret(1, 4));
 		$auth_settings = $this->get_authentication_settings( $post->ID );
 		
 		if( !empty( $auth_settings['private_key'] ) ) {
@@ -112,6 +112,8 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		
 		$auth_params = WpakWebServiceContext::getClientAppParams();
 		
+		$debug_mode = WpakBuild::get_app_debug_mode( $app_id ) === 'on';
+		
 		switch( $auth_params['auth_action'] ) {
 			
 			case "get_public_key":
@@ -133,7 +135,12 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 						
 							$public_key = $this->get_app_public_key( $app_id );
 							if ( !empty( $public_key ) ) {
-								$service_answer = array( 'public_key' => $public_key );
+								
+								//Return public key :
+								$service_answer['public_key'] = $public_key;
+								
+								//Add control key :
+								$service_answer['control'] = $this->generate_hmac( $public_key . $user, $control_key );
 							}
 							
 						}
@@ -148,6 +155,8 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 					 && !empty( $auth_params['encrypted'] )
 					) {
 					
+					$service_answer = array( 'authenticated' => 0 );
+					
 					$user = $auth_params['user'];
 					$control = $auth_params['control'];
 					$timestamp = $auth_params['timestamp'];
@@ -158,23 +167,82 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 					
 					if ( is_array( $decrypted ) && !empty( $decrypted['secret'] ) ) {
 						
-						$control_key = $decrypted['secret'];
+						$user_secret_key = $control_key = $decrypted['secret'];
 						
-						if ( $this->check_hmac( $auth_params['auth_action'] . $user . $timestamp . $encrypted, $control_key, $control ) ) {
+						if ( $this->check_secret_format( $user_secret_key ) ) {
 							
-							if ( $this->check_query_time( $timestamp ) ) {
-								
-								//Check user login/pass
-								
-								//Memorize user as registered and store its secret control key
-								
-								//Get user permissions
-								
-								//Return authentication result to client :
+							if ( $this->check_hmac( $auth_params['auth_action'] . $user . $timestamp . $encrypted, $control_key, $control ) 
+								 && $user == $decrypted['user']
+								) {
 
+								if ( $this->check_query_time( $timestamp ) ) {
+
+									//Check user data :
+
+									$user = $decrypted['user'];
+									$user_wp = get_user_by( 'login', $user );
+
+									if ( $user_wp ) {
+
+										//Check the user is not banned :
+										if ( $this->check_user_is_allowed_to_authenticate( $user_wp->ID, $app_id ) ) {
+
+											//Check password :
+											$pass = $decrypted['pass'];
+											if ( wp_check_password( $pass, $user_wp->data->user_pass, $user_wp->ID ) ) {
+
+												//Memorize user as registered and store its secret control key
+												$this->authenticate_user( $user_wp->ID, $user_secret_key, $app_id );
+
+												//Return authentication result to client :
+												$service_answer['authenticated'] = 1; 
+
+												//Get user permissions :
+												$service_answer['permissions'] = $this->get_user_permissions( $user_wp->ID, $app_id );
+												
+												//Add control key :
+												$service_answer['control'] = $this->generate_hmac( 'authenticated' . $user, $user_secret_key );
+
+												//For security reason, only allow to add custom data, not modify WPAK core auth data :
+												$additional_auth_data = apply_filters( 'wpak_auth_ok_additional_data', array(), $user_wp->ID, $app_id );
+												if ( is_array( $additional_auth_data ) ) {
+													foreach( $additional_auth_data as $key => $value ) {
+														if ( !array_key_exists( $key, $service_answer ) ) {
+															$service_answer[$key] = $value;
+														}
+													}
+												}
+
+											} else {
+												$service_answer['error'] = 'wrong-pass';
+											}
+
+										} else {
+											$service_answer['error'] = 'user-banned';
+										}
+
+									} else {
+										$service_answer['error'] = 'wrong-user';
+									}
+
+								} else {
+									//If not in debug mode, don't give error details for security concern :
+									$service_answer['error'] = $debug_mode ? 'wrong-query-time' : 'auth-error'; 
+								}
+
+							} else {
+								//If not in debug mode, don't give error details for security concern :
+								$service_answer['error'] = $debug_mode ? 'wrong-hmac' : 'auth-error'; //Don't give more details for security concern
 							}
 							
+						} else {
+							//If not in debug mode, don't give error details for security concern :
+							$service_answer['error'] = $debug_mode ? 'wrong-secret' : 'auth-error'; //Don't give more details for security concern
 						}
+						
+					} else {
+						//If not in debug mode, don't give error details for security concern :
+						$service_answer['error'] = $debug_mode ? 'wrong-decryption' : 'auth-error'; //Don't give more details for security concern
 					}
 					
 				}
@@ -186,17 +254,114 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 				
 		}
 		
+		//Note : deliberately don't add hook here to filter $service_answer
+		//so that malicious code can not modify authentication process.
+		
 		return $service_answer;
 	}
 	
+	/**
+	 * Generates HMAC control code from passed $data using $secret as secret key
+	 * 
+	 * @param String $data
+	 * @param String $secret
+	 * @return String
+	 */
+	protected function generate_hmac( $data, $secret ) {
+		return hash( 'sha256', $data .'|'. $secret );
+	}
+	
 	protected function check_hmac( $data, $secret, $to_check ) {
-		$hmac = hash( 'sha256', $data .'|'. $secret );
-		return $hmac === $to_check;
+		return $this->generate_hmac( $data, $secret ) === $to_check;
 	}
 	
 	protected function check_query_time( $query_timestamp ) {
 		$diff = time() - $query_timestamp;
 		$acceptable = apply_filters( 'wpak-auth-acceptable-delay', 60); //seconds
 		return $diff <= $acceptable;
+	}
+	
+	protected function check_secret_format( $user_secret_key ) {
+		$allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-=!@#$%^&*()_+:<>{}[]";
+		return strlen( $user_secret_key ) == 50 && preg_match( '|^['. preg_quote($allowed) .']+$|', $user_secret_key );
+	}
+	
+	/**
+	 * Stores locally (user meta) that the user is authenticated to access
+	 * the given app.
+	 */
+	protected function authenticate_user( $user_id, $user_secret_key, $app_id ) {
+		
+		$user_meta = '_wpak_auth_'. $app_id;
+		
+		$user_auth_data = get_user_meta( $user_id, $user_meta, true );
+		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) && array_key_exists( 'key', $user_auth_data ) ) {
+			$user_auth_data['key'] = $user_secret_key;
+			$user_auth_data['time'] = time();
+		} else {
+			$user_auth_data = array( 
+				'key' => $user_secret_key,
+				'time' => time()
+			);
+		}
+		
+		update_user_meta( $user_id, $user_meta, $user_auth_data );
+	}
+	
+	/**
+	 * Revokes access to the given user for the given app
+	 */
+	protected function unauthenticate_user( $user_id, $app_id ) {
+		$user_meta = '_wpak_auth_'. $app_id;
+		delete_user_meta( $user_id, $user_meta );
+	}
+	
+	/**
+	 * Retrieves user secret key used to connect to the given app
+	 */
+	protected function get_user_secret( $user_id, $app_id ) {
+		$user_secret = '';
+		$user_meta = '_wpak_auth_'. $app_id;
+		$user_auth_data = get_user_meta( $user_id, $user_meta, true );
+		var_dump($user_auth_data);
+		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) && array_key_exists( 'key', $user_auth_data ) ) {
+			$user_secret = $user_auth_data['key'];
+		} 
+		return $user_secret;
+	}
+	
+	/**
+	 * Retrieves user permisions (roles and capabilities) to return to the app.
+	 */
+	protected function get_user_permissions( $user_id, $app_id ) {
+		$user_permissions = array( 'capabilities' => array(), 'roles' => array() );
+		
+		$user = get_userdata( $user_id ); 
+		if ( $user ) {
+			foreach( $user->allcaps as $cap => $has_cap ) {
+				if ( $has_cap === true ) {
+					$user_permissions['capabilities'][] = $cap;
+				}
+			}
+			foreach( $user->roles as $role ) {
+				$user_permissions['roles'][] = $role;
+			}
+		}
+		
+		$user_permissions = apply_filters( 'wpak_auth_user_permissions', $user_permissions, $user_id, $app_id );
+		
+		return $user_permissions;
+	}
+	
+	protected function check_user_is_allowed_to_authenticate( $user_id, $app_id ) {
+		/**
+		 * Filter 'wpak_auth_user_is_allowed_to_authenticate' : 
+		 * use this to ban specific users.
+		 * 
+		 * @param $is_allowed Boolean Whether the user is allowed to authenticate (default true)
+		 * @param $user_id Integer User ID
+		 * @param $app_id Integer Application ID
+		 */
+		return apply_filters( 'wpak_auth_user_is_allowed_to_authenticate', true, $user_id, $app_id );
 	}
 }
