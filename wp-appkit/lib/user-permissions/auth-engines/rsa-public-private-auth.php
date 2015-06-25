@@ -203,16 +203,6 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 												//Add control key :
 												$service_answer['control'] = $this->generate_hmac( 'authenticated' . $user, $user_secret_key );
 
-												//For security reason, only allow to add custom data, not modify WPAK core auth data :
-												$additional_auth_data = apply_filters( 'wpak_auth_ok_additional_data', array(), $user_wp->ID, $app_id );
-												if ( is_array( $additional_auth_data ) ) {
-													foreach( $additional_auth_data as $key => $value ) {
-														if ( !array_key_exists( $key, $service_answer ) ) {
-															$service_answer[$key] = $value;
-														}
-													}
-												}
-
 											} else {
 												$service_answer['error'] = 'wrong-pass';
 											}
