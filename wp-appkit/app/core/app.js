@@ -742,15 +742,7 @@ define(function (require) {
       app.getPostGlobal = function( id, global_default ) {
       	var global = app.getCurrentScreenGlobal( global_default );
 
-      	// If global isn't returned by app.getCurrentScreenGlobal, it could be in favorites list
-      	// if( '' == global ) {
-      	// 	var post = app.favorites.get( id );
-      	// 	if( undefined !== post ) {
-      	// 		global = post.get( 'global' );
-      	// 	}
-      	// }
-
-      	return global;
+      	return Hooks.applyFilters( 'post-global', global, [id, global_default] );
       }
 
       app.getMoreOfComponent = function(component_id,cb_ok,cb_error){
