@@ -12,17 +12,28 @@ class Wpak_Commands extends WP_CLI_Command {
      * <app_id_or_slug> : Application ID or Application slug
 	 * 
 	 * <target_directory> : Target directory where the export files will be copied
+	 * 
+	 * <export_type> : (Optionnal) Export type can be "phonegap-cli" (default if not provided) or "phonegap-build"
      * 
      * ## EXAMPLES
      * 
-     *     wp wpak-export cli 123 /target/directory/
+     *     PhoneGap CLI export : wp wpak export 123 /target/directory/
+	 *     PhoneGap Build export : wp wpak export 123 /target/directory/ "phonegap-build"
      *
-     * @synopsis <app_id> <target_directory>
+     * @synopsis <app_id> <target_directory> [<export_type>]
 	 * 
-	 * @subcommand export-cli
+	 * @subcommand export
      */
-    public function export_cli( $args, $assoc_args ) {
-		list( $app_id_or_slug, $target_directory ) = $args;
+    public function export( $args, $assoc_args ) {
+		list( $app_id_or_slug, $target_directory, $export_type ) = $args;
+		
+		if ( empty( $export_type ) ) {
+			$export_type = "phonegap-cli";
+		}
+		
+		if ( !in_array( $export_type, array( "phonegap-cli", "phonegap-build" ) ) ) {
+			WP_CLI::error( 'Unknown export type "'. $export_type .'"' );
+		}
 
 		//Check that the given app exists :
 		if ( WpakApps::app_exists( $app_id_or_slug ) ) {
@@ -33,7 +44,7 @@ class Wpak_Commands extends WP_CLI_Command {
 
 				$app_id = WpakApps::get_app_id( $app_id_or_slug );
 
-				$answer = WpakBuild::build_app_sources( $app_id );
+				$answer = WpakBuild::build_app_sources( $app_id, $export_type );
 				if ( $answer['ok'] === 1 ) {
 					
 					$zip_file = $answer['export_full_name'];
