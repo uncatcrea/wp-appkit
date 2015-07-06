@@ -415,8 +415,9 @@ class WpakBuild {
 
 	private static function filter_index( $index_content ) {
 
-		//Add phonegap.js script :
-		$index_content = str_replace( '<head>', "<head>\r\n\t\t<script src=\"phonegap.js\"></script>\r\n\t\t", $index_content );
+		//Add cordova.js script (set cordova.js instead of phonegap.js, because PhoneGap Developer App doesn't seem
+		//to support phonegap.js). PhoneGap Build can use indifferently cordova.js or phonegap.js.
+		$index_content = str_replace( '<head>', "<head>\r\n\t\t<script src=\"cordova.js\"></script>\r\n\t\t", $index_content );
 
 		//Remove script used only for app simulation in web browser :
 		$index_content = preg_replace( '/<script[^>]*>[^<]*var query[^<]*<\/script>\s*<script/is', '<script', $index_content );
