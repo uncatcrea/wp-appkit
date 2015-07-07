@@ -145,6 +145,9 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 							
 						}
 					}
+					
+					//TODO : Handle errors
+					
 				}
 				break;
 				
@@ -204,42 +207,42 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 												$service_answer['control'] = $this->generate_hmac( 'authenticated' . $user, $user_secret_key );
 
 											} else {
-												$service_answer['error'] = 'wrong-pass';
+												$service_answer['auth_error'] = 'wrong-pass';
 											}
 
 										} else {
-											$service_answer['error'] = 'user-banned';
+											$service_answer['auth_error'] = 'user-banned';
 										}
 
 									} else {
-										$service_answer['error'] = 'wrong-user';
+										$service_answer['auth_error'] = 'wrong-user';
 									}
 
 								} else {
 									//If not in debug mode, don't give error details for security concern :
-									$service_answer['error'] = $debug_mode ? 'wrong-query-time' : 'auth-error'; 
+									$service_answer['auth_error'] = $debug_mode ? 'wrong-query-time' : 'auth_error'; 
 								}
 
 							} else {
 								//If not in debug mode, don't give error details for security concern :
-								$service_answer['error'] = $debug_mode ? 'wrong-hmac' : 'auth-error'; //Don't give more details for security concern
+								$service_answer['auth_error'] = $debug_mode ? 'wrong-hmac' : 'auth_error'; //Don't give more details for security concern
 							}
 							
 						} else {
 							//If not in debug mode, don't give error details for security concern :
-							$service_answer['error'] = $debug_mode ? 'wrong-secret' : 'auth-error'; //Don't give more details for security concern
+							$service_answer['auth_error'] = $debug_mode ? 'wrong-secret' : 'auth_error'; //Don't give more details for security concern
 						}
 						
 					} else {
 						//If not in debug mode, don't give error details for security concern :
-						$service_answer['error'] = $debug_mode ? 'wrong-decryption' : 'auth-error'; //Don't give more details for security concern
+						$service_answer['auth_error'] = $debug_mode ? 'wrong-decryption' : 'auth_error'; //Don't give more details for security concern
 					}
 					
 				}
 				break;
 				
 			default:
-				$service_answer = array( 'error' => 'wrong-action' );
+				$service_answer = array( 'error' => 'wrong-action' ); //This will set webservice answer status to 0.
 				break;
 				
 		}

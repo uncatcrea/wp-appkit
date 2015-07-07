@@ -228,38 +228,51 @@ define( function( require ) {
 			
 			var success = function( data ) {
 				console.log( 'Authentication result', data );
-				if ( data.hasOwnProperty( 'result' ) && data.result.hasOwnProperty( 'status' ) ) {
+				if ( data.hasOwnProperty( 'result' ) && data.result.hasOwnProperty( 'status' ) && data.result.hasOwnProperty( 'message' ) ) {
 					if ( data.result.status == 1 ) {
-						if ( data.hasOwnProperty( 'authenticated' ) && data.authenticated === 1 
-							 && data.hasOwnProperty( 'permissions' )
-							) {
+						if ( data.hasOwnProperty( 'authenticated' ) ) {
+							if ( data.authenticated === 1 ) {
 							
-							//Check control hmac :
-							if ( checkHMAC( 'authenticated' + user, user_secret, data.control ) ) {
+									if (  data.hasOwnProperty( 'permissions' ) ) {
+							
+										//Check control hmac :
+										if ( checkHMAC( 'authenticated' + user, user_secret, data.control ) ) {
+
+											//Memorize current user login and secret : 
+											authenticationData.set( 'user_login', user );
+											authenticationData.set( 'secret', user_secret );
+											authenticationData.set( 'is_authenticated', true );
+
+											//Memorize returned user permissions
+											authenticationData.set( 'permissions', data.permissions );
+
+											//Save all this to local storage
+											authenticationData.save();
+
+											cb_ok( { user: user, permissions: data.permissions });
+
+										} else {
+											cb_error( 'answer:wrong-hmac' );
+										}
+										
+									} else {
+										cb_error( 'answer:no-permissions' );
+									}
 								
-								//Memorize current user login and secret : 
-								authenticationData.set( 'user_login', user );
-								authenticationData.set( 'secret', user_secret );
-								authenticationData.set( 'is_authenticated', true );
-								
-								//Memorize returned user permissions
-								authenticationData.set( 'permissions', data.permissions );
-								
-								//Save all this to local storage
-								authenticationData.save();
-								
-								cb_ok( { user: user, permissions: data.permissions });
-								
+							} else if ( data.hasOwnProperty( 'auth_error' ) ) {
+								cb_error( data.auth_error );
 							} else {
-								cb_error( 'answer:wrong-hmac' );
+								cb_error( 'answer:no-auth-error' );
 							}
 							
 						} else {
-							cb_error( 'answer:wrong-data' );
+							cb_error( 'answer:wrong-auth-data' );
 						}
 					} else {
-						cb_error( 'answer:result-error' );
+						cb_error( 'answer:web-service-error : '+ data.result.message );
 					}
+				}else {
+					cb_error( 'answer:wrong-result-data' );
 				}
 			};
 
@@ -290,11 +303,30 @@ define( function( require ) {
 		authenticationData.save();
 	};
 
-	authentication.getCurrentUser = function() {
-		var user = authenticationData.get( 'user_login' );
-		if ( !user.length ) {
-			
+	/** 
+	 * Get public data about the current user
+	 * 
+	 * @param {String} field : to get a specific user data field (can be 'login', 'permissions')
+	 * @returns {JSON Object} :
+	 *			- login {String}
+	 *			- permissions {JSON Object} 
+	 */
+	authentication.getCurrentUser = function( field ) {
+		var user = null;
+		
+		var user_authenticated = authenticationData.get( 'is_authenticated' );
+		if ( user_authenticated ) {
+			user = {
+				login: authenticationData.get( 'user_login' ),
+				permissions: authenticationData.get( 'permissions' )
+			};
 		}
+		
+		if ( field !== undefined && user && user.hasOwnProperty( field ) ) {
+			user = user[field];
+		}
+		
+		return user;
 	};
 	
 	authentication.currentUserIsAuthenticated = function() {
@@ -304,9 +336,10 @@ define( function( require ) {
 	authentication.checkUserAuthenticationFromRemote = function() {
 		//Check that the user connection is still valid.
 		//Recheck public key and user secret from server
-	}
+	};
 	
-	authentication.connectUser = function( login, pass, cb_ok, cb_error ) {
+	
+	authentication.logUserIn = function( login, pass, cb_ok, cb_error ) {
 		getPublicKey( 
 			login, 
 			function( public_key ) {
@@ -328,7 +361,17 @@ define( function( require ) {
 				cb_error( error );
 			}
 		);
-	}
+	};
+	
+	authentication.logUserOut = function() {
+		authenticationData.set( 'user_login', '' );
+		authenticationData.set( 'public_key', '' );
+		authenticationData.set( 'secret', '' );
+		authenticationData.set( 'is_authenticated', false );
+		authenticationData.set( 'permissions', {} );
+		authenticationData.save();
+		console.log('Current user', authenticationData);
+	};
 
 	authentication.init = function() {
 		//authentication.connectUser( 'admin', 'admin', function( auth_data ){ console.log( 'connectUser OK', auth_data )}, function( error ) { console.log('connectUser error', error ) } );
