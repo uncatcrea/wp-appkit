@@ -249,7 +249,7 @@ define( function( require ) {
 											//Save all this to local storage
 											authenticationData.save();
 
-											cb_ok( { user: user, permissions: data.permissions });
+											cb_ok( { user: user, permissions: data.permissions } );
 
 										} else {
 											cb_error( 'answer:wrong-hmac' );
@@ -348,28 +348,32 @@ define( function( require ) {
 					pass,
 					function( auth_data ) {
 						console.log( 'User authentication OK', auth_data );
-						cb_ok( auth_data );
+						App.triggerInfo( 'auth:user-login', auth_data, cb_ok );
 					},
 					function( error ) {
 						console.log( 'User authentication ERROR : '+ error );
-						cb_error( error );
+						App.triggerError( 'auth:login-error', error, cb_error );
 					}
 				);
 			}, 
 			function( error ) {
 				console.log( 'Get public key error : '+ error );
-				cb_error( error );
+				App.triggerError( 'auth:login-error', error, cb_error );
 			}
 		);
 	};
 	
 	authentication.logUserOut = function() {
+		var user_info = { user: authenticationData.get( 'user_login' ), permissions: authenticationData.get( 'permissions' ) };
+		
 		authenticationData.set( 'user_login', '' );
 		authenticationData.set( 'public_key', '' );
 		authenticationData.set( 'secret', '' );
 		authenticationData.set( 'is_authenticated', false );
 		authenticationData.set( 'permissions', {} );
 		authenticationData.save();
+		
+		App.triggerInfo( 'auth:user-logout', user_info );
 		console.log('Current user', authenticationData);
 	};
 
