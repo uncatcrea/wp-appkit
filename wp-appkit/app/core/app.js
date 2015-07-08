@@ -30,18 +30,56 @@ define(function (require) {
 		  vent.on(event,callback);
 	  };
 
-	  //--------------------------------------------------------------------------
-	  //Error handling
+	//--------------------------------------------------------------------------
+	//Public event handling : errors and infos
 
-	  app.triggerError = function(error_id,error_data,error_callback){
-		  vent.trigger('error:'+ error_id,error_data);
-		  Utils.log('app.js error ('+ error_id +') : '+ error_data.message, error_data);
-		  if( error_callback != undefined ){
-			error_data = _.extend({event: 'error:'+ error_id}, error_data);
-	  		error_callback(error_data);
-	  	  }
-	  };
+	app.triggerError = function( error_id, error_data, error_callback ) {
+		vent.trigger( 'error:' + error_id, error_data );
+		Utils.log( 'app.js error (' + error_id + ') : ' + error_data.message, error_data );
+		if ( error_callback != undefined ) {
+			error_data = _.extend( { event: 'error:' + error_id }, error_data );
+			error_callback( error_data );
+		}
+	};
 
+	/**
+	 * Triggers an info event. Use this to trigger your own App events from modules and addons.
+	 * 
+	 * @param {String} info event name
+	 * @param {JSON Object} data Data that is passed to event callback
+	 */
+	app.triggerInfo = function( info, info_data, info_callback ) {
+
+		switch ( info ) {
+			
+			case 'no-content':
+				vent.trigger( 'info:no-content' );
+				break;
+				
+			case 'app-launched':
+				var stats = Stats.getStats();
+				vent.trigger( 'info:app-ready', { stats: stats } );
+				if ( stats.count_open == 1 ) {
+					vent.trigger( 'info:app-first-launch', { stats: stats } );
+				}
+				if ( stats.version_diff.diff != 0 ) {
+					vent.trigger( 'info:app-version-changed', { stats: stats } );
+				}
+				break;
+				
+			default:
+				vent.trigger( 'info:' + info, info_data );
+				if ( info_callback != undefined ) {
+					info_data = _.extend( { event: 'info:' + info }, info_data );
+					info_callback( info_data );
+				}
+				break;
+				
+		}
+		
+		
+	};
+	
 	  //--------------------------------------------------------------------------
 	  //Custom pages and routes handling
 
@@ -1240,26 +1278,6 @@ define(function (require) {
 
 		$.ajax( ajax_args );
 	};
-
-      app.sendInfo = function(info, data){
-		  //Note : we want to control which info is sent by the app :
-		  //only known infos will be triggered as an event.
-		  switch( info ){
-			  case 'no-content':
-				  vent.trigger('info:no-content');
-				  break;
-			  case 'app-launched':
-				  var stats = Stats.getStats();
-				  vent.trigger('info:app-ready',{stats: stats});
-				  if( stats.count_open == 1 ){
-					  vent.trigger('info:app-first-launch',{stats: stats});
-				  }
-				  if( stats.version_diff.diff != 0 ){
-					  vent.trigger('info:app-version-changed',{stats: stats});
-				  }
-				  break;
-		  }
-      };
 
       app.getComponentData = function(component_id){
     	  var component_data = null;
