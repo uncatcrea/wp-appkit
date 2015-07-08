@@ -133,7 +133,16 @@ define( function( require, exports ) {
 			}
 
 		}
-
+		
+		/**
+		 * "theme-event-message" filter : use this hook to customize event messages
+		 * 
+		 * @param {String} Event message to customize
+		 * @param {String} Original event name
+		 * @param {JSON Object} Theme event data object
+		 */
+		theme_event_data.message = Hooks.applyFilters( 'theme-event-message', theme_event_data.message, [event, theme_event_data] );
+		
 		return theme_event_data;
 	};
 
