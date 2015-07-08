@@ -178,8 +178,10 @@ define( function( require ) {
 							cb_error( 'answer:wrong-hmac' );
 						}
 						
-					} else {
-						cb_error( 'answer:wrong-data' );
+					} else if ( data.hasOwnProperty( 'auth_error' ) ) {
+						cb_error( data.auth_error );
+					}  else {
+						cb_error( 'answer:no-auth-error' );
 					}
 				} else {
 					cb_error( 'answer:result-error' );
