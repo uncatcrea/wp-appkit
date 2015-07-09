@@ -11,7 +11,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	}
 	
 	public function settings_meta_box_content( $post, $current_box ) {
-		var_dump( $this->get_user_secret(1, 4));
+		
 		$auth_settings = $this->get_authentication_settings( $post->ID );
 		
 		if( !empty( $auth_settings['private_key'] ) ) {
@@ -351,7 +351,6 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		$user_secret = '';
 		$user_meta = '_wpak_auth_'. $app_id;
 		$user_auth_data = get_user_meta( $user_id, $user_meta, true );
-		var_dump($user_auth_data);
 		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) && array_key_exists( 'key', $user_auth_data ) ) {
 			$user_secret = $user_auth_data['key'];
 		} 
