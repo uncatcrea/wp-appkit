@@ -14,24 +14,46 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		
 		$auth_settings = $this->get_authentication_settings( $post->ID );
 		
-		if( !empty( $auth_settings['private_key'] ) ) {
-			$private_key_ok = $this->check_private_key( $auth_settings['private_key'] );
-			if ( !$private_key_ok ) {
-				?>
-				<div class="error"><?php _e( "Private key not valid", WpAppKit::i18n_domain ) ?></div>
-				<div class="wpak-error"><?php _e( "Private key not valid", WpAppKit::i18n_domain ) ?></div>
-				<?php
+		$error_message = '';
+		$display_error_top = false;
+		$open_ssl_installed = false;
+		
+		if ( !function_exists( 'openssl_pkey_get_private' ) ) {
+			$error_message = __( "OpenSSL PHP extension not found.<br>Please install the OpenSSL PHP extension to use WP-AppKit secure authentication", 
+							 WpAppKit::i18n_domain );
+		} else {
+			
+			$open_ssl_installed = true;
+			
+			if ( !empty( $auth_settings['private_key'] ) ) {
+				$private_key_ok = $this->check_private_key( $auth_settings['private_key'] );
+				if ( !$private_key_ok ) {
+					$error_message = __( "Private key not valid", WpAppKit::i18n_domain );
+					$display_error_top = true;
+				}
 			}
+			
 		}
 		
-		?>
-		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
-		<div class="wpak_settings">
-			<label><?php _e( 'App Private Key', WpAppKit::i18n_domain ) ?></label>
-			<textarea name="wpak_app_private_key" id="wpak_app_private_key" style="height:23em"><?php echo esc_textarea( $auth_settings['private_key'] ) ?></textarea>
-		</div>
-		<?php wp_nonce_field( 'wpak-rsa-auth-settings-' . $post->ID, 'wpak-nonce-rsa-auth-settings' ) ?>
-		<?php
+		if ( !empty( $error_message ) ) {
+			$error_message = __( 'Secure authentication error', WpAppKit::i18n_domain ) . ' : '. $error_message;
+			?>
+			<?php if ( $display_error_top ): //WP moves .error to the top of edit pages ?>
+				<div class="error"><?php echo $error_message ?></div>
+			<?php endif ?>
+			<div class="wpak-error"><?php echo $error_message ?></div>
+			<?php
+		}
+		
+		if ( $open_ssl_installed ) {
+			?>
+			<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
+			<div class="wpak_settings">
+				<label><?php _e( 'App Private Key', WpAppKit::i18n_domain ) ?></label>
+				<textarea name="wpak_app_private_key" id="wpak_app_private_key" style="height:23em"><?php echo esc_textarea( $auth_settings['private_key'] ) ?></textarea>
+			</div>
+			<?php
+		}
 	}
 	
 	protected function get_authentication_settings( $app_id ) {
@@ -51,6 +73,8 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	
 	public function save_posted_settings( $post_id ) {
 
+		//TODO : check nonce "wpak-nonce-rsa-auth-settings" !
+		
 		$current_settings = $this->get_authentication_settings( $post_id );
 
 		if ( isset( $_POST['wpak_app_private_key'] ) ) {
@@ -68,11 +92,13 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	
 	protected function get_public_key_from_private_key( $private_key ) {
 		$public_key = '';
-		$private_key = openssl_pkey_get_private( $private_key );
-		if ( $private_key !== false ) {
-			$key_data = openssl_pkey_get_details( $private_key );
-			if ( $key_data !== false && !empty( $key_data['key'] ) ) {
-				$public_key = $key_data['key'];
+		if ( function_exists( 'openssl_pkey_get_private' ) ) {
+			$private_key = openssl_pkey_get_private( $private_key );
+			if ( $private_key !== false ) {
+				$key_data = openssl_pkey_get_details( $private_key );
+				if ( $key_data !== false && !empty( $key_data['key'] ) ) {
+					$public_key = $key_data['key'];
+				}
 			}
 		}
 		return $public_key;
@@ -96,12 +122,16 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		
 		$encrypted = base64_decode( $encrypted );
 		
-		$private_key = openssl_pkey_get_private( $this->get_app_private_key( $app_id ) );
-		
-		if ( !openssl_private_decrypt( $encrypted, $decrypted, $private_key, OPENSSL_PKCS1_PADDING) ) {
-			$decrypted = false;
-		} else {
-			$decrypted = (array)json_decode($decrypted);
+		if ( function_exists( 'openssl_pkey_get_private' ) ) {
+			
+			$private_key = openssl_pkey_get_private( $this->get_app_private_key( $app_id ) );
+
+			if ( !openssl_private_decrypt( $encrypted, $decrypted, $private_key, OPENSSL_PKCS1_PADDING) ) {
+				$decrypted = false;
+			} else {
+				$decrypted = (array)json_decode($decrypted);
+			}
+			
 		}
 		
 		return $decrypted;
@@ -142,18 +172,24 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 
 									if ( $this->check_query_time( $timestamp ) ) {
 
-										$public_key = $this->get_app_public_key( $app_id );
-										if ( !empty( $public_key ) ) {
+										if ( function_exists( 'openssl_pkey_get_private' ) ) {
+											
+											$public_key = $this->get_app_public_key( $app_id );
+											if ( !empty( $public_key ) ) {
 
-											//Return public key :
-											$service_answer['public_key'] = $public_key;
+												//Return public key :
+												$service_answer['public_key'] = $public_key;
 
-											//Add control key :
-											$service_answer['control'] = $this->generate_hmac( $public_key . $user, $control_key );
+												//Add control key :
+												$service_answer['control'] = $this->generate_hmac( $public_key . $user, $control_key );
+
+											} else {
+												//If not in debug mode, don't give error details for security concern :
+												$service_answer['auth_error'] = $debug_mode ? 'empty-public-key' : 'auth-error'; //Don't give more details for security concern
+											}
 											
 										} else {
-											//If not in debug mode, don't give error details for security concern :
-											$service_answer['auth_error'] = $debug_mode ? 'empty-public-key' : 'auth-error'; //Don't give more details for security concern
+											$service_answer['auth_error'] = $debug_mode ? 'php-openssl-not-found' : 'auth-error'; //Don't give more details for security concern
 										}
 
 									} else {

@@ -54,6 +54,7 @@ class AuthenticationSettings {
 	public static function inner_auth_settings_box( $post, $current_box ) {
 		$auth_engine = self::get_auth_engine_instance();
 		$auth_engine->settings_meta_box_content( $post, $current_box );
+		wp_nonce_field( 'wpak-app-auth-settings-' . $post->ID, 'wpak-nonce-app-auth-settings' );
 	}
 	
 	public static function save_post( $post_id ) {
@@ -70,7 +71,7 @@ class AuthenticationSettings {
 			return;
 		}
 
-		if ( !check_admin_referer( 'wpak-rsa-auth-settings-' . $post_id, 'wpak-nonce-rsa-auth-settings' ) ) {
+		if ( !check_admin_referer( 'wpak-app-auth-settings-' . $post_id, 'wpak-nonce-app-auth-settings' ) ) {
 			return;
 		}
 		
