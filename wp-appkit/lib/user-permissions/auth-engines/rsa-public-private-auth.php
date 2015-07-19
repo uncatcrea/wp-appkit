@@ -87,7 +87,8 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	protected function check_private_key( $private_key ) {
 		//Check if public key can be extracted from private key :
 		//if so, the private key is ok :
-		return !empty( $this->get_public_key_from_private_key( $private_key ) );
+		$public_key = $this->get_public_key_from_private_key( $private_key );
+		return !empty( $public_key );
 	}
 	
 	protected function get_public_key_from_private_key( $private_key ) {
