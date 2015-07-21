@@ -7,12 +7,25 @@ define( function( require ) {
 	var Hooks = require( 'core/lib/hooks' );
 	var WsToken = require( 'core/lib/encryption/token' );
 	var App = require( 'core/app' );
+	var Auth = require( 'core/modules/authentication' );
 	
 	var comments = {};
 	
 	var ws_url = WsToken.getWebServiceUrlToken( 'comments-post' ) + '/comments-post/';
 	
-	var ajaxQuery = function( web_service_params, crud_method, success, error ) {
+	var ajaxQuery = function( comment, crud_method, success, error ) {
+		
+		var action = 'comment-'+ crud_method;
+		
+		var web_service_params = {};
+		web_service_params.action = action;
+		web_service_params.comment = comment;
+		
+		var control_data_keys = ['content']; 
+		//TODO : we could add a filter on this to add more comment data to control field.
+		//(and same must be applied on server side)
+	
+		web_service_params.auth = Auth.getActionAuthData( action, control_data_keys, comment );
 		
 		/**
 		* Filter 'web-service-params' : use this to send custom key/value formated  

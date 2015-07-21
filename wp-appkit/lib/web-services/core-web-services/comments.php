@@ -107,14 +107,32 @@ class WpakWebServiceComments {
 		
 		$service_answer['comment_ok'] = false;
 		
-		if ( !empty( $data['comment'] ) ) {
+		if ( !empty( $data['comment'] )  ) {
+			
+			$comment = $data['comment'];
 			
 			//Check authentication
-			if ( !empty( $data['auth'] ) && !empty( $data['auth']['type'] ) ) {
+			if ( !empty( $data['auth'] ) ) {
 				
+				if ( is_array( $comment ) && !empty( $comment['content'] )  ) {
+					
+					$to_check = array( $comment['content'] );
+					//TODO we could add a filter on this to add more comment data to control field 
+					//(and same must be applied on app side).
+
+					$result = WpakUserLogin::log_user_from_authenticated_action( $app_id, "comment-POST", $data['auth'], $to_check );
+ 
+					if ( $result['ok'] ) {
+						$service_answer['comment_ok'] = true;
+					} else {
+						$service_answer['comment_error'] = $result['auth_error'];
+					}
+					
+				} else {
+					$service_answer['comment_error'] = 'empty-comment';
+				}
 				
-				
-			}else {
+			} else {
 				$service_answer['comment_error'] = 'no-auth';
 			}
 			
