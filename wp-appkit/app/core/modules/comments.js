@@ -75,6 +75,13 @@ define( function( require ) {
 		
 		console.log( 'Posting comment', comment );
 		
+		if ( comment.hasOwnProperty( 'content' ) ) {
+			//Base64 encode comment content :
+			comment['content'] = btoa( unescape( encodeURIComponent( comment['content'] ) ) );
+		} else {
+			cb_error( 'no-content' );
+		}
+		
 		var success = function( data ) {
 			cb_ok( data );
 		};
@@ -83,7 +90,7 @@ define( function( require ) {
 			cb_error( 'ajax:failed' );
 			App.triggerError(
 				'synchro:ajax',
-				{ type: 'ajax', where: 'authentication::getPublicKey', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } }
+				{ type: 'ajax', where: 'comments.postComment', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } }
 			);
 		};
 		
