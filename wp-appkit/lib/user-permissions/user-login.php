@@ -20,7 +20,9 @@ class WpakUserLogin {
 		//First check the validity of what was sent :
 		$result = $auth_engine->check_authenticated_action( $app_id, $action, $auth_data, $to_check );
 		if ( $result['ok'] ) {
-			self::$current_user = '';
+			//OK, log the user in for the current script execution :
+			$user_wp = get_user_by( 'login', $result['user'] );
+			self::$current_user = wp_set_current_user( $user_wp->ID );
 		}
 		
 		return $result;

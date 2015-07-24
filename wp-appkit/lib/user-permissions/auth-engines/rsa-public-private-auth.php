@@ -294,7 +294,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	 */
 	public function check_authenticated_action( $app_id, $action, $auth_data, $to_check ) {
 		
-		$result = array( 'ok' => false, 'auth_error' => '' );
+		$result = array( 'ok' => false, 'auth_error' => '', 'user' => '' );
 		
 		$debug_mode = WpakBuild::get_app_debug_mode( $app_id ) === 'on';
 		
@@ -333,6 +333,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 							if ( $this->check_query_time( $timestamp ) ) {
 
 								$result['ok'] = true;
+								$result['user'] = $user;
 								
 							} else {
 								//If not in debug mode, don't give error details for security concern :
