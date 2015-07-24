@@ -204,28 +204,24 @@ define( function( require ) {
 
 							cb_ok( data.public_key );
 						} else {
-							cb_error( 'answer:wrong-hmac' );
+							cb_error( 'wrong-hmac' );
 						}
 						
 					} else if ( data.hasOwnProperty( 'auth_error' ) ) {
 						cb_error( data.auth_error );
 					}  else {
-						cb_error( 'answer:no-auth-error' );
+						cb_error( 'no-auth-error' );
 					}
 				} else {
-					cb_error( 'answer:result-error' );
+					cb_error( 'result-error' );
 				}
 			} else {
-				cb_error( 'answer:no-result' );
+				cb_error( 'no-result' );
 			}
 		};
 
 		var error = function( jqXHR, textStatus, errorThrown ) {
-			cb_error( 'ajax:failed' );
-			App.triggerError(
-				'synchro:ajax',
-				{ type: 'ajax', where: 'authentication::getPublicKey', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } }
-			);
+			cb_error( 'ajax-failed' );
 		};
 
 		ajaxQuery( web_service_params, success, error );
@@ -283,42 +279,38 @@ define( function( require ) {
 											cb_ok( { user: user, permissions: data.permissions } );
 
 										} else {
-											cb_error( 'answer:wrong-hmac' );
+											cb_error( 'wrong-hmac' );
 										}
 										
 									} else {
-										cb_error( 'answer:no-permissions' );
+										cb_error( 'no-permissions' );
 									}
 								
 							} else if ( data.hasOwnProperty( 'auth_error' ) ) {
 								cb_error( data.auth_error );
 							} else {
-								cb_error( 'answer:no-auth-error' );
+								cb_error( 'no-auth-error' );
 							}
 							
 						} else {
-							cb_error( 'answer:wrong-auth-data' );
+							cb_error( 'wrong-auth-data' );
 						}
 					} else {
-						cb_error( 'answer:web-service-error : '+ data.result.message );
+						cb_error( 'web-service-error : '+ data.result.message );
 					}
 				}else {
-					cb_error( 'answer:wrong-result-data' );
+					cb_error( 'wrong-result-data' );
 				}
 			};
 
 			var error = function( jqXHR, textStatus, errorThrown ) {
-				cb_error( 'ajax:failed' );
-				App.triggerError(
-					'synchro:ajax',
-					{ type: 'ajax', where: 'authentication::sendAuthData', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } }
-				);
+				cb_error( 'ajax-failed' );
 			};
 		
 			ajaxQuery( web_service_params, success, error );
 			
 		} else {
-			cb_error( 'answer:no-public-key');
+			cb_error( 'no-public-key');
 		}
 		
 	};
@@ -398,13 +390,23 @@ define( function( require ) {
 					},
 					function( error ) {
 						console.log( 'User authentication ERROR : '+ error );
-						App.triggerError( 'auth:login-error', error, cb_error );
+						App.triggerError(
+							'auth:'+ error,
+							{ type: 'authentication-error', where: 'authentication.logUserIn:sendAuthData' },
+							cb_error,
+							false
+						);
 					}
 				);
 			}, 
 			function( error ) {
 				console.log( 'Get public key error : '+ error );
-				App.triggerError( 'auth:login-error', error, cb_error );
+				App.triggerError(
+					'auth:'+ error,
+					{ type: 'authentication-error', where: 'authentication.logUserIn:getPublicKey' },
+					cb_error,
+					false
+				);
 			}
 		);
 	};

@@ -18,7 +18,6 @@ define(function (require) {
           Hooks               = require('core/lib/hooks'),
 		  Stats               = require('core/stats'),
 		  Addons              = require('core/addons-internal'),
-          Sha256              = require('core/lib/encryption/sha256'),
 		  WsToken             = require('core/lib/encryption/token');
 
 	  var app = {};
@@ -33,11 +32,11 @@ define(function (require) {
 	//--------------------------------------------------------------------------
 	//Public event handling : errors and infos
 
-	app.triggerError = function( error_id, error_data, error_callback ) {
+	app.triggerError = function( error_id, error_data, error_callback, error_callback_data ) {
 		vent.trigger( 'error:' + error_id, error_data );
-		Utils.log( 'app.js error (' + error_id + ') : ' + error_data.message, error_data );
+		Utils.log( 'app.js error (' + error_id + ')' + (error_data.hasOwnProperty('message') ? ' : ' + error_data.message : ''), error_data );
 		if ( error_callback != undefined ) {
-			error_data = _.extend( { event: 'error:' + error_id }, error_data );
+			error_data = _.extend( { event: 'error:' + error_id, id: error_id }, error_data );
 			error_callback( error_data );
 		}
 	};
@@ -70,7 +69,7 @@ define(function (require) {
 			default:
 				vent.trigger( 'info:' + info, info_data );
 				if ( info_callback != undefined ) {
-					info_data = _.extend( { event: 'info:' + info }, info_data );
+					info_data = _.extend( { event: 'info:' + info, id: info }, info_data );
 					info_callback( info_data );
 				}
 				break;
