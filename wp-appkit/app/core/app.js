@@ -32,7 +32,7 @@ define(function (require) {
 	//--------------------------------------------------------------------------
 	//Public event handling : errors and infos
 
-	app.triggerError = function( error_id, error_data, error_callback, error_callback_data ) {
+	app.triggerError = function( error_id, error_data, error_callback ) {
 		vent.trigger( 'error:' + error_id, error_data );
 		Utils.log( 'app.js error (' + error_id + ')' + (error_data.hasOwnProperty('message') ? ' : ' + error_data.message : ''), error_data );
 		if ( error_callback != undefined ) {

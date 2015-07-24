@@ -114,71 +114,88 @@ class WpakWebServiceComments {
 			//Check authentication
 			if ( !empty( $data['auth'] ) ) {
 				
-				if ( is_array( $comment ) && !empty( $comment['content'] )  ) {
+				if ( is_array( $comment ) ) {
 					
-					$to_check = array( $comment['content'] );
-					//TODO we could add a filter on this to add more comment data to control field 
-					//(and same must be applied on app side).
+					$comment_content = trim( base64_decode( $comment['content'] ) );
+					
+					if ( !empty( $comment_content ) ) {
+					
+						$to_check = array( $comment['content'] );
+						//TODO we could add a filter on this to add more comment data to control field 
+						//(and same must be applied on app side).
 
-					$result = WpakUserLogin::log_user_from_authenticated_action( $app_id, "comment-POST", $data['auth'], $to_check );
- 
-					if ( $result['ok'] ) {
-						
-						//Save comment to database :
-						$service_answer['comment'] = base64_decode( $comment['content'] );
-						
-						if ( ! empty( $comment['id'] ) ) {
-							$service_answer['comment_error'] = 'comment-already-exists';
+						$result = WpakUserLogin::log_user_from_authenticated_action( $app_id, "comment-POST", $data['auth'], $to_check );
+
+						if ( $result['ok'] ) {
+
+							if ( empty( $comment['id'] ) ) {
+								if ( !empty( $comment['post'] ) ) {
+									$post = get_post( $comment['post'] );
+									if ( ! empty( $post ) ) {
+
+										$comment['content'] = $comment_content;
+										
+										//The following is inspired from the WP API v2 :)
+										
+										$prepared_comment = self::prepare_comment_for_database( $comment );
+										if ( is_array( $prepared_comment ) ) {
+											
+											// Setting remaining values before wp_insert_comment so we can
+											// use wp_allow_comment().
+											$prepared_comment['comment_author_IP'] = '127.0.0.1';
+											$prepared_comment['comment_agent'] = '';
+											$prepared_comment['comment_approved'] = wp_allow_comment( $prepared_comment );
+
+											$comment_id = wp_insert_comment( $prepared_comment );
+											if ( $comment_id ) {
+
+												/*if ( isset( $comment['status'] ) ) {
+													$comment = get_comment( $comment_id );
+													$this->handle_status_param( $comment['status'], $comment );
+												}
+
+												$this->update_additional_fields_for_object( get_comment( $comment_id ), $comment );
+												$context = current_user_can( 'moderate_comments' ) ? 'edit' : 'view';
+												$response = $this->get_item( array(
+													'id'      => $comment_id,
+													'context' => $context,
+												) );
+												$response = rest_ensure_response( $response );
+												if ( is_wp_error( $response ) ) {
+													return $response;
+												}
+												$response->set_status( 201 );
+												$response->header( 'Location', rest_url( '/wp/v2/comments/' . $comment_id ) );
+												return $response; */
+
+												$service_answer['comment_ok'] = 1;
+											} else {
+												$service_answer['comment_error'] = 'comment-post-not-found';
+											}
+										} else {
+											$service_answer['comment_error'] = $prepared_comment; //Contains error string
+										}
+									} else {
+										$service_answer['comment_error'] = 'comment-post-not-found';
+									}
+								} else {
+									$service_answer['comment_error'] = 'no-comment-post';
+								}
+							} else {
+								$service_answer['comment_error'] = 'comment-already-exists';
+							}
+						} else {
+							$service_answer['comment_error'] = $result['auth_error'];
 						}
-						
-						$post = get_post( $comment['post'] );
-						if ( empty( $post ) ) {
-							$service_answer['comment_error'] = 'comment-post-not-found';
-						}
-						
-						/*$prepared_comment = $this->prepare_item_for_database( $comment );
-						// Setting remaining values before wp_insert_comment so we can
-						// use wp_allow_comment().
-						$prepared_comment['comment_author_IP'] = '127.0.0.1';
-						$prepared_comment['comment_agent'] = '';
-						$prepared_comment['comment_approved'] = wp_allow_comment( $prepared_comment );
-						$prepared_comment = apply_filters( 'rest_pre_insert_comment', $prepared_comment, $comment );
-						$comment_id = wp_insert_comment( $prepared_comment );
-						if ( ! $comment_id ) {
-							return new WP_Error( 'rest_comment_failed_create', __( 'Creating comment failed.' ), array( 'status' => 500 ) );
-						}
-						if ( isset( $comment['status'] ) ) {
-							$comment = get_comment( $comment_id );
-							$this->handle_status_param( $comment['status'], $comment );
-						}
-						$this->update_additional_fields_for_object( get_comment( $comment_id ), $comment );
-						$context = current_user_can( 'moderate_comments' ) ? 'edit' : 'view';
-						$response = $this->get_item( array(
-							'id'      => $comment_id,
-							'context' => $context,
-						) );
-						$response = rest_ensure_response( $response );
-						if ( is_wp_error( $response ) ) {
-							return $response;
-						}
-						$response->set_status( 201 );
-						$response->header( 'Location', rest_url( '/wp/v2/comments/' . $comment_id ) );
-						return $response; */
-						
-						$service_answer['comment_ok'] = true;
-						
 					} else {
-						$service_answer['comment_error'] = $result['auth_error'];
+						$service_answer['comment_error'] = 'content-empty';
 					}
-					
 				} else {
-					$service_answer['comment_error'] = 'empty-comment';
+					$service_answer['comment_error'] = 'wrong-comment-format';
 				}
-				
 			} else {
 				$service_answer['comment_error'] = 'no-auth';
 			}
-			
 		} else {
 			$service_answer['comment_error'] = 'no-comment';
 		}
@@ -216,22 +233,26 @@ class WpakWebServiceComments {
 			$prepared_comment['comment_karma'] = $comment['karma'] ;
 		}
 		if ( ! empty( $comment['date'] ) ) {
-			$date_data = rest_get_date_with_gmt( $comment['date'] );
+			$date_data = self::rest_get_date_with_gmt( $comment['date'] );
 			if ( ! empty( $date_data ) ) {
-				list( $prepared_comment['comment_date'], $prepared_comment['comment_date_gmt'] ) =
-					$date_data;
+				list( $prepared_comment['comment_date'], $prepared_comment['comment_date_gmt'] ) =	$date_data;
 			} else {
-				return new WP_Error( 'rest_invalid_date', __( 'The date you provided is invalid.' ), array( 'status' => 400 ) );
+				return 'invalid-date';
 			}
 		} elseif ( ! empty( $comment['date_gmt'] ) ) {
-			$date_data = rest_get_date_with_gmt( $comment['date_gmt'], true );
+			$date_data = self::rest_get_date_with_gmt( $comment['date_gmt'], true );
 			if ( ! empty( $date_data ) ) {
 				list( $prepared_comment['comment_date'], $prepared_comment['comment_date_gmt'] ) = $date_data;
 			} else {
-				return new WP_Error( 'rest_invalid_date', __( 'The date you provided is invalid.' ), array( 'status' => 400 ) );
+				return 'invalid-gmt-date';
 			}
 		}
-		return apply_filters( 'rest_preprocess_comment', $prepared_comment, $comment );
+		return $prepared_comment;
+	}
+	
+	protected static function rest_get_date_with_gmt( $comment_date, $x ) {
+		//TODO : check this from WP API!!
+		return array();
 	}
 	
 }

@@ -393,8 +393,7 @@ define( function( require ) {
 						App.triggerError(
 							'auth:'+ error,
 							{ type: 'authentication-error', where: 'authentication.logUserIn:sendAuthData' },
-							cb_error,
-							false
+							cb_error
 						);
 					}
 				);
@@ -404,8 +403,7 @@ define( function( require ) {
 				App.triggerError(
 					'auth:'+ error,
 					{ type: 'authentication-error', where: 'authentication.logUserIn:getPublicKey' },
-					cb_error,
-					false
+					cb_error
 				);
 			}
 		);

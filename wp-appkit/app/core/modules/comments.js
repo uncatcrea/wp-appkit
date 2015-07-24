@@ -71,9 +71,7 @@ define( function( require ) {
 		
 	};
 	
-	comments.postComment = function( comment, cb_ok, cb_error ) {
-		
-		console.log( 'Posting comment', comment );
+	var sendComment = function( comment, cb_ok, cb_error ) {
 		
 		if ( comment.hasOwnProperty( 'content' ) ) {
 			//Base64 encode comment content :
@@ -83,18 +81,53 @@ define( function( require ) {
 		}
 		
 		var success = function( data ) {
-			cb_ok( data );
+			//Ajax call went ok : see if comment submission was accepted on server side :
+			if ( data.hasOwnProperty( 'result' ) && data.result.hasOwnProperty( 'status' ) && data.result.hasOwnProperty( 'message' ) ) {
+				if ( data.result.status == 1 ) {
+					if ( data.hasOwnProperty( 'comment_ok' ) ) {
+						if ( data.comment_ok === 1 ) {
+							cb_ok();
+						} else if ( data.hasOwnProperty( 'comment_error' ) ) {
+							cb_error( data.comment_error );
+						} else {
+							cb_error( 'no-comment-error' );
+						}
+					} else {
+						cb_error( 'wrong-answer-format' );
+					}
+				} else {
+					cb_error( 'web-service-error : '+ data.result.message );
+				}
+			}else {
+				cb_error( 'wrong-ws-data' );
+			}
 		};
 		
 		var error = function(  jqXHR, textStatus, errorThrown ) {
-			cb_error( 'ajax:failed' );
-			App.triggerError(
-				'synchro:ajax',
-				{ type: 'ajax', where: 'comments.postComment', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } }
-			);
+			cb_error( 'ajax-failed' );
 		};
 		
 		ajaxQuery( comment, 'POST', success, error );
+	};
+	
+	comments.postComment = function( comment, cb_ok, cb_error ) {
+		
+		console.log( 'Posting comment', comment );
+		
+		sendComment(
+			comment,
+			function( comment_data ) {
+				App.triggerInfo( 'comment:posted', comment_data, cb_ok );
+			},
+			function( error ) {
+				App.triggerError(
+					'comment:'+ error,
+					{ type: 'comment-error', where: 'comments.postComment:sendComment' },
+					cb_error
+				);
+			}
+		);
+		
 	};
 	
 	return comments;
