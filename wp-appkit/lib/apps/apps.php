@@ -646,13 +646,13 @@ class WpakApps {
 	protected static function get_default_phonegap_plugins( $app_id ) {
 
 		$default_plugins = array(
-			'org.apache.cordova.inappbrowser' => array( 'version' => '', 'source' => '' ),
-			'org.apache.cordova.network-information' => array( 'version' => '', 'source' => '' )
+			'org.apache.cordova.inappbrowser' => array( 'version' => '', 'source' => 'npm' ),
+			'org.apache.cordova.network-information' => array( 'version' => '', 'source' => 'npm' )
 		);
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		if( $app_main_infos['platform'] == 'ios' ) {
-			$default_plugins['com.phonegap.plugin.statusbar'] = array( 'version' => '', 'source' => '' );
+			$default_plugins['org.apache.cordova.statusbar'] = array( 'version' => '', 'source' => 'npm' );
 		}
 
 		/**
@@ -703,7 +703,7 @@ class WpakApps {
 					if ( preg_match( '/source="([^"]+)"/', $match, $source_match ) && strlen( $source_match[1] ) > 0 ) {
 						$source = $source_match[1];
 					}
-					$plugins_array[$name_match[1]] = array( 
+					$plugins_array[$name_match[1]] = array(
 						'version' => $version,
 						'source' => $source
 					);
