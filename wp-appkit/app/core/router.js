@@ -178,16 +178,15 @@ define(function (require) {
         },
 
         comments: function (post_id) {
+			route_asked = 'comments-/'+ post_id;
+			
         	require(["core/app"],function(App){
-        		//App.setQueriedScreen({screen_type:'comments',component_id:'',item_id:parseInt(post_id)}); //done in RegionManager.show() now
         		RegionManager.startWaiting();
 	        	App.getPostComments(
 	        		post_id,
 	        		function(comments,post){
 	        			RegionManager.stopWaiting();
-	        			//Check if we are still on the right post :
-	        			var current_screen = App.getCurrentScreenData();
-	        			if( current_screen.screen_type == 'single' && current_screen.item_id == post_id ){
+	        			if( check_route('comments-/'+ post.id) ){
 							RegionManager.show(
 								'comments',
 								{comments:comments,post:post},
