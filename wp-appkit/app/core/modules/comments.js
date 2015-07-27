@@ -8,6 +8,7 @@ define( function( require ) {
 	var WsToken = require( 'core/lib/encryption/token' );
 	var App = require( 'core/app' );
 	var Auth = require( 'core/modules/authentication' );
+	var RegionManager = require( 'core/region-manager' );
 	
 	var comments = {};
 	
@@ -21,7 +22,7 @@ define( function( require ) {
 		web_service_params.action = action;
 		web_service_params.comment = comment;
 		
-		var control_data_keys = ['content']; 
+		var control_data_keys = ['content', 'post']; 
 		//TODO : we could add a filter on this to add more comment data to control field.
 		//(and same must be applied on server side)
 	
@@ -74,10 +75,16 @@ define( function( require ) {
 	var sendComment = function( comment, cb_ok, cb_error ) {
 		
 		if ( comment.hasOwnProperty( 'content' ) ) {
-			//Base64 encode comment content :
+			//Base64 encode comment content to avoid special chars breaking web service :
 			comment['content'] = btoa( unescape( encodeURIComponent( comment['content'] ) ) );
 		} else {
 			cb_error( 'no-content' );
+			return;
+		}
+		
+		if ( !comment.hasOwnProperty( 'post' ) || !comment.post ) {
+			cb_error( 'no-comment-post' );
+			return;
 		}
 		
 		var success = function( data ) {
@@ -86,6 +93,13 @@ define( function( require ) {
 				if ( data.result.status == 1 ) {
 					if ( data.hasOwnProperty( 'comment_ok' ) ) {
 						if ( data.comment_ok === 1 ) {
+							
+							//Update comments list if current screen is comments screen :
+							var current_view = RegionManager.getCurrentView();
+							if ( current_view.hasOwnProperty( 'update_comments' ) ) {
+								current_view.update_comments( data.comments );
+							}
+							
 							cb_ok();
 						} else if ( data.hasOwnProperty( 'comment_error' ) ) {
 							cb_error( data.comment_error );

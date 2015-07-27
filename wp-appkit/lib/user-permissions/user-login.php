@@ -28,4 +28,8 @@ class WpakUserLogin {
 		return $result;
 	}
 	
+	public static function get_current_user() {
+		return self::$current_user;
+	}
+	
 }

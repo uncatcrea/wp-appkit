@@ -12,16 +12,7 @@ class WpakWebServiceComments {
 
 		$post_id = $id;
 
-		$max = 50;
-
-		$query_args = array(
-			'post_id' => $post_id,
-			'status' => 'approve',
-			'number' => $max,
-		);
-
-		$comments = get_comments( $query_args );
-		$comment_tree = self::get_comments_tree( $comments );
+		$comment_tree = self::get_post_comments( $post_id, $app_id );
 
 		foreach ( $comment_tree as $comment_node ) {
 
@@ -35,7 +26,32 @@ class WpakWebServiceComments {
 		return $service_answer;
 	}
 
-	private static function get_comment_web_service_data( $comment_node ) {
+	protected static function get_post_comments( $post_id, $app_id ) {
+		
+		$max_comments = 50;
+		
+		/**
+		 * Filter max number of comments to retrieve per post
+		 *
+		 * @param int 			$max_comments    	Maximum number of comments
+		 * @param int 	        $post_id 			ID of the post we're commenting on
+		 * @param int 			$app_id 			ID of the app
+		 */
+		$max_comments = apply_filters( 'wpak_max_comments', $max_comments, $post_id, $app_id );
+
+		$query_args = array(
+			'post_id' => $post_id,
+			'status' => 'approve',
+			'number' => $max_comments,
+		);
+
+		$comments = get_comments( $query_args );
+		$comment_tree = self::get_comments_tree( $comments );
+		
+		return $comment_tree;
+	}
+	
+	protected static function get_comment_web_service_data( $comment_node ) {
 		$comment_data = array();
 
 		$id = $comment_node['id'];
@@ -65,7 +81,7 @@ class WpakWebServiceComments {
 		return $comment_data;
 	}
 
-	private static function get_comments_tree( $comments ) {
+	protected static function get_comments_tree( $comments ) {
 
 		$tree = array();
 
@@ -105,7 +121,7 @@ class WpakWebServiceComments {
 	public static function create( $service_answer, $data, $app_id ) {
 		$service_answer = array();
 		
-		$service_answer['comment_ok'] = false;
+		$service_answer['comment_ok'] = 0;
 		
 		if ( !empty( $data['comment'] )  ) {
 			
@@ -120,7 +136,7 @@ class WpakWebServiceComments {
 					
 					if ( !empty( $comment_content ) ) {
 					
-						$to_check = array( $comment['content'] );
+						$to_check = array( $comment['content'], $comment['post'] );
 						//TODO we could add a filter on this to add more comment data to control field 
 						//(and same must be applied on app side).
 
@@ -129,51 +145,80 @@ class WpakWebServiceComments {
 						if ( $result['ok'] ) {
 
 							if ( empty( $comment['id'] ) ) {
+								
 								if ( !empty( $comment['post'] ) ) {
+									
 									$post = get_post( $comment['post'] );
 									if ( ! empty( $post ) ) {
 
-										$comment['content'] = $comment_content;
-										
-										//The following is inspired from the WP API v2 :)
-										
-										$prepared_comment = self::prepare_comment_for_database( $comment );
-										if ( is_array( $prepared_comment ) ) {
+										if ( $post->post_status === 'publish' ) {
 											
-											// Setting remaining values before wp_insert_comment so we can
-											// use wp_allow_comment().
-											$prepared_comment['comment_author_IP'] = '127.0.0.1';
-											$prepared_comment['comment_agent'] = '';
-											$prepared_comment['comment_approved'] = wp_allow_comment( $prepared_comment );
+											//Comments must be open for the given post:
+											if ( comments_open( $post->ID ) ) {
 
-											$comment_id = wp_insert_comment( $prepared_comment );
-											if ( $comment_id ) {
+												$post_type = get_post_type_object( $post->post_type );
 
-												/*if ( isset( $comment['status'] ) ) {
-													$comment = get_comment( $comment_id );
-													$this->handle_status_param( $comment['status'], $comment );
+												//The logged in user must be able to read the post he's commenting on :
+												if ( current_user_can( $post_type->cap->read_post, $post->ID ) ) {
+
+													$comment['content'] = $comment_content;
+
+													$logged_in_user = WpakUserLogin::get_current_user();
+													$comment['author'] = $logged_in_user->ID;
+													$comment['author_name'] = $logged_in_user->user_login;
+													$comment['author_email'] = $logged_in_user->user_email;
+													$comment['author_url'] = $logged_in_user->user_url;
+
+													//The following comment insertion is inspired from the WP API v2 :)
+
+													$prepared_comment = self::prepare_comment_for_database( $comment );
+													if ( is_array( $prepared_comment ) ) {
+
+														//Don't post the same comment twice :
+														if ( !self::is_duplicate( $prepared_comment ) ) {
+														
+															$prepared_comment['comment_approved'] = wp_allow_comment( $prepared_comment );
+
+															/**
+															 * Use this filter to edit the comment fields before inserting it to database.
+															 * 
+															 * @param array     $prepared_comment       Comment that is going to be inserted into db
+															 * @param WP_User   $logged_in_user         Currently logged in user
+															 * @param int       $app_id                 Id of the current app
+															 */
+															$prepared_comment = apply_filters( 'wpak_comments_before_insert', $prepared_comment, $logged_in_user, $app_id );
+															
+															$comment_id = wp_insert_comment( $prepared_comment );
+															if ( $comment_id ) {
+
+																$comment_tree = self::get_post_comments( $post->ID, $app_id );
+																if ( !empty( $comment_tree[$comment_id] ) ) {
+
+																	$service_answer['comment'] = self::get_comment_web_service_data( $comment_tree[$comment_id] );
+																	$service_answer['comments'] = self::read_one( array(), $post->ID, $app_id);
+
+																	$service_answer['comment_ok'] = 1;
+
+																} else {
+																	$service_answer['comment_error'] = 'comment-not-inserted';
+																}
+															} else {
+																$service_answer['comment_error'] = 'wp-insert-comment-failed';
+															}
+														} else {
+															$service_answer['comment_error'] = 'already-said-that';
+														}
+													} else {
+														$service_answer['comment_error'] = $prepared_comment; //Contains error string
+													}
+												} else {
+													$service_answer['comment_error'] = 'user-cant-comment-this-post';
 												}
-
-												$this->update_additional_fields_for_object( get_comment( $comment_id ), $comment );
-												$context = current_user_can( 'moderate_comments' ) ? 'edit' : 'view';
-												$response = $this->get_item( array(
-													'id'      => $comment_id,
-													'context' => $context,
-												) );
-												$response = rest_ensure_response( $response );
-												if ( is_wp_error( $response ) ) {
-													return $response;
-												}
-												$response->set_status( 201 );
-												$response->header( 'Location', rest_url( '/wp/v2/comments/' . $comment_id ) );
-												return $response; */
-
-												$service_answer['comment_ok'] = 1;
 											} else {
-												$service_answer['comment_error'] = 'comment-post-not-found';
+												$service_answer['comment_error'] = 'comments-closed';
 											}
 										} else {
-											$service_answer['comment_error'] = $prepared_comment; //Contains error string
+											$service_answer['comment_error'] = 'post-not-published';
 										}
 									} else {
 										$service_answer['comment_error'] = 'comment-post-not-found';
@@ -203,58 +248,85 @@ class WpakWebServiceComments {
 		return (object)$service_answer;
 	}
 	
-	protected function prepare_comment_for_database( $comment ) {
+	protected static function prepare_comment_for_database( $comment ) {
 		$prepared_comment = array();
+		
 		if ( isset( $comment['content'] ) ) {
 			$prepared_comment['comment_content'] = $comment['content'];
+		} else {
+			return 'no-content';
 		}
+		
 		if ( isset( $comment['post'] ) ) {
 			$prepared_comment['comment_post_ID'] = (int) $comment['post'];
+		} else {
+			return 'no-comment-post';
 		}
-		if ( isset( $comment['parent'] ) ) {
-			$prepared_comment['comment_parent'] = $comment['parent'];
-		}
+		
 		if ( isset( $comment['author'] ) ) {
-			$prepared_comment['user_id'] = $comment['author'];
+			$prepared_comment['user_id'] = (int) $comment['author'];
+		} else {
+			return 'no-author';
 		}
-		if ( isset( $comment['author_name'] ) ) {
-			$prepared_comment['comment_author'] = $comment['author_name'];
-		}
-		if ( isset( $comment['author_email'] ) ) {
-			$prepared_comment['comment_author_email'] = $comment['author_email'];
-		}
+		
+		//"comment_parent", "comment_author" and "comment_author_email" is required so that 
+		//wp_allow_comment doesn't send a notice :
+		$prepared_comment['comment_parent'] = isset( $comment['parent'] ) ? (int)$comment['parent'] : 0;
+		$prepared_comment['comment_author'] = isset( $comment['author_name'] ) ? sanitize_text_field( $comment['author_name'] ) : '';
+		$prepared_comment['comment_author_email'] = isset( $comment['author_email'] ) ? sanitize_email( $comment['author_email'] ) : '';
+		
 		if ( isset( $comment['author_url'] ) ) {
-			$prepared_comment['comment_author_url'] = $comment['author_url'];
+			$prepared_comment['comment_author_url'] = esc_url_raw( $comment['author_url'] );
 		}
+		
 		if ( isset( $comment['type'] ) ) {
-			$prepared_comment['comment_type'] = $comment['type'];
+			$prepared_comment['comment_type'] = sanitize_key( $comment['type'] );
 		}
-		if ( isset( $comment['karma'] ) ) {
-			$prepared_comment['comment_karma'] = $comment['karma'] ;
-		}
-		if ( ! empty( $comment['date'] ) ) {
-			$date_data = self::rest_get_date_with_gmt( $comment['date'] );
-			if ( ! empty( $date_data ) ) {
-				list( $prepared_comment['comment_date'], $prepared_comment['comment_date_gmt'] ) =	$date_data;
-			} else {
-				return 'invalid-date';
-			}
-		} elseif ( ! empty( $comment['date_gmt'] ) ) {
-			$date_data = self::rest_get_date_with_gmt( $comment['date_gmt'], true );
-			if ( ! empty( $date_data ) ) {
-				list( $prepared_comment['comment_date'], $prepared_comment['comment_date_gmt'] ) = $date_data;
-			} else {
-				return 'invalid-gmt-date';
-			}
-		}
+		
+		$prepared_comment['comment_date'] = isset( $request['date'] ) ? $request['date'] : current_time( 'mysql' );
+		$prepared_comment['comment_date_gmt'] = isset( $request['date_gmt'] ) ? $request['date_gmt'] : current_time( 'mysql', 1 );
+				
+		// Setting remaining values before wp_insert_comment so we can use wp_allow_comment() :
+		$prepared_comment['comment_author_IP'] = '127.0.0.1';
+		$prepared_comment['comment_agent'] = '';
+											
 		return $prepared_comment;
 	}
 	
-	protected static function rest_get_date_with_gmt( $comment_date, $x ) {
-		//TODO : check this from WP API!!
-		return array();
+	/**
+	 * We have to rewrite wp-includes/comment.php::wp_allow_comment()'s duplicate
+	 * check because the original function dies if duplicate comment, which we
+	 * don't want, as we need to return a valide web service error answer.
+	 */
+	protected static function is_duplicate( $commentdata ) {
+		global $wpdb;
+		
+		$duplicate = false;
+
+		// Simple duplicate check
+		// expected_slashed ($comment_post_ID, $comment_author, $comment_author_email, $comment_content)
+		$dupe = $wpdb->prepare(
+			"SELECT comment_ID FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_parent = %s AND comment_approved != 'trash' AND ( comment_author = %s ",
+			wp_unslash( $commentdata['comment_post_ID'] ),
+			wp_unslash( $commentdata['comment_parent'] ),
+			wp_unslash( $commentdata['comment_author'] )
+		);
+		if ( $commentdata['comment_author_email'] ) {
+			$dupe .= $wpdb->prepare(
+				"OR comment_author_email = %s ",
+				wp_unslash( $commentdata['comment_author_email'] )
+			);
+		}
+		$dupe .= $wpdb->prepare(
+			") AND comment_content = %s LIMIT 1",
+			wp_unslash( $commentdata['comment_content'] )
+		);
+		if ( $wpdb->get_var( $dupe ) ) {
+			$duplicate = true;
+		}
+		
+		return $duplicate;
 	}
-	
 }
 
 WpakWebServiceComments::hooks();

@@ -59,6 +59,9 @@ class WpakWebServices {
 
 		self::log( $_SERVER['REQUEST_METHOD'] . ' : ' . $action . ' : ' . print_r( $_REQUEST, true ) );
 
+		//Set AJAX WP context :
+		define ( 'DOING_AJAX', true );
+		
 		if ( self::cache_on() ) {
 			//TODO_WPAK
 			/* $cached_webservice = WpakCache::get_cached_web_service(

@@ -97,11 +97,11 @@ define( function( require, exports ) {
 	 * }
 	 */
 	var format_theme_event_data = function( event, data ) {
-
+		
 		var theme_event_data = { 
 			event: event, 
 			type: '',
-			subtype: data.hasOwnProperty( 'type' ) ? data.type : '',
+			subtype: data !== undefined && data.hasOwnProperty( 'type' ) ? data.type : '',
 			message: '', 
 			data: data 
 		};
