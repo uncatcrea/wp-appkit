@@ -34,7 +34,7 @@ define(function (require) {
 
 	app.triggerError = function( error_id, error_data, error_callback ) {
 		vent.trigger( 'error:' + error_id, error_data );
-		Utils.log( 'app.js error (' + error_id + ')' + (error_data.hasOwnProperty('message') ? ' : ' + error_data.message : ''), error_data );
+		Utils.log( 'App error event [' + error_id + ']' + (error_data.hasOwnProperty('message') ? ' ' + error_data.message : ''), error_data );
 		if ( error_callback != undefined ) {
 			error_data = _.extend( { event: 'error:' + error_id, id: error_id }, error_data );
 			error_callback( error_data );

@@ -9,6 +9,7 @@ define( function( require ) {
 	var App = require( 'core/app' );
 	var Auth = require( 'core/modules/authentication' );
 	var RegionManager = require( 'core/region-manager' );
+	var Utils = require( 'core/app-utils' );
 	
 	var comments = {};
 	
@@ -64,7 +65,11 @@ define( function( require ) {
 		
 		ajax_args.success = success;
 		
-		ajax_args.error = error;
+		ajax_args.error = function( jqXHR, textStatus, errorThrown ) {
+			var error_id = 'ajax-failed';
+			error_id += ( ':' + Utils.getAjaxErrorType( jqXHR, textStatus, errorThrown ) );
+			error( error_id, { jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } );
+		};
 		
 		console.log( 'Sending comment query', ajax_args );
 		
@@ -126,8 +131,8 @@ define( function( require ) {
 			}
 		};
 		
-		var error = function(  jqXHR, textStatus, errorThrown ) {
-			cb_error( 'ajax-failed' );
+		var error = function( error_id ) {
+			cb_error( error_id );
 		};
 		
 		ajaxQuery( comment, 'POST', success, error );
@@ -140,9 +145,19 @@ define( function( require ) {
 		sendComment(
 			comment,
 			function( comment_data ) {
+				Utils.log( 'Comment added successfully' + ( comment_data.waiting_approval ? ', waiting for approval' : '' ), comment_data);
 				App.triggerInfo( 'comment:posted', comment_data, cb_ok );
 			},
 			function( error ) {
+				
+				//Comment posting returned that the user connection has expired or is not valid:
+				//we have to transfer this info to the authentication module :
+				if ( error === 'user-connection-expired' ) {
+					Auth.logUserOut( 2 );
+				} else if ( error === 'user-not-authenticated' ) {
+					Auth.logUserOut( 3 );
+				}
+				
 				App.triggerError(
 					'comment:'+ error,
 					{ type: 'comment-error', where: 'comments.postComment:sendComment' },

@@ -68,13 +68,27 @@ define( function( require, exports ) {
 
 		var theme_event_data = format_theme_event_data( event, data );
 
-		if ( theme_event_data.type == 'error'
-				|| theme_event_data.type == 'info'
-				|| theme_event_data.type == 'network'
+		/**
+		 * "stop-theme-event" filter : use this filter to avoid an event from triggering in the theme.
+		 * Useful to deactivate some error events display for exemple.
+		 * 
+		 * @param {boolean} Whether to stop the event or not. Default false.
+		 * @param {JSON Object} theme_event_data : Theme event data object
+		 * @param {String} event : Original (internal) event name
+		 */
+		var stop_theme_event = Hooks.applyFilters( 'stop-theme-event', false, [theme_event_data, event] );
+		
+		if ( !stop_theme_event ) {
+			
+			if ( theme_event_data.type == 'error'
+				 || theme_event_data.type == 'info'
+				 || theme_event_data.type == 'network'
 				) {
-			//2 ways of binding to error and info events :
-			vent.trigger( event, theme_event_data ); //Ex: bind directly to 'info:no-content'
-			vent.trigger( theme_event_data.type, theme_event_data ); //Ex: bind to general 'info', then filter with if( info.event == 'no-content' )
+				//2 ways of binding to error and info events :
+				vent.trigger( event, theme_event_data ); //Ex: bind directly to 'info:no-content'
+				vent.trigger( theme_event_data.type, theme_event_data ); //Ex: bind to general 'info', then filter with if( info.event == 'no-content' )
+			}
+			
 		}
 
 	} );

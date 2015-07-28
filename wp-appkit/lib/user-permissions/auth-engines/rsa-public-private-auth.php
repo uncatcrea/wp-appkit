@@ -305,7 +305,40 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 					}
 					
 				} else {
-					$service_answer['auth_error'] = 'empty-user';
+					$service_answer['auth_error'] = 'wrong-auth-data';
+				}
+				break;
+				
+			case 'check_user_auth':
+				$service_answer['user_auth_ok'] = 0;
+				//Check authentication
+				if ( !empty( $auth_params['user'] ) 
+					 && !empty( $auth_params['control'] )
+					 && !empty( $auth_params['timestamp'] )
+					) {
+					
+					if ( !empty( $auth_params['hash'] ) && !empty( $auth_params['hasher'] ) ) {
+						$result = $this->check_authenticated_action( $app_id, 'check_user_auth', $auth_params, array( $auth_params['hash'], $auth_params['hasher'] ) );
+						if ( $result['ok'] ) {
+							//Means that the user is authenticated ok on server side, with secret ok.
+							//Now, check that the public key has not changed :
+							$app_public_key = $this->get_app_public_key( $app_id );
+							$hash = $this->generate_hmac( $app_public_key, $auth_params['hasher'] );
+							if ( $auth_params['hash'] === $hash ) {
+								$service_answer['user_auth_ok'] = 1;
+							} else {
+								$service_answer['auth_error'] = 'wrong-public-key';
+							}
+						} else {
+							//Depending on $result['auth_error'], can mean that the user
+							//is not authenticated or that his secret has changed (if hmac check failed).
+							$service_answer['auth_error'] = $result['auth_error'];
+						}
+					} else {
+						$service_answer['auth_error'] = 'no-hash';
+					}
+				}else {
+					$service_answer['auth_error'] = 'wrong-auth-data';
 				}
 				break;
 				
@@ -344,48 +377,55 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 			$user_wp = get_user_by( 'login', $user );
 			if ( $user_wp ) {
 
-				//Check if the user is authenticated for the given app :
-				if ( $this->user_is_authenticated( $user_wp->ID, $app_id ) ) {
+				//Check the user is not banned :
+				if ( $this->check_user_is_allowed_to_authenticate( $user_wp->ID, $app_id ) ) {
 
-					if ( !empty( $auth_data['control'] ) && !empty( $auth_data['timestamp'] ) ) {
+					//Check if the user is authenticated for the given app :
+					if ( $this->user_is_authenticated( $user_wp->ID, $app_id ) ) {
 
-						$control_key = $this->get_user_secret( $user_wp->ID, $app_id ); //If the user is authenticated, he has a secret key
+						if ( !empty( $auth_data['control'] ) && !empty( $auth_data['timestamp'] ) ) {
 
-						$control = $auth_data['control'];
-						
-						$timestamp = $auth_data['timestamp'];
+							$control_key = $this->get_user_secret( $user_wp->ID, $app_id ); //If the user is authenticated, he has a secret key
 
-						$control_string = '';
-						foreach( $to_check as $value ) {
-							if ( is_string($value) || is_numeric( $value ) ) {
-								$control_string .= $value;
-							} elseif( is_bool( $value ) ) {
-								$control_string .= $value ? '1' : '0';
+							$control = $auth_data['control'];
+
+							$timestamp = $auth_data['timestamp'];
+
+							$control_string = '';
+							foreach( $to_check as $value ) {
+								if ( is_string($value) || is_numeric( $value ) ) {
+									$control_string .= $value;
+								} elseif( is_bool( $value ) ) {
+									$control_string .= $value ? '1' : '0';
+								}
 							}
-						}
-						
-						//Check control data :
-						if ( $this->check_hmac( $action . $user . $timestamp . $control_string, $control_key, $control ) ) {
 
-							if ( $this->check_query_time( $timestamp ) ) {
+							//Check control data :
+							if ( $this->check_hmac( $action . $user . $timestamp . $control_string, $control_key, $control ) ) {
 
-								$result['ok'] = true;
-								$result['user'] = $user;
-								
+								if ( $this->check_query_time( $timestamp ) ) {
+
+									$result['ok'] = true;
+									$result['user'] = $user;
+
+								} else {
+									//If not in debug mode, don't give error details for security concern :
+									$result['auth_error'] = $debug_mode ? 'wrong-query-time' : 'auth-error'; //Don't give more details for security concern
+								}
 							} else {
 								//If not in debug mode, don't give error details for security concern :
-								$result['auth_error'] = $debug_mode ? 'wrong-query-time' : 'auth-error'; //Don't give more details for security concern
+								$result['auth_error'] = $debug_mode ? 'wrong-hmac' : 'auth-error'; //Don't give more details for security concern
 							}
 						} else {
 							//If not in debug mode, don't give error details for security concern :
-							$result['auth_error'] = $debug_mode ? 'wrong-hmac' : 'auth-error'; //Don't give more details for security concern
+							$result['auth_error'] = $debug_mode ? 'wrong-auth-data' : 'auth-error'; //Don't give more details for security concern
 						}
 					} else {
-						//If not in debug mode, don't give error details for security concern :
-						$result['auth_error'] = $debug_mode ? 'wrong-auth-data' : 'auth-error'; //Don't give more details for security concern
+						$connection_validity = $this->get_user_connection_validity( $user_wp->ID, $app_id );
+						$result['auth_error'] = $connection_validity === 0 ? 'user-not-authenticated' : 'user-connection-expired';
 					}
 				} else {
-					$result['auth_error'] = 'user-not-authenticated';
+					$result['auth_error'] = 'user-banned';
 				}
 			} else {
 				$result['auth_error'] = 'wrong-user';
@@ -397,6 +437,14 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		return $result;
 	}
 	
+	/**
+	 * Checks if the user is stored as authenticated on server side,
+	 * which means he has a valid user secret in its meta.
+	 * 
+	 * @param int|WP_User|string    $user       User to check
+	 * @param int                   $app_id     App id to check the user for
+	 * @return boolean True if user is authenticated
+	 */
 	public function user_is_authenticated( $user, $app_id ) {
 		$user_is_authenticated = false;
 		
@@ -412,8 +460,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		}
 		
 		if ( $user_id ) {
-			$user_secret = $this->get_user_secret( $user_id, $app_id );
-			$user_is_authenticated = !empty( $user_secret );
+			$user_is_authenticated = ( $this->get_user_connection_validity( $user_id, $app_id ) > 0 );
 		}
 		
 		return $user_is_authenticated;
@@ -482,10 +529,59 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		$user_secret = '';
 		$user_meta = '_wpak_auth_'. $app_id;
 		$user_auth_data = get_user_meta( $user_id, $user_meta, true );
-		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) && array_key_exists( 'key', $user_auth_data ) ) {
+		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) && !empty( $user_auth_data['key'] ) ) {
 			$user_secret = $user_auth_data['key'];
 		} 
 		return $user_secret;
+	}
+	
+	/**
+	 * Get the current user connection validity : return values :
+	 * -1 : connection has expired
+	 * 0  : not connected at all
+	 * 1  : connected ok
+	 * 
+	 * Use the "wpak_auth_connection_expiration_time" filter to set the expiration time.
+	 * 
+	 * @param int  $user_id              User id
+	 * @param int  $app_id               App id
+	 * @return int $connection_validity  -1:expired, 0:not_connected, 1:connected
+	 */
+	protected function get_user_connection_validity( $user_id, $app_id ) {
+		$connection_validity = 0;
+		
+		$user_meta = '_wpak_auth_'. $app_id;
+		
+		$user_auth_data = get_user_meta( $user_id, $user_meta, true );
+		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) 
+			 && !empty( $user_auth_data['key'] ) 
+			 &&	!empty( $user_auth_data['time'] ) 
+			) {
+			
+			$user_secret_time = (int)$user_auth_data['time'];
+			
+			$default_expiration_time = 3600*24*3; //3 days
+			
+			/**
+			* Filter 'wpak_auth_connection_expiration_time' : 
+			* use this to set the user connection expiration time.
+			* Defaults is 3 days. Set -1 for no connection expiration.
+			* 
+			* @param $expiration_time     int    Connection duration (in seconds). Defaults to 3 days. Return -1 for no expiration.
+			* @param $user_id             int    User ID
+			* @param $app_id              int    Application ID
+			*/
+			$expiration_time = apply_filters( 'wpak_auth_connection_expiration_time', $default_expiration_time, $user_id, $app_id );
+			
+			if ( $expiration_time === -1 ) {
+				$connection_validity = 1;
+			} else {
+				$connection_validity = ( ( time() - $user_secret_time ) <= $expiration_time ) ? 1 : -1;
+			}
+			
+		} 
+		
+		return $connection_validity;
 	}
 	
 	/**

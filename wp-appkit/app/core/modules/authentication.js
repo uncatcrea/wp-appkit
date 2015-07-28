@@ -10,6 +10,7 @@ define( function( require ) {
 	var Config = require( 'root/config' );
 	var Sha256 = require( 'core/lib/encryption/sha256' );
 	var WsToken = require( 'core/lib/encryption/token' );
+	var Utils = require( 'core/app-utils' );
 	require( 'core/lib/encryption/jsencrypt' );
 	require( 'localstorage' );
 
@@ -27,8 +28,6 @@ define( function( require ) {
 	var authenticationData = new AuthenticationDataModel( { id: 'Authentication-' + Config.app_slug } );
 	authenticationData.fetch();
 	
-	console.log('Current user', authenticationData);
-	
 	var ws_url = WsToken.getWebServiceUrlToken( 'authentication' ) + '/authentication/';
 
 	var authentication = { };
@@ -40,6 +39,12 @@ define( function( require ) {
 			secret += base[Math.floor( Math.random() * base.length )];
 		}
 		return secret;
+	};
+	
+	var resetSecret = function() {
+		var new_secret = generateRandomSecret();
+		authenticationData.set( 'secret', new_secret );
+		authenticationData.save();
 	};
 
 	var generateHMAC = function( data, secret ) {
@@ -176,7 +181,11 @@ define( function( require ) {
 		
 		ajax_args.success = success;
 		
-		ajax_args.error = error;
+		ajax_args.error = function( jqXHR, textStatus, errorThrown ) {
+			var error_id = 'ajax-failed';
+			error_id += ( ':' + Utils.getAjaxErrorType( jqXHR, textStatus, errorThrown ) );
+			error( error_id, { jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } );
+		};
 		
 		console.log( 'Sending auth query', ajax_args );
 		
@@ -220,8 +229,8 @@ define( function( require ) {
 			}
 		};
 
-		var error = function( jqXHR, textStatus, errorThrown ) {
-			cb_error( 'ajax-failed' );
+		var error = function( error_id ) {
+			cb_error( error_id );
 		};
 
 		ajaxQuery( web_service_params, success, error );
@@ -303,8 +312,8 @@ define( function( require ) {
 				}
 			};
 
-			var error = function( jqXHR, textStatus, errorThrown ) {
-				cb_error( 'ajax-failed' );
+			var error = function( error_id ) {
+				cb_error( error_id );
 			};
 		
 			ajaxQuery( web_service_params, success, error );
@@ -315,17 +324,6 @@ define( function( require ) {
 		
 	};
 
-	authentication.getCurrentSecret = function() {
-		var current_secret = authenticationData.get( 'secret' );
-		return current_secret;
-	};
-
-	authentication.resetSecret = function() {
-		var new_secret = generateRandomSecret();
-		authenticationData.set( 'secret', new_secret );
-		authenticationData.save();
-	};
-	
 	authentication.getActionAuthData = function( action, control_data_keys, control_data ) {
 		var auth_data = null;
 		
@@ -371,11 +369,73 @@ define( function( require ) {
 		return authenticationData.get( 'is_authenticated' );
 	};
 	
-	authentication.checkUserAuthenticationFromRemote = function() {
-		//Check that the user connection is still valid.
-		//Recheck public key and user secret from server
+	/**
+	 * If a user is logged in, checks if his connection is still valid by
+	 * rechecking public key and user secret from server.
+	 * If not ok, calls logUserOut() to trigger logout events.
+	 * 
+	 * @param {function} cb_auth_ok
+	 * @param {function} cb_auth_error
+	 */
+	authentication.checkUserAuthenticationFromRemote = function( cb_auth_ok, cb_auth_error ) {
+		
+		var user_authenticated = authenticationData.get( 'is_authenticated' );
+		if ( user_authenticated ) {
+			
+			var public_key = authenticationData.get( 'public_key' );
+			
+			var hasher = generateRandomSecret();
+			var hash = generateHMAC( public_key, hasher );
+			
+			//We check user connection by sending an authenticated query and checking it on server side.
+			//We send a public_key hash so that user public key can be verified on server side.
+			var web_service_params = getAuthWebServicesParams( 'check_user_auth', authenticationData.get( 'user_login' ), true, ['hash','hasher'], {hash: hash, hasher:hasher} );
+			
+			var success = function( data ) {
+				if ( data.hasOwnProperty( 'result' ) && data.result.hasOwnProperty( 'status' ) && data.result.hasOwnProperty( 'message' ) ) {
+					if ( data.result.status == 1 ) {
+						if ( data.hasOwnProperty( 'user_auth_ok' ) ) {
+							if ( data.user_auth_ok === 1 ) {
+
+								//The user is connected ok.
+								//Nothing more to do, simply return.
+								cb_auth_ok( authentication.getCurrentUser() );
+
+							} else if ( data.hasOwnProperty( 'auth_error' ) ) {
+								switch( data.auth_error ) {
+									case 'user-connection-expired':
+										authentication.logUserOut( 2 );
+										break;
+									default:
+										authentication.logUserOut( 3 );
+										break;
+								}
+								cb_auth_error( data.auth_error );
+							} else {
+								cb_auth_error( 'no-auth-error' );
+							}
+						} else {
+							cb_auth_error( 'wrong-answer-format' );
+						}
+					} else {
+						cb_auth_error( 'web-service-error : '+ data.result.message );
+					}
+				}else {
+					cb_auth_error( 'wrong-result-data' );
+				}
+			};
+			
+			var error = function( error_id ) {
+				cb_auth_error( error_id );
+			};
+			
+			ajaxQuery( web_service_params, success, error );
+			
+		} else {
+			cb_auth_error( 'no-user-logged-in' );
+		}
+		
 	};
-	
 	
 	authentication.logUserIn = function( login, pass, cb_ok, cb_error ) {
 		getPublicKey( 
@@ -386,6 +446,7 @@ define( function( require ) {
 					pass,
 					function( auth_data ) {
 						console.log( 'User authentication OK', auth_data );
+						auth_data.type = 'authentication-info'; //So that theme info event subtype is set
 						App.triggerInfo( 'auth:user-login', auth_data, cb_ok );
 					},
 					function( error ) {
@@ -409,8 +470,40 @@ define( function( require ) {
 		);
 	};
 	
-	authentication.logUserOut = function() {
-		var user_info = { user: authenticationData.get( 'user_login' ), permissions: authenticationData.get( 'permissions' ) };
+	/**
+	 * Log the user out.
+	 * 
+	 * @param {int} logout_type :
+	 * 1: (default) Normal logout triggered by the user in the app
+	 * 2: logout due to user connection expiration (because the server answered so)
+	 * 3: logout due to the server answering that the user is not authenticated at all on server side
+	 */
+	authentication.logUserOut = function( logout_type ) {
+		
+		logout_type = ( logout_type === undefined ) ? 1 : logout_type;
+		
+		var logout_info_type = '';
+		switch( logout_type ) {
+			case 1:
+				logout_info_type = 'normal';
+				break;
+			case 2:
+				logout_info_type = 'user-connection-expired';
+				break;
+			case 3:
+				logout_info_type = 'user-not-authenticated';
+				break;
+			default:
+				logout_info_type = 'unknown';
+				break;
+		}
+		
+		var logout_info = {
+			type: 'authentication-info', //So that theme info event subtype is set
+			user: authenticationData.get( 'user_login' ), 
+			permissions: authenticationData.get( 'permissions' ),
+			logout_type: logout_info_type
+		};
 		
 		authenticationData.set( 'user_login', '' );
 		authenticationData.set( 'public_key', '' );
@@ -419,12 +512,8 @@ define( function( require ) {
 		authenticationData.set( 'permissions', {} );
 		authenticationData.save();
 		
-		App.triggerInfo( 'auth:user-logout', user_info );
+		App.triggerInfo( 'auth:user-logout', logout_info );
 		console.log('Current user', authenticationData);
-	};
-
-	authentication.init = function() {
-		//authentication.connectUser( 'admin', 'admin', function( auth_data ){ console.log( 'connectUser OK', auth_data )}, function( error ) { console.log('connectUser error', error ) } );
 	};
 
 	return authentication;

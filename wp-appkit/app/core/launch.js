@@ -32,12 +32,10 @@ require(['root/config'],function(Config){
 	    paths: dynamic_paths
 	});
 
-	require(['jquery', 'core/addons-internal', 'core/app-utils', 'core/app', 'core/router', 'core/region-manager', 'core/stats', 'core/phonegap/utils', 'core/modules/authentication'],
-			function ($, Addons, Utils, App, Router, RegionManager, Stats, PhoneGap, Authentication) {
+	require(['jquery', 'core/addons-internal', 'core/app-utils', 'core/app', 'core/router', 'core/region-manager', 'core/stats', 'core/phonegap/utils'],
+			function ($, Addons, Utils, App, Router, RegionManager, Stats, PhoneGap) {
 
 			var launch = function() {
-				
-				Authentication.init();
 				
 				require(Addons.getJs('init','before'),function(){
 					// Initialize application before using it

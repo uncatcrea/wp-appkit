@@ -14,6 +14,8 @@ class WpakWebServiceAuthentication {
 			$app_id = WpakApps::get_app_id( $app_id );
 			$auth_engine = AuthenticationSettings::get_auth_engine_instance();
 			$service_answer = $auth_engine->get_webservice_answer( $app_id );
+		} else {
+			$service_answer = array( 'error' => 'no-auth-action' ); //This will set webservice answer status to 0.
 		}
 
 		return ( object ) $service_answer;
