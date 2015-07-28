@@ -26,7 +26,7 @@ class WpakWebServiceComments {
 		return $service_answer;
 	}
 
-	protected static function get_post_comments( $post_id, $app_id ) {
+	protected static function get_post_comments( $post_id, $app_id, $only_approved = true ) {
 		
 		$max_comments = 50;
 		
@@ -41,9 +41,12 @@ class WpakWebServiceComments {
 
 		$query_args = array(
 			'post_id' => $post_id,
-			'status' => 'approve',
 			'number' => $max_comments,
 		);
+		
+		if ( $only_approved ) {
+			$query_args['status'] = 'approve';
+		}
 
 		$comments = get_comments( $query_args );
 		$comment_tree = self::get_comments_tree( $comments );
@@ -191,16 +194,40 @@ class WpakWebServiceComments {
 															$comment_id = wp_insert_comment( $prepared_comment );
 															if ( $comment_id ) {
 
-																$comment_tree = self::get_post_comments( $post->ID, $app_id );
-																if ( !empty( $comment_tree[$comment_id] ) ) {
+																$inserted_comment = get_comment( $comment_id );
+																if ( $inserted_comment->comment_approved ) {
+																
+																	$comment_tree = self::get_post_comments( $post->ID, $app_id );
+																	if ( !empty( $comment_tree[$comment_id] ) ) {
 
-																	$service_answer['comment'] = self::get_comment_web_service_data( $comment_tree[$comment_id] );
-																	$service_answer['comments'] = self::read_one( array(), $post->ID, $app_id);
+																		$service_answer['comment'] = self::get_comment_web_service_data( $comment_tree[$comment_id] );
+																		$service_answer['comments'] = self::read_one( array(), $post->ID, $app_id );
 
-																	$service_answer['comment_ok'] = 1;
+																		$service_answer['comment_ok'] = 1;
+																		$service_answer['waiting_approval'] = 0;
 
+																	} else {
+																		$service_answer['comment_error'] = 'wrong-comment-tree';
+																	}
+																	
 																} else {
-																	$service_answer['comment_error'] = 'comment-not-inserted';
+																	
+																	$comment_tree = self::get_post_comments( $post->ID, $app_id, false ); //false to get non approved comments too
+																	if ( !empty( $comment_tree[$comment_id] ) ) {
+
+																		$service_answer['comment'] = self::get_comment_web_service_data( $comment_tree[$comment_id] );
+																		
+																		$service_answer['comments'] = self::read_one( array(), $post->ID, $app_id ); 
+																		//Note : $service_answer['comments'] will not contain the inserted comment as 
+																		//it is waiting for approval.
+
+																		$service_answer['comment_ok'] = 1;
+																		$service_answer['waiting_approval'] = 1;
+
+																	} else {
+																		$service_answer['comment_error'] = 'wrong-comment-tree';
+																	}
+																	
 																}
 															} else {
 																$service_answer['comment_error'] = 'wp-insert-comment-failed';
@@ -269,19 +296,12 @@ class WpakWebServiceComments {
 			return 'no-author';
 		}
 		
-		//"comment_parent", "comment_author" and "comment_author_email" is required so that 
-		//wp_allow_comment doesn't send a notice :
 		$prepared_comment['comment_parent'] = isset( $comment['parent'] ) ? (int)$comment['parent'] : 0;
 		$prepared_comment['comment_author'] = isset( $comment['author_name'] ) ? sanitize_text_field( $comment['author_name'] ) : '';
 		$prepared_comment['comment_author_email'] = isset( $comment['author_email'] ) ? sanitize_email( $comment['author_email'] ) : '';
+		$prepared_comment['comment_author_url'] = isset( $comment['author_url'] ) ? esc_url_raw( $comment['author_url'] ) : '';
 		
-		if ( isset( $comment['author_url'] ) ) {
-			$prepared_comment['comment_author_url'] = esc_url_raw( $comment['author_url'] );
-		}
-		
-		if ( isset( $comment['type'] ) ) {
-			$prepared_comment['comment_type'] = sanitize_key( $comment['type'] );
-		}
+		$prepared_comment['comment_type'] = isset( $comment['type'] ) ? sanitize_key( $comment['type'] ) : '';
 		
 		$prepared_comment['comment_date'] = isset( $request['date'] ) ? $request['date'] : current_time( 'mysql' );
 		$prepared_comment['comment_date_gmt'] = isset( $request['date_gmt'] ) ? $request['date_gmt'] : current_time( 'mysql', 1 );

@@ -94,13 +94,22 @@ define( function( require ) {
 					if ( data.hasOwnProperty( 'comment_ok' ) ) {
 						if ( data.comment_ok === 1 ) {
 							
-							//Update comments list if current screen is comments screen :
-							var current_view = RegionManager.getCurrentView();
-							if ( current_view.hasOwnProperty( 'update_comments' ) ) {
-								current_view.update_comments( data.comments );
-							}
+							if ( data.waiting_approval === 0 ) {
+								//Update comments list if current screen is comments screen :
+								var current_view = RegionManager.getCurrentView();
+								if ( current_view.hasOwnProperty( 'update_comments' ) ) {
+									current_view.update_comments( data.comments );
+								}
+							} 
 							
-							cb_ok();
+							var return_data = {
+								comment: data.comment,
+								comments: data.comments,
+								waiting_approval: data.waiting_approval
+							};
+							
+							cb_ok( return_data );
+							
 						} else if ( data.hasOwnProperty( 'comment_error' ) ) {
 							cb_error( data.comment_error );
 						} else {
