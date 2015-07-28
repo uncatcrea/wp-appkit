@@ -57,6 +57,31 @@ define( function( require ) {
 		return Math.floor( Date.now() / 1000);
 	};
 	
+	var generateControlStringFromData = function( to_control, control_key ) {
+		var control_string = '';
+		
+		if ( to_control.length ) {
+			_.each( to_control, function( value ) {
+				control_string += value;
+			} );
+			control_string = generateHMAC( control_string, control_key );
+		}
+		
+		return control_string;
+	};
+	
+	var generateControlString = function( control_data_keys, control_data, control_key ) {
+		var to_control = [];
+		
+		_.each( control_data_keys, function( key ) {
+			if ( control_data.hasOwnProperty( key ) ) {
+				to_control.push( control_data[key] );
+			}
+		} );
+		
+		return generateControlStringFromData( to_control, control_key );
+	};
+	
 	/**
 	 * Builds the HMAC secured Web service params object.
 	 * 
@@ -67,17 +92,22 @@ define( function( require ) {
 	 * @param object data Data to send to server
 	 * @returns object HMAC secured Web service params object
 	 */
-	var getAuthWebServicesParams = function( auth_action, user, use_user_control, data_keys, data ) {
+	var getAuthWebServicesParams = function( auth_action, user, use_user_control, data_keys, data, add_data_to_ws_params ) {
 		
 		user = user === undefined ? 'wpak-app' : user;
+		
+		add_data_to_ws_params = add_data_to_ws_params === undefined || add_data_to_ws_params === true;
 		
 		var timestamp = getTimestamp();
 
 		var web_service_params = {
-			auth_action: auth_action,
 			user: user,
 			timestamp: timestamp,
 		};
+		
+		if ( add_data_to_ws_params ) {
+			web_service_params.auth_action = auth_action;
+		}
 		
 		var control_key = '';
 		if ( use_user_control === undefined || use_user_control === false ) {
@@ -93,18 +123,17 @@ define( function( require ) {
 
 		var to_control = [auth_action, user, timestamp];
 		if ( data_keys !== undefined && data !== undefined ) {
-			_.each( data_keys, function( value ) {
-				to_control.push( data[value] );
-				web_service_params[value] = data[value];
+			_.each( data_keys, function( key ) {
+				if ( data.hasOwnProperty( key ) ) {
+					to_control.push( data[key] );
+					if ( add_data_to_ws_params ) {
+						web_service_params[key] = data[key];
+					}
+				}
 			} );
 		}
 		
-		var control_string = '';
-		_.each( to_control, function( value ) {
-			control_string += value;
-		} );
-		
-		web_service_params.control = generateHMAC( control_string, control_key )
+		web_service_params.control = generateControlStringFromData( to_control, control_key ) ;
 		
 		return web_service_params;
 	};
@@ -175,28 +204,24 @@ define( function( require ) {
 
 							cb_ok( data.public_key );
 						} else {
-							cb_error( 'answer:wrong-hmac' );
+							cb_error( 'wrong-hmac' );
 						}
 						
 					} else if ( data.hasOwnProperty( 'auth_error' ) ) {
 						cb_error( data.auth_error );
 					}  else {
-						cb_error( 'answer:no-auth-error' );
+						cb_error( 'no-auth-error' );
 					}
 				} else {
-					cb_error( 'answer:result-error' );
+					cb_error( 'result-error' );
 				}
 			} else {
-				cb_error( 'answer:no-result' );
+				cb_error( 'no-result' );
 			}
 		};
 
 		var error = function( jqXHR, textStatus, errorThrown ) {
-			cb_error( 'ajax:failed' );
-			App.triggerError(
-				'synchro:ajax',
-				{ type: 'ajax', where: 'authentication::getPublicKey', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } }
-			);
+			cb_error( 'ajax-failed' );
 		};
 
 		ajaxQuery( web_service_params, success, error );
@@ -254,42 +279,38 @@ define( function( require ) {
 											cb_ok( { user: user, permissions: data.permissions } );
 
 										} else {
-											cb_error( 'answer:wrong-hmac' );
+											cb_error( 'wrong-hmac' );
 										}
 										
 									} else {
-										cb_error( 'answer:no-permissions' );
+										cb_error( 'no-permissions' );
 									}
 								
 							} else if ( data.hasOwnProperty( 'auth_error' ) ) {
 								cb_error( data.auth_error );
 							} else {
-								cb_error( 'answer:no-auth-error' );
+								cb_error( 'no-auth-error' );
 							}
 							
 						} else {
-							cb_error( 'answer:wrong-auth-data' );
+							cb_error( 'wrong-auth-data' );
 						}
 					} else {
-						cb_error( 'answer:web-service-error : '+ data.result.message );
+						cb_error( 'web-service-error : '+ data.result.message );
 					}
 				}else {
-					cb_error( 'answer:wrong-result-data' );
+					cb_error( 'wrong-result-data' );
 				}
 			};
 
 			var error = function( jqXHR, textStatus, errorThrown ) {
-				cb_error( 'ajax:failed' );
-				App.triggerError(
-					'synchro:ajax',
-					{ type: 'ajax', where: 'authentication::sendAuthData', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } }
-				);
+				cb_error( 'ajax-failed' );
 			};
 		
 			ajaxQuery( web_service_params, success, error );
 			
 		} else {
-			cb_error( 'answer:no-public-key');
+			cb_error( 'no-public-key');
 		}
 		
 	};
@@ -303,6 +324,21 @@ define( function( require ) {
 		var new_secret = generateRandomSecret();
 		authenticationData.set( 'secret', new_secret );
 		authenticationData.save();
+	};
+	
+	authentication.getActionAuthData = function( action, control_data_keys, control_data ) {
+		var auth_data = null;
+		
+		var user_authenticated = authenticationData.get( 'is_authenticated' ); 
+		if ( user_authenticated ) {
+			var user_login = authenticationData.get( 'user_login' );
+			var user_secret = authenticationData.get( 'secret' );
+			if ( user_login && user_secret ) {
+				auth_data = getAuthWebServicesParams( action, user_login, true, control_data_keys, control_data, false );
+			}
+		}
+		
+		return auth_data;
 	};
 
 	/** 
@@ -354,13 +390,21 @@ define( function( require ) {
 					},
 					function( error ) {
 						console.log( 'User authentication ERROR : '+ error );
-						App.triggerError( 'auth:login-error', error, cb_error );
+						App.triggerError(
+							'auth:'+ error,
+							{ type: 'authentication-error', where: 'authentication.logUserIn:sendAuthData' },
+							cb_error
+						);
 					}
 				);
 			}, 
 			function( error ) {
 				console.log( 'Get public key error : '+ error );
-				App.triggerError( 'auth:login-error', error, cb_error );
+				App.triggerError(
+					'auth:'+ error,
+					{ type: 'authentication-error', where: 'authentication.logUserIn:getPublicKey' },
+					cb_error
+				);
 			}
 		);
 	};

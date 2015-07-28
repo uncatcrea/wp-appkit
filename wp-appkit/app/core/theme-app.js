@@ -97,8 +97,14 @@ define( function( require, exports ) {
 	 * }
 	 */
 	var format_theme_event_data = function( event, data ) {
-
-		var theme_event_data = { event: event, type: '', message: '', data: data };
+		
+		var theme_event_data = { 
+			event: event, 
+			type: '',
+			subtype: data !== undefined && data.hasOwnProperty( 'type' ) ? data.type : '',
+			message: '', 
+			data: data 
+		};
 
 		if ( event.indexOf( 'error:' ) === 0 ) {
 
@@ -138,10 +144,10 @@ define( function( require, exports ) {
 		 * "theme-event-message" filter : use this hook to customize event messages
 		 * 
 		 * @param {String} Event message to customize
-		 * @param {String} Original event name
-		 * @param {JSON Object} Theme event data object
+		 * @param {JSON Object} theme_event_data : Theme event data object
+		 * @param {String} event : Original (internal) event name
 		 */
-		theme_event_data.message = Hooks.applyFilters( 'theme-event-message', theme_event_data.message, [event, theme_event_data] );
+		theme_event_data.message = Hooks.applyFilters( 'theme-event-message', theme_event_data.message, [theme_event_data, event] );
 		
 		return theme_event_data;
 	};

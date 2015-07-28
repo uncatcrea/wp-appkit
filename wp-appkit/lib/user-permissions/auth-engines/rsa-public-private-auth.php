@@ -6,10 +6,6 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	
 	const auth_meta_id = '_wpak_rsa_auth_settings';
 	
-	public function log_user_in() {
-		
-	}
-	
 	public function settings_meta_box_content( $post, $current_box ) {
 		
 		$auth_settings = $this->get_authentication_settings( $post->ID );
@@ -323,6 +319,104 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		//so that malicious code can not modify authentication process.
 		
 		return $service_answer;
+	}
+	
+	/**
+	 * Checks that control data sent is valid
+	 * 
+	 * @param int $app_id App id
+	 * @param string $action Authentication action name
+	 * @param array $auth_data Authentication data (user, control, timestamp)
+	 * @param array $to_check Data we have to check validity for
+	 */
+	public function check_authenticated_action( $app_id, $action, $auth_data, $to_check ) {
+		
+		$result = array( 'ok' => false, 'auth_error' => '', 'user' => '' );
+		
+		$debug_mode = WpakBuild::get_app_debug_mode( $app_id ) === 'on';
+		
+		//First check user validity
+		if ( !empty( $auth_data['user'] ) ) {
+
+			$user = $auth_data['user'];
+			
+			//Check user exists
+			$user_wp = get_user_by( 'login', $user );
+			if ( $user_wp ) {
+
+				//Check if the user is authenticated for the given app :
+				if ( $this->user_is_authenticated( $user_wp->ID, $app_id ) ) {
+
+					if ( !empty( $auth_data['control'] ) && !empty( $auth_data['timestamp'] ) ) {
+
+						$control_key = $this->get_user_secret( $user_wp->ID, $app_id ); //If the user is authenticated, he has a secret key
+
+						$control = $auth_data['control'];
+						
+						$timestamp = $auth_data['timestamp'];
+
+						$control_string = '';
+						foreach( $to_check as $value ) {
+							if ( is_string($value) || is_numeric( $value ) ) {
+								$control_string .= $value;
+							} elseif( is_bool( $value ) ) {
+								$control_string .= $value ? '1' : '0';
+							}
+						}
+						
+						//Check control data :
+						if ( $this->check_hmac( $action . $user . $timestamp . $control_string, $control_key, $control ) ) {
+
+							if ( $this->check_query_time( $timestamp ) ) {
+
+								$result['ok'] = true;
+								$result['user'] = $user;
+								
+							} else {
+								//If not in debug mode, don't give error details for security concern :
+								$result['auth_error'] = $debug_mode ? 'wrong-query-time' : 'auth-error'; //Don't give more details for security concern
+							}
+						} else {
+							//If not in debug mode, don't give error details for security concern :
+							$result['auth_error'] = $debug_mode ? 'wrong-hmac' : 'auth-error'; //Don't give more details for security concern
+						}
+					} else {
+						//If not in debug mode, don't give error details for security concern :
+						$result['auth_error'] = $debug_mode ? 'wrong-auth-data' : 'auth-error'; //Don't give more details for security concern
+					}
+				} else {
+					$result['auth_error'] = 'user-not-authenticated';
+				}
+			} else {
+				$result['auth_error'] = 'wrong-user';
+			}
+		} else {
+			$result['auth_error'] = 'no-user';
+		}
+		
+		return $result;
+	}
+	
+	public function user_is_authenticated( $user, $app_id ) {
+		$user_is_authenticated = false;
+		
+		$user_id = 0;
+		if( is_numeric( $user ) ) {
+			$user_id = $user;
+		}elseif ( is_a( $user, 'WP_User' ) ) {
+			$user_id = $user->ID;
+		} elseif( is_string( $user ) ) {
+			if ( $user = get_user_by( 'login', $user ) ) {
+				$user_id = $user->ID;
+			}
+		}
+		
+		if ( $user_id ) {
+			$user_secret = $this->get_user_secret( $user_id, $app_id );
+			$user_is_authenticated = !empty( $user_secret );
+		}
+		
+		return $user_is_authenticated;
 	}
 	
 	/**
