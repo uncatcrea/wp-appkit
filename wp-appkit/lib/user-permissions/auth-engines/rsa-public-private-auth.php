@@ -69,7 +69,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	
 	public function save_posted_settings( $post_id ) {
 
-		//TODO : check nonce "wpak-nonce-rsa-auth-settings" !
+		//(Security nonce checked in mother class)
 		
 		$current_settings = $this->get_authentication_settings( $post_id );
 

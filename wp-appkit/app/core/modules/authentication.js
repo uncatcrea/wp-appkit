@@ -222,7 +222,7 @@ define( function( require ) {
 						cb_error( 'no-auth-error' );
 					}
 				} else {
-					cb_error( 'result-error' );
+					cb_error( 'web-service-error', data.result.message );
 				}
 			} else {
 				cb_error( 'no-result' );
@@ -305,7 +305,7 @@ define( function( require ) {
 							cb_error( 'wrong-auth-data' );
 						}
 					} else {
-						cb_error( 'web-service-error : '+ data.result.message );
+						cb_error( 'web-service-error', data.result.message );
 					}
 				}else {
 					cb_error( 'wrong-result-data' );
@@ -369,10 +369,65 @@ define( function( require ) {
 		return authenticationData.get( 'is_authenticated' );
 	};
 	
+	authentication.currentUserCan = function ( capability ) {
+		var user_can = false;
+		
+		if ( authenticationData.get( 'is_authenticated' ) ) {
+			
+			var user_permissions = authenticationData.get( 'permissions' );
+			
+			if ( user_permissions.hasOwnProperty( 'capabilities' ) ) {
+				user_can = ( user_permissions.capabilities.indexOf( capability ) !== -1 );
+			}
+			
+			/**
+			 * Use this filter to handle your own capability check.
+			 * Useful if you used the "wpak_auth_user_permissions" filter on server side
+			 * to customize your user permissions.
+			 * 
+			 * @param    boolean         user_can      Defines if the user has the capability or not
+			 * @param    string          capability    Capability that has to be checked
+			 * @param    JSON Object     permissions   Permissions object containing role and capibilities array (and more custom data of yours if you added some)
+			 * @param    JSON Object     current_user  Currently connected user
+			 */
+			user_can = Hooks.applyFilters( 'current-user-can', user_can, [capability, authenticationData.get( 'permissions' ),authentication.getCurrentUser()] );
+		
+		}
+		
+		return user_can;
+	};
+	
+	authentication.currentUserRoleIs = function ( role ) {
+		var user_role_ok = false;
+		if ( authenticationData.get( 'is_authenticated' ) ) {
+			
+			var user_permissions = authenticationData.get( 'permissions' );
+			
+			if ( user_permissions.hasOwnProperty( 'roles' ) ) {
+				user_role_ok = ( user_permissions.roles.indexOf( role ) !== -1 );
+			}
+			
+			/**
+			 * Use this filter to handle your own role check.
+			 * Useful if you used the "wpak_auth_user_permissions" filter on server side
+			 * to customize your user permissions.
+			 * 
+			 * @param    boolean         user_role_ok  Defines if the role corresponds to the one given or not
+			 * @param    string          role          Role that has to be checked
+			 * @param    JSON Object     permissions   Permissions object containing role and capibilities array (and more custom data of yours if you added some)
+			 * @param    JSON Object     current_user  Currently connected user
+			 */
+			user_role_ok = Hooks.applyFilters( 'current-user-role', user_role_ok, [role, authenticationData.get( 'permissions' ), authentication.getCurrentUser()] );
+		
+		}
+		return user_role_ok;
+	};
+	
 	/**
 	 * If a user is logged in, checks if his connection is still valid by
 	 * rechecking public key and user secret from server.
-	 * If not ok, calls logUserOut() to trigger logout events.
+	 * If we reached the server and it answered connection not ok, 
+	 * calls logUserOut() to trigger logout events.
 	 * 
 	 * @param {function} cb_auth_ok
 	 * @param {function} cb_auth_error
@@ -449,21 +504,27 @@ define( function( require ) {
 						auth_data.type = 'authentication-info'; //So that theme info event subtype is set
 						App.triggerInfo( 'auth:user-login', auth_data, cb_ok );
 					},
-					function( error ) {
-						console.log( 'User authentication ERROR : '+ error );
+					function( error, message ) {
+						var error_data = { type: 'authentication-error', where: 'authentication.logUserIn:sendAuthData' };
+						if ( message !== undefined ) {
+							error_data.message = message;
+						}
 						App.triggerError(
 							'auth:'+ error,
-							{ type: 'authentication-error', where: 'authentication.logUserIn:sendAuthData' },
+							error_data,
 							cb_error
 						);
 					}
 				);
 			}, 
-			function( error ) {
-				console.log( 'Get public key error : '+ error );
+			function( error, message ) {
+				var error_data = { type: 'authentication-error', where: 'authentication.logUserIn:getPublicKey' };
+				if ( message !== undefined ) {
+					error_data.message = message;
+				}
 				App.triggerError(
 					'auth:'+ error,
-					{ type: 'authentication-error', where: 'authentication.logUserIn:getPublicKey' },
+					error_data,
 					cb_error
 				);
 			}
@@ -471,7 +532,8 @@ define( function( require ) {
 	};
 	
 	/**
-	 * Log the user out.
+	 * Log the user out on app side.
+	 * Note : this does not call the server to warn it that the user has logged out.
 	 * 
 	 * @param {int} logout_type :
 	 * 1: (default) Normal logout triggered by the user in the app
