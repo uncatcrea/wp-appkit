@@ -17,7 +17,8 @@ define(function (require) {
           Hooks               = require('core/lib/hooks'),
 		  Stats               = require('core/stats'),
 		  Addons              = require('core/addons-internal'),
-		  WsToken             = require('core/lib/encryption/token');
+		  WsToken             = require('core/lib/encryption/token'),
+          DeepLink			  = require( 'core/modules/deep-link' );
 
 	  var app = {};
 
@@ -42,18 +43,18 @@ define(function (require) {
 
 	/**
 	 * Triggers an info event. Use this to trigger your own App events from modules and addons.
-	 * 
+	 *
 	 * @param {String} info event name
 	 * @param {JSON Object} data Data that is passed to event callback
 	 */
 	app.triggerInfo = function( info, info_data, info_callback ) {
 
 		switch ( info ) {
-			
+
 			case 'no-content':
 				vent.trigger( 'info:no-content' );
 				break;
-				
+
 			case 'app-launched':
 				var stats = Stats.getStats();
 				vent.trigger( 'info:app-ready', { stats: stats } );
@@ -64,7 +65,7 @@ define(function (require) {
 					vent.trigger( 'info:app-version-changed', { stats: stats } );
 				}
 				break;
-				
+
 			default:
 				vent.trigger( 'info:' + info, info_data );
 				if ( info_callback != undefined ) {
@@ -72,12 +73,12 @@ define(function (require) {
 					info_callback( info_data );
 				}
 				break;
-				
+
 		}
-		
-		
+
+
 	};
-	
+
 	  //--------------------------------------------------------------------------
 	  //Custom pages and routes handling
 
@@ -190,7 +191,8 @@ define(function (require) {
 
 		var default_route = app.resetDefaultRoute(true);
 
-		var launch_route = default_route;
+		// Pass default_route to DeepLink module so that it can define the launch_route regarding the provided URL if any
+		var launch_route = DeepLink.getLaunchRoute( default_route );
 
 		/**
 		 * Use the 'launch-route' filter to display a specific screen at app launch
@@ -1138,7 +1140,7 @@ define(function (require) {
 
 		//persistent defaults to false :
 		var persistent = options.hasOwnProperty('persistent') && options.persistent === true;
-		
+
 		var token = WsToken.getWebServiceUrlToken( 'live-query' );
 		var ws_url = token + '/live-query';
 
