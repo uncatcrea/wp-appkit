@@ -16,7 +16,7 @@ define(function (require) {
             
     		this.setTemplate('comments');
            
-            _.bindAll(this,'render');
+            _.bindAll(this,'render','update_comments');
             
     		this.comments = args.comments;
     		
@@ -46,7 +46,11 @@ define(function (require) {
         	var renderedContent = this.template(template_args);
             $(this.el).html(renderedContent); 
             return this;
-        }
+        },
+		
+		update_comments : function( comments ) {
+			this.comments.reset( comments );
+		}
         
     });
 

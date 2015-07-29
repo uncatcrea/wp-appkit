@@ -4,6 +4,7 @@ require_once( dirname( __FILE__ ) . '/core-web-services/synchronization.php' );
 require_once( dirname( __FILE__ ) . '/core-web-services/comments.php' );
 require_once( dirname( __FILE__ ) . '/core-web-services/component.php' );
 require_once( dirname( __FILE__ ) . '/core-web-services/live-query.php' );
+require_once( dirname( __FILE__ ) . '/core-web-services/authentication.php' );
 
 class WpakWebServiceCrud {
 

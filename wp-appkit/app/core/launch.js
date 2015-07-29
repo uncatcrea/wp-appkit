@@ -36,6 +36,7 @@ require(['root/config'],function(Config){
 			function ($, Addons, Utils, App, Router, RegionManager, Stats, PhoneGap) {
 
 			var launch = function() {
+				
 				require(Addons.getJs('init','before'),function(){
 					// Initialize application before using it
 					App.initialize( function() {
@@ -68,7 +69,7 @@ require(['root/config'],function(Config){
 
 																App.launchRouting();
 
-																App.sendInfo('app-launched'); //triggers info:app-ready, info:app-first-launch and info:app-version-changed
+																App.triggerInfo('app-launched'); //triggers info:app-ready, info:app-first-launch and info:app-version-changed
 
 																//Refresh at app launch can be canceled using the 'refresh-at-app-launch' App param,
 																//this is useful if we set a specific launch page and don't want to be redirected
@@ -94,7 +95,7 @@ require(['root/config'],function(Config){
 
 															PhoneGap.hideSplashScreen();
 
-															App.sendInfo('no-content');
+															App.triggerInfo('no-content');
 														},
 														false //true to force refresh local storage at each app launch.
 													);

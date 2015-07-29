@@ -59,6 +59,9 @@ class WpakWebServices {
 
 		self::log( $_SERVER['REQUEST_METHOD'] . ' : ' . $action . ' : ' . print_r( $_REQUEST, true ) );
 
+		//Set AJAX WP context :
+		define ( 'DOING_AJAX', true );
+		
 		if ( self::cache_on() ) {
 			//TODO_WPAK
 			/* $cached_webservice = WpakCache::get_cached_web_service(
@@ -114,12 +117,18 @@ class WpakWebServices {
 
 					$headers = function_exists( 'apache_request_headers' ) ? apache_request_headers() : array();
 
-					$is_emulate_json = (!empty( $headers['Content-Type'] ) && strpos( $headers['Content-Type'], 'application/x-www-form-urlencoded' ) !== false) || (!empty( $_SERVER['CONTENT_TYPE'] ) && strpos( $_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded' ) !== false);
+					$is_url_encoded = (!empty( $headers['Content-Type'] ) && strpos( $headers['Content-Type'], 'application/x-www-form-urlencoded' ) !== false) || (!empty( $_SERVER['CONTENT_TYPE'] ) && strpos( $_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded' ) !== false);
 
-					if ( $is_emulate_json ) {
-						self::log( 'EMULATE JSON' );
-						$json = stripslashes( $_POST['model'] ); //TODO : this is maybe specific to backbone's "emulateJSON"
-						$sent = json_decode( $json );
+					if ( $is_url_encoded ) {
+						
+						if ( isset( $_POST['model'] ) ) {
+							//Specific to backbone's "emulateJSON"
+							$json = stripslashes( $_POST['model'] );
+							$sent = json_decode( $json );
+						} else {
+							$sent = $_POST;
+						}
+						
 					} else {
 						$json = file_get_contents( "php://input" );
 						$sent = json_decode( $json );
@@ -160,24 +169,26 @@ class WpakWebServices {
 						$http_method_override_method = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'];
 					}
 
-					$is_emulate_json = (!empty( $headers['Content-Type'] ) && strpos( $headers['Content-Type'], 'application/x-www-form-urlencoded' ) !== false) || (!empty( $_SERVER['CONTENT_TYPE'] ) && strpos( $_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded' ) !== false);
+					$is_url_encoded = (!empty( $headers['Content-Type'] ) && strpos( $headers['Content-Type'], 'application/x-www-form-urlencoded' ) !== false) || (!empty( $_SERVER['CONTENT_TYPE'] ) && strpos( $_SERVER['CONTENT_TYPE'], 'application/x-www-form-urlencoded' ) !== false);
 
 					//self::log('$_SERVER : '. print_r($_SERVER,true));
 
 					self::log( 'X-HTTP-Method-Override : ' . $http_method_override_method );
-					if ( $is_emulate_json ) {
-						self::log( 'EMULATE JSON' );
-					}
 
 					if ( !empty( $http_method_override_method ) ) {
 
 						if ( $http_method_override_method == 'PUT' ) {
 
-							if ( $is_emulate_json ) {
-
-								$json = stripslashes( $_POST['model'] ); //TODO : this is maybe specific to backbone's "emulateJSON"
-								$new = json_decode( $json );
-
+							if ( $is_url_encoded ) {
+								
+								if ( isset( $_POST['model'] ) ) {
+									//Specific to backbone's "emulateJSON"
+									$json = stripslashes( $_POST['model'] );
+									$sent = json_decode( $json );
+								} else {
+									$sent = $_POST;
+								}
+								
 								self::log( 'PUT one (X-HTTP-Method-Override + emulateJSON) : ' . $id . ' - json :' . $json . ' - _POST : ' . print_r( $_POST, true ) );
 							} else {
 								$data = file_get_contents( "php://input" );

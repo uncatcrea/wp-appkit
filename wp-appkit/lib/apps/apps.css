@@ -1049,3 +1049,10 @@ a.list-group-item-danger.active:focus {
 .wpak_phonegap_export {
     float:right;
 }
+
+.wpak-error {
+    margin: 5px 0 15px;
+    border-left: 4px solid #dd3d36;
+    background: #fff;
+    padding: 1px 12px;
+}

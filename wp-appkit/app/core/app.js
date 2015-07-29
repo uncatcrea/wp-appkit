@@ -18,7 +18,7 @@ define(function (require) {
           Hooks               = require('core/lib/hooks'),
 		  Stats               = require('core/stats'),
 		  Addons              = require('core/addons-internal'),
-          Sha256              = require('core/lib/sha256');
+		  WsToken             = require('core/lib/encryption/token');
 
 	  var app = {};
 
@@ -29,18 +29,56 @@ define(function (require) {
 		  vent.on(event,callback);
 	  };
 
-	  //--------------------------------------------------------------------------
-	  //Error handling
+	//--------------------------------------------------------------------------
+	//Public event handling : errors and infos
 
-	  app.triggerError = function(error_id,error_data,error_callback){
-		  vent.trigger('error:'+ error_id,error_data);
-		  Utils.log('app.js error ('+ error_id +') : '+ error_data.message, error_data);
-		  if( error_callback != undefined ){
-			error_data = _.extend({event: 'error:'+ error_id}, error_data);
-	  		error_callback(error_data);
-	  	  }
-	  };
+	app.triggerError = function( error_id, error_data, error_callback ) {
+		vent.trigger( 'error:' + error_id, error_data );
+		Utils.log( 'App error event [' + error_id + ']' + (error_data.hasOwnProperty('message') ? ' ' + error_data.message : ''), error_data );
+		if ( error_callback != undefined ) {
+			error_data = _.extend( { event: 'error:' + error_id, id: error_id }, error_data );
+			error_callback( error_data );
+		}
+	};
 
+	/**
+	 * Triggers an info event. Use this to trigger your own App events from modules and addons.
+	 * 
+	 * @param {String} info event name
+	 * @param {JSON Object} data Data that is passed to event callback
+	 */
+	app.triggerInfo = function( info, info_data, info_callback ) {
+
+		switch ( info ) {
+			
+			case 'no-content':
+				vent.trigger( 'info:no-content' );
+				break;
+				
+			case 'app-launched':
+				var stats = Stats.getStats();
+				vent.trigger( 'info:app-ready', { stats: stats } );
+				if ( stats.count_open == 1 ) {
+					vent.trigger( 'info:app-first-launch', { stats: stats } );
+				}
+				if ( stats.version_diff.diff != 0 ) {
+					vent.trigger( 'info:app-version-changed', { stats: stats } );
+				}
+				break;
+				
+			default:
+				vent.trigger( 'info:' + info, info_data );
+				if ( info_callback != undefined ) {
+					info_data = _.extend( { event: 'info:' + info, id: info }, info_data );
+					info_callback( info_data );
+				}
+				break;
+				
+		}
+		
+		
+	};
+	
 	  //--------------------------------------------------------------------------
 	  //Custom pages and routes handling
 
@@ -430,37 +468,6 @@ define(function (require) {
 		return navigation_components;
 	};
 
-	  var getToken = function(web_service){
-		  var token = '';
-		  var key = '';
-
-		  if( Config.hasOwnProperty('auth_key') ){
-			  key = Config.auth_key;
-			  var app_slug = Config.app_slug;
-	    	  var date = new Date();
-	    	  var month = date.getUTCMonth() + 1;
-	    	  var day = date.getUTCDate();
-	    	  var year = date.getUTCFullYear();
-	    	  if( month < 10 ){
-	    		  month = '0'+ month;
-	    	  }
-	    	  if( day < 10 ){
-	    		  day = '0'+ day;
-	    	  }
-	    	  var date_str = year +'-'+ month +'-'+ day;
-	    	  var hash = Sha256(key + app_slug + date_str);
-	    	  token = window.btoa(hash);
-		  }
-
-		  token = Hooks.applyFilters('get-token',token,[key,web_service]);
-
-		  if( token.length ){
-			  token = '/'+ token;
-		  }
-
-    	  return token;
-	  };
-
 	  //--------------------------------------------------------------------------
 	  //App synchronization :
 	  
@@ -526,7 +533,7 @@ define(function (require) {
       };
 	  
 	  var syncWebService = function(cb_ok,cb_error,force_reload){
-			var token = getToken( 'synchronization' );
+			var token = WsToken.getWebServiceUrlToken( 'synchronization' );
 			var ws_url = token + '/synchronization/';
 
 			/**
@@ -686,7 +693,7 @@ define(function (require) {
 	  };
 
 	  app.getPostComments = function(post_id,cb_ok,cb_error){
-    	  var token = getToken('comments-post');
+    	  var token = WsToken.getWebServiceUrlToken('comments-post');
     	  var ws_url = token +'/comments-post/'+ post_id;
 
     	  var comments = new Comments.Comments;
@@ -776,7 +783,7 @@ define(function (require) {
 
 				if ( component_data.hasOwnProperty( 'ids' ) ) {
 
-					var token = getToken( 'component' );
+					var token = WsToken.getWebServiceUrlToken( 'component' );
 					var ws_url = token + '/component/' + component_id;
 
 					var last_item_id = _.last( component_data.ids );
@@ -1123,7 +1130,7 @@ define(function (require) {
 		//persistent defaults to false :
 		var persistent = options.hasOwnProperty('persistent') && options.persistent === true;
 		
-		var token = getToken( 'live-query' );
+		var token = WsToken.getWebServiceUrlToken( 'live-query' );
 		var ws_url = token + '/live-query';
 		
 		/**
@@ -1280,26 +1287,6 @@ define(function (require) {
 
 		$.ajax( ajax_args );
 	};
-
-      app.sendInfo = function(info, data){
-		  //Note : we want to control which info is sent by the app :
-		  //only known infos will be triggered as an event.
-		  switch( info ){
-			  case 'no-content':
-				  vent.trigger('info:no-content');
-				  break;
-			  case 'app-launched':
-				  var stats = Stats.getStats();
-				  vent.trigger('info:app-ready',{stats: stats});
-				  if( stats.count_open == 1 ){
-					  vent.trigger('info:app-first-launch',{stats: stats});
-				  }
-				  if( stats.version_diff.diff != 0 ){
-					  vent.trigger('info:app-version-changed',{stats: stats});
-				  }
-				  break;
-		  }
-      };
 
       app.getComponentData = function(component_id){
     	  var component_data = null;
