@@ -126,6 +126,8 @@ define(function (require) {
 	  //their value during a same app execution.
 	  //TODO : we should link (but not merge because they don't have the same usage)
 	  //those params to App options...
+	  // Beware when merging these because options are stored permanently while params are runtime-dependant (refreshed at each app launch)
+	  // Deep Link module especially is updating a param
 
 	  var params = {
 		  'refresh-at-app-launch' : true,
@@ -190,9 +192,21 @@ define(function (require) {
 	  app.launchRouting = function() {
 
 		var default_route = app.resetDefaultRoute(true);
+		var launch_route = default_route;
+		var deep_link_route = DeepLink.getLaunchRoute();
 
-		// Pass default_route to DeepLink module so that it can define the launch_route regarding the provided URL if any
-		var launch_route = DeepLink.getLaunchRoute( default_route );
+		if( deep_link_route.length > 0 ) {
+            launch_route = deep_link_route;
+
+            //
+            // Disable refresh at app launch because:
+            //  1. it will cause going to default route right after, so our launch route won't be useful
+            //  2. if we're here, it's because we're in launching process, after having retrieved some data
+            //  3. if we disable 'go-to-default-route-after-refresh', we'd have to enable it again after the next refresh
+            //
+
+            app.setParam( 'refresh-at-app-launch', false );
+		}
 
 		/**
 		 * Use the 'launch-route' filter to display a specific screen at app launch
