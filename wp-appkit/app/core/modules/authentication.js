@@ -1,5 +1,13 @@
 define( function( require ) {
 
+	/**
+	 * WP-AppKit Authentication Module
+	 * 
+	 * Handles user authentication using :
+	 * - RSA public key encryption for handshake and all sensible data exchanges,
+	 * - HMAC token controls based on user secret key to authenticate web services.
+	 */
+
 	"use strict";
 
 	var $ = require( 'jquery' );
@@ -324,6 +332,18 @@ define( function( require ) {
 		
 	};
 
+	/**
+	 * Generates authentication control data for any custom webservice action.
+	 * Use this to authenticate a webservice call.
+	 * It generates a control hash based on control_data/user/timestamp/user_secret_key that allows 
+	 * to check on server side that the query comes from the right user and has not been modified.
+	 * 
+	 * @param {string}         action             Webservice query action name 
+	 * @param {array}          control_data_keys  Ordered keys of the data you want to control (order is important for the hash control!)
+	 * @param {JSON Object}    control_data       Data you want to control.
+	 * @returns {JSON Object}  auth_data          Object containing the authentication data, that can be checked directly 
+	 *                                            with WpakRsaPublicPrivateAuth::check_authenticated_action() on server side
+	 */
 	authentication.getActionAuthData = function( action, control_data_keys, control_data ) {
 		var auth_data = null;
 		
@@ -340,9 +360,9 @@ define( function( require ) {
 	};
 
 	/** 
-	 * Get public data about the current user
+	 * Get public info about the current user
 	 * 
-	 * @param {String} field : to get a specific user data field (can be 'login', 'permissions')
+	 * @param {String} field  (Optional) to get a specific user data field (can be 'login', 'permissions')
 	 * @returns {JSON Object} :
 	 *			- login {String}
 	 *			- permissions {JSON Object} 
@@ -365,10 +385,25 @@ define( function( require ) {
 		return user;
 	};
 	
-	authentication.currentUserIsAuthenticated = function() {
+	/**
+	 * Check if a user is currently logged in.
+	 * Note : this only check if a user is locally logged in into the app :
+	 * does not make a remote check to see if his connection is still valid on server side :
+	 * use authentication.checkUserAuthenticationFromRemote() for that.
+	 * 
+	 * @returns {boolean} True if a user is logged in.
+	 */
+	authentication.userIsLoggedIn = function() {
 		return authenticationData.get( 'is_authenticated' );
 	};
 	
+	/**
+	 * Checks if the current user has the given capability.
+	 * Can be customized using the "current-user-can" filter (and "wpak_auth_user_permissions" filter on server side)
+	 * 
+	 * @param   {string}   capability    Capability we want to check
+	 * @returns {Boolean}  True if the user has the given capability in its permissions
+	 */
 	authentication.currentUserCan = function ( capability ) {
 		var user_can = false;
 		
@@ -397,6 +432,13 @@ define( function( require ) {
 		return user_can;
 	};
 	
+	/**
+	 * Checks if the current user has the given role.
+	 * Can be customized using the "current-user-role" filter (and "wpak_auth_user_permissions" filter on server side)
+	 * 
+	 * @param   {string}   role   Role we want to check
+	 * @returns {Boolean}  True if the user has the given role in its permissions
+	 */
 	authentication.currentUserRoleIs = function ( role ) {
 		var user_role_ok = false;
 		if ( authenticationData.get( 'is_authenticated' ) ) {
@@ -424,15 +466,27 @@ define( function( require ) {
 	};
 	
 	/**
-	 * If a user is logged in, checks if his connection is still valid by
-	 * rechecking public key and user secret from server.
-	 * If we reached the server and it answered connection not ok, 
-	 * calls logUserOut() to trigger logout events.
+	 * If a user is logged in, does a remote server check to see if his connection 
+	 * is still valid by verifying public key and user secret from server.
+	 * If we reached the server and it answered connection is not ok, 
+	 * automatically calls logUserOut() to trigger logout events.
 	 * 
-	 * @param {function} cb_auth_ok
-	 * @param {function} cb_auth_error
+	 * @param {function} cb_auth_ok     Called if the user is connected ok
+	 * @param {function} cb_auth_error  Called if the user is not connected
 	 */
 	authentication.checkUserAuthenticationFromRemote = function( cb_auth_ok, cb_auth_error ) {
+		
+		var cb_ok = function( data ) {
+			if ( cb_auth_ok !== undefined ) {
+				cb_auth_ok( data );
+			}
+		};
+
+		var cb_error = function( error ) {
+			if ( cb_auth_error !== undefined ) {
+				cb_auth_error( error );
+			}
+		};
 		
 		var user_authenticated = authenticationData.get( 'is_authenticated' );
 		if ( user_authenticated ) {
@@ -454,7 +508,7 @@ define( function( require ) {
 
 								//The user is connected ok.
 								//Nothing more to do, simply return.
-								cb_auth_ok( authentication.getCurrentUser() );
+								cb_ok( authentication.getCurrentUser() );
 
 							} else if ( data.hasOwnProperty( 'auth_error' ) ) {
 								switch( data.auth_error ) {
@@ -465,33 +519,44 @@ define( function( require ) {
 										authentication.logUserOut( 3 );
 										break;
 								}
-								cb_auth_error( data.auth_error );
+								cb_error( data.auth_error );
 							} else {
-								cb_auth_error( 'no-auth-error' );
+								cb_error( 'no-auth-error' );
 							}
 						} else {
-							cb_auth_error( 'wrong-answer-format' );
+							cb_error( 'wrong-answer-format' );
 						}
 					} else {
-						cb_auth_error( 'web-service-error : '+ data.result.message );
+						cb_error( 'web-service-error : '+ data.result.message );
 					}
 				}else {
-					cb_auth_error( 'wrong-result-data' );
+					cb_error( 'wrong-result-data' );
 				}
 			};
 			
 			var error = function( error_id ) {
-				cb_auth_error( error_id );
+				cb_error( error_id );
 			};
 			
 			ajaxQuery( web_service_params, success, error );
 			
 		} else {
-			cb_auth_error( 'no-user-logged-in' );
+			cb_error( 'no-user-logged-in' );
 		}
 		
 	};
 	
+	/**
+	 * Logs the given user in from given login/password.
+	 * Use this to log a user in from your theme.
+	 * 
+	 * Note : all sensible data (password) is encrypted with RSA public key encryption in the process.
+	 * 
+	 * @param {string}   login     User login
+	 * @param {string}   pass      User password 
+	 * @param {function} cb_ok     What to do if login went ok
+	 * @param {function} cb_error  What to do if login went wrong
+	 */
 	authentication.logUserIn = function( login, pass, cb_ok, cb_error ) {
 		getPublicKey( 
 			login, 
@@ -536,7 +601,7 @@ define( function( require ) {
 	 * Note : this does not call the server to warn it that the user has logged out.
 	 * 
 	 * @param {int} logout_type :
-	 * 1: (default) Normal logout triggered by the user in the app
+	 * 1: (default) Normal logout triggered by the user in the app : use this from theme.
 	 * 2: logout due to user connection expiration (because the server answered so)
 	 * 3: logout due to the server answering that the user is not authenticated at all on server side
 	 */

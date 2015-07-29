@@ -1,5 +1,11 @@
 define( function( require ) {
 
+	/**
+	 * WP-AppKit Comments Module
+	 * 
+	 * Allows authenticated users to post comments to server.
+	 */
+
 	"use strict";
 	
 	var $ = require( 'jquery' );
@@ -138,6 +144,21 @@ define( function( require ) {
 		ajaxQuery( comment, 'POST', success, error );
 	};
 	
+	/**
+	 * Post a comment to server.
+	 * Use this to submit a comment from your theme.
+	 * Note : 
+	 * - a user must be logged in to comment, this function will fail if no
+	 * user is logged in, calling the error callback.
+	 * - if the server answers that the given user's connection is not valid (expired for example),
+	 * loggout events are automatically triggered.
+	 * 
+	 * @param {JSON Object}  comment    Comment object : must contain at least the following fields : 
+	 *                                                   - "content" {string} The comment content
+	 *                                                   - "post"    {int}    ID of the post  we're commenting on
+	 * @param {function}     cb_ok      What to do if comment was posted ok.
+	 * @param {function}     cb_error   What to do if comment posting failed.
+	 */
 	comments.postComment = function( comment, cb_ok, cb_error ) {
 		
 		console.log( 'Posting comment', comment );

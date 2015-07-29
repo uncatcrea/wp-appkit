@@ -355,7 +355,8 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	}
 	
 	/**
-	 * Checks that control data sent is valid
+	 * Checks that control data sent is valid.
+	 * User authentication.getActionAuthData() on server side to generate $auth_data.
 	 * 
 	 * @param int $app_id App id
 	 * @param string $action Authentication action name
