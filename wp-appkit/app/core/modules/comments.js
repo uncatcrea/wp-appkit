@@ -77,7 +77,7 @@ define( function( require ) {
 			error( error_id, { jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } );
 		};
 		
-		console.log( 'Sending comment query', ajax_args );
+		Utils.log( 'Calling comments web service', web_service_params.comment );
 		
 		$.ajax( ajax_args );
 		
@@ -86,8 +86,10 @@ define( function( require ) {
 	var sendComment = function( comment, cb_ok, cb_error ) {
 		
 		if ( comment.hasOwnProperty( 'content' ) ) {
+			var original_content = comment.content;
 			//Base64 encode comment content to avoid special chars breaking web service :
-			comment['content'] = btoa( unescape( encodeURIComponent( comment['content'] ) ) );
+			//(this is not a security encoding here, just avoiding special chars problems!)
+			comment.content = btoa( unescape( encodeURIComponent( original_content ) ) );
 		} else {
 			cb_error( 'no-content' );
 			return;
@@ -97,6 +99,8 @@ define( function( require ) {
 			cb_error( 'no-comment-post' );
 			return;
 		}
+		
+		Utils.log( 'Sending comment on post '+ comment.post +' : ', original_content );
 		
 		var success = function( data ) {
 			//Ajax call went ok : see if comment submission was accepted on server side :
@@ -118,6 +122,8 @@ define( function( require ) {
 								comments: data.comments,
 								waiting_approval: data.waiting_approval
 							};
+							
+							Utils.log( 'Comment added successfully' + ( return_data.waiting_approval ? ', waiting for approval' : '' ), return_data );
 							
 							cb_ok( return_data );
 							
@@ -161,12 +167,9 @@ define( function( require ) {
 	 */
 	comments.postComment = function( comment, cb_ok, cb_error ) {
 		
-		console.log( 'Posting comment', comment );
-		
 		sendComment(
 			comment,
 			function( comment_data ) {
-				Utils.log( 'Comment added successfully' + ( comment_data.waiting_approval ? ', waiting for approval' : '' ), comment_data);
 				App.triggerInfo( 'comment:posted', comment_data, cb_ok );
 			},
 			function( error ) {
