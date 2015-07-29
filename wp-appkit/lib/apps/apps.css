@@ -1056,3 +1056,15 @@ a.list-group-item-danger.active:focus {
     background: #fff;
     padding: 1px 12px;
 }
+
+.wp-list-table tr.error td {
+    border-top: 1px solid #f00;
+    border-bottom: 1px solid #f00;
+    color:#f00;
+}
+.wp-list-table tr.error td:first-child {
+    border-left: 1px solid #f00;
+}
+.wp-list-table tr.error td:last-child {
+    border-right: 1px solid #f00;
+}

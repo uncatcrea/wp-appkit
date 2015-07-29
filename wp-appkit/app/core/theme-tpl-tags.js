@@ -53,7 +53,7 @@ define(function(require, exports) {
     themeTplTags.getPreviousScreen = function() {
         return App.getPreviousScreenData();
     };
-	
+
 	/**
 	 * Retrieves the name of the template used for the current screen.
 	 * @returns {String} Template name
@@ -201,7 +201,7 @@ define(function(require, exports) {
 	themeTplTags.getComponent = function(component_id) {
         return App.getComponentData(component_id);
     };
-	
+
 	themeTplTags.getComponentItems = function( component_id, return_format ) {
 		return_format = return_format === undefined ? 'view_items' : return_format;
 		var items = [];
@@ -245,29 +245,29 @@ define(function(require, exports) {
 	themeTplTags.getThemePath = function() {
 		return 'themes/'+ Config.theme;
 	};
-	
+
 	/**
-	 * This allows to add theme path and cache busting (and GET params that may be needed 
+	 * This allows to add theme path and cache busting (and GET params that may be needed
 	 * for app simulation in browser) to the given asset file url.
-	 * 
+	 *
 	 * For example, to include a CSS in the head.html template you can use one
 	 * of the following according to your needs :
 	 * - <%= TemplateTags.getThemePath() %>/css/my-styles.css
 	 * - <%= TemplateTags.getThemeAssetUrl('css/my-styles.css') %> : adds cache busting if in debug mode
 	 * - <%= TemplateTags.getThemeAssetUrl('css/my-styles.css', true) %> : to force cache busting in any case
-	 * 
+	 *
 	 * @param {string} theme_asset_url Asset file url RELATIVE to the theme directory
 	 * @param Optional {type} bust True to add a cache busting param to the url. Defaults to Config.debug_mode == 'on'.
 	 * @returns {String} modified theme asset url with cache busting
 	 */
 	themeTplTags.getThemeAssetUrl = function( theme_asset_url, bust ) {
-		
+
 		if( bust === undefined ) {
 			bust = Config.debug_mode == 'on';
 		}else{
 			bust = bust === true;
 		}
-		
+
 		//For app simulation in browser :
 		var query = window.location.search.substring(1);
 		if( query.length ){
@@ -277,14 +277,14 @@ define(function(require, exports) {
 			var query_value = query_key_value[1];
 			theme_asset_url = Utils.addParamToUrl(theme_asset_url, query_key, query_value);
 		}
-		
+
 		if( bust ) {
 			var time = new Date().getTime();
 			theme_asset_url = Utils.addParamToUrl(theme_asset_url, 'bust', time);
 		}
-		
+
 		theme_asset_url = themeTplTags.getThemePath() +'/'+ theme_asset_url;
-		
+
 		return theme_asset_url;
 	};
 
@@ -302,11 +302,11 @@ define(function(require, exports) {
 
 		return menu_items;
 	};
-	
+
 	/**********************************************
 	 * Addons
 	 */
-	
+
 	/**
 	 * Checks if an addon is active
 	 * @param string addon_slug
@@ -603,22 +603,6 @@ define(function(require, exports) {
         attributes = Hooks.applyFilters( 'post-data-attributes', attributes, [post_id] );
 
         return attributes.join( ' ' );
-    };
-
-    /**
-     * Return true or false whether the post is in the favorites list or not.
-     *
-     * @param   int     post_id     The post id.
-     * @return  bool    isFavorite  The HTML for the button.
-     */
-    themeTplTags.isFavorite = function( post_id ) {
-        var isFavorite = false;
-
-        if( undefined !== post_id ) {
-            isFavorite = undefined !== App.favorites.get( post_id );
-        }
-
-        return isFavorite;
     };
 
     /**

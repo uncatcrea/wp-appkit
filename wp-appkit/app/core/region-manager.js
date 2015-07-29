@@ -2,43 +2,43 @@ define(function (require) {
 
 	"use strict";
 
-	var $                   = require('jquery'), 
+	var $                   = require('jquery'),
 		_                   = require('underscore'),
 		Backbone            = require('backbone'),
 		App            		= require('core/app'),
 		Hooks               = require('core/lib/hooks'),
 		Utils               = require('core/app-utils');
-      
+
 	Backbone.View.prototype.close = function(){
-		
+
 		//We also have to remove Views Models and Collections events by hand + handle closing subviews :
 		// > use onClose for this.
 		if( this.onClose ){
 			this.onClose();
 		}
-		
+
 		this.unbind(); // this will unbind all listeners to events from this view. This is probably not necessary because this view will be garbage collected.
 		this.remove(); // uses the default Backbone.View.remove() method which removes this.el from the DOM and removes DOM events.
 	};
-	
+
 	var RegionManager = (function (Backbone, $, _) {
-	    
+
 		var headView = null;
-		
+
 		var layoutView = null;
 		var elLayout = "#app-layout";
-		
+
 		var headerView = null;
 		var elHeader = "#app-header";
-		
+
 		var currentView = null;
 	    var el = "#app-content-wrapper";
-	    
+
 	    var elMenu = "#app-menu";
-	    var menuView= null; 
-	    
+	    var menuView= null;
+
 	    var region = {};
-	    
+
 	    var vent = _.extend({}, Backbone.Events);
 	    region.on = function(event,callback){
 	    	vent.on(event,callback);
@@ -46,7 +46,7 @@ define(function (require) {
 	    region.off = function(event,callback){
 	    	vent.off(event,callback);
 	    };
-	 
+
 	    region.buildHead = function(cb){
 	    	if( headView === null ){
 	    		require(['core/views/head'],function(HeadView){
@@ -58,7 +58,7 @@ define(function (require) {
 	    		cb();
 	    	}
 	    };
-	    
+
 	    region.buildLayout = function(cb){
 	    	if( layoutView === null ){
 	    		require(['core/views/layout'],function(LayoutView){
@@ -70,7 +70,7 @@ define(function (require) {
 	    		cb();
 	    	}
 	    };
-	    
+
 	    region.buildHeader = function(cb){
 	    	if( layoutView.containsHeader() ){
 		    	if( headerView === null ){
@@ -97,30 +97,30 @@ define(function (require) {
 	    		cb();
 	    	}
 	    };
-	    
+
 	    region.buildMenu = function(cb,force_reload){
-	    	
+
 	    	force_reload = (force_reload!=undefined && force_reload);
-	    	
+
 	    	if( menuView === null || force_reload ){
 	    		require(['core/views/menu'],function(MenuView){
-	    			var menu_el = $(elMenu).length ? {el:elMenu} : {}; 
+	    			var menu_el = $(elMenu).length ? {el:elMenu} : {};
 		    		menuView = new MenuView(menu_el);
 	    			menuView.resetAll();
-					
+
 					var menu_items = [];
-					
+
 		    		App.navigation.each(function(element, index){
 		    			var component = App.components.get(element.get('component_id'));
 		    			if( component ){
 							menu_items.push({id:component.get('id'),label:component.get('label'),type:component.get('type'),link:'#component-'+ component.get('id'),options:element.get('options')});
 		    			}
 		   		  	});
-					
+
 					/**
 					 * Use this "menu-items" filter to add or remove menu items.
 					 * Menu item format :
-					 * { 
+					 * {
 					 *	 id:slug, //unique slug identifier for the menu item
 					 *	 label:label, //displayed menu item label
 					 *	 type:type, //page, posts-list, favorites etc or custom
@@ -129,12 +129,12 @@ define(function (require) {
 					 * }
 					 */
 					menu_items = Hooks.applyFilters('menu-items', menu_items, [App.navigation]);
-		    		
+
 					_.each(menu_items,function( menu_item ){
 						var options = menu_item.options ? menu_item.options : {};
 						menuView.addItem( menu_item.id, menu_item.type, menu_item.label, menu_item.link, options );
 					});
-					
+
 					showMenu(force_reload);
 		    		cb();
 	    		});
@@ -142,10 +142,10 @@ define(function (require) {
 	    		cb();
 	    	}
 	    };
-	    
+
 	    var showMenu = function(force_reload){
 	    	if( menuView ){
-	    		if( $(elMenu).length 
+	    		if( $(elMenu).length
 	    			&& (!$(elMenu).html().length || (force_reload!=undefined && force_reload) ) ){
 		    		menuView.render();
 		    		vent.trigger('menu:refresh',App.getCurrentScreenData(),menuView);
@@ -157,11 +157,11 @@ define(function (require) {
 	    		}
 	    	}
 	    };
-	    
+
 	    region.getMenuView = function(){
 	    	return menuView;
 	    };
-	    
+
 	    var renderSubRegions = function(){
 	    	if( headerView && headerView.templateExists() && layoutView.containsHeader() ){
 		    	headerView.render();
@@ -172,7 +172,7 @@ define(function (require) {
 			    vent.trigger('header:render',App.getCurrentScreenData(),headerView);
 	    	}
 	    };
-	    
+
 	    var closeView = function (view) {
 	        if( view ){
 	        	if( view.is_static ){
@@ -190,12 +190,12 @@ define(function (require) {
 	        	}
 	        }
 	    };
-	 
+
 	    var openView = function (view) {
 	    	var first_static_opening = false;
-	    	
+
 			var custom_rendering = App.getParam('custom-screen-rendering');
-			
+
 			if( !view.is_static || !$(view.el).html().length ){
 	    		if( view.is_static != undefined && view.is_static ){
 					first_static_opening = true;
@@ -207,7 +207,7 @@ define(function (require) {
 			} else {
 				Utils.log('Re-open existing static view',{view:view});
 			}
-				
+
 			var $el = $(el);
 
 			vent.trigger('screen:before-transition',App.getCurrentScreenData(),currentView,custom_rendering);
@@ -235,9 +235,9 @@ define(function (require) {
 				view.onShow();
 			}
 	    };
-	    
+
 	    var showView = function(view,force_no_waiting){
-	    	
+
 	    	var no_waiting = force_no_waiting != undefined && force_no_waiting == true;
 
 	    	if( !view.is_static || !$(view.el).html().length ){
@@ -245,32 +245,32 @@ define(function (require) {
 	    		if( !no_waiting ){
 	    			region.startWaiting();
 	    		}
-		    	
+
 				showSimple(view);
-				
+
 				if( !no_waiting ){
 					region.stopWaiting();
 				}
-		    	
+
 	    	}else{
 	    		showSimple(view);
 	    	}
 	    };
-	    
+
 	    var showSimple = function(view) {
-			
+
 	    	var custom_rendering = App.getParam('custom-screen-rendering');
-	    	
+
 	    	if( currentView ){
 				if( !custom_rendering ){ //Custom rendering must handle views closing by itself (on screen:leave)
 					closeView(currentView);
 				}
 	    	}
-	    	
+
 	    	currentView = view;
 		    openView(currentView);
 	    };
-		
+
 		var screen_static_views = { };
 
 		var getScreenId = function( screen ) {
@@ -285,7 +285,7 @@ define(function (require) {
 		var memorizeScreenStaticView = function( screen, view ) {
 			screen_static_views[getScreenId( screen )] = view;
 		};
-	    
+
 	    var switchScreen = function( view, force_flush, force_no_waiting ) {
 			var queried_screen = App.getQueriedScreen();
 			vent.trigger( 'screen:leave', App.getCurrentScreenData(), queried_screen, currentView );
@@ -297,14 +297,14 @@ define(function (require) {
 
 			showView( view, force_no_waiting );
 		};
-		
+
 		var createNewView = function( view_type, view_data, is_static, callback ) {
-			
+
 			var return_view = function( view ){
 				view.is_static = is_static;
 				callback( view );
 			};
-			
+
 			switch ( view_type ) {
 				case 'single':
 					require( [ "core/views/single" ], function( SingleView ) {
@@ -319,11 +319,6 @@ define(function (require) {
 				case 'posts-list':
 					require( [ "core/views/archive" ], function( ArchiveView ) {
 						return_view( new ArchiveView( view_data ) );
-					} );
-					break;
-				case 'favorites':
-					require( [ "core/views/favorites" ], function( FavoritesView ) {
-						return_view( new FavoritesView( view_data ) );
 					} );
 					break;
 				case 'hooks':
@@ -341,12 +336,20 @@ define(function (require) {
 						return_view( new CustomPageView( view_data ) );
 					} );
 					break;
-				//TODO : we could add a filter here to allow using a 
+				default:
+					var customView = Hooks.applyFilters( 'custom-view', "", [view_type] );
+					if( customView.length ) {
+						require( [ customView ], function( CustomViewObject ) {
+							return_view( new CustomViewObject( view_data ) );
+						});
+					}
+					break;
+				//TODO : we could add a filter here to allow using a
 				//customized not native view type created by an addon.
 			}
-			
+
 		};
-		
+
 		region.show = function( view_type, view_data, screen_data ) {
 			
 			App.setQueriedScreen( screen_data );
@@ -396,22 +399,22 @@ define(function (require) {
 				} );
 			}
 		}
-	    
+
 	    region.getCurrentView = function(){
 	    	return currentView;
 	    };
-	    
+
 	    region.startWaiting = function(){
 	    	vent.trigger('waiting:start',App.getCurrentScreenData(),currentView);
 	    };
-	    
+
 	    region.stopWaiting = function(){
 	    	vent.trigger('waiting:stop',App.getCurrentScreenData(),currentView);
 	    };
-	    
+
 	    return region;
-	    
+
 	})(Backbone, $, _);
-	
+
 	return RegionManager;
 });

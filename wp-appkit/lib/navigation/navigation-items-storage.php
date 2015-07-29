@@ -70,7 +70,9 @@ class WpakNavigationItemsStorage{
 			foreach($navigation_items as $nav_item_id => $nav_item){
 				if( WpakComponentsStorage::component_exists($post_id,$nav_item->component_id) ){
 					$component = WpakComponentsStorage::get_component($post_id,$nav_item->component_id);
-					$navigation_indexed_by_components[$component->slug] = $only_nav_items_options ? $nav_item->options : $nav_item;
+					if( WpakComponentsTypes::component_type_exists( $component->type ) ) {
+						$navigation_indexed_by_components[$component->slug] = $only_nav_items_options ? $nav_item->options : $nav_item;
+					}
 				}
 			}
 		}

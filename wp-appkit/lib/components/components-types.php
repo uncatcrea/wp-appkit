@@ -24,9 +24,9 @@ abstract class WpakComponentType {
 		$this->compute_data( $component, $component->options, $args );
 		return $this->data;
 	}
-	
+
 	/**
-	 * Retrieves a subset ($items_ids) of component items 
+	 * Retrieves a subset ($items_ids) of component items
 	 */
 	public function get_items( WpakComponent $component, $items_ids, $args = array() ) {
 		$items_by_global = array();
@@ -73,7 +73,7 @@ class WpakComponentsTypes {
 		}
 		return $data;
 	}
-	
+
 	public static function get_component_items( WpakComponent $component, $items_ids, $args = array() ) {
 		$items = null;
 		if ( self::component_type_exists( $component->type ) ) {
@@ -145,4 +145,3 @@ class WpakComponentsTypes {
 require_once(dirname( __FILE__ ) . '/components-types/posts-list.php');
 require_once(dirname( __FILE__ ) . '/components-types/page.php');
 require_once(dirname( __FILE__ ) . '/components-types/hooks.php');
-require_once(dirname( __FILE__ ) . '/components-types/favorites.php');

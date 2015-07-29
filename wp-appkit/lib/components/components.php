@@ -17,13 +17,24 @@ class WpakComponents {
 		$components_data = array();
 
 		WpakAddons::require_app_addons_php_files( $app_id );
-		
+
 		$components_raw = WpakComponentsStorage::get_components( $app_id );
 
 		if ( !empty( $components_raw ) ) {
 			$globals = array();
 			foreach ( $components_raw as $component ) {
 				$component_data = WpakComponentsTypes::get_component_data( $component, $globals );
+
+				//
+				// Don't include null component into the webservice's return
+				// Component data could be null if an addon's component has been added to the app and the addon isn't activated anymore
+				// An addon could be seen as deactivated either if the corresponding plugin is deactivated, or if the corresponding checkbox is unchecked for the given app
+				//
+
+				if( null === $component_data ) {
+					continue;
+				}
+
 				$globals = $component_data['globals'];
 				$components[$component->slug] = $component_data['specific'];
 			}
@@ -31,11 +42,11 @@ class WpakComponents {
 			$navigation_items = WpakNavigationItemsStorage::get_navigation_indexed_by_components_slugs( $app_id, true );
 
 			$navigation_items = apply_filters( 'wpak_navigation_items', $navigation_items, WpakApps::get_app_slug( $app_id ) );
-			
+
 			$components_data['navigation'] = $navigation_items;
 			$components_data['components'] = $components;
 			$components_data['globals'] = $globals;
-			
+
 			$components_data['addons'] = WpakAddons::get_app_addons_dynamic_data( $app_id );
 		}
 
@@ -54,10 +65,10 @@ class WpakComponents {
 
 		return $component_data;
 	}
-	
+
 	public static function get_component_items( $app_id, $component_slug, $items_ids, $args = array() ) {
 		$component_items = array();
-		
+
 		if ( WpakComponentsStorage::component_exists( $app_id, $component_slug ) ) {
 			$component = WpakComponentsStorage::get_component( $app_id, $component_slug );
 			$component_items_by_global = WpakComponentsTypes::get_component_items( $component, $items_ids, $args );
@@ -67,7 +78,7 @@ class WpakComponents {
 				}
 			}
 		}
-		
+
 		return $component_items;
 	}
 
@@ -75,7 +86,7 @@ class WpakComponents {
 	 * Adds custom mobile image sizes only if activated via hook
 	 */
 	public static function handle_images_sizes() {
-		
+
 		//Handle specific mobile images sizes :
 		$mobile_images_sizes_default = array(
 			//Example : array( 'name' => 'mobile-featured-thumb', 'width' => 327, 'height' => 218 )
