@@ -195,20 +195,21 @@ define( function( require ) {
 			error( error_id, { jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } );
 		};
 		
-		console.log( 'Sending auth query', ajax_args );
+		Utils.log( 
+			'Sending authentication query', 
+			( web_service_params.hasOwnProperty( 'auth_action' ) ? '"' + web_service_params.auth_action + '"' : '' ),
+			( web_service_params.hasOwnProperty( 'user' ) ? 'for user ' + web_service_params.user : '' ) 
+		);
 		
 		$.ajax( ajax_args );
 	};
 
 	var getPublicKey = function( user, cb_ok, cb_error ) {
 
-		console.log( 'Get public key for', user );
-
 		var web_service_params = getAuthWebServicesParams( 'get_public_key', user, false );
 
 		//Retrieve app's public key from server :
 		var success = function( data ) {
-			console.log( 'Public key returned', data );
 			if ( data.hasOwnProperty( 'result' ) && data.result.hasOwnProperty( 'status' ) ) {
 				if ( data.result.status == 1 ) {
 					if ( data.public_key && data.public_key.length && data.control ) {
@@ -218,6 +219,8 @@ define( function( require ) {
 							//Set public key to Local Storage :
 							authenticationData.set( 'public_key', data.public_key );
 							authenticationData.save();
+							
+							Utils.log( 'Public key retrieved successfully' );
 
 							cb_ok( data.public_key );
 						} else {
@@ -247,8 +250,6 @@ define( function( require ) {
 	
 	var sendAuthData = function( user, pass, cb_ok, cb_error ) {
 		
-		console.log( 'Send auth data' );
-		
 		//Get public key from Local Storage :
 		var public_key = authenticationData.get( 'public_key' );
 		if ( public_key.length ) {
@@ -271,7 +272,6 @@ define( function( require ) {
 			var web_service_params = getAuthWebServicesParams( 'connect_user', user, true, ['encrypted'], { encrypted: encrypted } );
 			
 			var success = function( data ) {
-				console.log( 'Authentication result', data );
 				if ( data.hasOwnProperty( 'result' ) && data.result.hasOwnProperty( 'status' ) && data.result.hasOwnProperty( 'message' ) ) {
 					if ( data.result.status == 1 ) {
 						if ( data.hasOwnProperty( 'authenticated' ) ) {
@@ -292,6 +292,8 @@ define( function( require ) {
 
 											//Save all this to local storage
 											authenticationData.save();
+											
+											Utils.log( 'User "' + user + '" logged in successfully', authentication.getCurrentUser() );
 
 											cb_ok( { user: user, permissions: data.permissions } );
 
@@ -477,12 +479,28 @@ define( function( require ) {
 	authentication.checkUserAuthenticationFromRemote = function( cb_auth_ok, cb_auth_error ) {
 		
 		var cb_ok = function( data ) {
+			
+			var user = authentication.getCurrentUser();
+			Utils.log( 'User authentication remote check ok : user "'+ user.login +'" connected', user );
+			
 			if ( cb_auth_ok !== undefined ) {
 				cb_auth_ok( data );
 			}
 		};
 
 		var cb_error = function( error ) {
+			
+			var message = '';
+			switch ( error ) {
+				case 'user-connection-expired':
+					message += 'user connection expired : user logged out';
+					break;
+				default:
+					message += 'user not connected (' + error + ')';
+					break;
+			}
+			Utils.log( 'User authentication remote check : '+ message);
+			
 			if ( cb_auth_error !== undefined ) {
 				cb_auth_error( error );
 			}
@@ -565,7 +583,6 @@ define( function( require ) {
 					login, 
 					pass,
 					function( auth_data ) {
-						console.log( 'User authentication OK', auth_data );
 						auth_data.type = 'authentication-info'; //So that theme info event subtype is set
 						App.triggerInfo( 'auth:user-login', auth_data, cb_ok );
 					},
@@ -607,6 +624,10 @@ define( function( require ) {
 	 */
 	authentication.logUserOut = function( logout_type ) {
 		
+		if ( !authenticationData.get( 'is_authenticated' ) ) {
+			return;
+		}
+		
 		logout_type = ( logout_type === undefined ) ? 1 : logout_type;
 		
 		var logout_info_type = '';
@@ -632,6 +653,8 @@ define( function( require ) {
 			logout_type: logout_info_type
 		};
 		
+		var user_memory = authenticationData.get( 'user_login' );
+		
 		authenticationData.set( 'user_login', '' );
 		authenticationData.set( 'public_key', '' );
 		authenticationData.set( 'secret', '' );
@@ -640,8 +663,19 @@ define( function( require ) {
 		authenticationData.save();
 		
 		App.triggerInfo( 'auth:user-logout', logout_info );
-		console.log('Current user', authenticationData);
+		
+		Utils.log( 'User "' + user_memory + '" logged out' );
 	};
+	
+	//Display user auth info when the module is loaded, if debug mode activated :
+	var log_message = 'User authentication : ';
+	if ( authenticationData.get( 'is_authenticated' ) ) {
+		log_message += ( 'user "'+ authenticationData.get( 'user_login' ) + '" logged in' );
+		Utils.log( log_message, authentication.getCurrentUser() );
+	} else {
+		log_message += 'no user logged in'
+		Utils.log( log_message );
+	}
 
 	return authentication;
 } );
