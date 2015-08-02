@@ -82,24 +82,6 @@ class WpakComponentsUtils {
 
 		$content = get_the_content();
 
-		$replacement_image = self::get_unavailable_media_img();
-
-		//Convert dailymotion video
-		$content = preg_replace( '/\[dailymotion\](.*?)(\[\/dailymotion\])/is', $replacement_image, $content );
-
-		//Youtube :
-		$content = preg_replace( '/<a[^>]*href="[^"]*youtube.com.*?".*?>.*?(<\/a>)/is', $replacement_image, $content );
-		$content = preg_replace( '/\[youtube\](.*?)(\[\/youtube\])/is', $replacement_image, $content );
-		
-		//Mp3 :
-		$content = preg_replace( '/<a[^>]*href="[^"]*(\.mp3).*?".*?>.*?(<\/a>)/is', $replacement_image, $content );
-		
-		//Delete [embed]
-		$content = preg_replace( '/\[embed .*?\](.*?)(\[\/embed\\])/is', $replacement_image, $content );
-
-		//Replace iframes (slideshare etc...) by default image :
-		$content = preg_replace( '/<iframe([^>]*?)>.*?(<\/iframe>)/is', $replacement_image, $content );
-
 		//Apply "the_content" filter : formats shortcodes etc... :
 		$content = apply_filters( 'the_content', $content );
 		$content = str_replace( ']]>', ']]&gt;', $content );
@@ -142,31 +124,6 @@ class WpakComponentsUtils {
 		 * @param WP_Post 	$post 			The post object.
 		 */
 		return apply_filters( 'wpak_post_excerpt', $post_excerpt, $post );
-	}
-
-	public static function get_unavailable_media_img() {
-
-		$upload_dir = wp_upload_dir();
-		if ( !empty( $upload_dir['error'] ) ) {
-			return '';
-		}
-
-		$params = array(
-			'src' => $upload_dir['baseurl'] . '/wpak_unavailable_media.png',
-			'width' => 604,
-			'height' => 332
-		);
-
-		/**
-		 * Filter parameters of the default image showed when a media is unavailable.
-		 *
-		 * @param array 	$params   The default parameters.
-		 */
-		$params = apply_filters( 'wpak_unavailable_media_img', $params );
-
-		$img = '<img class="unavailable" alt="' . __( 'Unavailable content', WpAppKit::i18n_domain ) . '" src="' . $params['src'] . '" width="' . $params['width'] . '" height="' . $params['height'] . '" />';
-
-		return $img;
 	}
 
 	/**
