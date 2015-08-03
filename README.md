@@ -5,9 +5,10 @@ Create mobile apps and connect them to WordPress.
 > All versions under 1.0 are beta versions
 
 ## News
-* 06/09/2015: Version 0.3.1: fixes a serious bug where PhoneGap Build export doesn't work with 5.2.8 and above 
-* 05/04/2015: Version 0.3: discover its totally new revamped UI!
-* To know about changes in this version, read the [changelog](https://github.com/uncatcrea/wp-app-kit/blob/master/CHANGELOG.md)
+* 08/03/2015: Version 0.4.
+* This version adds the long awaited **login feature** (meaning that you can now support a WordPress secured authentication in your apps)
+* You can also now use **WP CLI** to export your app's project
+* There's many other changes and fixes, check the [changelog](https://github.com/uncatcrea/wp-app-kit/blob/master/CHANGELOG.md)
 
 ## What Is WP-AppKit?
 It's a WordPress plugin which provides:
