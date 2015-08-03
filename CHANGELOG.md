@@ -1,3 +1,26 @@
+## 0.4 (2015-08-03)
+
+### Features:
+
+- **Create a new template tag to retrieve a component's items** ([#104](https://github.com/uncatcrea/wp-appkit/issues/104), [@mleroi](https://github.com/mleroi))
+- **Add new filter "redirect" to allow to force redirection to a different screen than the queried one** ([#103](https://github.com/uncatcrea/wp-appkit/issues/103), [@mleroi](https://github.com/mleroi))
+- **Allow users to comment securely from apps** ([#102](https://github.com/uncatcrea/wp-appkit/issues/102), [@mleroi](https://github.com/mleroi))
+- **User login : allow users to authenticate securely from apps** ([#101](https://github.com/uncatcrea/wp-appkit/issues/101), [@mleroi](https://github.com/mleroi))
+- **Extract favorites feature from core** ([#100](https://github.com/uncatcrea/wp-appkit/issues/100), [@mleroi](https://github.com/mleroi))
+- **WP CLI command to export WP-AppKit apps** ([#87](https://github.com/uncatcrea/wp-appkit/issues/87), [@mleroi](https://github.com/mleroi))
+- **"Live query" web service** ([#86](https://github.com/uncatcrea/wp-appkit/issues/86), [@mleroi](https://github.com/mleroi))
+- **Add an easier way (template tag?) to retrieve the template used for the current page** ([#84](https://github.com/uncatcrea/wp-appkit/issues/84), [@mleroi](https://github.com/mleroi))
+- **Remove unused code following the Zip export history simplification in 0.3** ([#71](https://github.com/uncatcrea/wp-appkit/issues/71), [@mleroi](https://github.com/mleroi))
+- **"Post list" component : don't force to choose a taxonomy term** ([#50](https://github.com/uncatcrea/wp-appkit/issues/50), [@mleroi](https://github.com/mleroi))
+
+### Bugfixes:
+- **Collections items not removed from local storage when the collection is empty in webservice** ([#91](https://github.com/uncatcrea/wp-appkit/issues/91), [@mleroi](https://github.com/mleroi))
+- **Themes' readme files not supported if filename upper case** ([#85](https://github.com/uncatcrea/wp-appkit/issues/85), [@mleroi](https://github.com/mleroi))
+- **Plugins field doesn't allow "source" parameter** ([#82](https://github.com/uncatcrea/wp-appkit/issues/82), [@lpointet](https://github.com/lpointet))
+- **Setup appearance and navigation checkbox wrongly checked** ([#81](https://github.com/uncatcrea/wp-appkit/issues/81), [@lpointet](https://github.com/lpointet))
+- **wpak_unavailable_media.png appears unexpectedly in a single post** ([#27](https://github.com/uncatcrea/wp-appkit/issues/27), [@mleroi](https://github.com/mleroi))
+- **PhoneGap plugins duplicates in config.xml ** ([#24](https://github.com/uncatcrea/wp-appkit/issues/24), [@mleroi](https://github.com/mleroi))
+
 ## 0.3.1 (2015-06-09)
 
 ### Bugfixes:
