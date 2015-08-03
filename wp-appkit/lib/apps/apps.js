@@ -60,7 +60,7 @@ jQuery().ready(function(){
 
     var wizard_navigation_observer = {
         update: function() {
-            var uncheck = $( '#navigation-items-table tr > td' ).length == 0 || app_title.val().length == 0;
+            var uncheck = $( '#navigation-items-table .navigation-item' ).length == 0 || app_title.val().length == 0;
 
             wizard_update.apply( wizard_navigation, [uncheck] );
         }

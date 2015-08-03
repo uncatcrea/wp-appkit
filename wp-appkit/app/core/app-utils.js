@@ -23,6 +23,34 @@ define( function( require ) {
 		}
 		return new_url;
 	};
+	
+	utils.getAjaxErrorType = function( jqXHR, textStatus, errorThrown ) {
+		var error_type = 'unknown-error';
+		
+		textStatus = ( textStatus !== null ) ? textStatus : 'unknown';
+		
+		switch( jqXHR.status ) {
+			case 404:
+				if ( textStatus == 'error' ) {
+					error_type = 'url-not-found';
+				} else {
+					error_type = '404:' + textStatus; 
+				}
+				break;
+			case 200:
+				if ( textStatus == 'parsererror' ) {
+					error_type = 'parse-error-in-json-answer';
+				} else {
+					error_type = '200:' + textStatus;
+				}
+				break;
+			default:
+				error_type = jqXHR.status + ':' + textStatus;
+				break;
+		}
+		
+		return error_type;
+	};
 
 	return utils;
 } );

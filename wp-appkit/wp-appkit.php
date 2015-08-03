@@ -3,14 +3,14 @@
 /*
   Plugin Name: WP AppKit
   Description: Build Phonegap Mobile apps based on your WordPress content
-  Version: 0.3.1
+  Version: 0.4
  */
 
 if ( !class_exists( 'WpAppKit' ) ) {
 
 	class WpAppKit {
 
-		const resources_version = '0.3.1';
+		const resources_version = '0.4';
 		const i18n_domain = 'wp-appkit';
 
 		public static function hooks() {
@@ -27,6 +27,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 
 		protected static function lib_require() {
 			require_once(dirname( __FILE__ ) . '/lib/addons/addons.php');
+			require_once(dirname( __FILE__ ) . '/lib/user-permissions/user-login.php');
 			require_once(dirname( __FILE__ ) . '/lib/web-services/web-services.php');
 			require_once(dirname( __FILE__ ) . '/lib/apps/apps.php');
 			require_once(dirname( __FILE__ ) . '/lib/apps/build.php');
@@ -96,4 +97,11 @@ if ( !class_exists( 'WpAppKit' ) ) {
 	}
 
 	WpAppKit::hooks();
+
+	/**
+	 * WP AppKit WP CLI commands :
+	 */
+	if ( defined('WP_CLI') && WP_CLI ) {
+		require_once( dirname( __FILE__ ) .'/wp-cli-commands/wpak-commands.php' );
+	}
 }

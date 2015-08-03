@@ -36,7 +36,7 @@ define( function( require, exports ) {
 	themeApp.trigger = function( event, data ) {
 		vent.trigger( event, data );
 	};
-	
+
 	/**
 	 * Aggregate App and RegionManager events
 	 */
@@ -68,13 +68,27 @@ define( function( require, exports ) {
 
 		var theme_event_data = format_theme_event_data( event, data );
 
-		if ( theme_event_data.type == 'error'
-				|| theme_event_data.type == 'info'
-				|| theme_event_data.type == 'network'
+		/**
+		 * "stop-theme-event" filter : use this filter to avoid an event from triggering in the theme.
+		 * Useful to deactivate some error events display for exemple.
+		 * 
+		 * @param {boolean} Whether to stop the event or not. Default false.
+		 * @param {JSON Object} theme_event_data : Theme event data object
+		 * @param {String} event : Original (internal) event name
+		 */
+		var stop_theme_event = Hooks.applyFilters( 'stop-theme-event', false, [theme_event_data, event] );
+		
+		if ( !stop_theme_event ) {
+			
+			if ( theme_event_data.type == 'error'
+				 || theme_event_data.type == 'info'
+				 || theme_event_data.type == 'network'
 				) {
-			//2 ways of binding to error and info events :
-			vent.trigger( event, theme_event_data ); //Ex: bind directly to 'info:no-content'
-			vent.trigger( theme_event_data.type, theme_event_data ); //Ex: bind to general 'info', then filter with if( info.event == 'no-content' )
+				//2 ways of binding to error and info events :
+				vent.trigger( event, theme_event_data ); //Ex: bind directly to 'info:no-content'
+				vent.trigger( theme_event_data.type, theme_event_data ); //Ex: bind to general 'info', then filter with if( info.event == 'no-content' )
+			}
+			
 		}
 
 	} );
@@ -97,8 +111,14 @@ define( function( require, exports ) {
 	 * }
 	 */
 	var format_theme_event_data = function( event, data ) {
-
-		var theme_event_data = { event: event, type: '', message: '', data: data };
+		
+		var theme_event_data = { 
+			event: event, 
+			type: '',
+			subtype: data !== undefined && data.hasOwnProperty( 'type' ) ? data.type : '',
+			message: '', 
+			data: data 
+		};
 
 		if ( event.indexOf( 'error:' ) === 0 ) {
 
@@ -133,7 +153,16 @@ define( function( require, exports ) {
 			}
 
 		}
-
+		
+		/**
+		 * "theme-event-message" filter : use this hook to customize event messages
+		 * 
+		 * @param {String} Event message to customize
+		 * @param {JSON Object} theme_event_data : Theme event data object
+		 * @param {String} event : Original (internal) event name
+		 */
+		theme_event_data.message = Hooks.applyFilters( 'theme-event-message', theme_event_data.message, [theme_event_data, event] );
+		
 		return theme_event_data;
 	};
 
@@ -273,6 +302,27 @@ define( function( require, exports ) {
 		App.router.default_route();
 	};
 
+	/**
+	 * Reload current screen : re-trigger current route.
+	 */
+	themeApp.reloadCurrentScreen = function() {
+		//Directly navigate to current fragment doesn't work (Backbone sees that
+		//it is the same and doesn't re-trigger it!) : we have to navigate to a
+		//false dummy route (without triggering the navigation, so it is invisible)
+		//and then renavigate to original current route :
+		var current_fragment = Backbone.history.getFragment();
+		App.router.navigate( 'WpakDummyRoute' ); //Route that does not exist
+		App.router.navigate( current_fragment, { trigger: true } );
+	};
+
+	/**
+	 * Re-render current view WITHOUT re-triggering any route.
+	 */
+	themeApp.rerenderCurrentScreen = function() {
+		var current_view = RegionManager.getCurrentView();
+		current_view.render();
+	};
+
 	/************************************************
 	 * Back button
 	 */
@@ -348,6 +398,7 @@ define( function( require, exports ) {
 		var get_more_link_data = { display: false, nb_left: 0 };
 
 		var current_screen = App.getCurrentScreenData();
+
 		if ( current_screen.screen_type == 'list' ) {
 			var component = App.components.get( current_screen.component_id );
 			if ( component ) {
@@ -359,6 +410,8 @@ define( function( require, exports ) {
 				}
 			}
 		}
+
+		get_more_link_data = Hooks.applyFilters( 'get-more-link-display', get_more_link_data, [ current_screen ] );
 
 		return get_more_link_data;
 	};
@@ -375,6 +428,129 @@ define( function( require, exports ) {
 						do_after( is_last, new_items, data.nb_left );
 					}
 			);
+		} else {
+			Hooks.doActions( 'get-more-component-items', [ current_screen, do_after ] );
+		}
+	};
+
+	/************************************************
+	 * "Live Query" Web Service
+	 */
+
+	/**
+	 * Call live query web service
+	 *
+	 * @param JSON Object web_service_params Any params that you want to send to the server.
+	 *        The following params are automatically recognised and interpreted on server side :
+	 *        - wpak_component_slug : { string | Array of string } components to make query on
+	 *        - wpak_query_action : { string } 'get-component' to retrieve the full component, or 'get-items' to retrieve choosen component items
+	 *        - wpak_items_ids : { int | array of int } If wpak_query_action = 'get-items' : component items ids to retrieve
+	 * @param options JSON Object : allowed settings :
+	 * - success Function Callback called on success
+	 * - error Function Callback called on error
+	 * - auto_interpret_result Boolean (default true). If false, web service answer must be interpreted in the cb_ok callback.
+	 * - type String : can be one of :
+	 *       -- "update" : merge new with existing component data,
+	 *       -- "replace" : delete current component data and replace with new
+	 *       -- "replace-keep-global-items" (default) : for list components : replace component ids and merge global items
+	 * - persistent Boolean (default false). If true, new data is stored in local storage.
+	 */
+	themeApp.liveQuery = function( web_service_params, options ){
+
+		var cb_ok = null;
+		if( options.success ) {
+			cb_ok = options.success;
+			delete options.success;
+		}
+
+		var cb_error = null;
+		if( options.error ) {
+			cb_error = options.error;
+			delete options.error;
+		}
+
+		App.liveQuery( web_service_params, cb_ok, cb_error, options );
+
+	};
+
+	/**
+	 * Refresh component items from server.
+	 *
+	 * @param {int} component_id
+	 * @param {int | array of int} items_ids. If none provided, will refresh all component items.
+	 * @param {JSON Object} options :
+	 *	- success {callback}
+	 *	- error {callback}
+	 *	- autoformat_answer {boolean} If true (default), the answer returned to the success
+	 *	  callback is automatically formated to return significant data. If false, the full
+	 *	  liveQuery answer is returned no matter what.
+	 */
+	themeApp.refreshComponentItems = function ( component_id, items_ids, options ) {
+		var existing_component = App.components.get( component_id );
+    	if( existing_component ) {
+
+			//If no item id provided, refresh all component items :
+			if ( items_ids === undefined || items_ids === '' || items_ids === 0 || ( _.isArray( items_ids ) && items_ids.length === 0 ) ) {
+				var component_data = existing_component.get('data');
+				if ( component_data && component_data.ids ) {
+					items_ids = component_data.ids;
+				} else {
+					items_ids = null;
+				}
+			}
+
+			if ( items_ids !== null ) {
+
+				themeApp.liveQuery(
+					{
+						wpak_component_slug : component_id,
+						wpak_query_action : 'get-items',
+						wpak_items_ids : items_ids
+					},
+					{	//Those are default liveQuery options values, but we set
+						//them explicitly for more clarity :
+						type : 'update',
+						auto_interpret_result : true,
+						persistent : false,
+
+						//Callbacks :
+						success : function ( answer ) {
+							if ( options !== undefined && options.success ) {
+								//If no globals in answer, return full answer
+								var refreshed_items = answer;
+
+								if ( !options.hasOwnProperty( 'autoformat_answer' ) || options.autoformat_answer === true ) {
+									if ( answer.globals ) {
+										//If globals in answer, return items indexed on globals :
+										refreshed_items = answer.globals;
+										var globals = [];
+										_.each( answer.globals, function ( items, global ) {
+											globals.push( global );
+										} );
+										if ( globals.length === 1 ) {
+											//If only one global returned, return directly the corresponding items
+											if ( _.isArray( items_ids ) ) {
+												refreshed_items = answer.globals[globals[0]];
+											} else {
+												//If only one item asked, return only this item :
+												refreshed_items = _.first( _.toArray( answer.globals[globals[0]] ) );
+											}
+										}
+									}
+								}
+
+								options.success( refreshed_items );
+							}
+						},
+						error : function ( answer_error ) {
+							if ( options !== undefined && options.error ) {
+								options.error( answer_error );
+							}
+						}
+					}
+				);
+
+			}
 		}
 	};
 
@@ -503,7 +679,7 @@ define( function( require, exports ) {
 		}
 		App.showCustomPage( template, data, id );
 	};
-	
+
 	themeApp.addCustomRoute = function( fragment, template, data ) {
 		fragment = fragment.replace('#','');
 		if ( template === undefined ) {
@@ -514,67 +690,11 @@ define( function( require, exports ) {
 		}
 		App.addCustomRoute( fragment, template, data );
 	};
-	
+
 	themeApp.removeCustomRoute = function( fragment ) {
 		fragment = fragment.replace('#','');
 		App.removeCustomRoute( fragment );
 	};
-
-	/**
-	 * Add a post to the favorites list.
-	 * Refresh the current view in order to reflect this addition (the link/button should be updated).
-	 *
-	 * @param 	int 	 	id 				The post id.
-	 * @param 	callable 	callback 		The callback to call after favorite has been added.
-	 * @param 	string 		default_global 	The default value to use as global key for this post id.
-	 */
-	themeApp.addToFavorites = function( id, callback, default_global ) {
-		var item_global = App.getPostGlobal( id, default_global );
-		var item = App.getGlobalItem( item_global, id );
-		var saved = false;
-
-		if( null !== item ) {
-			App.favorites.add( _.extend( { global: item_global }, item ) );
-			App.favorites.saveAll();
-			saved = true;
-		}
-
-		if( undefined !== callback ) {
-			callback( saved, id );
-		}
-	};
-
-	/**
-	 * Remove a post from the favorites list.
-	 * Refresh the current view in order to reflect this removal (the link/button should be updated).
-	 *
-	 * @param 	int 	id 				The post id.
-	 */
-	themeApp.removeFromFavorites = function( id, callback ) {
-		var item = App.getGlobalItem( App.getPostGlobal( id ), id );
-		var saved = false;
-
-		if( null !== item ) {
-			App.favorites.remove( item );
-			App.favorites.saveAll();
-			saved = true;
-		}
-
-		if( undefined !== callback ) {
-			callback( saved, id );
-		}
-	};
-
-    /**
-     * Reset the list of favorites.
-     */
-    themeApp.resetFavorites = function( callback ) {
-    	App.favorites.resetAll();
-
-    	if( undefined !== callback ) {
-    		callback();
-    	}
-    };
 
 	/**************************************************
 	 * Retrieve internal app data that can be useful in themes
@@ -582,11 +702,11 @@ define( function( require, exports ) {
 
 	themeApp.getGlobalItems = function( global_key, items_ids, result_type ) {
 		var items = null;
-		
+
 		if( result_type === undefined ) {
 			result_type = 'slice';
 		}
-		
+
 		switch( result_type ) {
 			case 'slice' :
 				items = App.getGlobalItemsSlice( global_key, items_ids );
@@ -595,10 +715,10 @@ define( function( require, exports ) {
 				items = App.getGlobalItems( global_key, items_ids );
 				break;
 		}
-		
+
 		return items;
 	};
-	
+
 	//Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
 	//a circular dependency for requirejs) can both be required at the same time
 	//(in theme functions.js for example) :

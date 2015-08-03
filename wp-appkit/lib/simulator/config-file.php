@@ -123,7 +123,7 @@ define( function ( require ) {
 		return !$echo ? $content : '';
 	}
 
-	public static function get_config_xml( $app_id, $echo = false ) {
+	public static function get_config_xml( $app_id, $echo = false, $export_type = '' ) {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		$app_name = $app_main_infos['name'];
@@ -138,6 +138,27 @@ define( function ( require ) {
 		$app_platform = $app_main_infos['platform'];
 		$app_icons = $app_main_infos['icons'];
 
+		$access = array();
+		if ( $export_type == 'phonegap-cli' ) {
+			$access[] = array( 
+				'origin' =>  '*',
+				'subdomains' => ''
+			);
+		}
+		
+		/**
+		 * Filter : allows to modify config.xml <access> element
+		 *
+		 * @param array  	array		array of <access> elements 
+		 *                              Each <access> element is an array with the following attributes :
+		 *								- 'origin' string The domain of where the resource lives
+		 *								- 'subdomains' bool Whether to allow subdomains on the 
+		 *								  host specified in the origin parameter. Pass an empty
+		 *								  string to ignore this optional attribute.
+		 * @param int		$app_id		Application id
+		 */
+		$access = apply_filters( 'wpak_config_xml_access', $access, $app_id );
+		
 		//Merge our default Phonegap Build plugins to those set in BO :
 		$app_phonegap_plugins = WpakApps::get_merged_phonegap_plugins_xml($app_id, $app_main_infos['phonegap_plugins']);
 
@@ -167,6 +188,22 @@ define( function ( require ) {
 <?php if( !empty( $app_phonegap_version ) ): ?>
 
 	<preference name="phonegap-version" value="<?php echo $app_phonegap_version ?>" />
+<?php endif ?>
+<?php if ( !empty( $access ) ): ?>
+
+<?php foreach( $access as $access_element ): ?>
+<?php if ( empty( $access_element['origin'] ) ) {
+	continue;
+}  
+?>
+<?php 
+	$subdomains = '';
+	if ( isset( $access_element['subdomains'] ) && is_bool( $access_element['subdomains'] ) ) {
+		$subdomains = ' subdomains="'. ( $access_element['subdomains'] ? 'true' : 'false' ) .'"';
+	}
+?>
+	<access origin="<?php echo $access_element['origin'] ?>"<?php echo $subdomains ?> />
+<?php endforeach ?>
 <?php endif ?>
 <?php
 	/**

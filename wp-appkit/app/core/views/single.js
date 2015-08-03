@@ -27,11 +27,10 @@ define(function (require) {
         render : function() {
 			var template_args = {};
 			
-			if( this.global == 'posts' || this.global == 'pages' ){
-				template_args.post = this.item.toJSON();
-			}else{
-				template_args.item = this.item.toJSON();
-			}	
+			//Systematically set post and item because sometimes we want to 
+			//display an "item" using the post single template :
+			template_args.post = this.item.toJSON();
+			template_args.item = this.item.toJSON();
 			
 			template_args.TemplateTags = ThemeTplTags;
 			

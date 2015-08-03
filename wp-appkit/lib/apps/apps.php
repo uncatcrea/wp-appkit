@@ -646,13 +646,13 @@ class WpakApps {
 	protected static function get_default_phonegap_plugins( $app_id ) {
 
 		$default_plugins = array(
-			'org.apache.cordova.inappbrowser' => array( 'version' => '' ),
-			'org.apache.cordova.network-information' => array( 'version' => '' )
+			'org.apache.cordova.inappbrowser' => array( 'version' => '', 'source' => 'npm' ),
+			'org.apache.cordova.network-information' => array( 'version' => '', 'source' => 'npm' )
 		);
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		if( $app_main_infos['platform'] == 'ios' ) {
-			$default_plugins['com.phonegap.plugin.statusbar'] = array( 'version' => '' );
+			$default_plugins['org.apache.cordova.statusbar'] = array( 'version' => '', 'source' => 'npm' );
 		}
 
 		/**
@@ -676,6 +676,9 @@ class WpakApps {
 				if ( !empty( $plugin_data['version'] ) ) {
 					$plugin_xml .= ' version="'. $plugin_data['version'] .'"';
 				}
+				if ( !empty( $plugin_data['source'] ) ) {
+					$plugin_xml .= ' source="'. $plugin_data['source'] .'"';
+				}
 				$plugin_xml .= ' />';
 				$plugins_xml_array[] = $plugin_xml;
 			}
@@ -692,11 +695,18 @@ class WpakApps {
 			foreach ( $matches[0] as $match ) {
 				$name = '';
 				$version = '';
+				$source = '';
 				if ( preg_match( '/name="([^"]+)"/', $match, $name_match ) && strlen( $name_match[1] ) > 0 ) {
 					if ( preg_match( '/version="([^"]+)"/', $match, $version_match ) && strlen( $version_match[1] ) > 0 ) {
 						$version = $version_match[1];
 					}
-					$plugins_array[$name_match[1]] = array( 'version' => $version );
+					if ( preg_match( '/source="([^"]+)"/', $match, $source_match ) && strlen( $source_match[1] ) > 0 ) {
+						$source = $source_match[1];
+					}
+					$plugins_array[$name_match[1]] = array(
+						'version' => $version,
+						'source' => $source
+					);
 				}
 			}
 		}

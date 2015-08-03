@@ -91,10 +91,23 @@ class WpakComponentsBoSettings {
 	}
 
 	private static function get_component_row( $post_id, $i, $component_id, WpakComponent $component ) {
+		$alternate_class = $i % 2 ? '' : 'alternate';
+		$error_class = '';
+		$label = WpakComponentsTypes::get_label( $component->type );
+
+		//
+		// Component type could be unknown if an addon's component has been added to the app and the addon isn't activated anymore
+		// An addon could be seen as deactivated either if the corresponding plugin is deactivated, or if the corresponding checkbox is unchecked for the given app
+		//
+
+		if( !WpakComponentsTypes::component_type_exists( $component->type ) ) {
+			$error_class =  ' error';
+			$label = __( 'Component type doesn\'t exist, this component won\'t be included into the app', WpAppKit::i18n_domain );
+		}
+
 		ob_start();
 		?>
-		<?php $alternate_class = $i % 2 ? '' : 'alternate' ?>
-		<tr class="component-row <?php echo $alternate_class ?>" id="component-row-<?php echo $component_id ?>">
+		<tr class="component-row <?php echo $alternate_class . $error_class ?>" id="component-row-<?php echo $component_id ?>">
 			<td>
 				<?php echo $component->label ?>
 				<div class="row-actions">
@@ -103,7 +116,7 @@ class WpakComponentsBoSettings {
 				</div>
 			</td>
 			<td><?php echo $component->slug ?></td>
-			<td><?php echo WpakComponentsTypes::get_label( $component->type ) ?></td>
+			<td><?php echo $label ?></td>
 			<td>
 				<?php $options = WpakComponentsTypes::get_options_to_display( $component ) ?>
 				<?php foreach ( $options as $option ): ?>

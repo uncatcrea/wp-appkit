@@ -129,7 +129,7 @@ class WpakBuild {
 		}
 	}
 
-	public static function build_app_sources( $app_id ) {
+	public static function build_app_sources( $app_id, $export_type = 'phonegap-build' ) {
 		$answer = array();
 
 		if ( !extension_loaded( 'zip' ) ) {
@@ -153,15 +153,10 @@ class WpakBuild {
 		$export_filename = self::get_export_file_base_name( $app_id );
 		$export_filename_full = self::get_export_files_path() . "/" . $export_filename . '.zip';
 
-		$answer = self::build_zip( $app_id, $appli_dir, $export_filename_full, array( $current_theme ), WpakAddons::get_app_addons( $app_id ) );
-
-		$maintenance_answer = self::export_files_maintenance( $app_id );
-		if ( $maintenance_answer['ok'] == 0 ) {
-			$answer['ok'] = $answer['ok'] == 1 ? 2 : $answer['ok'];
-			$answer['msg'] .= "<br/>" . $maintenance_answer['msg'];
-		}
+		$answer = self::build_zip( $app_id, $appli_dir, $export_filename_full, array( $current_theme ), WpakAddons::get_app_addons( $app_id ), $export_type );
 
 		$answer['export'] = $export_filename;
+		$answer['export_full_name'] = $export_filename_full;
 
 		return $answer;
 	}
@@ -219,7 +214,7 @@ class WpakBuild {
 		return $ok;
 	}
 
-	private static function build_zip( $app_id, $source, $destination, $themes, $addons ) {
+	private static function build_zip( $app_id, $source, $destination, $themes, $addons, $export_type ) {
 
 		$answer = array( 'ok' => 1, 'msg' => '' );
 
@@ -277,42 +272,65 @@ class WpakBuild {
 
 		if ( is_dir( $source ) === true ) {
 
+			$source_root = '';
+			
+			if ( $export_type === 'phonegap-cli' ) {
+				//PhoneGap CLI export is made in www subdirectory
+				//( only config.xml stays at zip root )
+				$source_root = 'www';
+				if ( !$zip->addEmptyDir( $source_root ) ) {
+					$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $source_root );
+					$answer['ok'] = 0;
+					return $answer;
+				}
+			}
+			
+			if ( !empty( $source_root ) ) {
+				$source_root .= '/';
+			}
+
 			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $source ), RecursiveIteratorIterator::SELF_FIRST );
 
 			foreach ( $files as $file ) {
 				$filename = str_replace( $source, '', $file );
 				$filename = wp_normalize_path( $filename );
 				$filename = ltrim( $filename, '/\\' );
-
+				
 				//Themes are included separately from the wpak themes directory
 				if ( preg_match( '|themes[/\\\].+|', $filename ) ) {
 					continue;
 				}
 
+				$zip_filename = $source_root . $filename;
+				
 				if ( is_dir( $file ) === true ) {
-					if ( !$zip->addEmptyDir( $filename ) ) {
-						$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $filename );
+					
+					if ( !$zip->addEmptyDir( $zip_filename ) ) {
+						$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
 						$answer['ok'] = 0;
 						return $answer;
 					}
+					
 				} elseif ( is_file( $file ) === true ) {
 
 					if ( $filename == 'index.html' ) {
 
 						$index_content = self::filter_index( file_get_contents( $file ) );
 
-						if ( !$zip->addFromString( $filename, $index_content ) ) {
-							$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $filename );
+						if ( !$zip->addFromString( $zip_filename, $index_content ) ) {
+							$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
 							$answer['ok'] = 0;
 							return $answer;
 						}
+						
 					} else {
 
-						if ( !$zip->addFile( $file, $filename ) ) {
-							$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $filename );
+						if ( !$zip->addFile( $file, $zip_filename ) ) {
+							$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
 							$answer['ok'] = 0;
 							return $answer;
 						}
+						
 					}
 				}
 			}
@@ -343,15 +361,18 @@ class WpakBuild {
 						}
 
 						$filename = 'themes/'. $filename;
+						
+						$zip_filename = $source_root . $filename;
+						
 						if ( is_dir( $file ) === true ) {
-							if ( !$zip->addEmptyDir( $filename ) ) {
-								$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $filename );
+							if ( !$zip->addEmptyDir( $zip_filename ) ) {
+								$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
 								$answer['ok'] = 0;
 								return $answer;
 							}
 						} elseif ( is_file( $file ) === true ) {
-							if ( !$zip->addFile( $file, $filename ) ) {
-								$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $filename );
+							if ( !$zip->addFile( $file, $zip_filename ) ) {
+								$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
 								$answer['ok'] = 0;
 								return $answer;
 							}
@@ -365,14 +386,18 @@ class WpakBuild {
 				foreach ( $addons as $addon ) {
 					$addon_files = $addon->get_all_files();
 					foreach ( $addon_files as $addon_file ) {
-						$zip->addFile( $addon_file['full'], 'addons/'. $addon->slug .'/'. $addon_file['relative'] );
+						$zip_filename = $source_root .'addons/'. $addon->slug .'/'. $addon_file['relative'];
+						$zip->addFile( $addon_file['full'], $zip_filename );
 					}
 				}
 			}
 
-			//Create config.js and config.xml files
-			$zip->addFromString( 'config.js', WpakConfigFile::get_config_js( $app_id ) );
-			$zip->addFromString( 'config.xml', WpakConfigFile::get_config_xml( $app_id ) );
+			//Create config.js file :
+			$zip->addFromString( $source_root .'config.js', WpakConfigFile::get_config_js( $app_id ) );
+			
+			//Create config.xml file (stays at zip root) :
+			$zip->addFromString( 'config.xml', WpakConfigFile::get_config_xml( $app_id, false, $export_type ) );
+			
 		} else {
 			$answer['msg'] = sprintf( __( 'Zip archive source directory [%s] could not be found.', WpAppKit::i18n_domain ), $source );
 			$answer['ok'] = 0;
@@ -388,60 +413,11 @@ class WpakBuild {
 		return $answer;
 	}
 
-	private static function export_files_maintenance( $app_id ) {
-		$answer = array( 'ok' => 1, 'msg' => '' );
-
-		$export_directory = self::get_export_files_path();
-
-		$entries = self::get_available_app_exports( $app_id );
-
-		if ( !empty( $entries ) ) {
-			$i = 1;
-			foreach ( $entries as $entry ) {
-				if ( $i > self::export_file_memory ) {
-					if ( !unlink( $export_directory . '/' . $entry ) ) {
-						$answer['msg'] .= sprintf( __( "Couldn't delete old export [%s]", WpAppKit::i18n_domain ), $entry ) . "<br/>\n";
-						$answer['ok'] = 0;
-					}
-				}
-				$i++;
-			}
-		}
-
-		return $answer;
-	}
-
-	/**
-	 * Retrieves app export zip files ordered by date desc.
-	 */
-	private static function get_available_app_exports( $app_id ) {
-		$available_exports = array();
-
-		$export_filename_base = self::get_export_file_base_name( $app_id );
-		$export_directory = self::get_export_files_path();
-
-		if ( self::create_export_directory_if_doesnt_exist() ) {
-			if ( $handle = opendir( $export_directory ) ) {
-				while ( false !== ($entry = readdir( $handle )) ) {
-					if ( strpos( $entry, $export_filename_base ) !== false ) {
-						$entry_date = preg_replace( '/' . $export_filename_base . '-(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})\.zip/', '$1-$2-$3 $4:$5:$6', $entry );
-						$available_exports[strtotime( $entry_date )] = $entry;
-					}
-				}
-				closedir( $handle );
-				if ( !empty( $available_exports ) ) {
-					krsort( $available_exports );
-				}
-			}
-		}
-
-		return $available_exports;
-	}
-
 	private static function filter_index( $index_content ) {
 
-		//Add phonegap.js script :
-		$index_content = str_replace( '<head>', "<head>\r\n\t\t<script src=\"phonegap.js\"></script>\r\n\t\t", $index_content );
+		//Add cordova.js script (set cordova.js instead of phonegap.js, because PhoneGap Developer App doesn't seem
+		//to support phonegap.js). PhoneGap Build can use indifferently cordova.js or phonegap.js.
+		$index_content = str_replace( '<head>', "<head>\r\n\t\t<script src=\"cordova.js\"></script>\r\n\t\t", $index_content );
 
 		//Remove script used only for app simulation in web browser :
 		$index_content = preg_replace( '/<script[^>]*>[^<]*var query[^<]*<\/script>\s*<script/is', '<script', $index_content );

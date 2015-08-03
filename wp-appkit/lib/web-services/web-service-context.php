@@ -56,7 +56,7 @@ class WpakWebServiceContext {
 		//For now we only handle params for "read" type web services :
 		if ( self::$crud_action == 'read' || self::$crud_action == 'read_one' ) {
 			if ( isset( $_GET[$key] ) ) {
-				$client_app_param_value = $_GET[$key];
+				$client_app_param_value = $_GET[$key]; //Can be an array
 			}
 		}
 

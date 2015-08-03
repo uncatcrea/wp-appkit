@@ -78,12 +78,27 @@ class WpakNavigationBoSettings{
 	}
 
 	private static function get_navigation_row($post_id,$i,$nav_item_id,$nav_item){
+		
+		$error_class = '';
+		$alternate_class = $i%2 ? '' : 'alternate';
+		
+		$component = WpakComponentsStorage::get_component($post_id,$nav_item->component_id);
+		
+		//
+		// Component type could be unknown if an addon's component has been added to the app and the addon isn't activated anymore
+		// An addon could be seen as deactivated either if the corresponding plugin is deactivated, or if the corresponding checkbox is unchecked for the given app
+		//
+				
+		if( !WpakComponentsTypes::component_type_exists( $component->type ) ) {
+			$error_class =  ' error';
+			$error_message = __( 'Component type doesn\'t exist, this component won\'t be included into the app', WpAppKit::i18n_domain );
+		}
+		
 		ob_start();
+		
 		?>
-		<?php $alternate_class = $i%2 ? '' : 'alternate' ?>
-		<?php $component = WpakComponentsStorage::get_component($post_id,$nav_item->component_id) ?>
 		<?php if( !empty($component) ): ?>
-			<tr class="ui-state-default <?php echo $alternate_class ?> navigation-item-component-<?php echo $nav_item->component_id; ?>" data-id="<?php echo $nav_item_id ?>" id="navigation-item-row-<?php echo $nav_item_id ?>">
+			<tr class="ui-state-default <?php echo $alternate_class . $error_class  ?> navigation-item navigation-item-component-<?php echo $nav_item->component_id; ?>" data-id="<?php echo $nav_item_id ?>" id="navigation-item-row-<?php echo $nav_item_id ?>">
 				<td>
 					<span class="label"><?php echo $component->label ?></span> (<span class="slug"><?php echo $component->slug ?></span>)
 					<input type="hidden" id="position-<?php echo $nav_item_id ?>" name="positions[<?php echo $nav_item_id ?>]" value="<?php echo $nav_item->position ?>" />
@@ -92,20 +107,31 @@ class WpakNavigationBoSettings{
 					</div>
 				</td>
 				<td>
-					<?php $icon_value = $nav_item->options['icon_slug'] ?>
+					
+					<?php if ( empty( $error_message ) ): ?>
+					
+						<?php $icon_value = $nav_item->options['icon_slug'] ?>
 
-					<div id="nav-item-value-<?php echo $nav_item_id ?>">
-						<span id="span-<?php echo $nav_item_id ?>"><?php echo !empty($icon_value) ? $icon_value : __('none', WpAppKit::i18n_domain) ?></span>
-						<div class="row-actions">
-							<a href="#" class="change-icon-slug" data-id="<?php echo $nav_item_id ?>"><?php _e('Edit icon', WpAppKit::i18n_domain) ?></a>
+						<div id="nav-item-value-<?php echo $nav_item_id ?>">
+							<span id="span-<?php echo $nav_item_id ?>"><?php echo !empty($icon_value) ? $icon_value : __('none', WpAppKit::i18n_domain) ?></span>
+							<div class="row-actions">
+								<a href="#" class="change-icon-slug" data-id="<?php echo $nav_item_id ?>"><?php _e('Edit icon', WpAppKit::i18n_domain) ?></a>
+							</div>
 						</div>
-					</div>
 
-					<div id="nav-item-input-<?php echo $nav_item_id ?>" style="display:none" >
-						<input type="text" id="icon-<?php echo $nav_item_id ?>" class="menu-item-icon-input" data-id="<?php echo $nav_item_id ?>" value="<?php echo $nav_item->options['icon_slug'] ?>"/>
-						&nbsp;<a href="#" id="change-icon-slug-ok-<?php echo $nav_item_id ?>" class="change-icon-slug-ok" data-id="<?php echo $nav_item_id ?>" data-post-id="<?php echo $post_id ?>" ><?php _e('Ok', WpAppKit::i18n_domain) ?></a>
-						&nbsp;&nbsp;<a href="#" class="change-icon-slug-cancel" data-id="<?php echo $nav_item_id ?>"><?php _e('Cancel', WpAppKit::i18n_domain) ?></a>
-					</div>
+						<div id="nav-item-input-<?php echo $nav_item_id ?>" style="display:none" >
+							<input type="text" id="icon-<?php echo $nav_item_id ?>" class="menu-item-icon-input" data-id="<?php echo $nav_item_id ?>" value="<?php echo $nav_item->options['icon_slug'] ?>"/>
+							&nbsp;<a href="#" id="change-icon-slug-ok-<?php echo $nav_item_id ?>" class="change-icon-slug-ok" data-id="<?php echo $nav_item_id ?>" data-post-id="<?php echo $post_id ?>" ><?php _e('Ok', WpAppKit::i18n_domain) ?></a>
+							&nbsp;&nbsp;<a href="#" class="change-icon-slug-cancel" data-id="<?php echo $nav_item_id ?>"><?php _e('Cancel', WpAppKit::i18n_domain) ?></a>
+						</div>
+					
+					<?php else: ?>
+					
+						<div id="nav-item-value-<?php echo $nav_item_id ?>">
+							<span id="span-<?php echo $nav_item_id ?>"><?php echo $error_message ?></span>
+						</div>
+					
+					<?php endif ?>
 				</td>
 			</tr>
 		<?php endif ?>

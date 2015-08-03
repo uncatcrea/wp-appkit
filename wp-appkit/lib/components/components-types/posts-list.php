@@ -71,19 +71,28 @@ class WpakComponentTypePostsList extends WpakComponentType {
 
 				$query['type'] = 'last-posts';
 
-			}elseif ( !empty( $options['taxonomy'] ) && !empty( $options['term'] ) ) {
+			}elseif ( !empty( $options['taxonomy'] ) ) {
 
-				$query_args['tax_query'] = array(
-					array(
-						'taxonomy' => $options['taxonomy'],
-						'field' => 'slug',
-						'terms' => $options['term']
-					)
-				);
+				if ( $options['taxonomy'] === 'wpak-none' ) {
+					
+					$query['type'] = 'post-type';
+					
+				} elseif ( !empty( $options['term'] ) ) {
+					
+					$query_args['tax_query'] = array(
+						array(
+							'taxonomy' => $options['taxonomy'],
+							'field' => 'slug',
+							'terms' => $options['term']
+						)
+					);
 
-				$query['type'] = 'taxonomy';
-				$query['taxonomy'] = $options['taxonomy'];
-				$query['terms'] = is_array( $options['term'] ) ? $options['term'] : array( $options['term'] );
+					$query['type'] = 'taxonomy';
+					$query['taxonomy'] = $options['taxonomy'];
+					$query['terms'] = is_array( $options['term'] ) ? $options['term'] : array( $options['term'] );
+					
+				}
+				
 			}
 
 			if ( !empty( $before_post_date ) ) {
@@ -132,71 +141,60 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		$this->set_specific( 'query', $query );
 		$this->set_globals( 'posts', $posts_by_ids );
 	}
+	
+	/**
+	 * To retrieve only items given in $items_ids
+	 */
+	protected function get_items_data( $component, $options, $items_ids, $args = array() ) {
+		$items = array( 'posts' => array() );
+		
+		$posts_by_ids = array();
+		foreach ( $items_ids as $post_id ) {
+			$post = get_post( $post_id );
+			if( !empty($post) ) {
+				$posts_by_ids[$post_id] = self::get_post_data( $component, $post );
+				$posts_by_ids[$post_id]->title = $posts_by_ids[$post_id]->title;
+			}
+		}
+		
+		if( $options['post-type'] == 'custom' ) {
+			$posts_by_ids = apply_filters( 'wpak_posts_list_custom_items-' . $options['hook'], $posts_by_ids, $component, $options, $items_ids, $args );
+		} 
+		
+		$items['posts'] = $posts_by_ids;
+		
+		return $items;
+	}
 
-	protected static function get_post_data( $component, $_post ) {
-		global $post;
-		$post = $_post;
-		setup_postdata( $post );
-
-		$post_data = array(
-			'id' => $post->ID,
-			'post_type' => $post->post_type,
-			'date' => strtotime( $post->post_date ),
-			'title' => $post->post_title,
-			'content' => '',
-			'excerpt' => '',
-			'thumbnail' => '',
-			'author' => get_the_author_meta( 'nickname' ),
-			'nb_comments' => ( int ) get_comments_number()
-		);
-
+	protected static function get_post_data( $component, $post ) {
+		
+		$post_data = WpakComponentsUtils::get_post_data( $post, $component );
+		
 		/**
-		 * Filter post content into a posts list component. Use this to format app posts content your own way.
+		 * Filter post content for posts list components. 
+		 * Use this to format app posts content your own way only for posts list component.
 		 *
-		 * To apply the default AppKit formating to the content and add only minor modifications to it,
-		 * use the "wpak_post_content_format" filter instead.
+		 * To apply a custom content to all component types, use the "wpak_post_data_post_content" filter instead.
 		 *
 		 * @see WpakComponentsUtils::get_formated_content()
 		 *
-		 * @param string 			''    			The post content: an empty string by default.
+		 * @param string 			$post_content   The default post content.
 		 * @param WP_Post 			$post 			The post object.
 		 * @param WpakComponent 	$component		The component object.
 		 */
-		$content = apply_filters( 'wpak_posts_list_post_content', '', $post, $component );
-		if ( empty( $content ) ) {
-			$content = WpakComponentsUtils::get_formated_content();
-		}
-		$post_data['content'] = $content;
-
-		$post_data['excerpt'] = WpakComponentsUtils::get_post_excerpt( $post );
-
-		$post_featured_img_id = get_post_thumbnail_id( $post->ID );
-		if ( !empty( $post_featured_img_id ) ) {
-			
-			/**
-			 * Use this 'wpak_post_featured_image_size' to define a specific image
-			 * size to pass to the web service for posts.
-			 * By default the full (original) image size is used.
-			 */
-			$featured_image_size = apply_filters( 'wpak_post_featured_image_size', 'full', $post, $component );
-			
-			$featured_img_src = wp_get_attachment_image_src( $post_featured_img_id, $featured_image_size );
-			@$post_data['thumbnail']['src'] = $featured_img_src[0];
-			$post_data['thumbnail']['width'] = $featured_img_src[1];
-			$post_data['thumbnail']['height'] = $featured_img_src[2];
-		}
+		$post_data['content'] = apply_filters( 'wpak_posts_list_post_content', $post_data['content'], $post, $component );
 
 		/**
-		 * Filter post data sent to the app from a posts list component.
+		 * Filter post data sent to the app from a post list component.
 		 *
-		 * Use this for example to add a post meta to the default post data.
+		 * Use this for example to add a post meta to the default post data only for posts list components.
 		 *
 		 * @param array 			$post_data    	The default post data sent to an app.
 		 * @param WP_Post 			$post 			The post object.
 		 * @param WpakComponent 	$component		The component object.
 		 */
-		$post_data = apply_filters( 'wpak_post_data', $post_data, $post, $component );
-
+		$post_data = apply_filters( 'wpak_posts_list_post_data', $post_data, $post, $component );
+		
 		return ( object ) $post_data;
 	}
 
@@ -206,17 +204,28 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			$options = array(
 				'hook' => array( 'label' => __( 'Hook', WpAppKit::i18n_domain ), 'value' => $component->options['hook'] ),
 			);
-		} elseif ( $component->options['post-type'] != 'last-posts' ) {
+		} elseif ( $component->options['post-type'] == 'last-posts'  ) {
+			$options = array(
+				'post-type' => array( 'label' =>  __( 'List type', WpAppKit::i18n_domain ), 'value' => __( 'Latest posts', WpAppKit::i18n_domain ) )
+			);
+		} elseif ( !empty ( $component->options['post-type'] ) ) {
 			$post_type = get_post_type_object( $component->options['post-type'] );
-			$taxonomy = get_taxonomy( $component->options['taxonomy'] );
-			$term = get_term_by( 'slug', $component->options['term'], $component->options['taxonomy'] );
-			$options = array();
-			if ( !is_wp_error( $term ) ) {
-				$options = array(
-					'post-type' => array( 'label' => __( 'Post type' ), 'value' => $post_type->labels->name ),
-					'taxonomy' => array( 'label' => __( 'Taxonomy' ), 'value' => $taxonomy->labels->name ),
-					'term' => array( 'label' => __( 'Term' ), 'value' => $term->name )
-				);
+			$taxo_name = '';
+			$term_name = '';
+			if ( !empty( $component->options['taxonomy'] ) && $component->options['taxonomy'] !== 'wpak-none' ) {
+				$taxonomy = get_taxonomy( $component->options['taxonomy'] );
+				$term = get_term_by( 'slug', $component->options['term'], $component->options['taxonomy'] );
+				if ( !is_wp_error( $term ) ) {
+					$taxo_name = $taxonomy->labels->name;
+					$term_name = $term->name;
+				}
+			}
+			$options = array(
+				'post-type' => array( 'label' => __( 'Post type' ), 'value' => $post_type->labels->name )
+			);
+			if ( !empty( $taxo_name ) ) {
+				$options['taxonomy'] = array( 'label' => __( 'Taxonomy' ), 'value' => $taxo_name );
+				$options['term'] = array( 'label' => __( 'Term' ), 'value' => $term_name );
 			}
 		}
 		return $options;
@@ -311,12 +320,13 @@ class WpakComponentTypePostsList extends WpakComponentType {
 				 */
 				$taxonomies = apply_filters( 'wpak_component_type_posts_list_form_taxonomies', $taxonomies );
 
-				$first_taxonomy = reset( $taxonomies );
-				$current_taxonomy = empty( $current_taxonomy ) ? $first_taxonomy : $current_taxonomy;
+				$first_taxonomy = !empty( $taxonomies ) ? reset( $taxonomies ) : '';
+				$current_taxonomy = empty( $current_taxonomy ) ? empty( $first_taxonomy ) ? 'wpak-none' : $first_taxonomy : $current_taxonomy;
 			?>
 			<label><?php _e( 'Taxonomy', WpAppKit::i18n_domain ) ?> : </label>
 			<?php if ( !empty( $taxonomies ) ): ?>
 				<select name="taxonomy" class="posts-list-taxonomies">
+					<option value="wpak-none" <?php echo $current_taxonomy == 'wpak-none' ? 'selected="selected"' : '' ?>><?php _e( 'No taxonomy', WpAppKit::i18n_domain ) ?></option>
 					<?php foreach ( $taxonomies as $taxonomy_slug ): ?>
 						<?php $taxonomy = get_taxonomy( $taxonomy_slug ) ?>
 						<?php $selected = $taxonomy_slug == $current_taxonomy ? 'selected="selected"' : '' ?>
@@ -324,20 +334,22 @@ class WpakComponentTypePostsList extends WpakComponentType {
 					<?php endforeach ?>
 				</select>
 				<br/>
-				<?php
-					$taxonomy_obj = get_taxonomy( $current_taxonomy );
-					$terms = get_terms( $current_taxonomy );
-				?>
-				<label><?php echo $taxonomy_obj->labels->name ?> : </label>
-				<?php if ( !empty( $terms ) ): ?>
-					<select name="term">
-						<?php foreach ( $terms as $term ): ?>
-							<?php $selected = $term->slug == $current_term ? 'selected="selected"' : '' ?>
-							<option value="<?php echo $term->slug ?>" <?php echo $selected ?>><?php echo $term->name ?></option>
-						<?php endforeach ?>
-					</select>
-				<?php else: ?>
-					<?php echo sprintf( __( 'No %s found', WpAppKit::i18n_domain ), $taxonomy_obj->labels->name ); ?>
+				<?php if ( $current_taxonomy !== 'wpak-none' ) : ?>
+					<?php
+						$taxonomy_obj = get_taxonomy( $current_taxonomy );
+						$terms = get_terms( $current_taxonomy );
+					?>
+					<label><?php echo $taxonomy_obj->labels->name ?> : </label>
+					<?php if ( !empty( $terms ) ): ?>
+						<select name="term">
+							<?php foreach ( $terms as $term ): ?>
+								<?php $selected = $term->slug == $current_term ? 'selected="selected"' : '' ?>
+								<option value="<?php echo $term->slug ?>" <?php echo $selected ?>><?php echo $term->name ?></option>
+							<?php endforeach ?>
+						</select>
+					<?php else: ?>
+						<?php echo sprintf( __( 'No %s found', WpAppKit::i18n_domain ), $taxonomy_obj->labels->name ); ?>
+					<?php endif ?>
 				<?php endif ?>
 			<?php else: ?>
 				<?php echo sprintf( __( 'No taxonomy found for post type %s', WpAppKit::i18n_domain ), $current_post_type ); ?>

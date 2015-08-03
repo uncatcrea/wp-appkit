@@ -2,28 +2,85 @@
 
 class WpakComponentsUtils {
 
+	/**
+	 * Default function to retrieve web service formated data for a post
+	 */
+	public static function get_post_data( $_post, $component = null ) {
+		
+		if ( $component === null ) {
+			$component = new WpakComponent( 'wpak-internal', 'Internal', 'wpak-internal' );
+		}
+		
+		global $post;
+		$post = $_post;
+		setup_postdata( $post );
+
+		$post_data = array(
+			'id' => $post->ID,
+			'post_type' => $post->post_type,
+			'date' => strtotime( $post->post_date ),
+			'title' => $post->post_title,
+			'content' => '',
+			'excerpt' => '',
+			'thumbnail' => '',
+			'author' => get_the_author_meta( 'nickname' ),
+			'nb_comments' => ( int ) get_comments_number()
+		);
+
+		/**
+		 * Filter post content. Use this to format app posts content your own way.
+		 *
+		 * To apply the default WP AppKit formating to the content and add only minor modifications to it,
+		 * use the "wpak_post_content_format" filter instead.
+		 *
+		 * @see WpakComponentsUtils::get_formated_content()
+		 *
+		 * @param string 			''    			The post content: an empty string by default.
+		 * @param WP_Post 			$post 			The post object.
+		 * @param WpakComponent 	$component		The component object.
+		 */
+		$content = apply_filters( 'wpak_post_content', '', $post, $component );
+		if ( empty( $content ) ) {
+			$content = WpakComponentsUtils::get_formated_content();
+		}
+		$post_data['content'] = $content;
+
+		$post_data['excerpt'] = WpakComponentsUtils::get_post_excerpt( $post );
+
+		$post_featured_img_id = get_post_thumbnail_id( $post->ID );
+		if ( !empty( $post_featured_img_id ) ) {
+			
+			/**
+			 * Use this 'wpak_post_featured_image_size' to define a specific image
+			 * size to pass to the web service for posts.
+			 * By default the full (original) image size is used.
+			 */
+			$featured_image_size = apply_filters( 'wpak_post_featured_image_size', 'full', $post, $component );
+			
+			$featured_img_src = wp_get_attachment_image_src( $post_featured_img_id, $featured_image_size );
+			@$post_data['thumbnail']['src'] = $featured_img_src[0];
+			$post_data['thumbnail']['width'] = $featured_img_src[1];
+			$post_data['thumbnail']['height'] = $featured_img_src[2];
+		}
+
+		/**
+		 * Filter post data sent in web service.
+		 *
+		 * Use this for example to add a post meta to the default post data.
+		 *
+		 * @param array 			$post_data    	The default post data sent to an app.
+		 * @param WP_Post 			$post 			The post object.
+		 * @param WpakComponent 	$component		The component object.
+		 */
+		$post_data = apply_filters( 'wpak_post_data', $post_data, $post, $component );
+
+		return $post_data;
+	}
+	
 	public static function get_formated_content() {
 		$post = get_post();
 
 		$content = get_the_content();
-
-		$replacement_image = self::get_unavailable_media_img();
-
-		//Convert dailymotion video
-		$content = preg_replace( '/\[dailymotion\](.*?)(\[\/dailymotion\])/is', $replacement_image, $content );
-
-		//Youtube :
-		$content = preg_replace( '/<a[^>]*href="[^"]*youtube.com.*?".*?>.*?(<\/a>)/is', $replacement_image, $content );
-		$content = preg_replace( '/\[youtube\](.*?)(\[\/youtube\])/is', $replacement_image, $content );
-		
-		//Mp3 :
-		$content = preg_replace( '/<a[^>]*href="[^"]*(\.mp3).*?".*?>.*?(<\/a>)/is', $replacement_image, $content );
-		
-		//Delete [embed]
-		$content = preg_replace( '/\[embed .*?\](.*?)(\[\/embed\\])/is', $replacement_image, $content );
-
-		//Replace iframes (slideshare etc...) by default image :
-		$content = preg_replace( '/<iframe([^>]*?)>.*?(<\/iframe>)/is', $replacement_image, $content );
 
 		//Apply "the_content" filter : formats shortcodes etc... :
 		$content = apply_filters( 'the_content', $content );
@@ -67,31 +124,6 @@ class WpakComponentsUtils {
 		 * @param WP_Post 	$post 			The post object.
 		 */
 		return apply_filters( 'wpak_post_excerpt', $post_excerpt, $post );
-	}
-
-	public static function get_unavailable_media_img() {
-
-		$upload_dir = wp_upload_dir();
-		if ( !empty( $upload_dir['error'] ) ) {
-			return '';
-		}
-
-		$params = array(
-			'src' => $upload_dir['baseurl'] . '/wpak_unavailable_media.png',
-			'width' => 604,
-			'height' => 332
-		);
-
-		/**
-		 * Filter parameters of the default image showed when a media is unavailable.
-		 *
-		 * @param array 	$params   The default parameters.
-		 */
-		$params = apply_filters( 'wpak_unavailable_media_img', $params );
-
-		$img = '<img class="unavailable" alt="' . __( 'Unavailable content', WpAppKit::i18n_domain ) . '" src="' . $params['src'] . '" width="' . $params['width'] . '" height="' . $params['height'] . '" />';
-
-		return $img;
 	}
 
 	/**
