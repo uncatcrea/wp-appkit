@@ -14,7 +14,7 @@ define( function( require ) {
         var o   = parseUri.parse.options,
             m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
             uri = {},
-            i   = 14;
+            i   = o.key.length;
 
         while (i--) uri[o.key[i]] = m[i] || "";
 
