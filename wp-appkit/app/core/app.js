@@ -218,6 +218,9 @@ define(function (require) {
 
 		Hooks.doActions('pre-start-router',[launch_route,Stats.getStats()]);
 
+		// Reset DeepLink launch route after hooks are fired to let scripts retrieve this route if needed
+		DeepLink.reset();
+
 		if( launch_route.length > 0 ){
 			Backbone.history.start();
 			//Navigate to the launch_route :
