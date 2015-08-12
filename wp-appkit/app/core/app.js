@@ -1524,10 +1524,13 @@ define(function (require) {
 
 	  /**
        * App init:
+       *  - register "resume" event
        *  - set options
 	   *  - initialize addons
        */
       app.initialize = function ( callback ) {
+
+      	document.addEventListener( 'resume', app.onResume, false );
 
 		fetchOptions(function(){
 
@@ -1548,6 +1551,22 @@ define(function (require) {
 
 		});
 
+      };
+
+      /**
+       * Fires when the application was in background and is called to be in foreground again.
+       * Handles:
+       *  - deep links
+       */
+      app.onResume = function() {
+      	// If there is a defined launch URL, use it
+      	var route = DeepLink.getLaunchRoute();
+
+      	route = Hooks.applyFilters( 'resume-route', route, [Stats.getStats()] );
+
+      	if( route.length ) {
+      		app.router.navigate( route, { trigger: true } );
+      	}
       };
 
 	//--------------------------------------------------------------------------
