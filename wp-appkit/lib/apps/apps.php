@@ -695,9 +695,16 @@ class WpakApps {
 		}
 
 		// Activate Deep Linking if a Custom URL Scheme is present
-		// TODO: handle the plugin param to pass the URL Scheme
 		if( !empty( $app_main_infos['url_scheme'] ) ) {
-			$default_plugins['nl.x-services.plugins.launchmyapp'] = array( 'version' => '3.2.0' );
+			$default_plugins['nl.x-services.plugins.launchmyapp'] = array(
+				'version' => '3.2.0',
+				'param' => array(
+					array(
+						'name' => 'URL_SCHEME',
+						'value' => $app_main_infos['url_scheme'],
+					),
+				),
+			);
 		}
 
 		/**
