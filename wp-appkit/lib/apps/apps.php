@@ -673,13 +673,25 @@ class WpakApps {
 			$plugins_xml_array = array();
 			foreach ( $plugins as $plugin_name => $plugin_data ) {
 				$plugin_xml = '<gap:plugin name="' . $plugin_name . '"';
+				$xml_end = ' />';
 				if ( !empty( $plugin_data['version'] ) ) {
 					$plugin_xml .= ' version="'. $plugin_data['version'] .'"';
 				}
 				if ( !empty( $plugin_data['source'] ) ) {
 					$plugin_xml .= ' source="'. $plugin_data['source'] .'"';
 				}
-				$plugin_xml .= ' />';
+				if( !empty( $plugin_data['param'] ) ) {
+					$param_xml = array();
+					foreach( $plugin_data['param'] as $param ) {
+						if( !isset( $param['name'] ) || !isset( $param['value'] ) ) {
+							continue;
+						}
+						$param_xml[] = '<param name="' . $param['name'] . '" value="' . $param['value'] . '" />';
+					}
+					$plugin_xml.= " >\n\t" . implode( "\n\t", $param_xml ) . "\n";
+					$xml_end = '</gap:plugin>';
+				}
+				$plugin_xml .= $xml_end;
 				$plugins_xml_array[] = $plugin_xml;
 			}
 			$plugins_xml = implode( "\n", $plugins_xml_array );
@@ -691,8 +703,8 @@ class WpakApps {
 	protected static function parse_plugins_from_xml( $plugins_xml ) {
 		$plugins_array = array();
 
-		if ( preg_match_all( '/<gap:plugin [^\/]+\/>/s', $plugins_xml, $matches ) ) {
-			foreach ( $matches[0] as $match ) {
+		if ( preg_match_all( '/(<gap:plugin [^>]+)(\/>|>(.*)<\/gap:plugin>)/sU', $plugins_xml, $matches ) ) {
+			foreach ( $matches[1] as $i => $match ) {
 				$name = '';
 				$version = '';
 				$source = '';
@@ -703,9 +715,25 @@ class WpakApps {
 					if ( preg_match( '/source="([^"]+)"/', $match, $source_match ) && strlen( $source_match[1] ) > 0 ) {
 						$source = $source_match[1];
 					}
+
+					// Include params if any
+					$params = array();
+					if( !empty( $matches[3][$i] ) && preg_match_all( '/<param ([^>]+)>/U', $matches[3][$i], $param_matches ) ) {
+						foreach( $param_matches[1] as $param_match ) {
+							if( preg_match( '/name="([^"]+)"/', $param_match, $param_name_match ) && strlen( $param_name_match[1] ) > 0
+							 && preg_match( '/value="([^"]+)"/', $param_match, $param_value_match ) && strlen( $param_value_match[1] ) > 0 ) {
+								$params[$param_name_match[1]] = array(
+									'name' => $param_name_match[1],
+									'value' => $param_value_match[1],
+								);
+							}
+						}
+					}
+
 					$plugins_array[$name_match[1]] = array(
 						'version' => $version,
-						'source' => $source
+						'source' => $source,
+						'param' => array_values( $params ),
 					);
 				}
 			}
