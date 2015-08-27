@@ -680,9 +680,9 @@ class WpakApps {
 				if ( !empty( $plugin_data['source'] ) ) {
 					$plugin_xml .= ' source="'. $plugin_data['source'] .'"';
 				}
-				if( !empty( $plugin_data['param'] ) ) {
+				if( !empty( $plugin_data['params'] ) ) {
 					$param_xml = array();
-					foreach( $plugin_data['param'] as $param ) {
+					foreach( $plugin_data['params'] as $param ) {
 						if( !isset( $param['name'] ) || !isset( $param['value'] ) ) {
 							continue;
 						}
@@ -733,7 +733,7 @@ class WpakApps {
 					$plugins_array[$name_match[1]] = array(
 						'version' => $version,
 						'source' => $source,
-						'param' => array_values( $params ),
+						'params' => array_values( $params ),
 					);
 				}
 			}
