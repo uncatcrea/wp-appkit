@@ -652,14 +652,14 @@ class WpakApps {
 	protected static function get_default_phonegap_plugins( $app_id ) {
 
 		$default_plugins = array(
-			'org.apache.cordova.inappbrowser' => array( 'version' => '', 'source' => 'npm' ),
-			'org.apache.cordova.network-information' => array( 'version' => '', 'source' => 'npm' ),
+			'cordova-plugin-inappbrowser' => array( 'version' => '', 'source' => 'npm' ),
+			'cordova-plugin-network-information' => array( 'version' => '', 'source' => 'npm' ),
 			'cordova-plugin-whitelist' => array( 'version' => '', 'source' => 'npm' )
 		);
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		if( $app_main_infos['platform'] == 'ios' ) {
-			$default_plugins['org.apache.cordova.statusbar'] = array( 'version' => '', 'source' => 'npm' );
+			$default_plugins['cordova-plugin-statusbar'] = array( 'version' => '', 'source' => 'npm' );
 		}
 
 		/**
