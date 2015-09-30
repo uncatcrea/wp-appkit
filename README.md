@@ -6,7 +6,7 @@ Create mobile apps and connect them to WordPress.
 
 ## News
 
-### 09/30/2015: Verison 0.4.1
+### 09/30/2015: Version 0.4.1
 * Upgrade to support the latest Phonegap Build changes (whitelisting and NPM)
 * Fixes transitions
 
