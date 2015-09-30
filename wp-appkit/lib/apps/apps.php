@@ -660,6 +660,7 @@ class WpakApps {
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		if( $app_main_infos['platform'] == 'ios' ) {
 			$default_plugins['cordova-plugin-statusbar'] = array( 'version' => '', 'source' => 'npm' );
+			unset( $default_plugins['cordova-plugin-whitelist'] );
 		}
 
 		/**
