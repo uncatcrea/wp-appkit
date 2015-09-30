@@ -631,6 +631,12 @@ class WpakApps {
 	 */
 	public static function get_merged_phonegap_plugins_xml( $app_id, $bo_plugins_xml = '' ) {
 
+		$merged_plugins = self::get_merged_phonegap_plugins( $app_id, $bo_plugins_xml );
+				
+		return self::get_plugins_xml($merged_plugins);
+	}
+	
+	public static function get_merged_phonegap_plugins( $app_id, $bo_plugins_xml = '' ) {
 		if ( empty( $bo_plugins_xml ) ) {
 			$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 			$bo_plugins_xml = $app_main_infos['phonegap_plugins'];
@@ -640,14 +646,15 @@ class WpakApps {
 
 		$merged_plugins = array_merge( self::get_default_phonegap_plugins( $app_id ), $bo_plugins_array );
 
-		return self::get_plugins_xml($merged_plugins);
+		return $merged_plugins;
 	}
 
 	protected static function get_default_phonegap_plugins( $app_id ) {
 
 		$default_plugins = array(
 			'org.apache.cordova.inappbrowser' => array( 'version' => '', 'source' => 'npm' ),
-			'org.apache.cordova.network-information' => array( 'version' => '', 'source' => 'npm' )
+			'org.apache.cordova.network-information' => array( 'version' => '', 'source' => 'npm' ),
+			'cordova-plugin-whitelist' => array( 'version' => '', 'source' => 'npm' )
 		);
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );

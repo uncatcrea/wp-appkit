@@ -122,8 +122,50 @@ define( function ( require ) {
 
 		return !$echo ? $content : '';
 	}
+	
+	/**
+	 * Retrieves whitelist settings. 
+	 * Will be active only if the "cordova-plugin-whitelist" plugin is added to config.xml.
+	 * (see https://github.com/apache/cordova-plugin-whitelist).
+	 * 
+	 * @param int $app_id Application ID
+	 * @param string $export_type 'phonegap-build', 'phonegap-cli' etc
+	 */
+	protected static function get_whitelist_settings( $app_id, $export_type = 'phonegap-build' ) {
+		
+		//By default we allow everything :
+		$whitelist_settings = array(
+			'access' => array( 'origin' => '*' ),
+			'allow-intent' => array( 'href' => '*' ),
+			'allow-navigation' => array( 'href' => '*' )
+		);
+		
+		//No whitelist setting if the 'cordova-plugin-whitelist' plugin is not here :
+		$whitelist_plugin_here = true;
+		$current_phonegap_plugins = WpakApps::get_merged_phonegap_plugins( $app_id );
+		if ( !array_key_exists( 'cordova-plugin-whitelist', $current_phonegap_plugins ) ) {
+			$whitelist_settings = array();
+			$whitelist_plugin_here = false;
+		}
+		
+		/**
+		 * Filter : allows to modify config.xml whitelist configuration.
+		 * See https://github.com/apache/cordova-plugin-whitelist for detailed info.
+		 *
+		 * @param array  	$whitelist_settings     Array of whitelist settings : contains :
+		 *											 'access' => array( 'origin' => '*' ),
+		 *											 'allow-intent' => array( 'href' => '*' ),
+		 *											 'allow-navigation' => array( 'href' => '*' )
+		 * @param int		$app_id		            Application id
+		 * @param string    $export_type            'phonegap-build' (default) or 'phonegap-cli'
+		 * @param boolean   $whitelist_plugin_here  Whether or not the whitelist plugin is add for this app.
+		 */
+		$whitelist_settings = apply_filters( 'wpak_config_xml_whitelist', $whitelist_settings, $app_id, $export_type, $current_phonegap_plugins, $whitelist_plugin_here );
+		
+		return $whitelist_settings;
+	}
 
-	public static function get_config_xml( $app_id, $echo = false, $export_type = '' ) {
+	public static function get_config_xml( $app_id, $echo = false, $export_type = 'phonegap-build' ) {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		$app_name = $app_main_infos['name'];
@@ -138,26 +180,7 @@ define( function ( require ) {
 		$app_platform = $app_main_infos['platform'];
 		$app_icons = $app_main_infos['icons'];
 
-		$access = array();
-		if ( $export_type == 'phonegap-cli' ) {
-			$access[] = array( 
-				'origin' =>  '*',
-				'subdomains' => ''
-			);
-		}
-		
-		/**
-		 * Filter : allows to modify config.xml <access> element
-		 *
-		 * @param array  	array		array of <access> elements 
-		 *                              Each <access> element is an array with the following attributes :
-		 *								- 'origin' string The domain of where the resource lives
-		 *								- 'subdomains' bool Whether to allow subdomains on the 
-		 *								  host specified in the origin parameter. Pass an empty
-		 *								  string to ignore this optional attribute.
-		 * @param int		$app_id		Application id
-		 */
-		$access = apply_filters( 'wpak_config_xml_access', $access, $app_id );
+		$whitelist_settings = self::get_whitelist_settings( $app_id, $export_type );
 		
 		//Merge our default Phonegap Build plugins to those set in BO :
 		$app_phonegap_plugins = WpakApps::get_merged_phonegap_plugins_xml($app_id, $app_main_infos['phonegap_plugins']);
@@ -189,22 +212,6 @@ define( function ( require ) {
 
 	<preference name="phonegap-version" value="<?php echo $app_phonegap_version ?>" />
 <?php endif ?>
-<?php if ( !empty( $access ) ): ?>
-
-<?php foreach( $access as $access_element ): ?>
-<?php if ( empty( $access_element['origin'] ) ) {
-	continue;
-}  
-?>
-<?php 
-	$subdomains = '';
-	if ( isset( $access_element['subdomains'] ) && is_bool( $access_element['subdomains'] ) ) {
-		$subdomains = ' subdomains="'. ( $access_element['subdomains'] ? 'true' : 'false' ) .'"';
-	}
-?>
-	<access origin="<?php echo $access_element['origin'] ?>"<?php echo $subdomains ?> />
-<?php endforeach ?>
-<?php endif ?>
 <?php
 	/**
 	* Filter to handle the  "Webview bounce effect" on devices.
@@ -219,18 +226,35 @@ define( function ( require ) {
 	<preference name="webviewbounce" value="false" />
 <?php endif ?>
 
-	<!-- Add Icon, Splash screen and any PhoneGap plugin declaration here -->
+	<!-- PhoneGap plugin declaration -->
+<?php if( !empty( $app_phonegap_plugins ) ): ?>
+	<?php echo str_replace( "\n", "\n\t", $app_phonegap_plugins ) ?>
+
+<?php endif ?>
+<?php if ( !empty( $whitelist_settings ) ): ?>
+	
+	<!-- Whitelist policy  -->
+<?php foreach( $whitelist_settings as $whitelist_setting => $attributes ): ?>
+<?php 
+		if ( empty( $attributes ) || !is_array( $attributes ) ) {
+			continue;
+		}  
+		
+		$attributes_str = '';
+		foreach( $attributes as $attribute => $value ) {
+			$attributes_str .= ' ' . $attribute .'="'. $value .'"';
+		}
+?>
+	<<?php echo $whitelist_setting ?><?php echo $attributes_str ?> />
+<?php endforeach ?>
+<?php endif ?>
+
+	<!-- Icon and Splash screen declaration -->
 <?php if( !empty( $app_icons ) ): ?>
 
 	<?php echo str_replace( "\n", "\n\t", $app_icons ) ?>
 
 <?php endif ?>
-<?php if( !empty( $app_phonegap_plugins ) ): ?>
-
-	<?php echo str_replace( "\n", "\n\t", $app_phonegap_plugins ) ?>
-
-<?php endif ?>
-
 </widget>
 <?php
 		$content = '';
