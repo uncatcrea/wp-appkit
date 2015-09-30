@@ -1,3 +1,10 @@
+## 0.4.1 (2015-09-30)
+
+### Bugfixes:
+- **Fix setAutoScreenTransitions() following hooks implementation evolution** ([#111](https://github.com/uncatcrea/wp-appkit/issues/111), [@mleroi](https://github.com/mleroi))
+- **Support for the Whitelist Cordova plugin** ([#109](https://github.com/uncatcrea/wp-appkit/issues/109), [@mleroi](https://github.com/mleroi))
+- **Plugin parameters** ([#93](https://github.com/uncatcrea/wp-appkit/issues/93), [@lpointet](https://github.com/lpointet))
+
 ## 0.4 (2015-08-03)
 
 ### Features:

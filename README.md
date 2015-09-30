@@ -5,6 +5,10 @@ Create mobile apps and connect them to WordPress.
 > All versions under 1.0 are beta versions
 
 ## News
+* 09/30/2015: Verison 0.4.1
+* Upgrade to support the latest Phonegap Build changes (whitelisting and NPM)
+* Fixes transitions
+
 * 08/03/2015: Version 0.4.
 * This version adds the long awaited **login feature** (meaning that you can now support a WordPress secured authentication in your apps)
 * You can also now use **WP CLI** to export your app's project
