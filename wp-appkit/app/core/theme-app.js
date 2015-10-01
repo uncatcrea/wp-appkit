@@ -593,6 +593,15 @@ define( function( require, exports ) {
 	 * Screen transitions
 	 */
 
+	/**
+	 * Returns the transition direction ("right", "left", "replace" or customized) according
+	 * to current and previous screen.
+	 * 
+	 * @param {Object} current_screen : The screen that is (going to be) displayed after transition
+	 * @param {Object} previous_screen : The screen we're leaving.
+	 * @returns {String} Transition direction (default 'replace', 'right' and 'left' but 
+	 * can be customized with the "transition-direction" filter).
+	 */
 	themeApp.getTransitionDirection = function( current_screen, previous_screen ) {
 		var transition = 'replace';
 
@@ -615,15 +624,34 @@ define( function( require, exports ) {
 		} else {
 			transition = 'replace';
 		}
+		
+		/**
+		 * "transition-direction" filter : use this filter to customize transitions
+		 * directions according to what are current (ie asked) and previous screen.
+		 * 
+		 * @param {string} Transition direction to override if needed.
+		 * @param {Object} current_screen : The screen that is (going to be) displayed after transition.
+		 * @param {Object} previous_screen : The screen we're leaving.
+		 */
+		var transition = Hooks.applyFilters( 'transition-direction', transition, [current_screen, previous_screen] );
 
 		return transition;
 	};
 
+	/**
+	 * This allows to define your own left/right/replace transitions between screens.
+	 * 
+	 * @param {callback} transition_replace
+	 * @param {callback} transition_left
+	 * @param {callback} transition_right
+	 */
 	themeApp.setAutoScreenTransitions = function( transition_replace, transition_left, transition_right ) {
 
+		//Set custom-screen-rendering param to true so that screen rendering
+		//uses the 'screen-transition' action to render :
 		themeApp.setParam( 'custom-screen-rendering', true );
 
-		themeApp.action( 'screen-transition', function( $deferred, $wrapper, $current, $next, current_screen, previous_screen ) {
+		themeApp.action( 'screen-transition', function( $wrapper, $current, $next, current_screen, previous_screen, $deferred ) {
 
 			var direction = themeApp.getTransitionDirection( current_screen, previous_screen );
 
