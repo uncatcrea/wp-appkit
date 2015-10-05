@@ -70,11 +70,14 @@ define(function (require) {
 							}
 						},
 						function( fallback_error){
-							fallback_template_failed( fallback_error )
+							fallback_template_failed( fallback_error );
 						}
 					);
 				}else{
-					fallback_template_failed
+					Utils.log('Error : view template "'+ _this.template_name +'.html" not found in theme');		
+					if( cb_error ){		
+						cb_error();		
+					}
 				}
 			};
 			
