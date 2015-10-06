@@ -142,7 +142,7 @@ define( function ( require ) {
 		
 		//No whitelist setting if the 'cordova-plugin-whitelist' plugin is not here :
 		$whitelist_plugin_here = true;
-		$current_phonegap_plugins = WpakApps::get_merged_phonegap_plugins( $app_id );
+		$current_phonegap_plugins = WpakApps::get_merged_phonegap_plugins( $app_id, $export_type );
 		if ( !array_key_exists( 'cordova-plugin-whitelist', $current_phonegap_plugins ) ) {
 			$whitelist_settings = array();
 			$whitelist_plugin_here = false;
@@ -183,7 +183,7 @@ define( function ( require ) {
 		$whitelist_settings = self::get_whitelist_settings( $app_id, $export_type );
 		
 		//Merge our default Phonegap Build plugins to those set in BO :
-		$app_phonegap_plugins = WpakApps::get_merged_phonegap_plugins_xml($app_id, $app_main_infos['phonegap_plugins']);
+		$app_phonegap_plugins = WpakApps::get_merged_phonegap_plugins_xml( $app_id, $export_type, $app_main_infos['phonegap_plugins'] );
 
 		$xmlns = 'http://www.w3.org/ns/widgets';
 		$xmlns_gap = 'http://phonegap.com/ns/1.0';

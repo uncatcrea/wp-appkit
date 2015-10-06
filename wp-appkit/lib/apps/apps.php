@@ -629,14 +629,14 @@ class WpakApps {
 	 * @param string $bo_plugins_xml Optional. Pass this if the BO plugins XML has already be computed.
 	 * @return string Merged BO and default plugins XML.
 	 */
-	public static function get_merged_phonegap_plugins_xml( $app_id, $bo_plugins_xml = '' ) {
+	public static function get_merged_phonegap_plugins_xml( $app_id, $export_type, $bo_plugins_xml = '' ) {
 
-		$merged_plugins = self::get_merged_phonegap_plugins( $app_id, $bo_plugins_xml );
+		$merged_plugins = self::get_merged_phonegap_plugins( $app_id, $export_type, $bo_plugins_xml );
 				
 		return self::get_plugins_xml($merged_plugins);
 	}
 	
-	public static function get_merged_phonegap_plugins( $app_id, $bo_plugins_xml = '' ) {
+	public static function get_merged_phonegap_plugins( $app_id, $export_type, $bo_plugins_xml = '' ) {
 		if ( empty( $bo_plugins_xml ) ) {
 			$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 			$bo_plugins_xml = $app_main_infos['phonegap_plugins'];
@@ -644,12 +644,12 @@ class WpakApps {
 
 		$bo_plugins_array = self::parse_plugins_from_xml( $bo_plugins_xml );
 
-		$merged_plugins = array_merge( self::get_default_phonegap_plugins( $app_id ), $bo_plugins_array );
+		$merged_plugins = array_merge( self::get_default_phonegap_plugins( $app_id, $export_type ), $bo_plugins_array );
 
 		return $merged_plugins;
 	}
 
-	protected static function get_default_phonegap_plugins( $app_id ) {
+	protected static function get_default_phonegap_plugins( $app_id, $export_type = 'phonegap-build' ) {
 
 		$default_plugins = array(
 			'cordova-plugin-inappbrowser' => array( 'version' => '', 'source' => 'npm' ),
@@ -660,16 +660,19 @@ class WpakApps {
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		if( $app_main_infos['platform'] == 'ios' ) {
 			$default_plugins['cordova-plugin-statusbar'] = array( 'version' => '', 'source' => 'npm' );
-			unset( $default_plugins['cordova-plugin-whitelist'] );
+			if ( $export_type == 'phonegap-build' ) {
+				unset( $default_plugins['cordova-plugin-whitelist'] );
+			}
 		}
 
 		/**
 		 * Filter the Phonegap Build plugins that are included by default by WP AppKit
 		 *
 		 * @param array		$default_plugins	Array of default Phonegap plugins.
+		 * @param string    $export_type        Export type : 'phonegap-build' or 'phonegap-cli'
 		 * @param int		$app_id				Application id
 		 */
-		$default_plugins = apply_filters( 'wpak_default_phonegap_build_plugins', $default_plugins, $app_id );
+		$default_plugins = apply_filters( 'wpak_default_phonegap_build_plugins', $default_plugins, $export_type, $app_id );
 
 		return $default_plugins;
 	}
