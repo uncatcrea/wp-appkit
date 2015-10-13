@@ -149,7 +149,7 @@ define(function (require) {
 	    			&& (!$(elMenu).html().length || (force_reload!=undefined && force_reload) ) ){
 		    		menuView.render();
 		    		vent.trigger('menu:refresh',App.getCurrentScreenData(),menuView);
-		    		Utils.log('Render navigation',{menu_view:menuView,force_reload:force_reload});
+		    		Utils.log('Render menu',{menu_view:menuView,force_reload:force_reload});
 	    		}
 	    	}else{
 	    		if( $(elMenu).html().length ){

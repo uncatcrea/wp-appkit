@@ -170,7 +170,7 @@ define(function (require) {
 				var first_component = app.components.first();
 				default_route = '#component-'+ first_component.id;
 			}else{
-				Utils.log('No navigation, no component found. Could not set default route.');
+				Utils.log('No menu item, no component found. Could not set default route.');
 			}
 		}
 
@@ -508,7 +508,7 @@ define(function (require) {
 	    	    		 if( navigation.length == 0 ){
 	    	    			 syncWebService(cb_ok,cb_error);
 	    	    		 }else{
-	    	    			 Utils.log('Navigation retrieved from local storage.',{navigation:navigation});
+	    	    			 Utils.log('Menu items retrieved from local storage.',{navigation:navigation});
 	    	    			 globals_keys.fetch({'success': function(global_keys, response_global_keys, options_global_keys){
 	    	    	    		 if( global_keys.length == 0 ){
 	    	    	    			 syncWebService(cb_ok,cb_error);
@@ -631,7 +631,7 @@ define(function (require) {
 
 							Addons.setDynamicDataFromWebService( data.addons );
 
-							Utils.log( 'Components, navigation and globals retrieved from online.', { components: app.components, navigation: app.navigation, globals: app.globals } );
+							Utils.log( 'Components, menu items and globals retrieved from online.', { components: app.components, navigation: app.navigation, globals: app.globals } );
 
 							cb_ok();
 						} else {
