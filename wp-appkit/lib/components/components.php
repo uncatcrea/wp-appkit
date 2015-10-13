@@ -48,6 +48,18 @@ class WpakComponents {
 			$components_data['globals'] = $globals;
 
 			$components_data['addons'] = WpakAddons::get_app_addons_dynamic_data( $app_id );
+			
+		} else {
+			
+			//No component : return empty components, navigation, globals and 
+			//addons arrays so that the web service answer is considered valid :
+			
+			$components_data['navigation'] = array();
+			$components_data['components'] = array();
+			$components_data['globals'] = array();
+
+			$components_data['addons'] = WpakAddons::get_app_addons_dynamic_data( $app_id );
+			
 		}
 
 		return $components_data;
