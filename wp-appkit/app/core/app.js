@@ -631,9 +631,21 @@ define(function (require) {
 
 							Addons.setDynamicDataFromWebService( data.addons );
 
-							Utils.log( 'Components, menu items and globals retrieved from online.', { components: app.components, navigation: app.navigation, globals: app.globals } );
+							if ( data.components.length === 0 ) {
+						
+								app.triggerError(
+									'synchro:no-component',
+									{ type: 'ws-data', where: 'app::syncWebService', message: 'No component found for this App. Please add components to the App on WordPress side.', data: data },
+									cb_error
+								);
+						
+							} else {
+								
+								Utils.log( 'Components, menu items and globals retrieved from online.', { components: app.components, navigation: app.navigation, globals: app.globals } );
+								cb_ok();
+								
+							}
 
-							cb_ok();
 						} else {
 							app.triggerError(
 								'synchro:wrong-answer',

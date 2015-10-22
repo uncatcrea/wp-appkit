@@ -77,8 +77,8 @@ require(['root/config'],function(Config){
 																if( App.getParam('refresh-at-app-launch') ){
 																	//Refresh at app launch : as the theme is now loaded, use theme-app :
 																	require(['core/theme-app'],function(ThemeApp){
-																		last_updated = Stats.getStats( 'last_sync' );
-																		refresh_interval = App.options.get( 'refresh_interval' );
+																		var last_updated = Stats.getStats( 'last_sync' );
+																		var refresh_interval = App.options.get( 'refresh_interval' );
 																		if( undefined === last_updated || undefined === refresh_interval || Date.now() > last_updated + ( refresh_interval.get( 'value' ) * 1000 ) ) {
 																			Utils.log( 'Refresh interval exceeded, refreshing', { last_updated: new Date( last_updated ), refresh_interval: refresh_interval.get( 'value' ) } );
 																			ThemeApp.refresh();
@@ -89,9 +89,16 @@ require(['root/config'],function(Config){
 																PhoneGap.hideSplashScreen();
 															});
 														},
-														function(){
+														function( error ){
 															Backbone.history.start();
-															Utils.log("launch.js error : App could not synchronize with website.");
+															
+															var error_message = "Error : App could not synchronize with website";
+															
+															if ( error.id === 'synchro:no-component' ) {
+																error_message += " : no component found in web service answer. Please add components to the App on WordPress side.";
+															} 
+															
+															Utils.log( error_message );
 
 															PhoneGap.hideSplashScreen();
 
