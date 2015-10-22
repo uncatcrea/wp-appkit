@@ -323,7 +323,12 @@ define(function (require) {
 					  }else{
 						  history_action = 'push';
 					  }
-
+				  }else if( current_screen.screen_type == 'comments' ){
+					  if( previous_screen.screen_type == 'page' && previous_screen.item_id == queried_screen_data.item_id ){
+						  history_action = 'pop';
+					  }else{
+						  history_action = 'empty-then-push';
+					  }
 				  }else{
 					  history_action = 'empty-then-push';
 				  }
@@ -695,9 +700,24 @@ define(function (require) {
 
     	  var comments = new Comments.Comments;
 
-    	  var post = app.globals['posts'].get(post_id);
+		  /**
+		   * Use this 'comments-globals' filter if you defined custom global
+		   * types (other than posts and pages) that have comments associated to.
+		   */
+		  var comments_globals = Hooks.applyFilters( 'comments-globals', ['posts', 'pages'], [post_id] );
 
-    	  if( post != undefined ){
+		  var post = null;
+		  var item_global = '';
+
+		  comments_globals.every( function( global ) {
+			  post = app.globals[global].get(post_id);
+			  if ( post != undefined ) {
+				  item_global = global;
+			  }
+			  return post === undefined; //To make the loop break as soon as post != undefined
+		  } );
+
+    	  if( post != undefined && post != null ){
 
 			/**
 			* Filter 'web-service-params' : use this to send custom key/value formated
@@ -736,7 +756,7 @@ define(function (require) {
 				_.each( data.items, function( value, key, list ) {
 					comments.add( value );
 				} );
-				cb_ok( comments, post );
+				cb_ok( comments, post, item_global );
 			};
 
 			ajax_args.error = function( jqXHR, textStatus, errorThrown ) {

@@ -177,13 +177,13 @@ define(function (require) {
         		RegionManager.startWaiting();
 	        	App.getPostComments(
 	        		post_id,
-	        		function(comments,post){
+	        		function(comments,post,item_global){
 	        			RegionManager.stopWaiting();
 	        			if( check_route('comments-/'+ post.id) ){
 							RegionManager.show(
 								'comments',
 								{comments:comments,post:post},
-								{screen_type:'comments',component_id:'',item_id:parseInt(post_id)}
+								{screen_type:'comments',component_id:'',item_id:parseInt(post_id),data:{item_global:item_global}}
 							);
 	        			}
 		        	},
