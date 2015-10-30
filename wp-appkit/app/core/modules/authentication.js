@@ -198,15 +198,15 @@ define( function( require ) {
 		Utils.log( 
 			'Sending authentication query', 
 			( web_service_params.hasOwnProperty( 'auth_action' ) ? '"' + web_service_params.auth_action + '"' : '' ),
-			( web_service_params.hasOwnProperty( 'user' ) ? 'for user ' + web_service_params.user : '' ) 
+			( web_service_params.hasOwnProperty( 'user' ) && web_service_params.user !== 'wpak-app' ? 'for user ' + web_service_params.user : '' ) 
 		);
 		
 		$.ajax( ajax_args );
 	};
 
-	var getPublicKey = function( user, cb_ok, cb_error ) {
+	var getPublicKey = function( cb_ok, cb_error ) {
 
-		var web_service_params = getAuthWebServicesParams( 'get_public_key', user, false );
+		var web_service_params = getAuthWebServicesParams( 'get_public_key' );
 
 		//Retrieve app's public key from server :
 		var success = function( data ) {
@@ -214,7 +214,7 @@ define( function( require ) {
 				if ( data.result.status == 1 ) {
 					if ( data.public_key && data.public_key.length && data.control ) {
 						
-						if ( checkHMAC( data.public_key + user, web_service_params.control_key, data.control ) ) {
+						if ( checkHMAC( data.public_key, web_service_params.control_key, data.control ) ) {
 						
 							//Set public key to Local Storage :
 							authenticationData.set( 'public_key', data.public_key );
@@ -576,6 +576,43 @@ define( function( require ) {
 	 * @param {function} cb_error  What to do if login went wrong
 	 */
 	authentication.logUserIn = function( login, pass, cb_ok, cb_error ) {
+		getPublicKey( 
+			function( public_key ) {
+				sendAuthData( 
+					login, 
+					pass,
+					function( auth_data ) {
+						auth_data.type = 'authentication-info'; //So that theme info event subtype is set
+						App.triggerInfo( 'auth:user-login', auth_data, cb_ok );
+					},
+					function( error, message ) {
+						var error_data = { type: 'authentication-error', where: 'authentication.logUserIn:sendAuthData' };
+						if ( message !== undefined ) {
+							error_data.message = message;
+						}
+						App.triggerError(
+							'auth:'+ error,
+							error_data,
+							cb_error
+						);
+					}
+				);
+			}, 
+			function( error, message ) {
+				var error_data = { type: 'authentication-error', where: 'authentication.logUserIn:getPublicKey' };
+				if ( message !== undefined ) {
+					error_data.message = message;
+				}
+				App.triggerError(
+					'auth:'+ error,
+					error_data,
+					cb_error
+				);
+			}
+		);
+	};
+	
+	authentication.registerUser = function( user_data, cb_ok, cb_error ) {
 		getPublicKey( 
 			login, 
 			function( public_key ) {

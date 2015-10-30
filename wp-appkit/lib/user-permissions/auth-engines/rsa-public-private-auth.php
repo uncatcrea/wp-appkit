@@ -152,76 +152,55 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		switch( $auth_params['auth_action'] ) {
 			
 			case "get_public_key":
-				if ( !empty( $auth_params['user'] ) ) {
-					
-					$user = $auth_params['user'];
-					$user_wp = get_user_by( 'login', $user );
 
-					if ( $user_wp ) {
-					
-						//Check the user is not banned :
-						if ( $this->check_user_is_allowed_to_authenticate( $user_wp->ID, $app_id ) ) {
+				if ( !empty( $auth_params['control'] )
+					 && !empty( $auth_params['control_key'] )
+					 && !empty( $auth_params['timestamp'] )
+					) {
 
-							if ( !empty( $auth_params['control'] )
-								 && !empty( $auth_params['control_key'] )
-								 && !empty( $auth_params['timestamp'] )
-								) {
+					$control = $auth_params['control'];
+					$control_key = $auth_params['control_key'];
+					$timestamp = $auth_params['timestamp'];
+					$user = $auth_params['user']; //Not a real user here ('wpak-app') because public key can be retrieved by anyone
 
-								$user = $auth_params['user'];
-								$control = $auth_params['control'];
-								$control_key = $auth_params['control_key'];
-								$timestamp = $auth_params['timestamp'];
+					//First, check that sent data has not been modified :
+					if ( $this->check_hmac( $auth_params['auth_action'] . $user . $timestamp, $control_key, $control ) ) {
 
-								//First, check that sent data has not been modified :
-								if ( $this->check_hmac( $auth_params['auth_action'] . $user . $timestamp, $control_key, $control ) ) {
+						if ( $this->check_query_time( $timestamp ) ) {
 
-									if ( $this->check_query_time( $timestamp ) ) {
+							if ( function_exists( 'openssl_pkey_get_private' ) ) {
 
-										if ( function_exists( 'openssl_pkey_get_private' ) ) {
-											
-											$public_key = $this->get_app_public_key( $app_id );
-											if ( !empty( $public_key ) ) {
+								$public_key = $this->get_app_public_key( $app_id );
+								if ( !empty( $public_key ) ) {
 
-												//Return public key :
-												$service_answer['public_key'] = $public_key;
+									//Return public key :
+									$service_answer['public_key'] = $public_key;
 
-												//Add control key :
-												$service_answer['control'] = $this->generate_hmac( $public_key . $user, $control_key );
+									//Add control key :
+									$service_answer['control'] = $this->generate_hmac( $public_key, $control_key );
 
-											} else {
-												//If not in debug mode, don't give error details for security concern :
-												$service_answer['auth_error'] = $debug_mode ? 'empty-public-key' : 'auth-error'; //Don't give more details for security concern
-											}
-											
-										} else {
-											$service_answer['auth_error'] = $debug_mode ? 'php-openssl-not-found' : 'auth-error'; //Don't give more details for security concern
-										}
-
-									} else {
-										//If not in debug mode, don't give error details for security concern :
-										$service_answer['auth_error'] = $debug_mode ? 'wrong-query-time' : 'auth-error'; //Don't give more details for security concern
-									}
-									
 								} else {
 									//If not in debug mode, don't give error details for security concern :
-									$service_answer['auth_error'] = $debug_mode ? 'wrong-hmac' : 'auth-error'; //Don't give more details for security concern
+									$service_answer['auth_error'] = $debug_mode ? 'empty-public-key' : 'auth-error'; //Don't give more details for security concern
 								}
 
 							} else {
-								//If not in debug mode, don't give error details for security concern :
-								$service_answer['auth_error'] = $debug_mode ? 'wrong-data' : 'auth-error'; //Don't give more details for security concern
+								$service_answer['auth_error'] = $debug_mode ? 'php-openssl-not-found' : 'auth-error'; //Don't give more details for security concern
 							}
-							
+
 						} else {
-							$service_answer['auth_error'] = 'user-banned';
+							//If not in debug mode, don't give error details for security concern :
+							$service_answer['auth_error'] = $debug_mode ? 'wrong-query-time' : 'auth-error'; //Don't give more details for security concern
 						}
-						
+
 					} else {
-						$service_answer['auth_error'] = 'wrong-user';
+						//If not in debug mode, don't give error details for security concern :
+						$service_answer['auth_error'] = $debug_mode ? 'wrong-hmac' : 'auth-error'; //Don't give more details for security concern
 					}
-					
+
 				} else {
-					$service_answer['auth_error'] = 'empty-user';
+					//If not in debug mode, don't give error details for security concern :
+					$service_answer['auth_error'] = $debug_mode ? 'wrong-data' : 'auth-error'; //Don't give more details for security concern
 				}
 				break;
 				
