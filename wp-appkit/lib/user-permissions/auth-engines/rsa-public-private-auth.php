@@ -1,6 +1,7 @@
 <?php
 
 require_once( dirname( __FILE__ ) .'/abstract-auth-engine.php' );
+require_once( dirname( __FILE__ ) .'/../user-register.php' );
 
 class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	
@@ -346,6 +347,65 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 					}
 				}else {
 					$service_answer['auth_error'] = 'wrong-auth-data';
+				}
+				break;
+			
+			case "register_user":
+				if ( !empty( $auth_params['encrypted'] ) 
+					 && !empty( $auth_params['control'] )
+					 && !empty( $auth_params['timestamp'] )
+					) {
+					
+					$service_answer = array( 
+						'registered_ok'   => 0, 
+						'register_errors' => array()
+					);
+					
+					$encrypted = $auth_params['encrypted']; //contains user data
+					$control = $auth_params['control'];
+					$timestamp = $auth_params['timestamp'];
+
+					$decrypted = $this->decrypt( $app_id, $encrypted );
+
+					if ( is_array( $decrypted ) && !empty( $decrypted['control_key'] ) && !empty( $decrypted['user_data'] )) {
+
+						$control_key = $decrypted['control_key'];
+						
+						//Check that sent data has not been modified :
+						if ( $this->check_hmac( $auth_params['auth_action'] . $timestamp . $encrypted, $control_key, $control ) ) {
+
+							if ( $this->check_query_time( $timestamp ) ) {
+
+								$user_data = $decrypted['user_data'];
+								
+								if ( is_array( $user_data ) ) {
+
+									$result = WpakUserRegistration::register_user( $user_data, $app_id );
+
+									if ( $result['ok'] ) {
+										$service_answer['registered_ok'] = 1;
+									} else {
+										$service_answer['register_errors'] = $result['errors'];
+									}
+
+								} else {
+									$service_answer['register_errors'][] = $debug_mode ? 'wrong-user-data' : 'register-error'; //Don't give more details for security concern
+								}
+
+							} else {
+								$service_answer['register_errors'][] = $debug_mode ? 'wrong-query-time' : 'register-error'; //Don't give more details for security concern
+							}
+
+						} else {
+							$service_answer['register_errors'][] = $debug_mode ? 'wrong-hmac' : 'register-error'; //Don't give more details for security concern
+						}
+
+					} else {
+						$service_answer['register_errors'][] = $debug_mode ? 'wrong-decryption' : 'register-error'; //Don't give more details for security concern
+					}
+					
+				} else {
+					$service_answer['register_errors'][] = $debug_mode ? 'wrong-data' : 'register-error'; //Don't give more details for security concern
 				}
 				break;
 				
