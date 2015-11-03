@@ -70,7 +70,14 @@ define( function( require ) {
 		return Math.floor( Date.now() / 1000);
 	};
 	
-	var generateControlStringFromData = function( to_control, control_key ) {
+	/**
+	 * Generates HMAC control from ordered items passed in "to_control"
+	 * 
+	 * @param {array} to_control Ordered array of items to control
+	 * @param {string} control_key
+	 * @returns {string} HMAC string
+	 */
+	var generateControlHmacFromData = function( to_control, control_key ) {
 		var control_string = '';
 		
 		if ( to_control.length ) {
@@ -83,16 +90,32 @@ define( function( require ) {
 		return control_string;
 	};
 	
-	var generateControlString = function( control_data_keys, control_data, control_key ) {
-		var to_control = [];
+	/**
+	 * Generates a string resulting from the concatenation of values in "control_data".
+	 * Only values corresponding to "control_data_keys" in "control_data" are taken into account.
+	 * This string can then be passed to checkHmac().
+	 * 
+	 * @param {array} control_data_keys Ordered keys to consider in control_data
+	 * @param {JSON object} control_data 
+	 * @returns {string} Result of "control_data" values concatenation
+	 */
+	var generateControlString = function( control_data_keys, control_data ) {
+		var control_string = '';
 		
+		var to_control = [];
 		_.each( control_data_keys, function( key ) {
 			if ( control_data.hasOwnProperty( key ) ) {
 				to_control.push( control_data[key] );
 			}
 		} );
 		
-		return generateControlStringFromData( to_control, control_key );
+		if ( to_control.length ) {
+			_.each( to_control, function( value ) {
+				control_string += value;
+			} );
+		}
+		
+		return control_string;
 	};
 	
 	/**
@@ -107,7 +130,7 @@ define( function( require ) {
 	 */
 	var getAuthWebServicesParams = function( auth_action, user, use_user_control, data_keys, data, add_data_to_ws_params ) {
 		
-		user = user === undefined ? 'wpak-app' : user;
+		user = ( user === undefined || user === '' ) ? 'wpak-app' : user;
 		
 		add_data_to_ws_params = add_data_to_ws_params === undefined || add_data_to_ws_params === true;
 		
@@ -115,7 +138,7 @@ define( function( require ) {
 
 		var web_service_params = {
 			user: user,
-			timestamp: timestamp,
+			timestamp: timestamp
 		};
 		
 		if ( add_data_to_ws_params ) {
@@ -146,7 +169,7 @@ define( function( require ) {
 			} );
 		}
 		
-		web_service_params.control = generateControlStringFromData( to_control, control_key ) ;
+		web_service_params.control = generateControlHmacFromData( to_control, control_key ) ;
 		
 		return web_service_params;
 	};
@@ -332,6 +355,107 @@ define( function( require ) {
 			cb_error( 'no-public-key');
 		}
 		
+	};
+	
+	var sendRegisterData = function( user_data, options, cb_ok, cb_error ) {
+		
+		//Parse options:
+		options = options || {};
+		var login_after_register = options.login_after_register === true;
+			
+		//Get public key from Local Storage:
+		var public_key = authenticationData.get( 'public_key' );
+		if ( public_key.length ) {
+			
+			var encrypt = new JSEncrypt();
+			encrypt.setPublicKey( public_key );
+			
+			var to_encrypt = {};
+					
+			to_encrypt.user_data = user_data;
+			
+			//Even if we don't log the user at registration time, we use an encrypted secret key to control data.
+			//Generate local app user secret key (for HMAC checking and potentially symetric encryption):
+			var user_secret = generateRandomSecret();
+			authenticationData.set( 'secret', user_secret ); //need to set it here to be retrieved in getAuthWebServicesParams();
+			to_encrypt.secret = user_secret;
+			
+			var encrypted = encrypt.encrypt( JSON.stringify( to_encrypt ) );
+			
+			var web_service_params = getAuthWebServicesParams( 
+				'register_user', 
+				'', 
+				true, 
+				['encrypted', 'login_after_register'], 
+				{ encrypted: encrypted, login_after_register: login_after_register ? 1 : 0 } 
+			);
+			
+			var success = function( data ) {
+				if ( data.hasOwnProperty( 'result' ) && data.result.hasOwnProperty( 'status' ) && data.result.hasOwnProperty( 'message' ) ) {
+					if ( data.result.status === 1 ) {
+						if ( data.hasOwnProperty( 'registered_ok' ) ) {
+							if ( data.registered_ok === 1 ) {
+							
+								if (  data.hasOwnProperty( 'permissions' ) ) {
+
+									var control_string = generateControlString( data.controlled, data.user_data );
+									
+									//Check control hmac :
+									if ( checkHMAC( 'registered' + control_string, user_secret, data.control ) ) {
+
+										Utils.log( 'User "' + data.user_data.user_login + '" registered successfully', data.user_data );
+
+										if ( login_after_register ) {
+											//Memorize current user login and secret : 
+											authenticationData.set( 'user_login', data.user_data.user_login );
+											authenticationData.set( 'secret', user_secret );
+											authenticationData.set( 'is_authenticated', true );
+
+											//Memorize returned user permissions
+											authenticationData.set( 'permissions', data.permissions );
+
+											//Save all this to local storage
+											authenticationData.save();
+
+											Utils.log( 'User "' + data.user_data.user_login + '" logged in successfully', authentication.getCurrentUser() );
+										}
+										
+										cb_ok( { user: data.user_data.user_login, user_data: data.user_data, permissions: data.permissions } );
+
+									} else {
+										cb_error( 'wrong-hmac' );
+									}
+
+								} else {
+									cb_error( 'no-permissions' );
+								}
+								
+							} else if ( data.hasOwnProperty( 'register_errors' ) ) {
+								cb_error( data.register_errors );
+							} else {
+								cb_error( 'no-auth-error' );
+							}
+							
+						} else {
+							cb_error( 'wrong-auth-data' );
+						}
+					} else {
+						cb_error( 'web-service-error', data.result.message );
+					}
+				}else {
+					cb_error( 'wrong-result-data' );
+				}
+			};
+
+			var error = function( error_id ) {
+				cb_error( error_id );
+			};
+		
+			ajaxQuery( web_service_params, success, error );
+			
+		} else {
+			cb_error( 'no-public-key');
+		}
 	};
 
 	/**
@@ -612,19 +736,21 @@ define( function( require ) {
 		);
 	};
 	
-	authentication.registerUser = function( user_data, cb_ok, cb_error ) {
+	authentication.registerUser = function( user_data, options, cb_ok, cb_error ) {
+		
+		options = options || { login_after_register: false };
+
 		getPublicKey( 
-			login, 
 			function( public_key ) {
-				sendAuthData( 
-					login, 
-					pass,
-					function( auth_data ) {
-						auth_data.type = 'authentication-info'; //So that theme info event subtype is set
-						App.triggerInfo( 'auth:user-login', auth_data, cb_ok );
+				sendRegisterData( 
+					user_data,
+					options,
+					function( register_data ) {
+						register_data.type = 'authentication-info'; //So that theme info event subtype is set
+						App.triggerInfo( 'auth:user-register', register_data, cb_ok );
 					},
 					function( error, message ) {
-						var error_data = { type: 'authentication-error', where: 'authentication.logUserIn:sendAuthData' };
+						var error_data = { type: 'authentication-error', where: 'authentication.registerUser:sendRegisterData' };
 						if ( message !== undefined ) {
 							error_data.message = message;
 						}
@@ -637,7 +763,7 @@ define( function( require ) {
 				);
 			}, 
 			function( error, message ) {
-				var error_data = { type: 'authentication-error', where: 'authentication.logUserIn:getPublicKey' };
+				var error_data = { type: 'authentication-error', where: 'authentication.registerUser:getPublicKey' };
 				if ( message !== undefined ) {
 					error_data.message = message;
 				}

@@ -247,7 +247,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 											$pass = $decrypted['pass'];
 											if ( wp_check_password( $pass, $user_wp->data->user_pass, $user_wp->ID ) ) {
 
-												//Memorize user as registered and store its secret control key
+												//Memorize user as connected and store its secret control key
 												$this->authenticate_user( $user_wp->ID, $user_secret_key, $app_id );
 
 												//Return authentication result to client :
@@ -258,6 +258,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 												
 												//Add control key :
 												$service_answer['control'] = $this->generate_hmac( 'authenticated' . $user, $user_secret_key );
+												//TODO: we should add permissions to control.
 
 											} else {
 												$service_answer['auth_error'] = 'wrong-pass';
@@ -337,6 +338,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 					
 					$service_answer = array( 
 						'registered_ok'   => 0, 
+						'authenticated' => 0,
 						'register_errors' => array()
 					);
 					
@@ -346,23 +348,58 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 
 					$decrypted = $this->decrypt( $app_id, $encrypted );
 
-					if ( is_array( $decrypted ) && !empty( $decrypted['control_key'] ) && !empty( $decrypted['user_data'] )) {
+					if ( is_array( $decrypted ) && !empty( $decrypted['secret'] ) && !empty( $decrypted['user_data'] )) {
 
-						$control_key = $decrypted['control_key'];
+						$secret_key = $decrypted['secret'];
+						$login_after_register = $auth_params['login_after_register'] == 1 ? 1 : 0;
 						
 						//Check that sent data has not been modified :
-						if ( $this->check_hmac( $auth_params['auth_action'] . $timestamp . $encrypted, $control_key, $control ) ) {
+						if ( $this->check_hmac( $auth_params['auth_action'] . 'wpak-app' . $timestamp . $encrypted . $login_after_register, $secret_key, $control ) ) {
 
 							if ( $this->check_query_time( $timestamp ) ) {
 
 								$user_data = $decrypted['user_data'];
 								
-								if ( is_array( $user_data ) ) {
+								if ( is_object( $user_data ) ) {
 
+									$user_data = (array)$user_data;
+									
 									$result = WpakUserRegistration::register_user( $user_data, $app_id );
 
 									if ( $result['ok'] ) {
 										$service_answer['registered_ok'] = 1;
+										
+										$user_id = $result['registered_user']['user_id'];
+										
+										$service_answer['user'] = $result['registered_user']['user_login'];
+										
+										$service_answer['user_data'] = $result['registered_user'];
+										
+										//TODO: check on server side that "Login after register" is allowed
+										//(create an option in BO for that)
+										if ( $login_after_register ) {
+											//Memorize user as connected and store its secret control key
+											$this->authenticate_user( $user_id, $secret_key, $app_id );
+
+											//Return authentication result to client :
+											$service_answer['authenticated'] = 1; 
+										}
+										
+										//Get user permissions :
+										$service_answer['permissions'] = $this->get_user_permissions( $user_id, $app_id );
+										
+										//Add each user data to hmac control:
+										$to_control = 'registered';
+										foreach( $service_answer['user_data'] as $value ) {
+											$to_control .= (string)$value;
+										}
+										
+										$service_answer['control'] = $this->generate_hmac( $to_control, $secret_key );
+										//TODO: we should add permissions to control.
+										
+										//Tell the app the order of controlled user data:
+										$service_answer['controlled'] = array_keys( $service_answer['user_data'] );
+										
 									} else {
 										$service_answer['register_errors'] = $result['errors'];
 									}

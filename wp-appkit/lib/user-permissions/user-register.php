@@ -97,7 +97,7 @@ class WpakUserRegistration {
 								);
 
 								/**
-								 * Use this 'wpak_register_user_data' filter to add any custom data to the registerd user 
+								 * Use this 'wpak_register_user_data' filter to add any custom data to the registered user 
 								 * (for example 'first_name', 'last_name' etc...)
 								 * See the WordPress wp_insert_user() function for all possible fields.
 								 * 
@@ -110,11 +110,14 @@ class WpakUserRegistration {
 								// Insert new user
 								$user_id = wp_insert_user( $final_user_data );
 								
+								//Remove password from user data array, so that it is not returned in webservice answer:
+								unset( $final_user_data['user_pass'] );
+								
 								// Validate inserted user
 								if ( !is_wp_error( $user_id ) ){
 									
 									/**
-									 * User this 'wpak_user_registered' filter to set additionnal user (meta) data
+									 * Use this 'wpak_user_registered' filter to set additionnal user (meta) data
 									 * once the user was created successfully. This is a filter and not an action so
 									 * that errors can be returned.
 									 * 
@@ -132,7 +135,7 @@ class WpakUserRegistration {
 										//Send notification emails:
 									
 										/**
-										 * Use this 'wpak_registration_notification' to choose whether or not
+										 * Use this 'wpak_registration_notification' filter to choose whether or not
 										 * sending notification to admin and to the registered user.
 										 * 
 										 * Default type = 'both'.
@@ -145,7 +148,14 @@ class WpakUserRegistration {
 										}
 										
 										$result['ok'] = true;
-										$result['registered_user'] = $final_user_data + array( 'user_id' => $user_id );
+										
+										/**
+										 * Use this "wpak_returned_registered_user" filter to set what user info will be 
+										 * returned to the app after registration.
+										 */
+										$final_user_data = apply_filters( 'wpak_returned_registered_user', $final_user_data + array( 'user_id' => $user_id ), $app_id );
+										
+										$result['registered_user'] = $final_user_data;
 										
 									} else {
 										$result['errors'] = $errors;
