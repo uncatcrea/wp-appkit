@@ -327,7 +327,7 @@ class WpakApps {
 		?>
 		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
 		<div class="wpak_setting field-group">
-			<p class="description"><?php _e( 'Deep Linking allows you to create links to open the app. Enter here the custom scheme you want to use (e.g. urlscheme://mylink).', WpAppKit::i18n_domain ) ?></p>
+			<p class="description"><?php _e( 'Deep Linking allows you to create links to open the app. Enter here the custom scheme you want to use (e.g. "urlscheme" lets you create links like urlscheme://mylink).', WpAppKit::i18n_domain ) ?></p>
 			<label for="wpak_app_url_scheme"><?php _e( 'Custom URL Scheme', WpAppKit::i18n_domain ) ?></label>
 			<input id="wpak_app_url_scheme" type="text" name="wpak_app_url_scheme" value="<?php echo esc_attr( $main_infos['url_scheme'] ); ?>" />
 			<span class="description"><?php _e( 'If empty, deep linking feature won\'t be available for this app', WpAppKit::i18n_domain ) ?></span>
