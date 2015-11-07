@@ -302,7 +302,7 @@ class WpakApps {
 		$main_infos = self::get_app_main_infos( $post->ID );
 		?>
 		<div class="wpak_settings">
-			<select name="wpak_app_platform">
+			<select id="wpak_app_platform" name="wpak_app_platform">
 				<?php foreach ( self::get_platforms() as $value => $label ): ?>
 					<?php $selected = $value == $main_infos['platform'] ? 'selected="selected"' : '' ?>
 					<option value="<?php echo $value ?>" <?php echo $selected ?>><?php echo $label ?></option>
@@ -337,7 +337,7 @@ class WpakApps {
 					<label><?php _e( 'Version', WpAppKit::i18n_domain ) ?></label>
 					<input type="text" name="wpak_app_version" value="<?php echo esc_attr( $main_infos['version'] ) ?>" id="wpak_app_version" />
 				</div>
-				<div class="field-group">
+				<div class="field-group platform-specific android">
 					<label><?php _e( 'VersionCode (Android only)', WpAppKit::i18n_domain ) ?></label>
 					<input type="text" name="wpak_app_version_code" value="<?php echo esc_attr( $main_infos['version_code'] ) ?>" id="wpak_app_version_code" />
 				</div>
