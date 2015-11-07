@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP AppKit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-07 15:42+0100\n"
-"PO-Revision-Date: 2015-11-07 15:42+0100\n"
+"POT-Creation-Date: 2015-11-07 21:32+0100\n"
+"PO-Revision-Date: 2015-11-07 21:33+0100\n"
 "Last-Translator: Lionel Pointet <lionel.pointet@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -48,8 +48,8 @@ msgid "Addons"
 msgstr "Addons"
 
 #: ../lib/addons/addons.php:126
-msgid "Addons activated for this App:"
-msgstr "Addons activés pour cette application :"
+msgid "Addons activated for this App"
+msgstr "Addons activés pour cette application"
 
 #: ../lib/apps/apps.php:30 ../lib/apps/apps.php:319 ../lib/apps/build.php:30
 #: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:46
@@ -281,7 +281,17 @@ msgid "App Simulation Visibility"
 msgstr "Visibilité de la simulation de l'application"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:392
+#: ../lib/apps/apps.php:395
+msgid "Private"
+msgstr "Privée"
+
+# @ wp-appkit
+#: ../lib/apps/apps.php:396
+msgid "Public"
+msgstr "Publique"
+
+# @ wp-appkit
+#: ../lib/apps/apps.php:398
 msgid ""
 "If activated, only connected users with right permissions can access the app "
 "simulation in web browser.<br/>If deactivated, the app simulation is "
@@ -293,16 +303,6 @@ msgstr ""
 "navigateur.<br/>Si désactivé, la simulation de l'application est visible "
 "publiquement dans tout navigateur web, y compris les fichiers config.js et "
 "config.xml, qui peuvent contenir des informations sensibles."
-
-# @ wp-appkit
-#: ../lib/apps/apps.php:396
-msgid "Private"
-msgstr "Privée"
-
-# @ wp-appkit
-#: ../lib/apps/apps.php:397
-msgid "Public"
-msgstr "Publique"
 
 # @ wp-appkit
 #: ../lib/apps/apps.php:509
@@ -1109,7 +1109,7 @@ msgstr "Erreur d'authentification sécurisée"
 msgid "Private Key"
 msgstr "Clé privée"
 
-#: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:50
+#: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:51
 msgid ""
 "This private key is required to allow users to log in from the app using "
 "their WordPress credentials."
@@ -1117,7 +1117,7 @@ msgstr ""
 "Cette clé privée est requise pour permettre aux utilisateur de se connecter "
 "depuis l'app grâce à leurs identifiants WordPress"
 
-#: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:51
+#: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:52
 msgid ""
 "It is an OpenSSL RSA Encryption Key that can be generated with the openssl "
 "command line (Unix/OSX) or using PuTTYgen (Windows)."
@@ -1125,7 +1125,7 @@ msgstr ""
 "C'est une clé de chiffrement OpenSSL RSA qui peut être générée grâce à la "
 "ligne de commande openssl (Unix / OSX) ou en utilisant PuTTYgen (Windows)."
 
-#: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:52
+#: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:53
 msgid ""
 "Here is the openssl command that generates the private key: openssl genrsa -"
 "out rsa_1024_priv.pem 1024."
@@ -1133,7 +1133,7 @@ msgstr ""
 "La commande openssl qui génère la clé privée est la suivante : openssl "
 "genrsa -out rsa_1024_priv.pem 1024."
 
-#: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:53
+#: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:54
 msgid ""
 "(Note that WP-AppKit authentication is only compatible with 1024 bits "
 "authentication keys.)"
