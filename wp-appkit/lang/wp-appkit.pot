@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP AppKit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-07 22:51+0100\n"
-"PO-Revision-Date: 2015-11-07 22:51+0100\n"
+"POT-Creation-Date: 2015-11-07 22:53+0100\n"
+"PO-Revision-Date: 2015-11-07 22:53+0100\n"
 "Last-Translator: Lionel Pointet <lionel.pointet@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -49,7 +49,8 @@ msgstr ""
 msgid "Addons activated for this App"
 msgstr ""
 
-#: ../lib/apps/apps.php:30 ../lib/apps/apps.php:319 ../lib/apps/build.php:30
+#: ../lib/apps/apps.php:30 ../lib/apps/apps.php:328 ../lib/apps/apps.php:342
+#: ../lib/apps/build.php:30
 #: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:46
 #: ../lib/web-services/web-services-bo-settings.php:25
 msgid "Help me"
@@ -65,7 +66,7 @@ msgid "Applications"
 msgstr ""
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:68 ../lib/apps/apps.php:323
+#: ../lib/apps/apps.php:68 ../lib/apps/apps.php:346
 msgid "Application"
 msgstr ""
 
@@ -121,66 +122,84 @@ msgstr ""
 msgid "Platform"
 msgstr ""
 
-#: ../lib/apps/apps.php:154 ../lib/apps/apps.php:294
+#: ../lib/apps/apps.php:150
+msgid "Deep Linking"
+msgstr ""
+
+#: ../lib/apps/apps.php:163 ../lib/apps/apps.php:303
 msgid "PhoneGap Build"
 msgstr ""
 
-#: ../lib/apps/apps.php:180 ../lib/apps/apps.php:232 ../lib/apps/apps.php:235
+#: ../lib/apps/apps.php:189 ../lib/apps/apps.php:241 ../lib/apps/apps.php:244
 msgid "Save"
 msgstr ""
 
-#: ../lib/apps/apps.php:186
+#: ../lib/apps/apps.php:195
 msgid "Preview"
 msgstr ""
 
 #. translators: Publish box date format, see http://php.net/date
-#: ../lib/apps/apps.php:195
+#: ../lib/apps/apps.php:204
 msgid "M j, Y @ H:i"
 msgstr ""
 
-#: ../lib/apps/apps.php:198
+#: ../lib/apps/apps.php:207
 #, php-format
 msgid "Last saved on: <b>%1$s</b>"
 msgstr ""
 
-#: ../lib/apps/apps.php:200 ../lib/apps/apps.php:204
+#: ../lib/apps/apps.php:209 ../lib/apps/apps.php:213
 msgid "Not saved yet"
 msgstr ""
 
-#: ../lib/apps/apps.php:219
+#: ../lib/apps/apps.php:228
 msgid "Delete Permanently"
 msgstr ""
 
-#: ../lib/apps/apps.php:221
+#: ../lib/apps/apps.php:230
 msgid "Move to Trash"
 msgstr ""
 
-#: ../lib/apps/apps.php:272
+#: ../lib/apps/apps.php:281
 msgid "Define a title"
 msgstr ""
 
-#: ../lib/apps/apps.php:276
+#: ../lib/apps/apps.php:285
 msgid "Add components"
 msgstr ""
 
-#: ../lib/apps/apps.php:280
+#: ../lib/apps/apps.php:289
 msgid "Setup appearance and navigation"
 msgstr ""
 
-#: ../lib/apps/apps.php:284
+#: ../lib/apps/apps.php:293
 msgid "Setup PhoneGap config"
 msgstr ""
 
-#: ../lib/apps/apps.php:288
+#: ../lib/apps/apps.php:297
 msgid "Save your app"
 msgstr ""
 
-#: ../lib/apps/apps.php:294 ../lib/apps/apps.php:379
+#: ../lib/apps/apps.php:303 ../lib/apps/apps.php:402
 msgid "Export"
 msgstr ""
 
+#: ../lib/apps/apps.php:330
+msgid ""
+"Deep Linking allows you to create links to open the app. Enter here the "
+"custom scheme you want to use (e.g. urlscheme://mylink)."
+msgstr ""
+
+#: ../lib/apps/apps.php:331
+msgid "Custom URL Scheme"
+msgstr ""
+
+#: ../lib/apps/apps.php:333
+msgid "If empty, deep linking feature won't be available for this app"
+msgstr ""
+
 # @ wp-appkit
-#: ../lib/apps/apps.php:321
+#: ../lib/apps/apps.php:344
 msgid ""
 "PhoneGap config.xml informations that are going to be displayed on App "
 "Stores.<br/>They are required when exporting the App to Phonegap, but are "
@@ -188,60 +207,60 @@ msgid ""
 msgstr ""
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:325 ../lib/apps/apps.php:353
+#: ../lib/apps/apps.php:348 ../lib/apps/apps.php:376
 #: ../lib/components/components-bo-settings.php:61
 msgid "Name"
 msgstr ""
 
-#: ../lib/apps/apps.php:329
+#: ../lib/apps/apps.php:352
 msgid "Description"
 msgstr ""
 
-#: ../lib/apps/apps.php:333
+#: ../lib/apps/apps.php:356
 msgid "ID"
 msgstr ""
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:337 ../lib/apps/apps.php:368
+#: ../lib/apps/apps.php:360 ../lib/apps/apps.php:391
 msgid "Version"
 msgstr ""
 
-#: ../lib/apps/apps.php:341
+#: ../lib/apps/apps.php:364
 msgid "VersionCode (Android only)"
 msgstr ""
 
-#: ../lib/apps/apps.php:345
+#: ../lib/apps/apps.php:368
 msgid "Icons and Splashscreens"
 msgstr ""
 
-#: ../lib/apps/apps.php:347
+#: ../lib/apps/apps.php:370
 msgid ""
 "Write the icons and splashscreens tags as defined in the PhoneGap "
 "documentation.<br/>Example: "
 msgstr ""
 
-#: ../lib/apps/apps.php:351
+#: ../lib/apps/apps.php:374
 msgid "Author"
 msgstr ""
 
-#: ../lib/apps/apps.php:357
+#: ../lib/apps/apps.php:380
 msgid "Website"
 msgstr ""
 
-#: ../lib/apps/apps.php:361
+#: ../lib/apps/apps.php:384
 msgid "Email"
 msgstr ""
 
-#: ../lib/apps/apps.php:366
+#: ../lib/apps/apps.php:389
 msgid "PhoneGap"
 msgstr ""
 
-#: ../lib/apps/apps.php:372
+#: ../lib/apps/apps.php:395
 msgid "Plugins"
 msgstr ""
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:374
+#: ../lib/apps/apps.php:397
 msgid ""
 "Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/"
 ">Example : to include the \"In App Browser\" plugin for a Phonegap Build "
@@ -250,26 +269,26 @@ msgid ""
 msgstr ""
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:378
+#: ../lib/apps/apps.php:401
 msgid "View config.xml"
 msgstr ""
 
-#: ../lib/apps/apps.php:391
+#: ../lib/apps/apps.php:414
 msgid "App Simulation Visibility"
 msgstr ""
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:395
+#: ../lib/apps/apps.php:418
 msgid "Private"
 msgstr ""
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:396
+#: ../lib/apps/apps.php:419
 msgid "Public"
 msgstr ""
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:398
+#: ../lib/apps/apps.php:421
 msgid ""
 "If activated, only connected users with right permissions can access the app "
 "simulation in web browser.<br/>If deactivated, the app simulation is "
@@ -278,12 +297,12 @@ msgid ""
 msgstr ""
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:509
+#: ../lib/apps/apps.php:536
 msgid "iOS"
 msgstr ""
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:510
+#: ../lib/apps/apps.php:537
 msgid "Android"
 msgstr ""
 
