@@ -29,7 +29,7 @@ class WpakBuild {
 		?>
 		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
 		<div class="field-group">
-			<label><?php _e( 'Debug Mode', WpAppKit::i18n_domain ) ?> : </label>
+			<label><?php _e( 'Debug Mode', WpAppKit::i18n_domain ) ?></label>
 			<select name="wpak_app_debug_mode">
 				<option value="on" <?php echo $debug_mode == 'on' ? 'selected="selected"' : '' ?>><?php _e( 'On', WpAppKit::i18n_domain ) ?></option>
 				<option value="off" <?php echo $debug_mode == 'off' ? 'selected="selected"' : '' ?>><?php _e( 'Off', WpAppKit::i18n_domain ) ?></option>
@@ -273,7 +273,7 @@ class WpakBuild {
 		if ( is_dir( $source ) === true ) {
 
 			$source_root = '';
-			
+
 			if ( $export_type === 'phonegap-cli' ) {
 				//PhoneGap CLI export is made in www subdirectory
 				//( only config.xml stays at zip root )
@@ -284,7 +284,7 @@ class WpakBuild {
 					return $answer;
 				}
 			}
-			
+
 			if ( !empty( $source_root ) ) {
 				$source_root .= '/';
 			}
@@ -295,22 +295,22 @@ class WpakBuild {
 				$filename = str_replace( $source, '', $file );
 				$filename = wp_normalize_path( $filename );
 				$filename = ltrim( $filename, '/\\' );
-				
+
 				//Themes are included separately from the wpak themes directory
 				if ( preg_match( '|themes[/\\\].+|', $filename ) ) {
 					continue;
 				}
 
 				$zip_filename = $source_root . $filename;
-				
+
 				if ( is_dir( $file ) === true ) {
-					
+
 					if ( !$zip->addEmptyDir( $zip_filename ) ) {
 						$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
 						$answer['ok'] = 0;
 						return $answer;
 					}
-					
+
 				} elseif ( is_file( $file ) === true ) {
 
 					if ( $filename == 'index.html' ) {
@@ -322,7 +322,7 @@ class WpakBuild {
 							$answer['ok'] = 0;
 							return $answer;
 						}
-						
+
 					} else {
 
 						if ( !$zip->addFile( $file, $zip_filename ) ) {
@@ -330,7 +330,7 @@ class WpakBuild {
 							$answer['ok'] = 0;
 							return $answer;
 						}
-						
+
 					}
 				}
 			}
@@ -361,9 +361,9 @@ class WpakBuild {
 						}
 
 						$filename = 'themes/'. $filename;
-						
+
 						$zip_filename = $source_root . $filename;
-						
+
 						if ( is_dir( $file ) === true ) {
 							if ( !$zip->addEmptyDir( $zip_filename ) ) {
 								$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
@@ -394,10 +394,10 @@ class WpakBuild {
 
 			//Create config.js file :
 			$zip->addFromString( $source_root .'config.js', WpakConfigFile::get_config_js( $app_id ) );
-			
+
 			//Create config.xml file (stays at zip root) :
 			$zip->addFromString( 'config.xml', WpakConfigFile::get_config_xml( $app_id, false, $export_type ) );
-			
+
 		} else {
 			$answer['msg'] = sprintf( __( 'Zip archive source directory [%s] could not be found.', WpAppKit::i18n_domain ), $source );
 			$answer['ok'] = 0;
