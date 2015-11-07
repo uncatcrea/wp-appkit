@@ -48,7 +48,8 @@ jQuery().ready(function(){
         wizard_phonegap = $( '#wpak_app_wizard_phonegap' ),
         wizard_save = $( '#wpak_app_wizard_save' ),
         title = $( '#title' ),
-        app_title = $( '#wpak_app_title' );
+        app_title = $( '#wpak_app_title' ),
+        platform_select = $( '#wpak_app_platform' );
 
     var wizard_components_observer = {
         update: function() {
@@ -114,5 +115,10 @@ jQuery().ready(function(){
             $this.text( Apps.i18n.show_help );
         }
     });
+
+    platform_select.on( 'change', function( e ) {
+        $( '.platform-specific' ).hide();
+        $( '.platform-specific.' + platform_select.val() ).show();
+    }).change();
 
 });
