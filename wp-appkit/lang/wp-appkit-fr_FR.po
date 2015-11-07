@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP AppKit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-07 15:35+0100\n"
-"PO-Revision-Date: 2015-11-07 15:35+0100\n"
+"POT-Creation-Date: 2015-11-07 15:42+0100\n"
+"PO-Revision-Date: 2015-11-07 15:42+0100\n"
 "Last-Translator: Lionel Pointet <lionel.pointet@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -889,8 +889,8 @@ msgstr ""
 "Erreur lors de la récupération des composants disponibles pour la navigation"
 
 #: ../lib/options/options-bo-settings.php:28
-msgid "Refresh Interval (in seconds):"
-msgstr "Intervalle de rafraichissement (en secondes) :"
+msgid "Refresh Interval (in seconds)"
+msgstr "Intervalle de rafraichissement (en secondes)"
 
 #: ../lib/options/options-bo-settings.php:30
 msgid ""
