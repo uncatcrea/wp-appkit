@@ -506,6 +506,7 @@ class WpakApps {
 
 	private static function get_platforms() {
 		return array(
+			'' => __( 'Universal', WpAppKit::i18n_domain ),
 			'ios' => __( 'iOS', WpAppKit::i18n_domain ),
 			'android' => __( 'Android', WpAppKit::i18n_domain )
 		);
@@ -632,10 +633,10 @@ class WpakApps {
 	public static function get_merged_phonegap_plugins_xml( $app_id, $export_type, $bo_plugins_xml = '' ) {
 
 		$merged_plugins = self::get_merged_phonegap_plugins( $app_id, $export_type, $bo_plugins_xml );
-				
+
 		return self::get_plugins_xml($merged_plugins);
 	}
-	
+
 	public static function get_merged_phonegap_plugins( $app_id, $export_type, $bo_plugins_xml = '' ) {
 		if ( empty( $bo_plugins_xml ) ) {
 			$app_main_infos = WpakApps::get_app_main_infos( $app_id );

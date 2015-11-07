@@ -9,11 +9,11 @@ class WpakConfigFile {
 
 	public static function rewrite_rules() {
 		add_rewrite_tag( '%wpak_appli_file%', '([^&]+)' );
-		
+
 		$home_url = home_url(); //Something like "http://my-site.com"
 		$url_to_config_file = plugins_url( 'app', dirname( dirname( __FILE__ ) ) ); //Something like "http://my-site.com/wp-content/plugins/wp-appkit/app"
 		$config_file_prefix = str_replace( trailingslashit($home_url), '', $url_to_config_file ); //Something like "wp-content/plugins/wp-appkit/app"
-		
+
 		add_rewrite_rule( '^' . $config_file_prefix . '/(config\.js)$', 'index.php?wpak_appli_file=$matches[1]', 'top' );
 		add_rewrite_rule( '^' . $config_file_prefix . '/(config\.xml)$', 'index.php?wpak_appli_file=$matches[1]', 'top' );
 	}
@@ -122,24 +122,24 @@ define( function ( require ) {
 
 		return !$echo ? $content : '';
 	}
-	
+
 	/**
-	 * Retrieves whitelist settings. 
+	 * Retrieves whitelist settings.
 	 * Will be active only if the "cordova-plugin-whitelist" plugin is added to config.xml.
 	 * (see https://github.com/apache/cordova-plugin-whitelist).
-	 * 
+	 *
 	 * @param int $app_id Application ID
 	 * @param string $export_type 'phonegap-build', 'phonegap-cli' etc
 	 */
 	protected static function get_whitelist_settings( $app_id, $export_type = 'phonegap-build' ) {
-		
+
 		//By default we allow everything :
 		$whitelist_settings = array(
 			'access' => array( 'origin' => '*' ),
 			'allow-intent' => array( 'href' => '*' ),
 			'allow-navigation' => array( 'href' => '*' )
 		);
-		
+
 		//No whitelist setting if the 'cordova-plugin-whitelist' plugin is not here :
 		$whitelist_plugin_here = true;
 		$current_phonegap_plugins = WpakApps::get_merged_phonegap_plugins( $app_id, $export_type );
@@ -147,7 +147,7 @@ define( function ( require ) {
 			$whitelist_settings = array();
 			$whitelist_plugin_here = false;
 		}
-		
+
 		/**
 		 * Filter : allows to modify config.xml whitelist configuration.
 		 * See https://github.com/apache/cordova-plugin-whitelist for detailed info.
@@ -161,7 +161,7 @@ define( function ( require ) {
 		 * @param boolean   $whitelist_plugin_here  Whether or not the whitelist plugin is add for this app.
 		 */
 		$whitelist_settings = apply_filters( 'wpak_config_xml_whitelist', $whitelist_settings, $app_id, $export_type, $current_phonegap_plugins, $whitelist_plugin_here );
-		
+
 		return $whitelist_settings;
 	}
 
@@ -181,7 +181,7 @@ define( function ( require ) {
 		$app_icons = $app_main_infos['icons'];
 
 		$whitelist_settings = self::get_whitelist_settings( $app_id, $export_type );
-		
+
 		//Merge our default Phonegap Build plugins to those set in BO :
 		$app_phonegap_plugins = WpakApps::get_merged_phonegap_plugins_xml( $app_id, $export_type, $app_main_infos['phonegap_plugins'] );
 
@@ -206,8 +206,10 @@ define( function ( require ) {
 	<description><?php echo $app_description ?></description>
 
 	<author href="<?php echo $app_author_website ?>" email="<?php echo $app_author_email ?>"><?php echo $app_author ?></author>
+<?php if( !empty( $app_platform ) ): ?>
 
 	<gap:platform name="<?php echo $app_platform ?>" />
+<?php endif ?>
 <?php if( !empty( $app_phonegap_version ) ): ?>
 
 	<preference name="phonegap-version" value="<?php echo $app_phonegap_version ?>" />
@@ -232,14 +234,14 @@ define( function ( require ) {
 
 <?php endif ?>
 <?php if ( !empty( $whitelist_settings ) ): ?>
-	
+
 	<!-- Whitelist policy  -->
 <?php foreach( $whitelist_settings as $whitelist_setting => $attributes ): ?>
-<?php 
+<?php
 		if ( empty( $attributes ) || !is_array( $attributes ) ) {
 			continue;
-		}  
-		
+		}
+
 		$attributes_str = '';
 		foreach( $attributes as $attribute => $value ) {
 			$attributes_str .= ' ' . $attribute .'="'. $value .'"';
