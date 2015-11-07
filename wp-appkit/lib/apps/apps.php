@@ -388,7 +388,7 @@ class WpakApps {
 		$simulation_secured = self::get_app_simulation_is_secured( $post->ID );
 		?>
 		<div class="field-group">
-			<label><?php _e( 'App Simulation Visibility', WpAppKit::i18n_domain ) ?></label> : <br/>
+			<label><?php _e( 'App Simulation Visibility', WpAppKit::i18n_domain ) ?></label><br/>
 			<span class="description"><?php _e( 'If activated, only connected users with right permissions can access the app simulation in web browser.<br/>If deactivated, the app simulation is publicly available in any browser, including the config.js and config.xml files, that can contain sensitive data.', WpAppKit::i18n_domain ) ?></span>
 		</div>
 		<div class="field-group">
