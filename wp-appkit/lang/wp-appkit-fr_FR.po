@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP AppKit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-07 02:20+0100\n"
-"PO-Revision-Date: 2015-11-07 02:20+0100\n"
+"POT-Creation-Date: 2015-11-07 02:23+0100\n"
+"PO-Revision-Date: 2015-11-07 02:23+0100\n"
 "Last-Translator: Lionel Pointet <lionel.pointet@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -304,13 +304,17 @@ msgstr "Privée"
 msgid "Public"
 msgstr "Publique"
 
-# @ wp-appkit
 #: ../lib/apps/apps.php:509
+msgid "Universal"
+msgstr "Universelle"
+
+# @ wp-appkit
+#: ../lib/apps/apps.php:510
 msgid "iOS"
 msgstr "iOS"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:510
+#: ../lib/apps/apps.php:511
 msgid "Android"
 msgstr "Android"
 
@@ -1181,6 +1185,3 @@ msgstr ""
 "Utilisation_des_permaliens#Choisir_votre_structure_de_permaliens\">section "
 "du codex \"Choisir votre structure de permaliens\"</a> pour plus "
 "d'informations sur comment activer les permaliens."
-
-#~ msgid "Universal"
-#~ msgstr "Universelle"
