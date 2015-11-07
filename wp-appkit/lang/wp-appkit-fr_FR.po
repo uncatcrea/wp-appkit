@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP AppKit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-07 15:33+0100\n"
-"PO-Revision-Date: 2015-11-07 15:33+0100\n"
+"POT-Creation-Date: 2015-11-07 15:35+0100\n"
+"PO-Revision-Date: 2015-11-07 15:35+0100\n"
 "Last-Translator: Lionel Pointet <lionel.pointet@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -224,7 +224,7 @@ msgid "VersionCode (Android only)"
 msgstr "\"versionCode\" de l'application (Android seulement)"
 
 #: ../lib/apps/apps.php:345
-msgid "Icons and splashscreens"
+msgid "Icons and Splashscreens"
 msgstr "Icônes et splashscreens"
 
 #: ../lib/apps/apps.php:347
@@ -1106,7 +1106,6 @@ msgstr "Erreur d'authentification sécurisée"
 
 # @ wp-appkit
 #: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:48
-#, fuzzy
 msgid "Private Key"
 msgstr "Clé privée"
 
