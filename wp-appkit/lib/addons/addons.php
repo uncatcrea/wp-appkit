@@ -31,11 +31,11 @@ class WpakAddons {
 
 	public static function rewrite_rules() {
 		add_rewrite_tag( '%wpak_addon_file%', '([^&]+)' );
-		
+
 		$home_url = home_url(); //Something like "http://my-site.com"
 		$url_to_addons_files = plugins_url( 'app/addons', dirname( dirname( __FILE__ ) ) ); //Something like "http://my-site.com/wp-content/plugins/wp-appkit/app/addons"
 		$addons_file_prefix = str_replace( trailingslashit($home_url), '', $url_to_addons_files ); //Something like "wp-content/plugins/wp-appkit/app/addons"
-		
+
 		add_rewrite_rule( '^' . $addons_file_prefix . '/(.*[\.js|\.css|\.html])$', 'index.php?wpak_addon_file=$matches[1]', 'top' );
 	}
 
@@ -123,7 +123,7 @@ class WpakAddons {
 		$app_addons = self::get_app_addons( $post->ID );
 		?>
 		<div class="wpak_addons">
-			<span><?php _e( 'Addons activated for this App:', WpAppKit::i18n_domain ) ?></span><br/>
+			<span><?php _e( 'Addons activated for this App', WpAppKit::i18n_domain ) ?></span><br/>
 			<?php foreach ( self::get_addons() as $addon ): ?>
 				<?php $checked = array_key_exists( $addon->slug, $app_addons ) ? 'checked' : '' ?>
 					<input type="checkbox" name="wpak-addons[]" id="<?php echo $addon->slug ?>" value="<?php echo $addon->slug ?>" <?php echo $checked ?> />
