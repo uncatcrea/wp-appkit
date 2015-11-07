@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP AppKit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-07 15:30+0100\n"
-"PO-Revision-Date: 2015-11-07 15:30+0100\n"
+"POT-Creation-Date: 2015-11-07 15:33+0100\n"
+"PO-Revision-Date: 2015-11-07 15:33+0100\n"
 "Last-Translator: Lionel Pointet <lionel.pointet@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -1106,7 +1106,8 @@ msgstr "Erreur d'authentification sécurisée"
 
 # @ wp-appkit
 #: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:48
-msgid "App Private Key"
+#, fuzzy
+msgid "Private Key"
 msgstr "Clé privée"
 
 #: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:50
