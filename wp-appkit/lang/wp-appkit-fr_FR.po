@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP AppKit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-07 02:20+0100\n"
-"PO-Revision-Date: 2015-11-07 02:20+0100\n"
+"POT-Creation-Date: 2015-11-07 15:30+0100\n"
+"PO-Revision-Date: 2015-11-07 15:30+0100\n"
 "Last-Translator: Lionel Pointet <lionel.pointet@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -567,55 +567,55 @@ msgid "Component options"
 msgstr "Options du composant"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:184
+#: ../lib/components/components-bo-settings.php:185
 #: ../lib/navigation/navigation-bo-settings.php:125
-#: ../lib/navigation/navigation-bo-settings.php:185
+#: ../lib/navigation/navigation-bo-settings.php:186
 msgid "Cancel"
 msgstr "Annuler"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:185
+#: ../lib/components/components-bo-settings.php:186
 msgid "Save Changes"
 msgstr "Enregistrer"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:242
+#: ../lib/components/components-bo-settings.php:243
 msgid "Application not found."
 msgstr "Application non trouvée."
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:253
+#: ../lib/components/components-bo-settings.php:254
 msgid "You must provide a label for the component!"
 msgstr "Le champ libellé est requis"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:258
+#: ../lib/components/components-bo-settings.php:259
 msgid "The component label can't be numeric."
 msgstr "Le libellé du composant ne peut pas être numérique."
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:266
+#: ../lib/components/components-bo-settings.php:267
 msgid "You must provide a slug for the component."
 msgstr "Le champ slug est requis."
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:271
+#: ../lib/components/components-bo-settings.php:272
 msgid "The component slug can't be numeric."
 msgstr "Le slug ne peut pas être numérique."
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:302
+#: ../lib/components/components-bo-settings.php:303
 #, php-format
 msgid "Component \"%s\" updated successfuly"
 msgstr "Composant \"%s\" enregistré"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:306
+#: ../lib/components/components-bo-settings.php:307
 #, php-format
 msgid "Component \"%s\" created successfuly"
 msgstr "Composant \"%s\" créé"
 
-#: ../lib/components/components-bo-settings.php:316
+#: ../lib/components/components-bo-settings.php:317
 msgid ""
 "The component to delete is in the app navigation. Please remove the "
 "component from app navigation before deleting it."
@@ -624,17 +624,17 @@ msgstr ""
 "Supprimez le composant de la navigation pour pouvoir l'effacer."
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:319
+#: ../lib/components/components-bo-settings.php:320
 msgid "Could not delete component"
 msgstr "Impossible d'effacer le composant"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:323
+#: ../lib/components/components-bo-settings.php:324
 msgid "Component deleted successfuly"
 msgstr "Composant effacé"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:327
+#: ../lib/components/components-bo-settings.php:328
 msgid "Component to delete not found"
 msgstr "Le composant à effacer est introuvable"
 
@@ -824,66 +824,66 @@ msgid "All components are already in navigation!"
 msgstr "Tous les composants sont déjà dans la navigation!"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:187
+#: ../lib/navigation/navigation-bo-settings.php:188
 msgid "Add component to navigation"
 msgstr "Ajouter un composant à la navigation"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:193
+#: ../lib/navigation/navigation-bo-settings.php:194
 msgid "No component found!"
 msgstr "Aucun composant trouvé!"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:193
+#: ../lib/navigation/navigation-bo-settings.php:194
 msgid "Please create a component!"
 msgstr "Veuillez créer un composant!"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:224
+#: ../lib/navigation/navigation-bo-settings.php:225
 msgid "You must choose a component!"
 msgstr "Veuillez choisir un composant!"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:229
+#: ../lib/navigation/navigation-bo-settings.php:230
 msgid "This component doesn't exist!"
 msgstr "Ce composant n'existe pas"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:234
+#: ../lib/navigation/navigation-bo-settings.php:235
 msgid "This component is already in navigation!"
 msgstr "Ce composant est déjà dans la navigation"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:245
+#: ../lib/navigation/navigation-bo-settings.php:246
 msgid "New navigation item created successfuly"
 msgstr "Nouvel élément de navigation créé"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:255
+#: ../lib/navigation/navigation-bo-settings.php:256
 msgid "Could not delete navigation item"
 msgstr "Impossible de supprimer cet élément de navigation"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:259
+#: ../lib/navigation/navigation-bo-settings.php:260
 msgid "Navigation item deleted successfuly"
 msgstr "Elément de navigation supprimé"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:262
+#: ../lib/navigation/navigation-bo-settings.php:263
 msgid "Navigation item to delete not found"
 msgstr "L'élément de navigation à supprimer est introuvable"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:270
+#: ../lib/navigation/navigation-bo-settings.php:271
 msgid "Navigation order updated successfuly"
 msgstr "Ordre des éléments de navigation enregistré"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:286
+#: ../lib/navigation/navigation-bo-settings.php:287
 msgid "Navigation item updated successfuly"
 msgstr "Elément de navigation modifié"
 
-#: ../lib/navigation/navigation-bo-settings.php:320
+#: ../lib/navigation/navigation-bo-settings.php:321
 msgid "Error while retrieving components available for navigation"
 msgstr ""
 "Erreur lors de la récupération des composants disponibles pour la navigation"
@@ -1142,8 +1142,8 @@ msgstr ""
 "des clés 1024 bits.)"
 
 #: ../lib/user-permissions/authentication-settings.php:46
-msgid "Authentication Settings"
-msgstr "Paramètres d'authentification"
+msgid "Authentication"
+msgstr "Authentification"
 
 # @ wp-appkit
 #: ../lib/user-permissions/user-permissions.php:36
