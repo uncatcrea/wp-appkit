@@ -342,7 +342,7 @@ class WpakApps {
 					<input type="text" name="wpak_app_version_code" value="<?php echo esc_attr( $main_infos['version_code'] ) ?>" id="wpak_app_version_code" />
 				</div>
 				<div class="field-group">
-					<label><?php _e( 'Icons and splashscreens', WpAppKit::i18n_domain ) ?></label>
+					<label><?php _e( 'Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_icons" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
 					<span class="description"><?php _e( 'Write the icons and splashscreens tags as defined in the PhoneGap documentation.<br/>Example: ', WpAppKit::i18n_domain ) ?>&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;</span>
 				</div>
@@ -632,10 +632,10 @@ class WpakApps {
 	public static function get_merged_phonegap_plugins_xml( $app_id, $export_type, $bo_plugins_xml = '' ) {
 
 		$merged_plugins = self::get_merged_phonegap_plugins( $app_id, $export_type, $bo_plugins_xml );
-				
+
 		return self::get_plugins_xml($merged_plugins);
 	}
-	
+
 	public static function get_merged_phonegap_plugins( $app_id, $export_type, $bo_plugins_xml = '' ) {
 		if ( empty( $bo_plugins_xml ) ) {
 			$app_main_infos = WpakApps::get_app_main_infos( $app_id );
