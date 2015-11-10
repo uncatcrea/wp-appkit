@@ -74,6 +74,9 @@ class WpakConfigFile {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		$app_title = $app_main_infos['title'];
+		
+		$app_platform = $app_main_infos['platform'];
+		$app_platform = empty( $app_platform ) ? 'all' : $app_platform;
 
 		$app_version = WpakApps::sanitize_app_version( $app_main_infos['version'] );
 
@@ -101,6 +104,7 @@ define( function ( require ) {
 		theme : '<?php echo addslashes($theme) ?>',
 		version : '<?php echo $app_version ?>',
 		app_title : '<?php echo addslashes($app_title) ?>',
+		app_platform : '<?php echo addslashes($app_platform) ?>',
 		debug_mode : '<?php echo $debug_mode ?>'<?php
 		if( !empty( $auth_key ) ):
 		?>,
@@ -131,7 +135,7 @@ define( function ( require ) {
 	 * @param int $app_id Application ID
 	 * @param string $export_type 'phonegap-build', 'phonegap-cli' etc
 	 */
-	protected static function get_whitelist_settings( $app_id, $export_type = 'phonegap-build' ) {
+	protected static function get_whitelist_settings( $app_id, $app_platform, $export_type = 'phonegap-build' ) {
 		
 		//By default we allow everything :
 		$whitelist_settings = array(
