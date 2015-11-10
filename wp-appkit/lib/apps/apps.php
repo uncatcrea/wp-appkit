@@ -654,7 +654,9 @@ class WpakApps {
 		$default_plugins = array(
 			'cordova-plugin-inappbrowser' => array( 'version' => '', 'source' => 'npm' ),
 			'cordova-plugin-network-information' => array( 'version' => '', 'source' => 'npm' ),
-			'cordova-plugin-whitelist' => array( 'version' => '', 'source' => 'npm' )
+			'cordova-plugin-whitelist' => array( 'version' => '', 'source' => 'npm' ),
+			'cordova-plugin-splashscreen' => array( 'version' => '', 'source' => 'npm' ),
+			'cordova-plugin-device' => array( 'version' => '', 'source' => 'npm' ),
 		);
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
@@ -716,7 +718,6 @@ class WpakApps {
 
 		if ( preg_match_all( '/(<gap:plugin [^>]+)(\/>|>(.*)<\/gap:plugin>)/sU', $plugins_xml, $matches ) ) {
 			foreach ( $matches[1] as $i => $match ) {
-				$name = '';
 				$version = '';
 				$source = '';
 				if ( preg_match( '/name="([^"]+)"/', $match, $name_match ) && strlen( $name_match[1] ) > 0 ) {

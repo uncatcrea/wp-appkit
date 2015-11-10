@@ -12,7 +12,15 @@ define( function( require ) {
 
 	phonegap.hideSplashScreen = function() {
 		if ( phonegap.isLoaded() && navigator.splashscreen !== undefined ) {
-			navigator.splashscreen.hide();
+			var app_platform = phonegap.getDeviceInfo().platform;
+			if ( app_platform === 'ios' ) {
+				navigator.splashscreen.hide();
+				if ( StatusBar !== undefined ) { //Status bar plugin activated
+					StatusBar.show(); // Status bar is initially hidden, we need to show it when splashscreen disappears
+				}
+			} else {
+				navigator.splashscreen.hide(); 
+			}
 		}
 	};
 

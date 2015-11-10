@@ -161,12 +161,55 @@ define( function ( require ) {
 		 *											 'allow-intent' => array( 'href' => '*' ),
 		 *											 'allow-navigation' => array( 'href' => '*' )
 		 * @param int		$app_id		            Application id
+		 * @param string    $app_platform           Application platform (ios, android ...)
 		 * @param string    $export_type            'phonegap-build' (default) or 'phonegap-cli'
-		 * @param boolean   $whitelist_plugin_here  Whether or not the whitelist plugin is add for this app.
+		 * @param boolean   $whitelist_plugin_here  Whether or not the whitelist plugin is activated for this app.
 		 */
-		$whitelist_settings = apply_filters( 'wpak_config_xml_whitelist', $whitelist_settings, $app_id, $export_type, $current_phonegap_plugins, $whitelist_plugin_here );
+		$whitelist_settings = apply_filters( 'wpak_config_xml_whitelist', $whitelist_settings, $app_id, $app_platform, $export_type, $current_phonegap_plugins, $whitelist_plugin_here );
 		
 		return $whitelist_settings;
+	}
+	
+	protected static function get_splashscreen_settings( $app_id, $app_platform, $export_type ) {
+		$splashcreen_settings = array( 'preferences' => array(), 'gap:config-file' => array() );
+		
+		switch ( $app_platform ) {
+			case 'ios':
+				$splashcreen_settings['preferences']['auto-hide-splash-screen'] = 'false';
+				$splashcreen_settings['preferences']['AutoHideSplashScreen'] = 'false';
+				$splashcreen_settings['preferences']['FadeSplashScreen'] = 'true';
+				$splashcreen_settings['preferences']['fade-splash-screen-duration'] = '5';
+				$splashcreen_settings['preferences']['show-splash-screen-spinner'] = 'false';
+				$splashcreen_settings['gap:config-file']['UIStatusBarHidden'] = 'true';
+				$splashcreen_settings['gap:config-file']['UIViewControllerBasedStatusBarAppearance'] = 'false';
+				break;
+			case 'android':
+				$splashcreen_settings['preferences']['SplashScreenDelay'] = '10000';
+				break;
+		}
+		
+		//No splashscreen setting if the 'cordova-plugin-whitelist' plugin is not here :
+		$splashcreen_plugin_here = true;
+		$current_phonegap_plugins = WpakApps::get_merged_phonegap_plugins( $app_id, $export_type );
+		if ( !array_key_exists( 'cordova-plugin-splashscreen', $current_phonegap_plugins ) ) {
+			$splashcreen_settings = array();
+			$splashcreen_plugin_here = false;
+		}
+		
+		/**
+		 * Filter : allows to modify config.xml splashscreen configuration.
+		 * See https://github.com/apache/cordova-plugin-splashscreen for detailed info.
+		 *
+		 * @param array  	$splashcreen_settings     Array of whitelist settings
+		 * @param int		$app_id		              Application id
+		 * @param string    $app_platform             Application platform (ios, android ...)
+		 * @param string    $export_type              'phonegap-build' (default) or 'phonegap-cli'
+		 * @param boolean   $splashcreen_plugin_here  Whether or not the splashscreen plugin is activated for this app.
+		 */
+		
+		$splashcreen_settings = apply_filters( 'wpak_config_xml_splashscreen', $splashcreen_settings, $app_id, $app_platform, $export_type, $current_phonegap_plugins, $splashcreen_plugin_here );
+		
+		return $splashcreen_settings;
 	}
 
 	public static function get_config_xml( $app_id, $echo = false, $export_type = 'phonegap-build' ) {
@@ -184,7 +227,8 @@ define( function ( require ) {
 		$app_platform = $app_main_infos['platform'];
 		$app_icons = $app_main_infos['icons'];
 
-		$whitelist_settings = self::get_whitelist_settings( $app_id, $export_type );
+		$whitelist_settings = self::get_whitelist_settings( $app_id, $app_platform, $export_type );
+		$splashscreen_settings = self::get_splashscreen_settings( $app_id, $app_platform, $export_type );
 		
 		//Merge our default Phonegap Build plugins to those set in BO :
 		$app_phonegap_plugins = WpakApps::get_merged_phonegap_plugins_xml( $app_id, $export_type, $app_main_infos['phonegap_plugins'] );
@@ -252,7 +296,21 @@ define( function ( require ) {
 	<<?php echo $whitelist_setting ?><?php echo $attributes_str ?> />
 <?php endforeach ?>
 <?php endif ?>
+<?php if( !empty( $splashscreen_settings ) ): ?>
 
+	<!-- SplashScreen configuration -->
+<?php if( !empty( $splashscreen_settings['preferences'] ) ) : ?>
+<?php foreach( $splashscreen_settings['preferences'] as $splashscreen_setting => $value ): ?>
+	<preference name="<?php echo $splashscreen_setting ?>" value="<?php echo $value ?>" />
+<?php endforeach ?>
+<?php endif ?>
+<?php if( !empty( $splashscreen_settings['gap:config-file'] ) ) : ?>
+<?php foreach( $splashscreen_settings['gap:config-file'] as $splashscreen_setting => $value ): ?>
+	<gap:config-file platform="<?php echo $app_platform ?>" parent="<?php echo $splashscreen_setting ?>"><<?php echo $value ?>/></gap:config-file>
+<?php endforeach ?>
+<?php endif ?>
+<?php endif ?>
+	
 	<!-- Icon and Splash screen declaration -->
 <?php if( !empty( $app_icons ) ): ?>
 
