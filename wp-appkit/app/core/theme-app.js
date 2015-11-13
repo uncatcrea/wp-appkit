@@ -728,12 +728,19 @@ define( function( require, exports ) {
 	 * Retrieve internal app data that can be useful in themes
 	 */
 
-	themeApp.getGlobalItems = function( global_key, items_ids, result_type ) {
+	/**
+	 * Retrieves a list of items (posts for example) from local storage
+	 *  
+	 * @param {array} items_ids IDs of the items to retrieve
+	 * @param {string} global_key (Optional) global to retrieve the items from: 'posts' (default) or 'pages'.
+	 * @param {string} result_type 'slice' to retrieve a Backbone Collection (default), 'array' to retrieve an array.
+	 * @returns {Backbone Collection | Array | null} items list
+	 */
+	themeApp.getItems = function( items_ids, global_key, result_type ) {
 		var items = null;
 
-		if( result_type === undefined ) {
-			result_type = 'slice';
-		}
+		global_key = global_key || 'posts';
+		result_type = result_type || 'slice';
 
 		switch( result_type ) {
 			case 'slice' :
@@ -745,6 +752,20 @@ define( function( require, exports ) {
 		}
 
 		return items;
+	};
+	
+	/**
+	 * Retrieves an item (post for example) from local storage
+	 * 
+	 * @param {int} item_id Post ID of the post to retrieve
+	 * @param {string} global_key (Optional) global to retrieve the item from: 'posts' (default) or 'pages'.
+	 * @returns {JSON Object} item (post or page) object
+	 */
+	themeApp.getItem = function( item_id, global_key ) {
+		
+		global_key = global_key || 'posts';
+		
+		return App.getGlobalItem( global_key, item_id );
 	};
 
 	//Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating

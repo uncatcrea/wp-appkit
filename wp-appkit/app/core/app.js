@@ -1453,7 +1453,7 @@ define(function (require) {
 			}
 
 			return items;
-	  }
+	  };
 
       app.getGlobalItem = function(global_key,item_id){
     	  var item = null;
