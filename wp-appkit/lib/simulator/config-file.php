@@ -175,16 +175,17 @@ define( function ( require ) {
 		
 		switch ( $app_platform ) {
 			case 'ios':
-				$splashcreen_settings['preferences']['auto-hide-splash-screen'] = 'false';
 				$splashcreen_settings['preferences']['AutoHideSplashScreen'] = 'false';
-				$splashcreen_settings['preferences']['FadeSplashScreen'] = 'true';
-				$splashcreen_settings['preferences']['fade-splash-screen-duration'] = '5';
-				$splashcreen_settings['preferences']['show-splash-screen-spinner'] = 'false';
+				$splashcreen_settings['preferences']['ShowSplashScreenSpinner'] = 'false';
 				$splashcreen_settings['gap:config-file']['UIStatusBarHidden'] = 'true';
 				$splashcreen_settings['gap:config-file']['UIViewControllerBasedStatusBarAppearance'] = 'false';
+				//Note:  we've not been able to make fading work when autohide is set to false.
 				break;
 			case 'android':
+				$splashcreen_settings['preferences']['SplashScreen'] = 'splash';
 				$splashcreen_settings['preferences']['SplashScreenDelay'] = '10000';
+				//Auto hiding doesn't work on Android (https://issues.apache.org/jira/browse/CB-8396). 
+				//So the plan is to have a very long delay for the splashscreen and let Javascript hiding the splashscreen
 				break;
 		}
 		
