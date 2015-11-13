@@ -92,18 +92,21 @@ class WpakComponentsUtils {
 		$content = apply_filters( 'the_content', $content );
 		$content = str_replace( ']]>', ']]&gt;', $content );
 
-		$allowed_tags = '<br/><br><p><div><h1><h2><h3><h4><h5><h6><a><span><sup><sub><img><i><em><strong><b><ul><ol><li><blockquote><pre>';
+		$allowed_tags = '';
 
 		/**
-		 * Filter allowed HTML tags for a given post.
+		 * Filter that allows to set the HTML tags allowed for a given post.
+		 * By default $allowed_tags is empty, meaning that all tags are allowed.
 		 *
-		 * @param string 	$allowed_tags   A string containing the concatenated list of default allowed HTML tags.
+		 * @param string 	$allowed_tags   A string containing the concatenated list of allowed HTML tags.
 		 * @param WP_Post 	$post 			The post object.
 		 */
 		$allowed_tags = apply_filters( 'wpak_post_content_allowed_tags', $allowed_tags, $post );
 
-		$content = strip_tags( $content, $allowed_tags );
-
+		if ( !empty( $allowed_tags ) ) {
+			$content = strip_tags( $content, $allowed_tags );
+		}
+		
 		/**
 		 * Filter a single post content.
 		 *
