@@ -78,6 +78,12 @@ class WpakComponentsUtils {
 	}
 	
 	public static function get_formated_content() {
+		
+		//Set global $more to 1 so that get_the_content() behaves correctly with <!-- more --> tag:
+		//(See wp-includes/class-wp.php::register_globals() and get_the_content())
+		global $more;
+		$more = 1; 
+		
 		$post = get_post();
 
 		$content = get_the_content();
