@@ -360,8 +360,8 @@ define( function ( require ) {
 							. 'gap:platform="'. $icon['platform'] .'" '
 							. ( !empty( $icon['qualifier']  ) ? 'gap:qualifier="'. $icon['qualifier'] .'" ' : '' )
 							. ( !empty( $icon['width']  ) ? 'width="'. $icon['width'] .'" ' : '' )
-							. ( !empty( $icon['width']  ) ? 'height="'. $icon['height']  : '' )
-					.'" />'."\n";
+							. ( !empty( $icon['height']  ) ? 'height="'. $icon['height'].'" ' : '' )
+					.'/>'."\n";
 				}
 			}
 			
@@ -373,8 +373,8 @@ define( function ( require ) {
 								. 'gap:platform="'. $splashscreen['platform'] .'" '
 								. ( !empty( $splashscreen['qualifier']  ) ? 'gap:qualifier="'. $splashscreen['qualifier'] .'" ' : '' )
 								. ( !empty( $splashscreen['width']  ) ? 'width="'. $splashscreen['width'] .'" ' : '' )
-								. ( !empty( $splashscreen['width']  ) ? 'height="'. $splashscreen['height']  : '' )
-						.'" />'."\n";
+								. ( !empty( $splashscreen['height']  ) ? 'height="'. $splashscreen['height'] .'" ' : '' )
+						.'/>'."\n";
 				}
 			}
 			
