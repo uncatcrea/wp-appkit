@@ -212,7 +212,178 @@ define( function ( require ) {
 		
 		return $splashcreen_settings;
 	}
+	
+	protected static function get_default_icons_and_splashscreens( $app_id, $export_type ) {
+	
+		$default_icons = array(
+			'android' => array (
+				array( 'src' => 'icon.png', 'qualifier' => '', 'width' => '', 'height' => '' ),
+				array( 'src' => 'icons/icon-wp-appkit-ldpi.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'icons/icon-wp-appkit-mdpi.png', 'qualifier' => 'mdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'icons/icon-wp-appkit-hdpi.png', 'qualifier' => 'hdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'icons/icon-wp-appkit-xhdpi.png', 'qualifier' => 'xhdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'icons/icon-wp-appkit-xxhdpi.png', 'qualifier' => 'xxhdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'icons/icon-wp-appkit-xxxhdpi.png', 'qualifier' => 'xxxhdpi', 'width' => '', 'height' => ''  ),
+			),
+			'ios' => array(
+				array( 'src' => 'icons/icon-60@3x.png', 'qualifier' => '', 'width' => '180', 'height' => '180' ),
+				array( 'src' => 'icons/icon-60@2x.png', 'qualifier' => '', 'width' => '120', 'height' => '120'  ),
+				array( 'src' => 'icons/icon@2x.png', 'qualifier' => '', 'width' => '114', 'height' => '114'  ),
+				array( 'src' => 'icons/icon-40@2x.png', 'qualifier' => '', 'width' => '80', 'height' => '80'  ),
+				array( 'src' => 'icons/icon-60.png', 'qualifier' => '', 'width' => '60', 'height' => '60'  ),
+				array( 'src' => 'icons/icon-small@2x.png', 'qualifier' => '', 'width' => '58', 'height' => '58'  ),
+				array( 'src' => 'icons/icon.png', 'qualifier' => '', 'width' => '57', 'height' => '57'  ),
+				array( 'src' => 'icons/icon-40.png', 'qualifier' => '', 'width' => '40', 'height' => '40'  ),
+				array( 'src' => 'icons/icon-small.png', 'qualifier' => '', 'width' => '29', 'height' => '29'  ),
+			)
+		);
+			
+		$default_splashscreens = array(
+			'android' => array (
+				array( 'src' => 'splash.9.png', 'qualifier' => '', 'width' => '', 'height' => '' ),
+				array( 'src' => 'splashscreens/splashscreen-wp-appkit-ldpi.9.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'splashscreens/splashscreen-wp-appkit-mdpi.9.png', 'qualifier' => 'mdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'splashscreens/splashscreen-wp-appkit-hdpi.9.png', 'qualifier' => 'hdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'splashscreens/splashscreen-wp-appkit-xhdpi.9.png', 'qualifier' => 'xhdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'splashscreens/splashscreen-wp-appkit-xxhdpi.9.png', 'qualifier' => 'xxhdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'splashscreens/splashscreen-wp-appkit-xxxhdpi.9.png', 'qualifier' => 'xxxhdpi', 'width' => '', 'height' => '' ),
+			),
+			'ios' => array( 
+				array( 'src' => 'splashscreens/Default-736h-Lanscape@3x~iphone.png', 'qualifier' => '', 'width' => '2208', 'height' => '1242' ),
+				array( 'src' => 'splashscreens/Default-736h-Portrait@3x~iphone.png', 'qualifier' => '', 'width' => '1242', 'height' => '2208' ),
+				array( 'src' => 'splashscreens/Default-667h-Landscape@2x~iphone.png', 'qualifier' => '', 'width' => '1334', 'height' => '750' ),
+				array( 'src' => 'splashscreens/Default-667h-Portrait@2x~iphone.png', 'qualifier' => '', 'width' => '750', 'height' => '1334' ),
+				array( 'src' => 'splashscreens/Default-568h-Landscape@2x~iphone.png', 'qualifier' => '', 'width' => '1136', 'height' => '640' ),
+				array( 'src' => 'splashscreens/Default-568h-Portrait@2x~iphone.png', 'qualifier' => '', 'width' => '640', 'height' => '1136' ),
+				array( 'src' => 'splashscreens/Default-Landscape@2x~iphone.png', 'qualifier' => '', 'width' => '960', 'height' => '640' ),
+				array( 'src' => 'splashscreens/Default-Portrait@2x~iphone.png', 'qualifier' => '', 'width' => '640', 'height' => '960' ),
+				array( 'src' => 'splashscreens/Default-Landscape~iphone.png', 'qualifier' => '', 'width' => '480', 'height' => '320' ),
+				array( 'src' => 'splashscreens/Default-Portrait~iphone.png', 'qualifier' => '', 'width' => '320', 'height' => '480' ),
+			)
+		);
+		
+		$icons_and_splashscreens = array( 'icons' => $default_icons, 'splashscreens' => $default_splashscreens );
+		
+		/**
+		 * 'wpak_default_icons_and_splashscreens' filter.
+		 * Use this filter to customize icons and splashscreens file names or attributes
+		 * 
+		 * @param $icons_and_splashscreens    array    Icon and splashscreens to modify
+		 * @param $app_id                     int      App id
+		 * @param $export_type                string   'phonegap-build' (default) or 'phonegap-cli'
+		 */
+		$icons_and_splashscreens = apply_filters( 'wpak_default_icons_and_splashscreens', $icons_and_splashscreens, $app_id, $export_type );
+		
+		return $icons_and_splashscreens;
+	}
+	
+	protected static function get_icons_splashscreens_dir( $app_id, $app_platform, $export_type ) {
+		
+		$default_icons_splashscreens_dir = dirname( __FILE__ ) .'/../../images/icons-splashscreens';
+		
+		
+		/**
+		 * 'wpak_icons_and_splashscreens_dir' filter.
+		 * Use this filter to customize icons and splashscreens files directory
+		 * 
+		 * @param $icons_and_splashscreens    array    Icon and splashscreens to modify
+		 * @param $app_id                     int      App id
+		 * @param $app_platform               string   App platform
+		 * @param $export_type                string   'phonegap-build' (default) or 'phonegap-cli'
+		 */
+		$default_icons_splashscreens_dir = apply_filters( 'wpak_icons_and_splashscreens_dir', $default_icons_splashscreens_dir, $app_id, $app_platform, $export_type );
+		
+		return $default_icons_splashscreens_dir;
+	}
+	
+	public static function get_platform_icons_and_splashscreens( $app_id, $app_platform, $export_type ) {
+		
+		$app_icons_and_splashscreens = array( 'icons' => array(), 'splashscreens' => array() );
+		
+		$default_icons_and_splash = self::get_default_icons_and_splashscreens( $app_id, $export_type );
+		$default_icons = $default_icons_and_splash['icons'];
+		$default_splashscreens = $default_icons_and_splash['splashscreens'];
+		
+		//Handle universal platform (case empty( $app_platform ) ):
+		$platforms = $app_platform === '' ? array( 'ios', 'android' ) : array( $app_platform ); 
+		
+		$icons_splashscreens_dir = self::get_icons_splashscreens_dir( $app_id, $app_platform, $export_type );
+		
+		foreach( $platforms as $platform ) {
+			
+			if ( !empty( $default_icons[$platform] ) ) {
+				foreach( $default_icons[$platform] as $icon ) {
+					$file_path = $icons_splashscreens_dir .'/'. $platform .'/'. $icon['src'];
+					if ( file_exists( $file_path ) ) {
+						$icon['platform'] = $platform;
+						$icon['full_path'] = $file_path;
+						$app_icons_and_splashscreens['icons'][] = $icon;
+					}
+				}
+			}
 
+			if ( !empty( $default_splashscreens[$platform] ) ) {
+				foreach( $default_splashscreens[$platform] as $splashscreen ) {
+					$file_path = $icons_splashscreens_dir .'/'. $platform .'/'. $splashscreen['src'];
+					if ( file_exists( $icons_splashscreens_dir .'/'. $platform .'/'. $splashscreen['src'] ) ) {
+						$splashscreen['platform'] = $platform;
+						$splashscreen['full_path'] = $file_path;
+						$app_icons_and_splashscreens['splashscreens'][] = $splashscreen;
+					}
+				}
+			}
+			
+		}
+		
+		return $app_icons_and_splashscreens;
+	}
+	
+	/**
+	 * Retrieves icons and splashscreens for build export.
+	 */
+	protected static function get_icons_and_splashscreens_xml( $app_id, $app_platform, $export_type ) {
+		
+		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
+		$app_icons_and_splashscreens = $app_main_infos['icons'];
+		
+		if ( empty( $app_icons_and_splashscreens ) ) {
+			
+			$icons_and_splash = self::get_platform_icons_and_splashscreens( $app_id, $app_platform, $export_type );
+			$icons = $icons_and_splash['icons'];
+			$splashscreens = $icons_and_splash['splashscreens'];
+			
+			$icons_str = '';
+			if ( !empty( $icons ) ) {
+				foreach( $icons as $icon ) {
+					$icons_str .= '<icon '
+							. 'src="'. $icon['src'] .'" '
+							. 'gap:platform="'. $icon['platform'] .'" '
+							. ( !empty( $icon['qualifier']  ) ? 'gap:qualifier="'. $icon['qualifier'] .'" ' : '' )
+							. ( !empty( $icon['width']  ) ? 'width="'. $icon['width'] .'" ' : '' )
+							. ( !empty( $icon['width']  ) ? 'height="'. $icon['height']  : '' )
+					.'" />'."\n";
+				}
+			}
+			
+			$splashscreens_str = '';
+			if ( !empty( $splashscreens) ) {
+				foreach( $splashscreens as $splashscreen ) {
+					$splashscreens_str .= '<gap:splash '
+								. 'src="'. $splashscreen['src'] .'" '
+								. 'gap:platform="'. $splashscreen['platform'] .'" '
+								. ( !empty( $splashscreen['qualifier']  ) ? 'gap:qualifier="'. $splashscreen['qualifier'] .'" ' : '' )
+								. ( !empty( $splashscreen['width']  ) ? 'width="'. $splashscreen['width'] .'" ' : '' )
+								. ( !empty( $splashscreen['width']  ) ? 'height="'. $splashscreen['height']  : '' )
+						.'" />'."\n";
+				}
+			}
+			
+			$app_icons_and_splashscreens = $icons_str ."\n". $splashscreens_str;
+		}
+		
+		return $app_icons_and_splashscreens;
+	}
+	
 	public static function get_config_xml( $app_id, $echo = false, $export_type = 'phonegap-build' ) {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
@@ -226,7 +397,7 @@ define( function ( require ) {
 		$app_author_email = $app_main_infos['author_email'];
 		$app_author_website = $app_main_infos['author_website'];
 		$app_platform = $app_main_infos['platform'];
-		$app_icons = $app_main_infos['icons'];
+		$app_icons_splashscreens = self::get_icons_and_splashscreens_xml( $app_id, $app_platform, $export_type );
 
 		$whitelist_settings = self::get_whitelist_settings( $app_id, $app_platform, $export_type );
 		$splashscreen_settings = self::get_splashscreen_settings( $app_id, $app_platform, $export_type );
@@ -313,9 +484,9 @@ define( function ( require ) {
 <?php endif ?>
 	
 	<!-- Icon and Splash screen declaration -->
-<?php if( !empty( $app_icons ) ): ?>
+<?php if( !empty( $app_icons_splashscreens ) ): ?>
 
-	<?php echo str_replace( "\n", "\n\t", $app_icons ) ?>
+	<?php echo str_replace( "\n", "\n\t", $app_icons_splashscreens ) ?>
 
 <?php endif ?>
 </widget>

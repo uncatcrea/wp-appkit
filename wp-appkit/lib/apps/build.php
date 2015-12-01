@@ -153,7 +153,18 @@ class WpakBuild {
 		$export_filename = self::get_export_file_base_name( $app_id );
 		$export_filename_full = self::get_export_files_path() . "/" . $export_filename . '.zip';
 
-		$answer = self::build_zip( $app_id, $appli_dir, $export_filename_full, array( $current_theme ), WpakAddons::get_app_addons( $app_id ), $export_type );
+		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
+		$app_platform = $app_main_infos['platform'];
+		
+		$answer = self::build_zip( 
+				$app_id, 
+				$appli_dir, 
+				$export_filename_full, 
+				array( $current_theme ), 
+				WpakAddons::get_app_addons( $app_id ), 
+				WpakConfigFile::get_platform_icons_and_splashscreens( $app_id, $app_platform, $export_type ),
+				$export_type 
+		);
 
 		$answer['export'] = $export_filename;
 		$answer['export_full_name'] = $export_filename_full;
@@ -214,7 +225,7 @@ class WpakBuild {
 		return $ok;
 	}
 
-	private static function build_zip( $app_id, $source, $destination, $themes, $addons, $export_type ) {
+	private static function build_zip( $app_id, $source, $destination, $themes, $addons, $icons_and_splashscreens, $export_type ) {
 
 		$answer = array( 'ok' => 1, 'msg' => '' );
 
@@ -390,6 +401,23 @@ class WpakBuild {
 						$zip->addFile( $addon_file['full'], $zip_filename );
 					}
 				}
+			}
+			
+			//Add icons and splashscreens files :
+			if ( !empty( $icons_and_splashscreens ) ) {
+				
+				$icons = $icons_and_splashscreens['icons'];
+				foreach ( $icons as $icon ) {
+					$zip_filename = $source_root . $icon['src'];
+					$zip->addFile( $icon['full_path'], $zip_filename );
+				}
+				
+				$splashscreens = $icons_and_splashscreens['splashscreens'];
+				foreach ( $splashscreens as $splashscreen ) {
+					$zip_filename = $source_root . $splashscreen['src'];
+					$zip->addFile( $splashscreen['full_path'], $zip_filename );
+				}
+				
 			}
 
 			//Create config.js file :
