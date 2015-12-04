@@ -283,6 +283,8 @@ class WpakBuild {
 
 		if ( is_dir( $source ) === true ) {
 
+			$webapp_files = array();
+			
 			$source_root = '';
 
 			if ( $export_type === 'phonegap-cli' ) {
@@ -326,7 +328,7 @@ class WpakBuild {
 
 					if ( $filename == 'index.html' ) {
 
-						$index_content = self::filter_index( file_get_contents( $file ) );
+						$index_content = self::filter_index( file_get_contents( $file ), $export_type );
 
 						if ( !$zip->addFromString( $zip_filename, $index_content ) ) {
 							$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
@@ -343,6 +345,8 @@ class WpakBuild {
 						}
 
 					}
+					
+					$webapp_files[] = $zip_filename;
 				}
 			}
 
@@ -370,6 +374,11 @@ class WpakBuild {
 						if ( preg_match( '|'. $theme .'[/\\\]php|', $filename ) ) {
 							continue;
 						}
+						
+						//Filter git files
+						if ( strpos( $filename, '.git' ) !== false ) {
+							continue;
+						}
 
 						$filename = 'themes/'. $filename;
 
@@ -382,11 +391,15 @@ class WpakBuild {
 								return $answer;
 							}
 						} elseif ( is_file( $file ) === true ) {
+							
 							if ( !$zip->addFile( $file, $zip_filename ) ) {
 								$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
 								$answer['ok'] = 0;
 								return $answer;
 							}
+							
+							$webapp_files[] = $zip_filename;
+							
 						}
 					}
 				}
@@ -399,6 +412,7 @@ class WpakBuild {
 					foreach ( $addon_files as $addon_file ) {
 						$zip_filename = $source_root .'addons/'. $addon->slug .'/'. $addon_file['relative'];
 						$zip->addFile( $addon_file['full'], $zip_filename );
+						$webapp_files[] = $zip_filename;
 					}
 				}
 			}
@@ -422,10 +436,19 @@ class WpakBuild {
 
 			//Create config.js file :
 			$zip->addFromString( $source_root .'config.js', WpakConfigFile::get_config_js( $app_id ) );
-
-			//Create config.xml file (stays at zip root) :
-			$zip->addFromString( 'config.xml', WpakConfigFile::get_config_xml( $app_id, false, $export_type ) );
-
+			$webapp_files[] = $source_root .'config.js';
+			
+			if ( $export_type !== 'webapp' ) {
+				//Create config.xml file (stays at zip root) :
+				$zip->addFromString( 'config.xml', WpakConfigFile::get_config_xml( $app_id, false, $export_type ) );
+			}
+			
+			if ( $export_type === 'webapp' ) {
+				//Create html cache manifest file
+				$cache_manifest_content = self::get_cache_manifest_content( $webapp_files );
+				$zip->addFromString( 'wpak.appcache', $cache_manifest_content );
+			}
+			
 		} else {
 			$answer['msg'] = sprintf( __( 'Zip archive source directory [%s] could not be found.', WpAppKit::i18n_domain ), $source );
 			$answer['ok'] = 0;
@@ -441,16 +464,48 @@ class WpakBuild {
 		return $answer;
 	}
 
-	private static function filter_index( $index_content ) {
+	private static function filter_index( $index_content, $export_type ) {
 
-		//Add cordova.js script (set cordova.js instead of phonegap.js, because PhoneGap Developer App doesn't seem
-		//to support phonegap.js). PhoneGap Build can use indifferently cordova.js or phonegap.js.
-		$index_content = str_replace( '<head>', "<head>\r\n\t\t<script src=\"cordova.js\"></script>\r\n\t\t", $index_content );
-
+		if ( $export_type === 'webapp' ) {
+			
+			//Add reference to the cache manifest to the <html> tag:
+			$index_content = str_replace( '<html>', '<html manifest="wpak.appcache" >', $index_content );
+			
+			//Remove script used only for app simulation in web browser :
+			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)/is', '', $index_content );
+			
+		} else {
+			
+			//Add cordova.js script (set cordova.js instead of phonegap.js, because PhoneGap Developer App doesn't seem
+			//to support phonegap.js). PhoneGap Build can use indifferently cordova.js or phonegap.js.
+			$index_content = str_replace( '<head>', "<head>\r\n\t\t<script src=\"cordova.js\"></script>\r\n\t\t", $index_content );
+			
+		}
+		
 		//Remove script used only for app simulation in web browser :
 		$index_content = preg_replace( '/<script[^>]*>[^<]*var query[^<]*<\/script>\s*<script/is', '<script', $index_content );
 
 		return $index_content;
+	}
+	
+	private static function get_cache_manifest_content( $webapp_files ) {
+		$cache_manifest = '';
+		
+		if ( !empty( $webapp_files ) ) {
+			$cache_manifest .= "CACHE MANIFEST\n";
+			
+			$cache_manifest .= "# v". date( 'Y-m-d H:i:s' ) ."\n\n";
+			
+			foreach( $webapp_files as $file ) {
+				$cache_manifest .= $file ."\n";
+			}
+			
+			$cache_manifest .= "\nNETWORK:\n";
+			$cache_manifest .= "/wp-appkit-api\n";
+			$cache_manifest .= "/wp-content/uploads\n";
+		}
+		
+		return $cache_manifest;
 	}
 
 }
