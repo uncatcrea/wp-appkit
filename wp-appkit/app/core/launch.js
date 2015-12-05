@@ -50,7 +50,7 @@ require(['root/config'],function(Config){
 									App.router = new Router();
 
 									require(Addons.getJs('theme','before'),function(){
-										require(['theme/js/functions'],function(){
+										require(['theme/js/functions','text!theme/single.html','text!theme/archive.html'],function(){
 											require(Addons.getJs('theme','after'),
 												function(){
 													App.sync(
@@ -66,7 +66,7 @@ require(['root/config'],function(Config){
 																	Utils.log( 'App opening  count : ', Stats.getCountOpen() );
 																	Utils.log( 'Last app opening  was on ', Stats.getLastOpenDate() );
 																}
-
+																
 																App.launchRouting();
 
 																App.triggerInfo('app-launched'); //triggers info:app-ready, info:app-first-launch and info:app-version-changed
