@@ -32,8 +32,8 @@ require(['root/config'],function(Config){
 	    paths: dynamic_paths
 	});
 
-	require(['jquery', 'core/addons-internal', 'core/app-utils', 'core/app', 'core/router', 'core/region-manager', 'core/stats', 'core/phonegap/utils'],
-			function ($, Addons, Utils, App, Router, RegionManager, Stats, PhoneGap) {
+	require(['jquery', 'core/addons-internal', 'core/app-utils', 'core/app', 'core/router', 'core/region-manager', 'core/stats', 'core/phonegap/utils','core/lib/hooks'],
+			function ($, Addons, Utils, App, Router, RegionManager, Stats, PhoneGap, Hooks) {
 
 			var launch = function() {
 				
@@ -50,65 +50,80 @@ require(['root/config'],function(Config){
 									App.router = new Router();
 
 									require(Addons.getJs('theme','before'),function(){
-										require(['theme/js/functions','text!theme/single.html','text!theme/archive.html'],function(){
-											require(Addons.getJs('theme','after'),
-												function(){
-													App.sync(
-														function(){
-															RegionManager.buildMenu(function(){ //Menu items are loaded by App.sync
+										require(['theme/js/functions'],function(){
+											
+											var preloaded_templates = ['text!theme/single.html','text!theme/archive.html'];
+											
+											/**
+											 * Define templates that are preloaded so that we don't have any delay
+											 * when requiring them dynamically.
+											 */
+											preloaded_templates = Hooks.applyFilters('preloaded-templates',preloaded_templates,[]);
+											
+											require(preloaded_templates,function(){
+											
+												require(Addons.getJs('theme','after'),
+													function(){
+														App.sync(
+															function(){
+																RegionManager.buildMenu(function(){ //Menu items are loaded by App.sync
 
-																Stats.updateVersion();
-																Stats.incrementCountOpen();
-																Stats.incrementLastOpenTime();
+																	Stats.updateVersion();
+																	Stats.incrementCountOpen();
+																	Stats.incrementLastOpenTime();
 
-																if( Config.debug_mode == 'on' ){
-																	Utils.log( 'App version : ', Stats.getVersionDiff() );
-																	Utils.log( 'App opening  count : ', Stats.getCountOpen() );
-																	Utils.log( 'Last app opening  was on ', Stats.getLastOpenDate() );
-																}
-																
-																App.launchRouting();
+																	if( Config.debug_mode == 'on' ){
+																		Utils.log( 'App version : ', Stats.getVersionDiff() );
+																		Utils.log( 'App opening  count : ', Stats.getCountOpen() );
+																		Utils.log( 'Last app opening  was on ', Stats.getLastOpenDate() );
+																	}
 
-																App.triggerInfo('app-launched'); //triggers info:app-ready, info:app-first-launch and info:app-version-changed
+																	App.launchRouting();
 
-																//Refresh at app launch can be canceled using the 'refresh-at-app-launch' App param,
-																//this is useful if we set a specific launch page and don't want to be redirected
-																//after the refresh.
-																if( App.getParam('refresh-at-app-launch') ){
-																	//Refresh at app launch : as the theme is now loaded, use theme-app :
-																	require(['core/theme-app'],function(ThemeApp){
-																		var last_updated = Stats.getStats( 'last_sync' );
-																		var refresh_interval = App.options.get( 'refresh_interval' );
-																		if( undefined === last_updated || undefined === refresh_interval || Date.now() > last_updated + ( refresh_interval.get( 'value' ) * 1000 ) ) {
-																			Utils.log( 'Refresh interval exceeded, refreshing', { last_updated: new Date( last_updated ), refresh_interval: refresh_interval.get( 'value' ) } );
-																			ThemeApp.refresh();
-																		}
-																	});
-																}
+																	App.triggerInfo('app-launched'); //triggers info:app-ready, info:app-first-launch and info:app-version-changed
+
+																	//Refresh at app launch can be canceled using the 'refresh-at-app-launch' App param,
+																	//this is useful if we set a specific launch page and don't want to be redirected
+																	//after the refresh.
+																	if( App.getParam('refresh-at-app-launch') ){
+																		//Refresh at app launch : as the theme is now loaded, use theme-app :
+																		require(['core/theme-app'],function(ThemeApp){
+																			var last_updated = Stats.getStats( 'last_sync' );
+																			var refresh_interval = App.options.get( 'refresh_interval' );
+																			if( undefined === last_updated || undefined === refresh_interval || Date.now() > last_updated + ( refresh_interval.get( 'value' ) * 1000 ) ) {
+																				Utils.log( 'Refresh interval exceeded, refreshing', { last_updated: new Date( last_updated ), refresh_interval: refresh_interval.get( 'value' ) } );
+																				ThemeApp.refresh();
+																			}
+																		});
+																	}
+
+																	PhoneGap.hideSplashScreen();
+																});
+															},
+															function( error ){
+																Backbone.history.start();
+
+																var error_message = "Error : App could not synchronize with website";
+
+																if ( error.id === 'synchro:no-component' ) {
+																	error_message += " : no component found in web service answer. Please add components to the App on WordPress side.";
+																} 
+
+																Utils.log( error_message );
 
 																PhoneGap.hideSplashScreen();
-															});
-														},
-														function( error ){
-															Backbone.history.start();
-															
-															var error_message = "Error : App could not synchronize with website";
-															
-															if ( error.id === 'synchro:no-component' ) {
-																error_message += " : no component found in web service answer. Please add components to the App on WordPress side.";
-															} 
-															
-															Utils.log( error_message );
 
-															PhoneGap.hideSplashScreen();
+																App.triggerInfo('no-content');
+															},
+															false //true to force refresh local storage at each app launch.
+														);
 
-															App.triggerInfo('no-content');
-														},
-														false //true to force refresh local storage at each app launch.
-													);
-
-												}
-											);
+													}
+												);
+											},
+											function(error){
+												Utils.log('Error : could not preload templates', error);
+											});
 										},
 										function(error){
 											Utils.log('Error : theme/js/functions.js not found', error);
