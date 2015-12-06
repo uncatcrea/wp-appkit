@@ -281,7 +281,6 @@ define( function ( require ) {
 		
 		$default_icons_splashscreens_dir = dirname( __FILE__ ) .'/../../images/icons-splashscreens';
 		
-		
 		/**
 		 * 'wpak_icons_and_splashscreens_dir' filter.
 		 * Use this filter to customize icons and splashscreens files directory
@@ -296,46 +295,52 @@ define( function ( require ) {
 		return $default_icons_splashscreens_dir;
 	}
 	
-	public static function get_platform_icons_and_splashscreens( $app_id, $app_platform, $export_type ) {
+	public static function get_platform_icons_and_splashscreens_files( $app_id, $app_platform, $export_type ) {
 		
-		$app_icons_and_splashscreens = array( 'icons' => array(), 'splashscreens' => array() );
+		$app_icons_and_splashscreens_files = array( 'icons' => array(), 'splashscreens' => array() );
 		
-		$default_icons_and_splash = self::get_default_icons_and_splashscreens( $app_id, $export_type );
-		$default_icons = $default_icons_and_splash['icons'];
-		$default_splashscreens = $default_icons_and_splash['splashscreens'];
+		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		
-		//Handle universal platform (case empty( $app_platform ) ):
-		$platforms = $app_platform === '' ? array( 'ios', 'android' ) : array( $app_platform ); 
+		if ( $app_main_infos['use_default_icons_and_splash'] ) {
 		
-		$icons_splashscreens_dir = self::get_icons_splashscreens_dir( $app_id, $app_platform, $export_type );
-		
-		foreach( $platforms as $platform ) {
-			
-			if ( !empty( $default_icons[$platform] ) ) {
-				foreach( $default_icons[$platform] as $icon ) {
-					$file_path = $icons_splashscreens_dir .'/'. $platform .'/'. $icon['src'];
-					if ( file_exists( $file_path ) ) {
-						$icon['platform'] = $platform;
-						$icon['full_path'] = $file_path;
-						$app_icons_and_splashscreens['icons'][] = $icon;
-					}
-				}
-			}
+			$default_icons_and_splash = self::get_default_icons_and_splashscreens( $app_id, $export_type );
+			$default_icons = $default_icons_and_splash['icons'];
+			$default_splashscreens = $default_icons_and_splash['splashscreens'];
 
-			if ( !empty( $default_splashscreens[$platform] ) ) {
-				foreach( $default_splashscreens[$platform] as $splashscreen ) {
-					$file_path = $icons_splashscreens_dir .'/'. $platform .'/'. $splashscreen['src'];
-					if ( file_exists( $icons_splashscreens_dir .'/'. $platform .'/'. $splashscreen['src'] ) ) {
-						$splashscreen['platform'] = $platform;
-						$splashscreen['full_path'] = $file_path;
-						$app_icons_and_splashscreens['splashscreens'][] = $splashscreen;
+			//Handle universal platform (case empty( $app_platform ) ):
+			$platforms = $app_platform === '' ? array( 'ios', 'android' ) : array( $app_platform ); 
+
+			$icons_splashscreens_dir = self::get_icons_splashscreens_dir( $app_id, $app_platform, $export_type );
+
+			foreach( $platforms as $platform ) {
+
+				if ( !empty( $default_icons[$platform] ) ) {
+					foreach( $default_icons[$platform] as $icon ) {
+						$file_path = $icons_splashscreens_dir .'/'. $platform .'/'. $icon['src'];
+						if ( file_exists( $file_path ) ) {
+							$icon['platform'] = $platform;
+							$icon['full_path'] = $file_path;
+							$app_icons_and_splashscreens_files['icons'][] = $icon;
+						}
 					}
 				}
+
+				if ( !empty( $default_splashscreens[$platform] ) ) {
+					foreach( $default_splashscreens[$platform] as $splashscreen ) {
+						$file_path = $icons_splashscreens_dir .'/'. $platform .'/'. $splashscreen['src'];
+						if ( file_exists( $icons_splashscreens_dir .'/'. $platform .'/'. $splashscreen['src'] ) ) {
+							$splashscreen['platform'] = $platform;
+							$splashscreen['full_path'] = $file_path;
+							$app_icons_and_splashscreens_files['splashscreens'][] = $splashscreen;
+						}
+					}
+				}
+
 			}
 			
 		}
 		
-		return $app_icons_and_splashscreens;
+		return $app_icons_and_splashscreens_files;
 	}
 	
 	/**
@@ -344,11 +349,12 @@ define( function ( require ) {
 	protected static function get_icons_and_splashscreens_xml( $app_id, $app_platform, $export_type ) {
 		
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
-		$app_icons_and_splashscreens = $app_main_infos['icons'];
+		$app_icons_and_splashscreens_files = $app_main_infos['icons'];
+		$app_use_default_icons_and_splashscreens = $app_main_infos['use_default_icons_and_splash'];
 		
-		if ( empty( $app_icons_and_splashscreens ) ) {
+		if ( empty( $app_icons_and_splashscreens_files ) && $app_use_default_icons_and_splashscreens ) {
 			
-			$icons_and_splash = self::get_platform_icons_and_splashscreens( $app_id, $app_platform, $export_type );
+			$icons_and_splash = self::get_platform_icons_and_splashscreens_files( $app_id, $app_platform, $export_type );
 			$icons = $icons_and_splash['icons'];
 			$splashscreens = $icons_and_splash['splashscreens'];
 			
@@ -378,10 +384,10 @@ define( function ( require ) {
 				}
 			}
 			
-			$app_icons_and_splashscreens = $icons_str ."\n". $splashscreens_str;
+			$app_icons_and_splashscreens_files = $icons_str ."\n". $splashscreens_str;
 		}
 		
-		return $app_icons_and_splashscreens;
+		return $app_icons_and_splashscreens_files;
 	}
 	
 	public static function get_config_xml( $app_id, $echo = false, $export_type = 'phonegap-build' ) {
@@ -483,7 +489,7 @@ define( function ( require ) {
 <?php endif ?>
 <?php endif ?>
 	
-	<!-- Icon and Splash screen declaration -->
+	<!-- Icons and Splashscreens declaration -->
 <?php if( !empty( $app_icons_splashscreens ) ): ?>
 
 	<?php echo str_replace( "\n", "\n\t", $app_icons_splashscreens ) ?>

@@ -350,7 +350,11 @@ class WpakApps {
 				<div class="field-group">
 					<label><?php _e( 'Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_icons" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
-					<span class="description"><?php _e( 'Write the icons and splashscreens tags as defined in the PhoneGap documentation.<br/>Example: ', WpAppKit::i18n_domain ) ?>&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;</span>
+					<span class="description"><?php _e( 'Write the icons and splashscreens tags as defined in the PhoneGap documentation.<br/>Example: ', WpAppKit::i18n_domain ) ?>&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;<br><br></span>
+					<br>
+					<input type="checkbox" id="wpak_use_default_icons_and_splash" name="wpak_use_default_icons_and_splash" <?php checked( $main_infos['use_default_icons_and_splash'] ) ?> />
+					<label for="wpak_use_default_icons_and_splash"><?php _e( 'Use default WP-AppKit Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
+					<span class="description"><?php _e( 'If checked and "Icons and Splashscreens" is empty, the app export will embed the default WP-AppKit Icons and Splashscreens.', WpAppKit::i18n_domain )?></span>
 				</div>
 			</fieldset>
 			<fieldset>
@@ -482,9 +486,22 @@ class WpakApps {
 
 		if ( isset( $_POST['wpak_app_icons'] ) ) {
 			$app_icons = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $_POST['wpak_app_icons'] );
-			update_post_meta( $post_id, '_wpak_app_icons', trim( $app_icons ) );
+			$app_icons = trim( $app_icons );
+			update_post_meta( $post_id, '_wpak_app_icons', $app_icons );
+			
+			//Use default app icons and splash only if none is provided manually:
+			if ( empty( $app_icons ) ) {
+				//App that have no existent '_wpak_use_default_icons_and_splash' meta must
+				//be considered as using the default icons and splash. So it is important
+				//that we set it to 'off' and not delete the meta.
+				$use_default = !empty( $_POST['wpak_use_default_icons_and_splash'] ) ? 'on' : 'off';
+				update_post_meta( $post_id, '_wpak_use_default_icons_and_splash', $use_default );
+			} else {
+				update_post_meta( $post_id, '_wpak_use_default_icons_and_splash', 'off' );
+			}
+			
 		}
-
+		
 		if ( isset( $_POST['wpak_app_simulation_secured'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_simulation_secured', sanitize_text_field( $_POST['wpak_app_simulation_secured'] ) );
 		}
@@ -595,6 +612,9 @@ class WpakApps {
 		$author_website = get_post_meta( $post_id, '_wpak_app_author_website', true );
 		$author_email = get_post_meta( $post_id, '_wpak_app_author_email', true );
 		$icons = get_post_meta( $post_id, '_wpak_app_icons', true );
+		
+		$use_default_icons_and_splash = get_post_meta( $post_id, '_wpak_use_default_icons_and_splash', true );
+		$use_default_icons_and_splash = empty( $use_default_icons_and_splash ) || $use_default_icons_and_splash === 'on';
 
 		$phonegap_plugins = '';
 		if ( metadata_exists( 'post', $post_id, '_wpak_app_phonegap_plugins' ) ) {
@@ -614,6 +634,7 @@ class WpakApps {
 			'author_email' => $author_email,
 			'phonegap_plugins' => $phonegap_plugins,
 			'icons' => $icons,
+			'use_default_icons_and_splash' => $use_default_icons_and_splash,
 		);
 	}
 

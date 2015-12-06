@@ -189,7 +189,7 @@ class WpakBuild {
 				$export_filename_full, 
 				array( $current_theme ), 
 				WpakAddons::get_app_addons( $app_id ), 
-				WpakConfigFile::get_platform_icons_and_splashscreens( $app_id, $app_platform, $export_type ),
+				WpakConfigFile::get_platform_icons_and_splashscreens_files( $app_id, $app_platform, $export_type ),
 				$export_type 
 		);
 
@@ -445,7 +445,10 @@ class WpakBuild {
 			}
 			
 			//Add icons and splashscreens files :
-			if ( !empty( $icons_and_splashscreens ) ) {
+			if ( !empty( $icons_and_splashscreens ) 
+				 && array_key_exists( 'icons', $icons_and_splashscreens ) 
+				 && array_key_exists( 'splashscreens', $icons_and_splashscreens )
+				) {
 				
 				$icons = $icons_and_splashscreens['icons'];
 				foreach ( $icons as $icon ) {
