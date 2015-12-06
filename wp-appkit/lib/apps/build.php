@@ -86,6 +86,19 @@ class WpakBuild {
 		return self::get_appli_dir_url() . '/index.html?wpak_app_id=' . WpakApps::get_app_slug( $app_id );
 	}
 
+	public static function get_allowed_export_types() {
+		$allowed_export_types = array( 
+			'phonegap-build' => __( 'PhoneGap Build', WpAppKit::i18n_domain ), 
+			'phonegap-cli' => __( 'PhoneGap CLI', WpAppKit::i18n_domain ), 
+			'webapp' => __( 'WebApp', WpAppKit::i18n_domain ) 
+		);
+		return $allowed_export_types;
+	}
+	
+	public static function is_allowed_export_type( $export_type ) {
+		return array_key_exists( $export_type, self::get_allowed_export_types() );
+	}
+	
 	public static function download_app_sources() {
 
 		if ( !check_admin_referer( 'wpak_download_app_sources' ) || !isset( $_GET['post'] ) ) {
@@ -97,9 +110,11 @@ class WpakBuild {
 		if( $app_id <= 0 ) {
 			return;
 		}
+		
+		$export_type = isset( $_GET['export_type'] ) && self::is_allowed_export_type( $_GET['export_type'] ) ? $_GET['export_type'] : 'phonegap-build';
 
 		// Re-build sources
-		$answer = self::build_app_sources( $app_id );
+		$answer = self::build_app_sources( $app_id, $export_type );
 
 		if( 1 === $answer['ok'] && !empty( $answer['export'] ) ) {
 			$filename = $answer['export'] . '.zip';
@@ -138,6 +153,12 @@ class WpakBuild {
 	public static function build_app_sources( $app_id, $export_type = 'phonegap-build' ) {
 		$answer = array();
 
+		if ( !self::is_allowed_export_type( $export_type ) ) {
+			$answer['ok'] = 0;
+			$answer['msg'] = __( 'Unknown export type', WpAppKit::i18n_domain ) . ": '$export_type'";
+			return $answer;
+		}
+		
 		if ( !extension_loaded( 'zip' ) ) {
 			$answer['ok'] = 0;
 			$answer['msg'] = __( 'Zip PHP extension is required to run file export. See http://www.php.net/manual/fr/book.zip.php.', WpAppKit::i18n_domain );

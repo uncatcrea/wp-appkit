@@ -49,7 +49,9 @@ jQuery().ready(function(){
         wizard_save = $( '#wpak_app_wizard_save' ),
         title = $( '#title' ),
         app_title = $( '#wpak_app_title' ),
-        platform_select = $( '#wpak_app_platform' );
+        platform_select = $( '#wpak_app_platform' ),
+		export_select = $( '#wpak_export_type' ),
+		export_link = $( '#wpak_export_link' );
 
     var wizard_components_observer = {
         update: function() {
@@ -120,5 +122,9 @@ jQuery().ready(function(){
         $( '.platform-specific' ).hide();
         $( '.platform-specific.' + platform_select.val() ).show();
     }).change();
+	
+	export_select.on( 'change', function() {
+		export_link.attr( 'href', export_link.attr( 'href' ).replace( /&export_type=[a-z\-_]+/, '&export_type='+ $( this ).val() ) );
+	} );
 
 });

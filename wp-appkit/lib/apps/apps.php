@@ -291,7 +291,13 @@ class WpakApps {
 			</div>
 
 			<div id="export-action">
-				<?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+				<?php $default_export_type = 'phonegap-build'; ?>
+				<select name="export_type" id="wpak_export_type" >
+					<?php foreach( WpakBuild::get_allowed_export_types() as $export_type => $label ): ?>
+					<option value="<?php echo esc_attr( $export_type ) ?>" <?php selected( $export_type === $default_export_type )?>><?php echo esc_html( $label ) ?></option>
+					<?php endforeach ?>
+				</select>
+				<a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => $default_export_type ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
 			</div>
 		</div>
 
