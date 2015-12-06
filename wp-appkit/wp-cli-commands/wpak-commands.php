@@ -13,12 +13,13 @@ class Wpak_Commands extends WP_CLI_Command {
 	 * 
 	 * <target_directory> : Target directory where the export files will be copied
 	 * 
-	 * <export_type> : (Optionnal) Export type can be "phonegap-cli" (default if not provided) or "phonegap-build"
+	 * <export_type> : (Optionnal) Export type can be "phonegap-cli" (default if not provided), "phonegap-build" or "webapp"
      * 
      * ## EXAMPLES
      * 
      *     PhoneGap CLI export : wp wpak export 123 /target/directory/
 	 *     PhoneGap Build export : wp wpak export 123 /target/directory/ "phonegap-build"
+	 *     Webapp export : wp wpak export 123 /target/directory/ "webapp"
      *
      * @synopsis <app_id> <target_directory> [<export_type>]
 	 * 

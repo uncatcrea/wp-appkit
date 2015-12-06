@@ -671,7 +671,7 @@ class WpakApps {
 		 * Filter the Phonegap Build plugins that are included by default by WP AppKit
 		 *
 		 * @param array		$default_plugins	Array of default Phonegap plugins.
-		 * @param string    $export_type        Export type : 'phonegap-build' or 'phonegap-cli'
+		 * @param string    $export_type        Export type : 'phonegap-build', 'phonegap-cli' or 'webapp'
 		 * @param int		$app_id				Application id
 		 */
 		$default_plugins = apply_filters( 'wpak_default_phonegap_build_plugins', $default_plugins, $export_type, $app_id );

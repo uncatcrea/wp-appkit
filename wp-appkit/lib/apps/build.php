@@ -129,6 +129,12 @@ class WpakBuild {
 		}
 	}
 
+	/**
+	* Retrieves export data and launch zip built.
+	*
+	* @param int		$app_id				Application id
+	* @param string     $export_type        Export type : 'phonegap-build' (default), 'phonegap-cli' or 'webapp'
+	*/
 	public static function build_app_sources( $app_id, $export_type = 'phonegap-build' ) {
 		$answer = array();
 

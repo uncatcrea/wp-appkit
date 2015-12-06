@@ -133,7 +133,7 @@ define( function ( require ) {
 	 * (see https://github.com/apache/cordova-plugin-whitelist).
 	 * 
 	 * @param int $app_id Application ID
-	 * @param string $export_type 'phonegap-build', 'phonegap-cli' etc
+	 * @param string $export_type 'phonegap-build' (default), 'phonegap-cli' or 'webapp'
 	 */
 	protected static function get_whitelist_settings( $app_id, $app_platform, $export_type = 'phonegap-build' ) {
 		
@@ -162,7 +162,7 @@ define( function ( require ) {
 		 *											 'allow-navigation' => array( 'href' => '*' )
 		 * @param int		$app_id		            Application id
 		 * @param string    $app_platform           Application platform (ios, android ...)
-		 * @param string    $export_type            'phonegap-build' (default) or 'phonegap-cli'
+		 * @param string    $export_type            'phonegap-build' (default), 'phonegap-cli' or 'webapp'
 		 * @param boolean   $whitelist_plugin_here  Whether or not the whitelist plugin is activated for this app.
 		 */
 		$whitelist_settings = apply_filters( 'wpak_config_xml_whitelist', $whitelist_settings, $app_id, $app_platform, $export_type, $current_phonegap_plugins, $whitelist_plugin_here );
@@ -204,7 +204,7 @@ define( function ( require ) {
 		 * @param array  	$splashcreen_settings     Array of whitelist settings
 		 * @param int		$app_id		              Application id
 		 * @param string    $app_platform             Application platform (ios, android ...)
-		 * @param string    $export_type              'phonegap-build' (default) or 'phonegap-cli'
+		 * @param string    $export_type              'phonegap-build' (default), 'phonegap-cli' or 'webapp'
 		 * @param boolean   $splashcreen_plugin_here  Whether or not the splashscreen plugin is activated for this app.
 		 */
 		
@@ -270,7 +270,7 @@ define( function ( require ) {
 		 * 
 		 * @param $icons_and_splashscreens    array    Icon and splashscreens to modify
 		 * @param $app_id                     int      App id
-		 * @param $export_type                string   'phonegap-build' (default) or 'phonegap-cli'
+		 * @param $export_type                string   'phonegap-build' (default), 'phonegap-cli' or 'webapp'
 		 */
 		$icons_and_splashscreens = apply_filters( 'wpak_default_icons_and_splashscreens', $icons_and_splashscreens, $app_id, $export_type );
 		
@@ -289,7 +289,7 @@ define( function ( require ) {
 		 * @param $icons_and_splashscreens    array    Icon and splashscreens to modify
 		 * @param $app_id                     int      App id
 		 * @param $app_platform               string   App platform
-		 * @param $export_type                string   'phonegap-build' (default) or 'phonegap-cli'
+		 * @param $export_type                string   'phonegap-build' (default), 'phonegap-cli' or 'webapp'
 		 */
 		$default_icons_splashscreens_dir = apply_filters( 'wpak_icons_and_splashscreens_dir', $default_icons_splashscreens_dir, $app_id, $app_platform, $export_type );
 		
