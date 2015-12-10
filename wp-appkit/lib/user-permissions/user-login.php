@@ -12,7 +12,7 @@ class WpakUserLogin {
 		return !empty( self::$current_user );
 	}
 	
-	public static function log_user_from_authenticated_action( $app_id, $action, $auth_data, $to_check ) {
+	public static function log_user_from_authenticated_action( $app_id, $action, $auth_data, $to_check = array() ) {
 		$result = array( 'ok' => false, 'auth_error' => '' );
 		
 		$auth_engine = AuthenticationSettings::get_auth_engine_instance();
