@@ -767,6 +767,28 @@ define( function( require, exports ) {
 		
 		return App.getGlobalItem( global_key, item_id );
 	};
+	
+	/**
+     * Retrieves current screen infos
+	 * 
+	 * (Alias of theme-tpl-tags::getCurrentScreen(): because getting current
+	 * screen is needed very often, we need it both sides)
+	 * 
+     * @return JSON object containing :
+     * - screen_type : list, single, comments, page
+     * - fragment : unique screen url id (what's after # in url)
+     * - component_id : component slug id, if displaying a component screen (list, page)
+     * - item_id : current item id, if displaying single content (post,page)
+	 * - label : current item label (title of component, title of post)
+     * - data : contains more specific data depending on which screen type is displayed
+     * 	> total : total number of posts for lists
+     * 	> query : query vars used to retrieve contents (taxonomy, terms...)
+     * 	> ids : id of posts displayed in lists
+     * 	> any other specific data depending on currently displayed component
+     */
+    themeApp.getCurrentScreen = function() {
+        return App.getCurrentScreenData();
+    };
 
 	//Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
 	//a circular dependency for requirejs) can both be required at the same time
