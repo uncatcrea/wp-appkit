@@ -256,9 +256,30 @@ class WpakComponentTypePostsList extends WpakComponentType {
 	}
 
 	public function echo_form_fields( $component ) {
-		$post_types = get_post_types( array( 'public' => true ), 'objects' ); //TODO : hook on arg array
-		unset( $post_types['attachment'] );
+		
+		$post_types_slugs = array_keys( get_post_types( array( 'public' => true ), 'names' ) ); 
+		if ( in_array( 'attachment', $post_types_slugs ) ) {
+			unset( $post_types_slugs[array_search( 'attachment', $post_types_slugs )] );
+		}
 
+		/**
+		 * Use this "wpak_posts_list_post_types" to customize which post types are
+		 * available in post list components.
+		 * 
+		 * @param $post_types_slugs     array              Array of post types slugs to be filtered
+		 * @param $component            WpakComponent      Current "post list" component
+		 */
+		$post_types_slugs = apply_filters( 'wpak_posts_list_post_types', $post_types_slugs, $component );
+		
+		//Retrieve post types objects
+		$post_types = array();
+		foreach( $post_types_slugs as $post_type_slug ) {
+			$post_type_object = get_post_type_object( $post_type_slug );
+			if ( $post_type_object ) {
+				$post_types[$post_type_slug] = $post_type_object;
+			}
+		}
+		
 		$has_options = !empty( $component ) && !empty( $component->options );
 
 		reset( $post_types );
