@@ -640,7 +640,7 @@ class WpakApps {
 		$icons = get_post_meta( $post_id, '_wpak_app_icons', true );
 		
 		$use_default_icons_and_splash = get_post_meta( $post_id, '_wpak_use_default_icons_and_splash', true );
-		$use_default_icons_and_splash = empty( $use_default_icons_and_splash ) || $use_default_icons_and_splash === 'on';
+		$use_default_icons_and_splash = ( empty( $use_default_icons_and_splash ) && empty( $icons ) ) || $use_default_icons_and_splash === 'on';
 
 		$phonegap_plugins = '';
 		if ( metadata_exists( 'post', $post_id, '_wpak_app_phonegap_plugins' ) ) {
