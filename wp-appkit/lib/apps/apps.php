@@ -17,6 +17,8 @@ class WpakApps {
 			add_filter( 'post_row_actions', array( __CLASS__, 'remove_quick_edit' ), 10, 2 );
 			add_action( 'admin_head', array( __CLASS__, 'add_icon' ) );
 			add_filter( 'post_updated_messages', array( __CLASS__, 'updated_messages' ) );
+			add_filter( 'manage_wpak_apps_posts_columns' , array( __CLASS__, 'add_platform_column' ) );
+			add_action( 'manage_wpak_apps_posts_custom_column' , array( __CLASS__, 'platform_column_content' ), 10, 2 );
 		}
 	}
 
@@ -110,6 +112,30 @@ class WpakApps {
 		}
 	}
 
+	/**
+	 * Add platfrom column after 'title' column
+	 */
+	public static function add_platform_column( $columns ) {
+		
+		$additionnal_column = array( 'wpak_platform' => __( 'Platform', WpAppKit::i18n_domain ) );
+
+		$title_index = array_search( 'title', array_keys( $columns ) ) + 1;
+
+		$columns = array_slice( $columns, 0, $title_index, true ) + $additionnal_column + array_slice( $columns, $title_index, count( $columns ) - $title_index, true );
+
+		return $columns;
+	}
+	
+	public static function platform_column_content( $column, $post_id ) {
+		if ( $column === 'wpak_platform' ) {
+			$app_info = self::get_app_main_infos( $post_id );
+			$available_platforms = self::get_platforms();
+			if ( array_key_exists( $app_info['platform'], $available_platforms ) ) {
+				echo esc_html( $available_platforms[$app_info['platform']] );
+			}
+		}
+	}
+	
 	public static function add_settings_panels() {
 		$capability_required = current_user_can( 'wpak_edit_apps' ) ? 'wpak_edit_apps' : 'manage_options';
 		add_menu_page( __( 'WP AppKit', WpAppKit::i18n_domain ), __( 'WP AppKit', WpAppKit::i18n_domain ), $capability_required, self::menu_item, array( __CLASS__, 'settings_panel' ) );
@@ -628,7 +654,7 @@ class WpakApps {
 			'version' => $version,
 			'version_code' => $version_code,
 			'phonegap_version' => $phonegap_version,
-			'platform' => $platform,
+			'platform' => !empty( $platform ) ? $platform : '',
 			'author' => $author,
 			'author_website' => $author_website,
 			'author_email' => $author_email,
