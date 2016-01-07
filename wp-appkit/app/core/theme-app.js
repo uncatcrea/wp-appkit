@@ -789,6 +789,37 @@ define( function( require, exports ) {
     themeApp.getCurrentScreen = function() {
         return App.getCurrentScreenData();
     };
+	
+	themeApp.getCurrentScreenObject = function() {
+		var screen_object = {};
+		
+		var screen_data = App.getCurrentScreenData();
+		
+		switch( screen_data.screen_type ) {
+			case 'list':
+				if ( screen_data.data ) {
+					screen_object = screen_data.data;
+				}
+				break;
+			case 'single':
+				if ( screen_data.data.post ) {
+					screen_object = screen_data.data.post;
+				} else if ( screen_data.data.item ) {
+					screen_object = screen_data.data.item;
+				}
+				break;
+			case 'comments':
+				if ( screen_data.data ) {
+					screen_object = screen_data.data;
+				}
+				break;
+			case 'custom-page':
+				
+				break;
+		};
+		
+        return screen_object;
+    };
 
 	//Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
 	//a circular dependency for requirejs) can both be required at the same time
