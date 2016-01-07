@@ -782,7 +782,7 @@ define(function (require) {
       	var global = app.getCurrentScreenGlobal( global_default );
 
       	return Hooks.applyFilters( 'post-global', global, [id, global_default] );
-      }
+      };
 
       app.getMoreOfComponent = function(component_id,cb_ok,cb_error){
 			var component = app.components.get( component_id );

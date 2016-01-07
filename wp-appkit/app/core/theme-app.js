@@ -416,20 +416,24 @@ define( function( require, exports ) {
 		return get_more_link_data;
 	};
 
-	themeApp.getMoreComponentItems = function( do_after ) {
+	themeApp.getMoreComponentItems = function( cb_after, cb_error ) {
 		var current_screen = App.getCurrentScreenData();
-		if ( current_screen.screen_type == 'list' ) {
+		if ( current_screen.screen_type === 'list' ) {
 			App.getMoreOfComponent(
 					current_screen.component_id,
 					function( new_items, is_last, data ) {
 						var current_archive_view = RegionManager.getCurrentView();
 						current_archive_view.addPosts( new_items );
 						current_archive_view.render();
-						do_after( is_last, new_items, data.nb_left );
+						cb_after( is_last, new_items, data.nb_left );
+					},
+					function( error ) {
+						var get_more_link_data = themeApp.getGetMoreLinkDisplay();
+						cb_error( format_theme_event_data( error.event, error ), get_more_link_data );
 					}
 			);
 		} else {
-			Hooks.doActions( 'get-more-component-items', [ current_screen, do_after ] );
+			Hooks.doActions( 'get-more-component-items', [ current_screen, cb_after, cb_error ] );
 		}
 	};
 
