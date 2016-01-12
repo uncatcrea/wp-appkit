@@ -219,11 +219,16 @@ define(function(require, exports) {
 		var items = [];
 		var component = themeTplTags.getComponent( component_id );
 		if ( component ) {
-			if ( return_format === 'view_items' ) {
+			if ( return_format === 'view_items' || return_format === 'json' ) {
+				
 				if ( component.view_data.hasOwnProperty( 'posts' ) ) {
 					items = component.view_data.posts;
 				} else if ( component.view_data.hasOwnProperty( 'items' ) ) {
 					items = component.view_data.items;
+				}
+				
+				if ( return_format === 'json' ) {
+					items = items.map( function( model ){ return model.toJSON(); } );
 				}
 			}
 		}
