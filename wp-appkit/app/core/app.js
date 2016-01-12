@@ -463,6 +463,10 @@ define(function (require) {
         }
 	};
 
+	app.componentExists = function( component_id ) {
+		return app.components.get( component_id ) !== undefined;
+	};
+
 	app.getComponents = function( filter ) {
 		var components = [];
 

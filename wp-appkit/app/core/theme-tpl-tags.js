@@ -201,6 +201,18 @@ define(function(require, exports) {
 	themeTplTags.getComponent = function(component_id) {
         return App.getComponentData(component_id);
     };
+	
+	themeTplTags.componentExists = function(component_id) {
+        return App.componentExists(component_id);
+    };
+	
+	themeTplTags.getComponentLink = function( component_id ) {
+		var component_link = '';
+		if ( App.componentExists( component_id ) ) {
+			component_link = '#component-'+ component_id;
+		}
+        return component_link;
+    };
 
 	themeTplTags.getComponentItems = function( component_id, return_format ) {
 		return_format = return_format === undefined ? 'view_items' : return_format;
@@ -301,6 +313,15 @@ define(function(require, exports) {
 		}
 
 		return menu_items;
+	};
+	
+	themeTplTags.isComponentInMenu = function( component_id ) {
+		var component_in_menu = false;
+		var menu_view = RegionManager.getMenuView();
+		if ( menu_view ) {
+			component_in_menu = menu_view.menu.get( component_id ) !== undefined;
+		}
+		return component_in_menu;
 	};
 
 	/**********************************************

@@ -436,6 +436,19 @@ define( function( require, exports ) {
 			Hooks.doActions( 'get-more-component-items', [ current_screen, cb_after, cb_error ] );
 		}
 	};
+	
+	/************************************************
+	 * Components
+	 */
+	
+	/**
+	 * Retrieve all app's components
+	 * 
+	 * @returns {Array} Array of compoents as JSON objects
+	 */
+	themeApp.getComponents = function() {
+		return App.getComponents();
+	};
 
 	/************************************************
 	 * "Live Query" Web Service
