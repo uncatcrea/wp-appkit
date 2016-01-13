@@ -80,6 +80,8 @@ class WpakConfigFile {
 
 		$app_version = WpakApps::sanitize_app_version( $app_main_infos['version'] );
 
+		$gmt_offset = (int)get_option( 'gmt_offset' );
+		
 		$debug_mode = WpakBuild::get_app_debug_mode( $app_id );
 
 		$auth_key = WpakApps::get_app_is_secured( $app_id ) ? WpakToken::get_hash_key() : '';
@@ -105,6 +107,7 @@ define( function ( require ) {
 		version : '<?php echo $app_version ?>',
 		app_title : '<?php echo addslashes($app_title) ?>',
 		app_platform : '<?php echo addslashes($app_platform) ?>',
+		gmt_offset : <?php echo addslashes($gmt_offset) ?>,
 		debug_mode : '<?php echo $debug_mode ?>'<?php
 		if( !empty( $auth_key ) ):
 		?>,
