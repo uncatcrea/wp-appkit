@@ -611,35 +611,35 @@ define( function( require, exports ) {
 	 */
 
 	/**
-	 * Returns the transition direction ("right", "left", "replace" or customized) according
+	 * Returns the transition direction ("next-screen", "previous-screen", "default" or customized) according
 	 * to current and previous screen.
 	 * 
 	 * @param {Object} current_screen : The screen that is (going to be) displayed after transition
 	 * @param {Object} previous_screen : The screen we're leaving.
-	 * @returns {String} Transition direction (default 'replace', 'right' and 'left' but 
+	 * @returns {String} Transition direction (default 'default', 'next-screen' and 'previous-screen' but 
 	 * can be customized with the "transition-direction" filter).
 	 */
 	themeApp.getTransitionDirection = function( current_screen, previous_screen ) {
-		var transition = 'replace';
+		var transition = 'default';
 
 		if ( current_screen.screen_type == 'list' || current_screen.screen_type == 'custom-component' ) {
 			if ( previous_screen.screen_type == 'single' ) {
-				transition = 'right';
+				transition = 'previous-screen';
 			} else {
-				transition = 'replace';
+				transition = 'default';
 			}
 		} else if ( current_screen.screen_type == 'single' ) {
 			if ( previous_screen.screen_type == 'list' || previous_screen.screen_type == 'custom-component' ) {
-				transition = 'left';
+				transition = 'next-screen';
 			} else if ( previous_screen.screen_type == 'comments' ) {
-				transition = 'right';
+				transition = 'previous-screen';
 			} else {
-				transition = 'replace';
+				transition = 'default';
 			}
 		} else if ( current_screen.screen_type == 'comments' ) {
-			transition = 'left';
+			transition = 'next-screen';
 		} else {
-			transition = 'replace';
+			transition = 'default';
 		}
 		
 		/**
@@ -656,13 +656,17 @@ define( function( require, exports ) {
 	};
 
 	/**
-	 * This allows to define your own left/right/replace transitions between screens.
+	 * This allows to define your own previous-screen/next-screen/default transitions between screens.
+	 * If you need more transition types than just previous/next/default (like single-to-comment, comment-to-single etc),
+	 * do the following (in functions.js) : 
+	 * - App.setParam( 'custom-screen-rendering', true );
+	 * - use the 'screen-transition' action hook to define your own transitions.
 	 * 
-	 * @param {callback} transition_replace
-	 * @param {callback} transition_left
-	 * @param {callback} transition_right
+	 * @param {callback} transition_default
+	 * @param {callback} transition_previous_screen
+	 * @param {callback} transition_next_screen
 	 */
-	themeApp.setAutoScreenTransitions = function( transition_replace, transition_left, transition_right ) {
+	themeApp.setAutoScreenTransitions = function( transition_default, transition_previous_screen, transition_next_screen ) {
 
 		//Set custom-screen-rendering param to true so that screen rendering
 		//uses the 'screen-transition' action to render :
@@ -673,17 +677,17 @@ define( function( require, exports ) {
 			var direction = themeApp.getTransitionDirection( current_screen, previous_screen );
 
 			switch ( direction ) {
-				case 'left':
-					transition_left( $wrapper, $current, $next, $deferred );
+				case 'previous-screen':
+					transition_previous_screen( $wrapper, $current, $next, $deferred );
 					break;
-				case 'right':
-					transition_right( $wrapper, $current, $next, $deferred );
+				case 'next-screen':
+					transition_next_screen( $wrapper, $current, $next, $deferred );
 					break;
-				case 'replace':
-					transition_replace( $wrapper, $current, $next, $deferred );
+				case 'default':
+					transition_default( $wrapper, $current, $next, $deferred );
 					break;
 				default:
-					transition_replace( $wrapper, $current, $next, $deferred );
+					transition_default( $wrapper, $current, $next, $deferred );
 					break;
 			}
 			;
