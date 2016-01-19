@@ -425,13 +425,14 @@ define(function (require) {
 		current_screen_global = Hooks.applyFilters( 'current-screen-global', current_screen_global, [screen_data, global] );
 
         return current_screen_global;
-	  }
+	  };
 
 	  //--------------------------------------------------------------------------
 	  //App items data :
 	  app.components = new Components;
 	  app.navigation = new Navigation;
 	  app.options    = new Options;
+	  app.comments   = new Comments.CommentsMemory;
 
 	  //For globals, separate keys from values because localstorage on
 	  //collections of collections won't work :-(
@@ -636,6 +637,9 @@ define(function (require) {
 							} );
 							globals_keys.saveAll();
 
+							//Empty comments memory
+							app.comments.reset();
+
 							Stats.incrementContentLastUpdate();
 
 							Addons.setDynamicDataFromWebService( data.addons );
@@ -698,41 +702,42 @@ define(function (require) {
 			$.ajax( ajax_args );
 	  };
 
-	  app.getPostComments = function(post_id,cb_ok,cb_error){
-    	  var token = WsToken.getWebServiceUrlToken('comments-post');
-    	  var ws_url = token +'/comments-post/'+ post_id;
+	var fetchPostComments = function ( post_id, cb_ok, cb_error ) {
+		
+		var token = WsToken.getWebServiceUrlToken( 'comments-post' );
+		var ws_url = token + '/comments-post/' + post_id;
 
-    	  var comments = new Comments.Comments;
+		var comments = new Comments.Comments;
 
-		  /**
-		   * Use this 'comments-globals' filter if you defined custom global
-		   * types (other than posts and pages) that have comments associated to.
-		   */
-		  var comments_globals = Hooks.applyFilters( 'comments-globals', ['posts', 'pages'], [post_id] );
+		/**
+		 * Use this 'comments-globals' filter if you defined custom global
+		 * types (other than posts and pages) that have comments associated to.
+		 */
+		var comments_globals = Hooks.applyFilters( 'comments-globals', [ 'posts', 'pages' ], [ post_id ] );
 
-		  var post = null;
-		  var item_global = '';
+		var post = null;
+		var item_global = '';
 
-		  comments_globals.every( function( global ) {
-			  post = app.globals[global].get(post_id);
-			  if ( post != undefined ) {
-				  item_global = global;
-			  }
-			  return post === undefined; //To make the loop break as soon as post != undefined
-		  } );
+		comments_globals.every( function ( global ) {
+			post = app.globals[global].get( post_id );
+			if ( post != undefined ) {
+				item_global = global;
+			}
+			return post === undefined; //To make the loop break as soon as post != undefined
+		} );
 
-    	  if( post != undefined && post != null ){
+		if ( post != undefined && post != null ) {
 
 			/**
-			* Filter 'web-service-params' : use this to send custom key/value formated
-			* data along with the web service. Those params are passed to the server
-			* (via $_GET) when calling the web service.
-			*
-			* Filtered data : web_service_params : JSON object where you can add your custom web service params
+			 * Filter 'web-service-params' : use this to send custom key/value formated
+			 * data along with the web service. Those params are passed to the server
+			 * (via $_GET) when calling the web service.
+			 *
+			 * Filtered data : web_service_params : JSON object where you can add your custom web service params
 			 * Filter arguments :
 			 * - web_service_name : string : name of the current web service ('get-post-comments' here).
-			*/
-			var web_service_params = Hooks.applyFilters('web-service-params',{},['get-post-comments']);
+			 */
+			var web_service_params = Hooks.applyFilters( 'web-service-params', { }, [ 'get-post-comments' ] );
 
 			//Build the ajax query :
 			var ajax_args = {
@@ -748,7 +753,7 @@ define(function (require) {
 			 * Filter arguments :
 			 * - web_service_name : string : name of the current web service ('get-post-comments' here).
 			 */
-			ajax_args = Hooks.applyFilters( 'ajax-args', ajax_args, ['get-post-comments'] );
+			ajax_args = Hooks.applyFilters( 'ajax-args', ajax_args, [ 'get-post-comments' ] );
 
 			ajax_args.url = Config.wp_ws_url + ws_url;
 
@@ -756,31 +761,63 @@ define(function (require) {
 
 			ajax_args.dataType = 'json';
 
-			ajax_args.success = function( data ) {
-				_.each( data.items, function( value, key, list ) {
+			ajax_args.success = function ( data ) {
+				_.each( data.items, function ( value, key, list ) {
 					comments.add( value );
 				} );
 				cb_ok( comments, post, item_global );
 			};
 
-			ajax_args.error = function( jqXHR, textStatus, errorThrown ) {
+			ajax_args.error = function ( jqXHR, textStatus, errorThrown ) {
 				app.triggerError(
 					'comments:ajax',
-					{ type: 'ajax', where: 'app::getPostComments', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } },
+					{ type: 'ajax', where: 'app::fetchPostComments', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } },
 					cb_error
 				);
 			};
 
-	    	$.ajax( ajax_args );
+			$.ajax( ajax_args );
 
-    	  }else{
-    		  app.triggerError(
-    			  'comments:post-not-found',
-    			  {type:'not-found',where:'app::getPostComments',message:'Post '+ post_id +' not found.'},
-		  		  cb_error
-    		  );
-    	  }
-      };
+		} else {
+			app.triggerError(
+				'comments:post-not-found',
+				{ type: 'not-found', where: 'app::fetchPostComments', message: 'Post ' + post_id + ' not found.' },
+				cb_error
+			);
+		}
+	};
+	
+	app.getPostComments = function ( post_id, cb_ok, cb_error ) {
+		
+		var post_comments_memory = app.comments.get( post_id );
+		if ( post_comments_memory ) {
+			
+			var post_comments = post_comments_memory.get( 'post_comments' );
+			var post = post_comments_memory.get( 'post' );
+			var item_global = post_comments_memory.get( 'item_global' );
+			
+			Utils.log( 'Comments retrieved from cache.', { comments: post_comments, post: post, item_global: item_global });
+			
+			cb_ok( post_comments, post, item_global );
+	
+		} else {
+			fetchPostComments( 
+				post_id, 
+				function( post_comments, post, item_global ) {
+					Utils.log( 'Comments retrieved from online.', { comments: post_comments, post: post, item_global: item_global } );
+					
+					//Memorize retrieved comments:
+					app.comments.addPostComments( post_id, post, item_global, post_comments );
+					
+					cb_ok( post_comments, post, item_global );
+				}, 
+				function( error ) {
+					cb_error( error );
+				}
+			);
+		}
+
+	};
 
       app.getPostGlobal = function( id, global_default ) {
       	var global = app.getCurrentScreenGlobal( global_default );

@@ -79,6 +79,16 @@ define(function(require, exports) {
         return single_global != '' ? '#single/' + single_global + '/' + post_id : '';
     };
 
+	/**
+	 * Retrieves url fragment for a comments screen.
+	 * NOTE : It is better to use ThemeApp.displayPostComments() than to use this
+	 * function, as ThemeApp.displayPostComments() allows to handle success and error callback.
+	 * Using TplTags.getCommentsLink() directly, you won't be able to handle errors on
+	 * comments screens display.
+	 * 
+	 * @param {int} post_id Post id to retrieve comments for
+	 * @returns {String} Comment's screen fragment
+	 */
     themeTplTags.getCommentsLink = function(post_id) {
         //TODO Check if the post exists in the posts global
         return '#comments-' + post_id;

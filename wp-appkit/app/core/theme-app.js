@@ -438,6 +438,41 @@ define( function( require, exports ) {
 	};
 	
 	/************************************************
+	 * Comments
+	 */
+	
+	/**
+	 * Displays the comments screen for a given post.
+	 * Retrieves the post comments from server or from memory if already cached,
+	 * then navigate to #comments-[post_id].
+	 * Using this function allows to use success and error callbacks (cb_ok/cb_error),
+	 * which you can't do if you navigate directly to #comments-[post_id] in your theme.
+	 * 
+	 * Note that the cb_ok() callback is called after comments are retrieved, but can't 
+	 * be called after the comments view is rendered (as view rendering is done in router).
+	 * If you need to do something after the comments screen is showed, you can use
+	 * the 'screen:showed' event where you'll test if ( current_screen.screen_type === 'comments' ) ).
+	 * 
+	 * @param {int} post_id         Post we want to retrieve the comments for.
+	 * @param {function} cb_ok      What to do if coments are retrieved ok
+	 * @param {function} cb_error   What to do if an error occurs while retrieving comments
+	 */
+	themeApp.displayPostComments = function ( post_id, cb_ok, cb_error ) {
+
+		App.getPostComments(
+			post_id,
+			function ( comments, post, item_global ) {
+				cb_ok( comments.toJSON(), post.toJSON(), item_global );
+				themeApp.navigate( '#comments-'+ post_id );
+			},
+			function ( error ) {
+				cb_error( format_theme_event_data( error.event, error ) );
+			}
+		);
+
+	};
+	
+	/************************************************
 	 * Components
 	 */
 	
