@@ -67,6 +67,9 @@ class WpakThemesBoSettings {
 								__( 'Visit theme site' )
 							);
 						}
+						if ( ! empty( $theme_data['WpakVersionRequired'] ) ) {
+							$theme_meta[] = __( 'Requires WP-AppKit version', WpAppKit::i18n_domain ) .' '. $theme_data['WpakVersionRequired'];
+						}
 					?>
 
 					<?php if( !empty($theme_meta) ): ?>
