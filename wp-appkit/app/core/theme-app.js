@@ -790,18 +790,37 @@ define( function( require, exports ) {
         return App.getCurrentScreenData();
     };
 	
+	/**
+	 * Retrieves useful data corresponding to the object that is currently displayed.
+	 * The returned set of data is a custom selection of data that can be found in 
+	 * "Screen data" (ThemeApp.getCurrentScreen()) and "View data" (RegionManager.getCurrentView()).
+	 * 
+	 * @returns JSON Object depending on current screen:
+	 * - for lists: Object containing: title (list title), posts (list of posts), ids (=post ids), total, component_id, query
+	 * - for single: post object
+	 * - for comments: Object containing: post (post we retrieve the comments for), comments (list of comments for this post)
+	 * - for pages: page object
+	 * - for custom pages: page object
+	 * - for custom components: 
+	 */
 	themeApp.getCurrentScreenObject = function() {
 		var screen_object = {};
 		
 		var screen_data = App.getCurrentScreenData();
-		
+		var current_view = RegionManager.getCurrentView();
+		console.log('screen_data',screen_data,'screen_view',current_view);
 		switch( screen_data.screen_type ) {
 			case 'list':
-				if ( screen_data.data ) {
-					screen_object = screen_data.data;
-				}
+				//For lists, build a custom screen object from screen data and current view data:
+				screen_object = {
+					title: screen_data.label,
+					component_id: screen_data.component_id,
+					posts: current_view.posts.toJSON()
+				};
+				_.extend( screen_object, screen_data.data );
 				break;
 			case 'single':
+				//For single, just return the current post object:
 				if ( screen_data.data.post ) {
 					screen_object = screen_data.data.post;
 				} else if ( screen_data.data.item ) {
@@ -809,13 +828,23 @@ define( function( require, exports ) {
 				}
 				break;
 			case 'comments':
-				if ( screen_data.data ) {
-					screen_object = screen_data.data;
-				}
+				//For comments, build a custom screen object from screen data and current view data:
+				screen_object = {
+					post: current_view.post.toJSON(),
+					comments: current_view.comments.toJSON()
+				};
+				break;
+			case 'page':
+				//For page, just return the current page object:
+				screen_object = screen_data.data.item;
 				break;
 			case 'custom-page':
 				
 				break;
+			case 'custom-component':
+				
+				break;
+			
 		};
 		
         return screen_object;
