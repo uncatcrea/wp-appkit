@@ -71,15 +71,15 @@ define( function( require, exports ) {
 		/**
 		 * "stop-theme-event" filter : use this filter to avoid an event from triggering in the theme.
 		 * Useful to deactivate some error events display for exemple.
-		 * 
+		 *
 		 * @param {boolean} Whether to stop the event or not. Default false.
 		 * @param {JSON Object} theme_event_data : Theme event data object
 		 * @param {String} event : Original (internal) event name
 		 */
 		var stop_theme_event = Hooks.applyFilters( 'stop-theme-event', false, [theme_event_data, event] );
-		
+
 		if ( !stop_theme_event ) {
-			
+
 			if ( theme_event_data.type == 'error'
 				 || theme_event_data.type == 'info'
 				 || theme_event_data.type == 'network'
@@ -88,7 +88,7 @@ define( function( require, exports ) {
 				vent.trigger( event, theme_event_data ); //Ex: bind directly to 'info:no-content'
 				vent.trigger( theme_event_data.type, theme_event_data ); //Ex: bind to general 'info', then filter with if( info.event == 'no-content' )
 			}
-			
+
 		}
 
 	} );
@@ -111,13 +111,13 @@ define( function( require, exports ) {
 	 * }
 	 */
 	var format_theme_event_data = function( event, data ) {
-		
-		var theme_event_data = { 
-			event: event, 
+
+		var theme_event_data = {
+			event: event,
 			type: '',
 			subtype: data !== undefined && data.hasOwnProperty( 'type' ) ? data.type : '',
-			message: '', 
-			data: data 
+			message: '',
+			data: data
 		};
 
 		if ( event.indexOf( 'error:' ) === 0 ) {
@@ -153,16 +153,16 @@ define( function( require, exports ) {
 			}
 
 		}
-		
+
 		/**
 		 * "theme-event-message" filter : use this hook to customize event messages
-		 * 
+		 *
 		 * @param {String} Event message to customize
 		 * @param {JSON Object} theme_event_data : Theme event data object
 		 * @param {String} event : Original (internal) event name
 		 */
 		theme_event_data.message = Hooks.applyFilters( 'theme-event-message', theme_event_data.message, [theme_event_data, event] );
-		
+
 		return theme_event_data;
 	};
 
@@ -436,23 +436,23 @@ define( function( require, exports ) {
 			Hooks.doActions( 'get-more-component-items', [ current_screen, cb_after, cb_error ] );
 		}
 	};
-	
+
 	/************************************************
 	 * Comments
 	 */
-	
+
 	/**
 	 * Displays the comments screen for a given post.
 	 * Retrieves the post comments from server or from memory if already cached,
 	 * then navigate to #comments-[post_id].
 	 * Using this function allows to use success and error callbacks (cb_ok/cb_error),
 	 * which you can't do if you navigate directly to #comments-[post_id] in your theme.
-	 * 
-	 * Note that the cb_ok() callback is called after comments are retrieved, but can't 
+	 *
+	 * Note that the cb_ok() callback is called after comments are retrieved, but can't
 	 * be called after the comments view is rendered (as view rendering is done in router).
 	 * If you need to do something after the comments screen is showed, you can use
 	 * the 'screen:showed' event where you'll test if ( current_screen.screen_type === 'comments' ) ).
-	 * 
+	 *
 	 * @param {int} post_id         Post we want to retrieve the comments for.
 	 * @param {function} cb_ok      What to do if coments are retrieved ok
 	 * @param {function} cb_error   What to do if an error occurs while retrieving comments
@@ -471,14 +471,14 @@ define( function( require, exports ) {
 		);
 
 	};
-	
+
 	/************************************************
 	 * Components
 	 */
-	
+
 	/**
 	 * Retrieve all app's components
-	 * 
+	 *
 	 * @returns {Array} Array of compoents as JSON objects
 	 */
 	themeApp.getComponents = function() {
@@ -648,10 +648,10 @@ define( function( require, exports ) {
 	/**
 	 * Returns the transition direction ("next-screen", "previous-screen", "default" or customized) according
 	 * to current and previous screen.
-	 * 
+	 *
 	 * @param {Object} current_screen : The screen that is (going to be) displayed after transition
 	 * @param {Object} previous_screen : The screen we're leaving.
-	 * @returns {String} Transition direction (default 'default', 'next-screen' and 'previous-screen' but 
+	 * @returns {String} Transition direction (default 'default', 'next-screen' and 'previous-screen' but
 	 * can be customized with the "transition-direction" filter).
 	 */
 	themeApp.getTransitionDirection = function( current_screen, previous_screen ) {
@@ -676,11 +676,11 @@ define( function( require, exports ) {
 		} else {
 			transition = 'default';
 		}
-		
+
 		/**
 		 * "transition-direction" filter : use this filter to customize transitions
 		 * directions according to what are current (ie asked) and previous screen.
-		 * 
+		 *
 		 * @param {string} Transition direction to override if needed.
 		 * @param {Object} current_screen : The screen that is (going to be) displayed after transition.
 		 * @param {Object} previous_screen : The screen we're leaving.
@@ -693,10 +693,10 @@ define( function( require, exports ) {
 	/**
 	 * This allows to define your own previous-screen/next-screen/default transitions between screens.
 	 * If you need more transition types than just previous/next/default (like single-to-comment, comment-to-single etc),
-	 * do the following (in functions.js) : 
+	 * do the following (in functions.js) :
 	 * - App.setParam( 'custom-screen-rendering', true );
 	 * - use the 'screen-transition' action hook to define your own transitions.
-	 * 
+	 *
 	 * @param {callback} transition_default
 	 * @param {callback} transition_previous_screen
 	 * @param {callback} transition_next_screen
@@ -786,7 +786,7 @@ define( function( require, exports ) {
 
 	/**
 	 * Retrieves a list of items (posts for example) from local storage
-	 *  
+	 *
 	 * @param {array} items_ids IDs of the items to retrieve
 	 * @param {string} global_key (Optional) global to retrieve the items from: 'posts' (default) or 'pages'.
 	 * @param {string} result_type 'slice' to retrieve a Backbone Collection (default), 'array' to retrieve an array.
@@ -809,27 +809,27 @@ define( function( require, exports ) {
 
 		return items;
 	};
-	
+
 	/**
 	 * Retrieves an item (post for example) from local storage
-	 * 
+	 *
 	 * @param {int} item_id Post ID of the post to retrieve
 	 * @param {string} global_key (Optional) global to retrieve the item from: 'posts' (default) or 'pages'.
 	 * @returns {JSON Object} item (post or page) object
 	 */
 	themeApp.getItem = function( item_id, global_key ) {
-		
+
 		global_key = global_key || 'posts';
-		
+
 		return App.getGlobalItem( global_key, item_id );
 	};
-	
+
 	/**
      * Retrieves current screen infos
-	 * 
+	 *
 	 * (Alias of theme-tpl-tags::getCurrentScreen(): because getting current
 	 * screen is needed very often, we need it both sides)
-	 * 
+	 *
      * @return JSON object containing :
      * - screen_type : list, single, comments, page
      * - fragment : unique screen url id (what's after # in url)
@@ -845,6 +845,63 @@ define( function( require, exports ) {
     themeApp.getCurrentScreen = function() {
         return App.getCurrentScreenData();
     };
+
+	var current_window = null;
+	var original_window_open = window.open;
+
+	themeApp.openWindow = function( url, target, options ) {
+		// Add utm_* parameters to the given URL, so that the called URL will know the user comes from this app
+		url = Utils.addParamToUrl( url, 'utm_source', 'appkit' );
+		url = Utils.addParamToUrl( url, 'utm_medium', 'mobile' );
+		url = Utils.addParamToUrl( url, 'utm_campaign', Config.app_slug );
+
+		var args = {
+			url: url,
+			target: target,
+			options: options
+		};
+
+		// Filter these arguments before opening the window
+		args = Hooks.applyFilters( 'open-window', args, [args] );
+
+		if( args.hasOwnProperty( 'url' ) ) {
+			url = args.url;
+		}
+		if( args.hasOwnProperty( 'target' ) ) {
+			target = args.target;
+		}
+		if( args.hasOwnProperty( 'options' ) ) {
+			options = args.options;
+		}
+
+		// Trigger an event so that external scripts can hook on it
+		App.triggerInfo( 'open-window', [url, target, options] );
+
+		if( PhoneGap.isLoaded() && "undefined" != typeof cordova.InAppBrowser ) {
+			current_window = cordova.InAppBrowser.open( url, target, options );
+		}
+		else {
+			current_window = original_window_open( url, target, options );
+		}
+
+		return current_window;
+	};
+
+	themeApp.getCurrentExternalWindow = function() {
+		return current_window;
+	}
+
+	// Try to intercept direct calls to window.open
+	var replaceWindowOpen = function() {
+		window.open = themeApp.openWindow;
+	};
+
+	if( PhoneGap.isLoaded() ) {
+		document.addEventListener( 'deviceready', replaceWindowOpen, false );
+	}
+	else {
+		$(document).ready( replaceWindowOpen );
+	}
 
 	//Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
 	//a circular dependency for requirejs) can both be required at the same time
