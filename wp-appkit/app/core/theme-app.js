@@ -117,7 +117,7 @@ define( function( require, exports ) {
 			type: '',
 			subtype: data !== undefined && data.hasOwnProperty( 'type' ) ? data.type : '',
 			message: '', 
-			data: data 
+			core_data: data 
 		};
 
 		if ( event.indexOf( 'error:' ) === 0 ) {
