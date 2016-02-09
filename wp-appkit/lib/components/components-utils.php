@@ -24,7 +24,9 @@ class WpakComponentsUtils {
 			'excerpt' => '',
 			'thumbnail' => '',
 			'author' => get_the_author_meta( 'nickname' ),
-			'nb_comments' => ( int ) get_comments_number()
+			'nb_comments' => ( int ) get_comments_number(),
+			'permalink' => get_permalink( $post ),
+			'slug' => $post->post_name
 		);
 
 		/**
