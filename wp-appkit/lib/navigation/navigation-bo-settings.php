@@ -48,7 +48,7 @@ class WpakNavigationBoSettings{
 				<thead>
 					<tr>
 						<th><?php _e('Menu Item',WpAppKit::i18n_domain) ?></th>
-						<th><?php _e('Icon Slug',WpAppKit::i18n_domain) ?></th>
+						<th><?php /* Icon slug deactivated for now _e('Icon Slug',WpAppKit::i18n_domain) */ ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -110,6 +110,8 @@ class WpakNavigationBoSettings{
 
 					<?php if ( empty( $error_message ) ): ?>
 
+						<?php /* Icon slug deactivated for now 
+					
 						<?php $icon_value = $nav_item->options['icon_slug'] ?>
 
 						<div id="nav-item-value-<?php echo $nav_item_id ?>">
@@ -119,11 +121,14 @@ class WpakNavigationBoSettings{
 							</div>
 						</div>
 
+						
 						<div id="nav-item-input-<?php echo $nav_item_id ?>" style="display:none" >
 							<input type="text" id="icon-<?php echo $nav_item_id ?>" class="menu-item-icon-input" data-id="<?php echo $nav_item_id ?>" value="<?php echo $nav_item->options['icon_slug'] ?>"/>
 							&nbsp;<a href="#" id="change-icon-slug-ok-<?php echo $nav_item_id ?>" class="change-icon-slug-ok" data-id="<?php echo $nav_item_id ?>" data-post-id="<?php echo $post_id ?>" ><?php _e('Ok', WpAppKit::i18n_domain) ?></a>
 							&nbsp;&nbsp;<a href="#" class="change-icon-slug-cancel" data-id="<?php echo $nav_item_id ?>"><?php _e('Cancel', WpAppKit::i18n_domain) ?></a>
 						</div>
+						
+						*/ ?>
 
 					<?php else: ?>
 

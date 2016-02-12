@@ -259,6 +259,8 @@ jQuery().ready(function(){
 		$('#new-item-form').slideUp();
 	});
 
+	/* Icon slug deactivated for now
+	
 	$('#navigation-wrapper').on('click','.change-icon-slug',function(e){
 		e.preventDefault();
 		var nav_item_id = $(this).data('id');
@@ -297,6 +299,8 @@ jQuery().ready(function(){
 			e.preventDefault();
 		}
 	});
+	
+	*/
 
 	var navigation_observer = {
 		update: function( data ) {
