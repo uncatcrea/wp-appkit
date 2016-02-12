@@ -187,6 +187,7 @@ define( function ( require ) {
 			case 'android':
 				$splashcreen_settings['preferences']['SplashScreen'] = 'splash';
 				$splashcreen_settings['preferences']['SplashScreenDelay'] = '10000';
+				$splashcreen_settings['preferences']['FadeSplashScreenDuration'] = '300';
 				//Auto hiding doesn't work on Android (https://issues.apache.org/jira/browse/CB-8396). 
 				//So the plan is to have a very long delay for the splashscreen and let Javascript hiding the splashscreen
 				break;
