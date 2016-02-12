@@ -255,7 +255,6 @@ define(function (require) {
 			  component_id:screen_data.component_id,
 			  item_id:screen_data.item_id,
 			  fragment:screen_data.fragment,
-			  is_default:screen_data.is_default,
 			  data:screen_data.hasOwnProperty('data') ? screen_data.data : {},
 			  global:screen_data.hasOwnProperty('global') ? screen_data.global : '',
 			  label:screen_data.hasOwnProperty('label') ? screen_data.label : ''
@@ -268,8 +267,7 @@ define(function (require) {
 	   */
 	  app.setQueriedScreen = function( screen_data ){
 		  queried_screen_data = formatScreenData( _.extend( screen_data, {
-		  	fragment: Backbone.history.fragment,
-		  	is_default: app.router.getDefaultRoute() == '#' + Backbone.history.fragment
+		  	fragment: Backbone.history.fragment
 	  	  }));
 	  };
 

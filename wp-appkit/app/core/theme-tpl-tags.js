@@ -55,11 +55,16 @@ define(function(require, exports) {
     };
 
 	/**
-     * Check if the current screen is the default one
+     * Check if the given or current screen is the default one
+     *
+     * @param   Object  screen_data     An object describing the screen we want to test, if not given, the current screen will be tested
+     *
      * @return  bool            Whether the screen is the default one or not
      */
-    themeTplTags.isDefaultScreen = function() {
-        return App.getCurrentScreenData().is_default;
+    themeTplTags.isDefaultScreen = function( screen_data ) {
+        var fragment = "undefined" != typeof screen_data && screen_data.hasOwnProperty( 'fragment' ) ? screen_data.fragment : Backbone.history.fragment;
+
+        return App.router.getDefaultRoute() == '#' + fragment;
     };
 
 	/**
