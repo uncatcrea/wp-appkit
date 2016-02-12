@@ -705,7 +705,7 @@ define(function (require) {
 	  };
 
 	var fetchPostComments = function ( post_id, cb_ok, cb_error ) {
-		
+
 		var token = WsToken.getWebServiceUrlToken( 'comments-post' );
 		var ws_url = token + '/comments-post/' + post_id;
 
@@ -788,31 +788,31 @@ define(function (require) {
 			);
 		}
 	};
-	
+
 	app.getPostComments = function ( post_id, cb_ok, cb_error ) {
-		
+
 		var post_comments_memory = app.comments.get( post_id );
 		if ( post_comments_memory ) {
-			
+
 			var post_comments = post_comments_memory.get( 'post_comments' );
 			var post = post_comments_memory.get( 'post' );
 			var item_global = post_comments_memory.get( 'item_global' );
-			
+
 			Utils.log( 'Comments retrieved from cache.', { comments: post_comments, post: post, item_global: item_global });
-			
+
 			cb_ok( post_comments, post, item_global );
-	
+
 		} else {
-			fetchPostComments( 
-				post_id, 
+			fetchPostComments(
+				post_id,
 				function( post_comments, post, item_global ) {
 					Utils.log( 'Comments retrieved from online.', { comments: post_comments, post: post, item_global: item_global } );
-					
+
 					//Memorize retrieved comments:
 					app.comments.addPostComments( post_id, post, item_global, post_comments );
-					
+
 					cb_ok( post_comments, post, item_global );
-				}, 
+				},
 				function( error ) {
 					cb_error( error );
 				}
@@ -900,8 +900,7 @@ define(function (require) {
 
 									Utils.log( 'More content retrieved for component', { component_id: component_id, new_ids: new_ids, new_items: new_items, component: component } );
 
-									cb_ok( new_items, is_last, { nb_left: nb_left, new_ids: new_ids, global: global, component: component } );
-
+									app.triggerInfo( 'component:get-more', { new_items: new_items, is_last: is_last, nb_left: nb_left, new_ids: new_ids, global: global, component: component }, cb_ok );
 								} else {
 									app.triggerError(
 										'getmore:global-not-found',
