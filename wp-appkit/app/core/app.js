@@ -42,18 +42,18 @@ define(function (require) {
 
 	/**
 	 * Triggers an info event. Use this to trigger your own App events from modules and addons.
-	 * 
+	 *
 	 * @param {String} info event name
 	 * @param {JSON Object} data Data that is passed to event callback
 	 */
 	app.triggerInfo = function( info, info_data, info_callback ) {
 
 		switch ( info ) {
-			
+
 			case 'no-content':
 				vent.trigger( 'info:no-content' );
 				break;
-				
+
 			case 'app-launched':
 				var stats = Stats.getStats();
 				vent.trigger( 'info:app-ready', { stats: stats } );
@@ -64,7 +64,7 @@ define(function (require) {
 					vent.trigger( 'info:app-version-changed', { stats: stats } );
 				}
 				break;
-				
+
 			default:
 				vent.trigger( 'info:' + info, info_data );
 				if ( info_callback != undefined ) {
@@ -72,12 +72,12 @@ define(function (require) {
 					info_callback( info_data );
 				}
 				break;
-				
+
 		}
-		
-		
+
+
 	};
-	
+
 	  //--------------------------------------------------------------------------
 	  //Custom pages and routes handling
 
@@ -645,18 +645,18 @@ define(function (require) {
 							Addons.setDynamicDataFromWebService( data.addons );
 
 							if ( data.components.length === 0 ) {
-						
+
 								app.triggerError(
 									'synchro:no-component',
 									{ type: 'ws-data', where: 'app::syncWebService', message: 'No component found for this App. Please add components to the App on WordPress side.', data: data },
 									cb_error
 								);
-						
+
 							} else {
-								
+
 								Utils.log( 'Components, menu items and globals retrieved from online.', { components: app.components, navigation: app.navigation, globals: app.globals } );
 								cb_ok();
-								
+
 							}
 
 						} else {
@@ -703,7 +703,7 @@ define(function (require) {
 	  };
 
 	var fetchPostComments = function ( post_id, cb_ok, cb_error ) {
-		
+
 		var token = WsToken.getWebServiceUrlToken( 'comments-post' );
 		var ws_url = token + '/comments-post/' + post_id;
 
@@ -786,31 +786,31 @@ define(function (require) {
 			);
 		}
 	};
-	
+
 	app.getPostComments = function ( post_id, cb_ok, cb_error ) {
-		
+
 		var post_comments_memory = app.comments.get( post_id );
 		if ( post_comments_memory ) {
-			
+
 			var post_comments = post_comments_memory.get( 'post_comments' );
 			var post = post_comments_memory.get( 'post' );
 			var item_global = post_comments_memory.get( 'item_global' );
-			
+
 			Utils.log( 'Comments retrieved from cache.', { comments: post_comments, post: post, item_global: item_global });
-			
+
 			cb_ok( post_comments, post, item_global );
-	
+
 		} else {
-			fetchPostComments( 
-				post_id, 
+			fetchPostComments(
+				post_id,
 				function( post_comments, post, item_global ) {
 					Utils.log( 'Comments retrieved from online.', { comments: post_comments, post: post, item_global: item_global } );
-					
+
 					//Memorize retrieved comments:
 					app.comments.addPostComments( post_id, post, item_global, post_comments );
-					
+
 					cb_ok( post_comments, post, item_global );
-				}, 
+				},
 				function( error ) {
 					cb_error( error );
 				}
@@ -897,6 +897,8 @@ define(function (require) {
 									var is_last = !_.isEmpty( answer.component.data.query.is_last_page ) ? true : nb_left <= 0;
 
 									Utils.log( 'More content retrieved for component', { component_id: component_id, new_ids: new_ids, new_items: new_items, component: component } );
+
+									app.triggerInfo( 'component:get-more', { new_items: new_items, is_last: is_last, nb_left: nb_left, new_ids: new_ids, global: global, component: component } );
 
 									cb_ok( new_items, is_last, { nb_left: nb_left, new_ids: new_ids, global: global, component: component } );
 
@@ -1179,7 +1181,7 @@ define(function (require) {
 
 		//persistent defaults to false :
 		var persistent = options.hasOwnProperty('persistent') && options.persistent === true;
-		
+
 		var token = WsToken.getWebServiceUrlToken( 'live-query' );
 		var ws_url = token + '/live-query';
 
