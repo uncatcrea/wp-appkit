@@ -42,18 +42,18 @@ define(function (require) {
 
 	/**
 	 * Triggers an info event. Use this to trigger your own App events from modules and addons.
-	 * 
+	 *
 	 * @param {String} info event name
 	 * @param {JSON Object} data Data that is passed to event callback
 	 */
 	app.triggerInfo = function( info, info_data, info_callback ) {
 
 		switch ( info ) {
-			
+
 			case 'no-content':
 				vent.trigger( 'info:no-content' );
 				break;
-				
+
 			case 'app-launched':
 				var stats = Stats.getStats();
 				vent.trigger( 'info:app-ready', { stats: stats } );
@@ -64,7 +64,7 @@ define(function (require) {
 					vent.trigger( 'info:app-version-changed', { stats: stats } );
 				}
 				break;
-				
+
 			default:
 				vent.trigger( 'info:' + info, info_data );
 				if ( info_callback != undefined ) {
@@ -72,12 +72,12 @@ define(function (require) {
 					info_callback( info_data );
 				}
 				break;
-				
+
 		}
-		
-		
+
+
 	};
-	
+
 	  //--------------------------------------------------------------------------
 	  //Custom pages and routes handling
 
@@ -262,11 +262,13 @@ define(function (require) {
 	  };
 
 	  /**
-	   * Called in router.js to set the queried screen according to the current route.
+	   * Called in region-manager.js to set the queried screen according to the current route.
 	   * This queried screen is then pushed to history in app.addQueriedScreenToHistory().
 	   */
-	  app.setQueriedScreen = function(screen_data){
-		  queried_screen_data = formatScreenData(_.extend(screen_data,{fragment: Backbone.history.fragment}));
+	  app.setQueriedScreen = function( screen_data ){
+		  queried_screen_data = formatScreenData( _.extend( screen_data, {
+		  	fragment: Backbone.history.fragment
+	  	  }));
 	  };
 
 	  app.getQueriedScreen = function(){
@@ -645,18 +647,18 @@ define(function (require) {
 							Addons.setDynamicDataFromWebService( data.addons );
 
 							if ( data.components.length === 0 ) {
-						
+
 								app.triggerError(
 									'synchro:no-component',
 									{ type: 'ws-data', where: 'app::syncWebService', message: 'No component found for this App. Please add components to the App on WordPress side.', data: data },
 									cb_error
 								);
-						
+
 							} else {
-								
+
 								Utils.log( 'Components, menu items and globals retrieved from online.', { components: app.components, navigation: app.navigation, globals: app.globals } );
 								cb_ok();
-								
+
 							}
 
 						} else {
@@ -1179,7 +1181,7 @@ define(function (require) {
 
 		//persistent defaults to false :
 		var persistent = options.hasOwnProperty('persistent') && options.persistent === true;
-		
+
 		var token = WsToken.getWebServiceUrlToken( 'live-query' );
 		var ws_url = token + '/live-query';
 

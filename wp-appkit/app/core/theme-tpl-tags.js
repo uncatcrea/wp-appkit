@@ -40,22 +40,35 @@ define(function(require, exports) {
 		return App.getCurrentScreenObject();
 	};
 
-	/**
+    /**
      * Retrieves previous screen infos :
      * @return JSON object containing :
      * - screen_type : list, single, comments, page
      * - fragment : unique screen url id (what's after # in url)
      * - component_id : component slug id, if displaying a component screen (list, page)
      * - item_id : current item id, if displaying single content (post,page)
-	 * - label : current item label (title of component, title of post)
+     * - label : current item label (title of component, title of post)
      * - data : contains more specific data depending on which screen type is displayed
-     * 	> total : total number of posts for lists
-     * 	> query : query vars used to retrieve contents (taxonomy, terms...)
-     * 	> ids : id of posts displayed in lists
-     * 	> any other specific data depending on currently displayed component
+     *  > total : total number of posts for lists
+     *  > query : query vars used to retrieve contents (taxonomy, terms...)
+     *  > ids : id of posts displayed in lists
+     *  > any other specific data depending on currently displayed component
      */
     themeTplTags.getPreviousScreen = function() {
         return App.getPreviousScreenData();
+    };
+
+	/**
+     * Check if the given or current screen is the default one
+     *
+     * @param   Object  screen_data     An object describing the screen we want to test, if not given, the current screen will be tested
+     *
+     * @return  bool            Whether the screen is the default one or not
+     */
+    themeTplTags.isDefaultScreen = function( screen_data ) {
+        var fragment = "undefined" != typeof screen_data && screen_data.hasOwnProperty( 'fragment' ) ? screen_data.fragment : Backbone.history.fragment;
+
+        return App.router.getDefaultRoute() == '#' + fragment;
     };
 
 	/**
