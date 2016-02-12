@@ -6,28 +6,35 @@ class WpakComponentTypeHooks extends WpakComponentType {
 
 		do_action( 'wpak_before_component_hooks', $component, $options );
 
-		$component_default_data = array(
-			'query' => array( 'type' => 'custom-component' ),
-			'total' => 0,
-			'global' => 'custom-global-' . $component->slug,
-			'global-items' => array(),
-			'global-items-ids' => array()
-		);
+		$component_default_data = array();
 
 		/**
 		 * Filter data from a custom component.
 		 *
-		 * @param array 			$component_default_data    	An array of default data.
+		 * @param array 			$component_default_data    	Put your custom component data here.
 		 * @param WpakComponent 	$component 					The component object.
-		 * @param array 			$options 					An array of options.
-		 * @param array 			$args 						An array of complementary arguments.
+		 * @param array 			$options 					Component options.
+		 * @param array 			$args 						Component's complementary arguments.
 		 */
 		$component_data = apply_filters( 'wpak_custom_component-' . $options['hook'], $component_default_data, $component, $options, $args );
 
-		if ( isset( $component_data['global'] ) && isset( $component_data['global-items'] ) && isset( $component_data['global-items-ids'] ) ) {
+		if ( isset( $component_data['global-items'] ) && isset( $component_data['global-items-ids'] ) ) {
+			
+			$global = !empty( $component_data['global'] ) ? $component_data['global'] : 'custom-global-' . $component->slug;
+			
 			$this->set_specific( 'ids', $component_data['global-items-ids'] );
-			$this->set_globals( $component_data['global'], $component_data['global-items'] );
-			unset( $component_data['global'] );
+			
+			$this->set_globals( $global, $component_data['global-items'] );
+			
+			$total = isset( $component_data['total'] ) && is_numeric( $component_data['total'] ) ? $component_data['total'] : count( $component_data['global-items-ids'] );
+			$this->set_specific( 'total', $total );
+			
+			if ( isset( $component_data['global'] ) ) {
+				unset( $component_data['global'] );
+			}
+			if ( isset( $component_data['total'] ) ) {
+				unset( $component_data['total'] );
+			}
 			unset( $component_data['global-items'] );
 			unset( $component_data['global-items-ids'] );
 		}

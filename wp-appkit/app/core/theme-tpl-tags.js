@@ -35,6 +35,10 @@ define(function(require, exports) {
     themeTplTags.getCurrentScreen = function() {
         return App.getCurrentScreenData();
     };
+	
+	themeTplTags.getCurrentScreenObject = function() {
+		return App.getCurrentScreenObject();
+	};
 
 	/**
      * Retrieves previous screen infos :

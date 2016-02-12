@@ -845,6 +845,83 @@ define( function( require, exports ) {
     themeApp.getCurrentScreen = function() {
         return App.getCurrentScreenData();
     };
+	
+	/**
+	 * Retrieves useful data corresponding to the object that is currently displayed.
+	 * The returned set of data is a custom selection of data that can be found in 
+	 * "Screen data" (ThemeApp.getCurrentScreen()) and "View data" (RegionManager.getCurrentView()).
+	 * 
+	 * @returns JSON Object depending on current screen:
+	 * - for lists:             object containing: title (list title), posts (list of posts), ids (=post ids), total, component_id, query
+	 * - for single:            post object: id, post_type, date, title, content, excerpt, thumbnail, author, nb_comments, slug, permalink
+	 * - for comments:          object containing: post (post we retrieve the comments for) and comments (list of comments for this post)
+	 * - for pages:             page object: id, post_type, date, title, content, excerpt, thumbnail, author, nb_comments, slug, permalink, tree_data
+	 * - for custom pages:      object containing: id, route, title (if custom page data contains a 'title' property), data (custom page data), template.
+	 * - for custom components: object containing: component_id, title, route, data, template
+	 * - for all:               field 'screen_type': can be: 'list', 'single', 'comments', 'page', 'custom-page', 'custom-component'
+	 */
+	themeApp.getCurrentScreenObject = function() {
+		var screen_object = {};
+		
+		var screen_data = App.getCurrentScreenData();
+		var current_view = RegionManager.getCurrentView();
+		
+		switch( screen_data.screen_type ) {
+			case 'list':
+				//For lists, build a custom screen object from screen data and current view data:
+				screen_object = {
+					title: screen_data.label,
+					component_id: screen_data.component_id,
+					posts: current_view.posts.toJSON()
+				};
+				_.extend( screen_object, screen_data.data ); //Adds ids, query, total
+				break;
+			case 'single':
+				//For single, just return the current post object:
+				if ( screen_data.data.post ) {
+					screen_object = screen_data.data.post;
+				} else if ( screen_data.data.item ) {
+					screen_object = screen_data.data.item;
+				}
+				break;
+			case 'comments':
+				//For comments, build a custom screen object from screen data and current view data:
+				screen_object = {
+					post: current_view.post.toJSON(),
+					comments: current_view.comments.toJSON()
+				};
+				break;
+			case 'page':
+				//For page, just return the current page object:
+				screen_object = screen_data.data.item;
+				break;
+			case 'custom-page':
+				//For custom pages, return page id, page route, page custom data, and page template:
+				//(id and route are the same thing, because a custom page is identified by its route)
+				screen_object = {
+					id: screen_data.item_id,
+					route: screen_data.item_id,
+					title: current_view.custom_page_data.hasOwnProperty( 'title' ) ? current_view.custom_page_data.title : '',
+					data: current_view.custom_page_data,
+					template: current_view.template_name
+				};
+				break;
+			case 'custom-component':
+				//For custom components, return component_id, title, route, data, template:
+				screen_object = {
+					component_id: screen_data.component_id,
+					title: screen_data.label,
+					route: screen_data.fragment,
+					data: screen_data.data,
+					template: current_view.template_name
+				};
+				break;
+		};
+		
+		screen_object.screen_type = screen_data.screen_type;
+		
+        return screen_object;
+    };
 
 	//Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
 	//a circular dependency for requirejs) can both be required at the same time
