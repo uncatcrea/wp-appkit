@@ -305,7 +305,11 @@ define( function( require, exports ) {
 	themeApp.navigateToPreviousScreen = function() {
 		var prev_screen_link = App.getPreviousScreenLink();
 
-		vent.trigger( 'navigate-to-previous-screen', prev_screen_link );
+		vent.trigger( 'navigate:previous-screen', {
+			previous_screen: App.getPreviousScreenData(),
+			current_screen: App.getCurrentScreenData(),
+			previous_screen_link: prev_screen_link
+		});
 
 		themeApp.navigate( prev_screen_link );
 	};
