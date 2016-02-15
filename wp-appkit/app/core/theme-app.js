@@ -302,6 +302,18 @@ define( function( require, exports ) {
 		App.router.default_route();
 	};
 
+	themeApp.navigateToPreviousScreen = function() {
+		var prev_screen_link = App.getPreviousScreenLink();
+
+		vent.trigger( 'navigate:previous-screen', {
+			previous_screen: App.getPreviousScreenData(),
+			current_screen: App.getCurrentScreenData(),
+			previous_screen_link: prev_screen_link
+		});
+
+		themeApp.navigate( prev_screen_link );
+	};
+
 	/**
 	 * Reload current screen : re-trigger current route.
 	 */
@@ -328,30 +340,6 @@ define( function( require, exports ) {
 	 */
 
 	/**
-	 * Automatically shows and hide Back button according to current screen (list, single, page, comments, etc...)
-	 * Use only if back button is not refreshed at each screen load! (otherwhise $go_back_btn will not be set correctly).
-	 * @param $go_back_btn Back button jQuery DOM element
-	 */
-	themeApp.setAutoBackButton = function( $go_back_btn, do_before_auto_action ) {
-		RegionManager.on( 'screen:showed', function( current_screen, view ) {
-			var display = themeApp.getBackButtonDisplay();
-			if ( display == 'show' ) {
-				if ( do_before_auto_action != undefined ) {
-					do_before_auto_action( true );
-				}
-				$go_back_btn.show();
-				themeApp.updateBackButtonEvents( $go_back_btn );
-			} else if ( display == 'hide' ) {
-				if ( do_before_auto_action != undefined ) {
-					do_before_auto_action( false );
-				}
-				themeApp.updateBackButtonEvents( $go_back_btn );
-				$go_back_btn.hide();
-			}
-		} );
-	};
-
-	/**
 	 * To know if the back button can be displayed on the current screen,
 	 * according to app history. Use this to configure back button
 	 * manually if you don't use themeApp.setAutoBackButton().
@@ -368,26 +356,6 @@ define( function( require, exports ) {
 		}
 
 		return display;
-	};
-
-	/**
-	 * Sets back buton click event. Use this to configure back button
-	 * manually if you don't use themeApp.setAutoBackButton().
-	 * @param $go_back_btn Back button jQuery DOM element
-	 */
-	themeApp.updateBackButtonEvents = function( $go_back_btn ) {
-		if ( $go_back_btn.length ) {
-			var display = themeApp.getBackButtonDisplay();
-			if ( display == 'show' ) {
-				$go_back_btn.unbind( 'click' ).click( function( e ) {
-					e.preventDefault();
-					var prev_screen_link = App.getPreviousScreenLink();
-					themeApp.navigate( prev_screen_link );
-				} );
-			} else if ( display == 'hide' ) {
-				$go_back_btn.unbind( 'click' );
-			}
-		}
 	};
 
 	/************************************************
