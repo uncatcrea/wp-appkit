@@ -36,6 +36,10 @@
     margin:10px 0;
 }
 
+.fix-align label {
+    vertical-align:baseline;
+}
+
 .description {
     display:none;
 }
