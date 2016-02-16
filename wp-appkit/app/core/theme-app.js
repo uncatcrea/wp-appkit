@@ -823,7 +823,7 @@ define( function( require, exports ) {
 	 * - for lists:             object containing: title (list title), posts (list of posts), ids (=post ids), total, component_id, query
 	 * - for single:            post object: id, post_type, date, title, content, excerpt, thumbnail, author, nb_comments, slug, permalink
 	 * - for comments:          object containing: post (post we retrieve the comments for) and comments (list of comments for this post)
-	 * - for pages:             page object: id, post_type, date, title, content, excerpt, thumbnail, author, nb_comments, slug, permalink, tree_data
+	 * - for pages:             page object: id, post_type, date, title, content, excerpt, thumbnail, author, nb_comments, slug, permalink, tree_data, component (page's component object)
 	 * - for custom pages:      object containing: id, route, title (if custom page data contains a 'title' property), data (custom page data), template.
 	 * - for custom components: object containing: component_id, title, route, data, template
 	 * - for all:               field 'screen_type': can be: 'list', 'single', 'comments', 'page', 'custom-page', 'custom-component'
@@ -862,6 +862,7 @@ define( function( require, exports ) {
 			case 'page':
 				//For page, just return the current page object:
 				screen_object = screen_data.data.item;
+				screen_object.component = TemplateTags.getComponent( screen_data.component_id );
 				break;
 			case 'custom-page':
 				//For custom pages, return page id, page route, page custom data, and page template:
