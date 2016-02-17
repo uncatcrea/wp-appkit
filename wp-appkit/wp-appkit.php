@@ -31,6 +31,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			require_once(dirname( __FILE__ ) . '/lib/web-services/web-services.php');
 			require_once(dirname( __FILE__ ) . '/lib/apps/apps.php');
 			require_once(dirname( __FILE__ ) . '/lib/apps/build.php');
+			require_once(dirname( __FILE__ ) . '/lib/apps/server-rewrite.php');
 			require_once(dirname( __FILE__ ) . '/lib/themes/themes.php');
 			require_once(dirname( __FILE__ ) . '/lib/themes/upload-themes.php');
 			require_once(dirname( __FILE__ ) . '/lib/user-permissions/user-permissions.php');
@@ -53,10 +54,13 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			flush_rewrite_rules();
 
 			WpakThemes::create_theme_directory();
+			
+			WpakServerRewrite::prepend_wp_network_wpak_rules_to_htaccess();
 		}
 
 		public static function on_deactivation() {
 			flush_rewrite_rules();
+			WpakServerRewrite::delete_wp_network_wpak_rules_from_htaccess();
 		}
 
 		public static function init() {
