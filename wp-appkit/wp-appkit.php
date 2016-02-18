@@ -31,7 +31,6 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			require_once(dirname( __FILE__ ) . '/lib/web-services/web-services.php');
 			require_once(dirname( __FILE__ ) . '/lib/apps/apps.php');
 			require_once(dirname( __FILE__ ) . '/lib/apps/build.php');
-			require_once(dirname( __FILE__ ) . '/lib/apps/server-rewrite.php');
 			require_once(dirname( __FILE__ ) . '/lib/themes/themes.php');
 			require_once(dirname( __FILE__ ) . '/lib/themes/upload-themes.php');
 			require_once(dirname( __FILE__ ) . '/lib/user-permissions/user-permissions.php');
@@ -40,6 +39,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			require_once(dirname( __FILE__ ) . '/lib/navigation/navigation.php');
 			require_once(dirname( __FILE__ ) . '/lib/options/options.php');
 			require_once(dirname( __FILE__ ) . '/lib/simulator/simulator.php');
+			require_once(dirname( __FILE__ ) . '/lib/simulator/server-rewrite.php');
 		}
 
 		public static function plugins_loaded() {
