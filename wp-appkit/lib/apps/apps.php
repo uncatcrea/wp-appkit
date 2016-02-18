@@ -116,7 +116,7 @@ class WpakApps {
 	 * Add platfrom column after 'title' column
 	 */
 	public static function add_platform_column( $columns ) {
-		
+
 		$additionnal_column = array( 'wpak_platform' => __( 'Platform', WpAppKit::i18n_domain ) );
 
 		$title_index = array_search( 'title', array_keys( $columns ) ) + 1;
@@ -125,7 +125,7 @@ class WpakApps {
 
 		return $columns;
 	}
-	
+
 	public static function platform_column_content( $column, $post_id ) {
 		if ( $column === 'wpak_platform' ) {
 			$app_info = self::get_app_main_infos( $post_id );
@@ -135,7 +135,7 @@ class WpakApps {
 			}
 		}
 	}
-	
+
 	public static function add_settings_panels() {
 		$capability_required = current_user_can( 'wpak_edit_apps' ) ? 'wpak_edit_apps' : 'manage_options';
 		add_menu_page( __( 'WP AppKit', WpAppKit::i18n_domain ), __( 'WP AppKit', WpAppKit::i18n_domain ), $capability_required, self::menu_item, array( __CLASS__, 'settings_panel' ) );
@@ -407,7 +407,7 @@ class WpakApps {
 				<div class="field-group">
 					<label><?php _e( 'Plugins', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_phonegap_plugins" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
-					<span class="description"><?php _e( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
+					<span class="description"><?php _e( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter &lt;plugin name="org.apache.cordova.inappbrowser" spec="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
 				</div>
 			</fieldset>
 			<div class="field-group wpak_phonegap_links">
@@ -514,7 +514,7 @@ class WpakApps {
 			$app_icons = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $_POST['wpak_app_icons'] );
 			$app_icons = trim( $app_icons );
 			update_post_meta( $post_id, '_wpak_app_icons', $app_icons );
-			
+
 			//Use default app icons and splash only if none is provided manually:
 			if ( empty( $app_icons ) ) {
 				//App that have no existent '_wpak_use_default_icons_and_splash' meta must
@@ -525,9 +525,9 @@ class WpakApps {
 			} else {
 				update_post_meta( $post_id, '_wpak_use_default_icons_and_splash', 'off' );
 			}
-			
+
 		}
-		
+
 		if ( isset( $_POST['wpak_app_simulation_secured'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_simulation_secured', sanitize_text_field( $_POST['wpak_app_simulation_secured'] ) );
 		}
@@ -638,7 +638,7 @@ class WpakApps {
 		$author_website = get_post_meta( $post_id, '_wpak_app_author_website', true );
 		$author_email = get_post_meta( $post_id, '_wpak_app_author_email', true );
 		$icons = get_post_meta( $post_id, '_wpak_app_icons', true );
-		
+
 		$use_default_icons_and_splash = get_post_meta( $post_id, '_wpak_use_default_icons_and_splash', true );
 		$use_default_icons_and_splash = ( empty( $use_default_icons_and_splash ) && empty( $icons ) ) || $use_default_icons_and_splash === 'on';
 
@@ -738,10 +738,10 @@ class WpakApps {
 		if ( is_array( $plugins ) ) {
 			$plugins_xml_array = array();
 			foreach ( $plugins as $plugin_name => $plugin_data ) {
-				$plugin_xml = '<gap:plugin name="' . $plugin_name . '"';
+				$plugin_xml = '<plugin name="' . $plugin_name . '"';
 				$xml_end = ' />';
 				if ( !empty( $plugin_data['version'] ) ) {
-					$plugin_xml .= ' version="'. $plugin_data['version'] .'"';
+					$plugin_xml .= ' spec="'. $plugin_data['version'] .'"';
 				}
 				if ( !empty( $plugin_data['source'] ) ) {
 					$plugin_xml .= ' source="'. $plugin_data['source'] .'"';
@@ -755,7 +755,7 @@ class WpakApps {
 						$param_xml[] = '<param name="' . $param['name'] . '" value="' . $param['value'] . '" />';
 					}
 					$plugin_xml.= " >\n\t" . implode( "\n\t", $param_xml ) . "\n";
-					$xml_end = '</gap:plugin>';
+					$xml_end = '</plugin>';
 				}
 				$plugin_xml .= $xml_end;
 				$plugins_xml_array[] = $plugin_xml;
@@ -769,13 +769,13 @@ class WpakApps {
 	protected static function parse_plugins_from_xml( $plugins_xml ) {
 		$plugins_array = array();
 
-		if ( preg_match_all( '/(<gap:plugin [^>]+)(\/>|>(.*)<\/gap:plugin>)/sU', $plugins_xml, $matches ) ) {
+		if ( preg_match_all( '/(<(gap:)?plugin [^>]+)(\/>|>(.*)<\/(gap:)?plugin>)/sU', $plugins_xml, $matches ) ) {
 			foreach ( $matches[1] as $i => $match ) {
 				$version = '';
 				$source = '';
 				if ( preg_match( '/name="([^"]+)"/', $match, $name_match ) && strlen( $name_match[1] ) > 0 ) {
-					if ( preg_match( '/version="([^"]+)"/', $match, $version_match ) && strlen( $version_match[1] ) > 0 ) {
-						$version = $version_match[1];
+					if ( preg_match( '/(version|spec)="([^"]+)"/', $match, $version_match ) && strlen( $version_match[2] ) > 0 ) {
+						$version = $version_match[2];
 					}
 					if ( preg_match( '/source="([^"]+)"/', $match, $source_match ) && strlen( $source_match[1] ) > 0 ) {
 						$source = $source_match[1];
@@ -783,7 +783,7 @@ class WpakApps {
 
 					// Include params if any
 					$params = array();
-					if( !empty( $matches[3][$i] ) && preg_match_all( '/<param ([^>]+)>/U', $matches[3][$i], $param_matches ) ) {
+					if( !empty( $matches[4][$i] ) && preg_match_all( '/<param ([^>]+)>/U', $matches[4][$i], $param_matches ) ) {
 						foreach( $param_matches[1] as $param_match ) {
 							if( preg_match( '/name="([^"]+)"/', $param_match, $param_name_match ) && strlen( $param_name_match[1] ) > 0
 							 && preg_match( '/value="([^"]+)"/', $param_match, $param_value_match ) && strlen( $param_value_match[1] ) > 0 ) {
