@@ -53,7 +53,17 @@ class WpakServerRewrite {
 	 * Get htaccess file path
 	 */
 	protected static function get_htaccess_file() {
-		$htaccess_file = get_home_path() . '.htaccess';
+		
+		//Inspired from WordPress network_step2() to fix some issues on
+		//get_home_path() on some WordPress Networks configs:
+		$slashed_home = trailingslashit( get_option( 'home' ) );
+		$base = parse_url( $slashed_home, PHP_URL_PATH );
+		$document_root_fix = str_replace( '\\', '/', realpath( $_SERVER['DOCUMENT_ROOT'] ) );
+		$abspath_fix = str_replace( '\\', '/', ABSPATH );
+		$home_path = 0 === strpos( $abspath_fix, $document_root_fix ) ? $document_root_fix . $base : get_home_path();
+		
+		$htaccess_file = $home_path . '.htaccess';
+		
 		return $htaccess_file;
 	}
 
