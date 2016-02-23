@@ -2,16 +2,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP AppKit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-07 21:32+0100\n"
-"PO-Revision-Date: 2015-11-07 21:33+0100\n"
-"Last-Translator: Lionel Pointet <lionel.pointet@gmail.com>\n"
+"POT-Creation-Date: 2016-02-23 17:03+0100\n"
+"PO-Revision-Date: 2016-02-23 17:11+0100\n"
+"Last-Translator: UncatCrea <uncategorized.creations@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n>1;\n"
-"X-Generator: Poedit 1.6.5\n"
+"X-Generator: Poedit 1.8.7\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;"
 "_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2\n"
@@ -51,143 +51,142 @@ msgstr "Addons"
 msgid "Addons activated for this App"
 msgstr "Addons activés pour cette application"
 
-#: ../lib/apps/apps.php:30 ../lib/apps/apps.php:319 ../lib/apps/build.php:30
+#: ../lib/apps/apps.php:32 ../lib/apps/apps.php:351 ../lib/apps/build.php:30
 #: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:46
 #: ../lib/web-services/web-services-bo-settings.php:25
 msgid "Help me"
 msgstr "Aidez-moi"
 
-#: ../lib/apps/apps.php:31
+#: ../lib/apps/apps.php:33
 msgid "Hide help texts"
 msgstr "Cacher les textes d'aide"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:52 ../lib/apps/apps.php:67 ../lib/apps/apps.php:69
+#: ../lib/apps/apps.php:54 ../lib/apps/apps.php:69 ../lib/apps/apps.php:71
 msgid "Applications"
 msgstr "Applications"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:68 ../lib/apps/apps.php:323
+#: ../lib/apps/apps.php:70 ../lib/apps/apps.php:355
 msgid "Application"
 msgstr "Application"
 
-#: ../lib/apps/apps.php:70
+#: ../lib/apps/apps.php:72
 msgid "Add New"
 msgstr "Ajouter"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:71
+#: ../lib/apps/apps.php:73
 msgid "Add an application"
 msgstr "Ajouter une application"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:72 ../lib/components/components-bo-settings.php:114
+#: ../lib/apps/apps.php:74 ../lib/components/components-bo-settings.php:114
 msgid "Edit"
 msgstr "Modifier"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:73
+#: ../lib/apps/apps.php:75
 msgid "Edit Application"
 msgstr "Modifier l'application"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:74
+#: ../lib/apps/apps.php:76
 msgid "New application"
 msgstr "Nouvelle application"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:75
+#: ../lib/apps/apps.php:77
 msgid "No application found"
 msgstr "Aucune application trouvée"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:84 ../lib/apps/apps.php:85 ../lib/apps/apps.php:86
-#: ../lib/apps/apps.php:87 ../lib/apps/apps.php:88 ../lib/apps/apps.php:89
-#: ../lib/apps/apps.php:90
+#: ../lib/apps/apps.php:86 ../lib/apps/apps.php:87 ../lib/apps/apps.php:88
+#: ../lib/apps/apps.php:89 ../lib/apps/apps.php:90 ../lib/apps/apps.php:91
+#: ../lib/apps/apps.php:92
 msgid "Application project saved."
 msgstr "Projet d'application enregistré."
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:115
-msgid "WP AppKit"
-msgstr "WP AppKit"
-
-#: ../lib/apps/apps.php:123
-msgid "Save & Preview"
-msgstr "Enregistrer et prévisualiser"
-
-#: ../lib/apps/apps.php:132
-msgid "My Project"
-msgstr "Mon projet"
-
-# @ wp-appkit
-#: ../lib/apps/apps.php:141
+#: ../lib/apps/apps.php:120 ../lib/apps/apps.php:167
 msgid "Platform"
 msgstr "Plateforme"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:154 ../lib/apps/apps.php:294
+#: ../lib/apps/apps.php:141
+msgid "WP AppKit"
+msgstr "WP AppKit"
+
+#: ../lib/apps/apps.php:149
+msgid "Save & Preview"
+msgstr "Enregistrer et prévisualiser"
+
+#: ../lib/apps/apps.php:158
+msgid "My Project"
+msgstr "Mon projet"
+
+# @ wp-appkit
+#: ../lib/apps/apps.php:180 ../lib/apps/build.php:91
 msgid "PhoneGap Build"
 msgstr "PhoneGap Build"
 
-#: ../lib/apps/apps.php:180 ../lib/apps/apps.php:232 ../lib/apps/apps.php:235
+#: ../lib/apps/apps.php:206 ../lib/apps/apps.php:258 ../lib/apps/apps.php:261
 msgid "Save"
 msgstr "Enregistrer"
 
-#: ../lib/apps/apps.php:186
+#: ../lib/apps/apps.php:212
 msgid "Preview"
 msgstr "Prévisualiser"
 
-#. translators: Publish box date format, see http://php.net/date
-#: ../lib/apps/apps.php:195
+#: ../lib/apps/apps.php:221
 msgid "M j, Y @ H:i"
 msgstr "j F Y \\à G \\h i \\m\\i\\n "
 
-#: ../lib/apps/apps.php:198
+#: ../lib/apps/apps.php:224
 #, php-format
 msgid "Last saved on: <b>%1$s</b>"
 msgstr "Dernière sauvegarde : <b>%1$s</b>"
 
-#: ../lib/apps/apps.php:200 ../lib/apps/apps.php:204
+#: ../lib/apps/apps.php:226 ../lib/apps/apps.php:230
 msgid "Not saved yet"
 msgstr "Pas encore enregistré"
 
-#: ../lib/apps/apps.php:219
+#: ../lib/apps/apps.php:245
 msgid "Delete Permanently"
 msgstr "Supprimer définitivement"
 
-#: ../lib/apps/apps.php:221
+#: ../lib/apps/apps.php:247
 msgid "Move to Trash"
 msgstr "Déplacer dans la corbeille"
 
-#: ../lib/apps/apps.php:272
+#: ../lib/apps/apps.php:298
 msgid "Define a title"
 msgstr "Définir un titre"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:276
+#: ../lib/apps/apps.php:302
 msgid "Add components"
 msgstr "Ajouter des composants"
 
-#: ../lib/apps/apps.php:280
+#: ../lib/apps/apps.php:306
 msgid "Setup appearance and navigation"
 msgstr "Configurer l'apparence et la navigation"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:284
+#: ../lib/apps/apps.php:310
 msgid "Setup PhoneGap config"
 msgstr "Configurer PhoneGap"
 
-#: ../lib/apps/apps.php:288
+#: ../lib/apps/apps.php:314
 msgid "Save your app"
 msgstr "Enregistrer votre application"
 
-#: ../lib/apps/apps.php:294 ../lib/apps/apps.php:379
+#: ../lib/apps/apps.php:326 ../lib/apps/apps.php:415
 msgid "Export"
 msgstr "Exporter"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:321
+#: ../lib/apps/apps.php:353
 msgid ""
 "PhoneGap config.xml informations that are going to be displayed on App "
 "Stores.<br/>They are required when exporting the App to Phonegap, but are "
@@ -200,34 +199,34 @@ msgstr ""
 "de l'application dans un navigateur."
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:325 ../lib/apps/apps.php:353
+#: ../lib/apps/apps.php:357 ../lib/apps/apps.php:389
 #: ../lib/components/components-bo-settings.php:61
 msgid "Name"
 msgstr "Nom"
 
-#: ../lib/apps/apps.php:329
+#: ../lib/apps/apps.php:361
 msgid "Description"
 msgstr "Description"
 
-#: ../lib/apps/apps.php:333
+#: ../lib/apps/apps.php:365
 msgid "ID"
 msgstr "ID"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:337 ../lib/apps/apps.php:368
+#: ../lib/apps/apps.php:369 ../lib/apps/apps.php:404
 msgid "Version"
 msgstr "Version"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:341
+#: ../lib/apps/apps.php:373
 msgid "VersionCode (Android only)"
 msgstr "\"versionCode\" de l'application (Android seulement)"
 
-#: ../lib/apps/apps.php:345
+#: ../lib/apps/apps.php:377
 msgid "Icons and Splashscreens"
 msgstr "Icônes et splashscreens"
 
-#: ../lib/apps/apps.php:347
+#: ../lib/apps/apps.php:379
 msgid ""
 "Write the icons and splashscreens tags as defined in the PhoneGap "
 "documentation.<br/>Example: "
@@ -235,63 +234,73 @@ msgstr ""
 "Saisir les tags pour les icônes et splashscreens comme indiqué dans la "
 "documentation PhoneGap.<br/>Exemple : "
 
-#: ../lib/apps/apps.php:351
+#: ../lib/apps/apps.php:382
+msgid "Use default WP-AppKit Icons and Splashscreens"
+msgstr "Utiliser les icônes et splashscreens par défaut de WP-AppKit"
+
+#: ../lib/apps/apps.php:383
+msgid ""
+"If checked and \"Icons and Splashscreens\" is empty, the app export will "
+"embed the default WP-AppKit Icons and Splashscreens."
+msgstr ""
+"Si sélectionné et \"Icônes et splashscreens\" est vide, l'export de l'app "
+"embarquera les icônes et splashscreens par défaut de WP-AppKit."
+
+#: ../lib/apps/apps.php:387
 msgid "Author"
 msgstr "Auteur"
 
-#: ../lib/apps/apps.php:357
+#: ../lib/apps/apps.php:393
 msgid "Website"
 msgstr "Site web"
 
-#: ../lib/apps/apps.php:361
+#: ../lib/apps/apps.php:397
 msgid "Email"
 msgstr "Email"
 
-#: ../lib/apps/apps.php:366
+#: ../lib/apps/apps.php:402
 msgid "PhoneGap"
 msgstr "PhoneGap"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:372
+#: ../lib/apps/apps.php:408
 msgid "Plugins"
 msgstr "Plugins"
 
-# @ wp-appkit
-#: ../lib/apps/apps.php:374
+#: ../lib/apps/apps.php:410
 msgid ""
 "Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/"
 ">Example : to include the \"In App Browser\" plugin for a Phonegap Build "
-"compilation, enter &lt;gap:plugin name=\"org.apache.cordova.inappbrowser\" "
-"version=\"0.3.3\" /&gt; directly in the textarea."
+"compilation, enter &lt;plugin name=\"org.apache.cordova.inappbrowser\" spec="
+"\"0.3.3\" /&gt; directly in the textarea."
 msgstr ""
-"Saisir les tags de plugins Phonegap comme définis dans la documentation "
-"Phonegap.<br/>Par exemple : pour inclure le plugin \"In App Browser\" lors "
-"de la compilation sous Phonegap Build, entrer  &lt;gap:plugin name=\"org."
-"apache.cordova.inappbrowser\" version=\"0.3.3\" /&gt; directement dans la "
-"zone de texte."
+"Saisir les tags pour les plugins PhoneGap comme indiqué dans la "
+"documentation PhoneGap.<br/>Exemple : pour inclure la compilation du plugin "
+"\"In App Browser\" pour PhoneGap Build, entrer &lt;plugin name=\"org.apache."
+"cordova.inappbrowser\" spec=\"0.3.3\" /&gt; directement dans le champ texte."
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:378
+#: ../lib/apps/apps.php:414
 msgid "View config.xml"
 msgstr "Voir le fichier config.xml"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:391
+#: ../lib/apps/apps.php:427
 msgid "App Simulation Visibility"
 msgstr "Visibilité de la simulation de l'application"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:395
+#: ../lib/apps/apps.php:431
 msgid "Private"
 msgstr "Privée"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:396
+#: ../lib/apps/apps.php:432
 msgid "Public"
 msgstr "Publique"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:398
+#: ../lib/apps/apps.php:434
 msgid ""
 "If activated, only connected users with right permissions can access the app "
 "simulation in web browser.<br/>If deactivated, the app simulation is "
@@ -305,12 +314,12 @@ msgstr ""
 "config.xml, qui peuvent contenir des informations sensibles."
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:509
+#: ../lib/apps/apps.php:558
 msgid "iOS"
 msgstr "iOS"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:510
+#: ../lib/apps/apps.php:559
 msgid "Android"
 msgstr "Android"
 
@@ -352,14 +361,26 @@ msgstr ""
 msgid "View config.js"
 msgstr "Voir le fichier config.js"
 
+#: ../lib/apps/build.php:92
+msgid "PhoneGap CLI"
+msgstr "PhoneGap CLI"
+
+#: ../lib/apps/build.php:93
+msgid "WebApp"
+msgstr "WebApp"
+
 # @ wp-appkit
-#: ../lib/apps/build.php:127
+#: ../lib/apps/build.php:142
 #, php-format
 msgid "Error: Could not find zip export file [%s]"
 msgstr "Erreur : le fichier d'export Zip est introuvable : [%s]"
 
+#: ../lib/apps/build.php:158
+msgid "Unknown export type"
+msgstr "Type d'export inconnu"
+
 # @ wp-appkit
-#: ../lib/apps/build.php:137
+#: ../lib/apps/build.php:164
 msgid ""
 "Zip PHP extension is required to run file export. See http://www.php.net/"
 "manual/fr/book.zip.php."
@@ -369,7 +390,7 @@ msgstr ""
 "cette extension."
 
 # @ wp-appkit
-#: ../lib/apps/build.php:144
+#: ../lib/apps/build.php:171
 #, php-format
 msgid ""
 "The export directory [%s] could not be created. Please check that you have "
@@ -379,12 +400,12 @@ msgstr ""
 "avez les permissions nécessaire pour créer ce répertoire."
 
 # @ wp-appkit
-#: ../lib/apps/build.php:169
+#: ../lib/apps/build.php:207
 msgid "Wrong application ID"
 msgstr "Mauvais identifiant d'application"
 
 # @ wp-appkit
-#: ../lib/apps/build.php:222
+#: ../lib/apps/build.php:260
 #, php-format
 msgid ""
 "The Zip archive file [%s] could not be created. Please check that you have "
@@ -393,53 +414,53 @@ msgstr ""
 "Impossible de créer le fichier Zip [%s]. Veuillez vérifier que vous avez les "
 "permissions en écriture sur ce répertoire."
 
-#: ../lib/apps/build.php:239
+#: ../lib/apps/build.php:277
 msgctxt "ZipArchive::ER_EXISTS error"
 msgid "File already exists"
 msgstr "Le fichier existe déjà"
 
-#: ../lib/apps/build.php:242
+#: ../lib/apps/build.php:280
 msgctxt "ZipArchive::ER_INCONS error"
 msgid "Zip archive inconsistent"
 msgstr "Fichier zip corrompu"
 
-#: ../lib/apps/build.php:245
+#: ../lib/apps/build.php:283
 msgctxt "ZipArchive::ER_INVAL error"
 msgid "Invalid argument"
 msgstr "Argument invalide"
 
-#: ../lib/apps/build.php:248
+#: ../lib/apps/build.php:286
 msgctxt "ZipArchive::ER_MEMORY error"
 msgid "Malloc failure"
 msgstr "Erreur mémoire"
 
-#: ../lib/apps/build.php:251
+#: ../lib/apps/build.php:289
 msgctxt "ZipArchive::ER_NOENT error"
 msgid "No such file"
 msgstr "Fichier introuvable"
 
-#: ../lib/apps/build.php:254
+#: ../lib/apps/build.php:292
 msgctxt "ZipArchive::ER_NOZIP error"
 msgid "Not a zip archive"
 msgstr "Le fichier indiqué n'est pas un zip"
 
-#: ../lib/apps/build.php:257
+#: ../lib/apps/build.php:295
 msgctxt "ZipArchive::ER_OPEN error"
 msgid "Can't open file"
 msgstr "Impossible d'ouvrir le fichier"
 
-#: ../lib/apps/build.php:260
+#: ../lib/apps/build.php:298
 msgctxt "ZipArchive::ER_READ error"
 msgid "Read error"
 msgstr "Erreur de lecture"
 
-#: ../lib/apps/build.php:263
+#: ../lib/apps/build.php:301
 msgctxt "ZipArchive::ER_SEEK error"
 msgid "Seek error"
 msgstr "Erreur de déplacement"
 
 # @ wp-appkit
-#: ../lib/apps/build.php:268
+#: ../lib/apps/build.php:306
 #, php-format
 msgid ""
 "The Zip archive file [%s] could not be opened (%s). Please check that you "
@@ -449,27 +470,27 @@ msgstr ""
 "avez les permissions en écriture sur ce répertoire."
 
 # @ wp-appkit
-#: ../lib/apps/build.php:282 ../lib/apps/build.php:309
-#: ../lib/apps/build.php:369
+#: ../lib/apps/build.php:322 ../lib/apps/build.php:349
+#: ../lib/apps/build.php:416
 #, php-format
 msgid "Could not add directory [%s] to zip archive"
 msgstr "Impossible d'ajouter le répertoire [%s] à l'archive Zip"
 
 # @ wp-appkit
-#: ../lib/apps/build.php:321 ../lib/apps/build.php:329
-#: ../lib/apps/build.php:375
+#: ../lib/apps/build.php:361 ../lib/apps/build.php:369
+#: ../lib/apps/build.php:423
 #, php-format
 msgid "Could not add file [%s] to zip archive"
 msgstr "Impossible d'ajouter le fichier [%s] à l'archive Zip"
 
 # @ wp-appkit
-#: ../lib/apps/build.php:402
+#: ../lib/apps/build.php:483
 #, php-format
 msgid "Zip archive source directory [%s] could not be found."
 msgstr "Impossible de trouver le répertoire source du fichier Zip [%s]."
 
 # @ wp-appkit
-#: ../lib/apps/build.php:408
+#: ../lib/apps/build.php:489
 msgid "Error during archive creation"
 msgstr "Erreur lors de la création de l'archive"
 
@@ -568,8 +589,7 @@ msgstr "Options du composant"
 
 # @ wp-appkit
 #: ../lib/components/components-bo-settings.php:185
-#: ../lib/navigation/navigation-bo-settings.php:125
-#: ../lib/navigation/navigation-bo-settings.php:186
+#: ../lib/navigation/navigation-bo-settings.php:191
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -639,19 +659,19 @@ msgid "Component to delete not found"
 msgstr "Le composant à effacer est introuvable"
 
 # @ wp-appkit
-#: ../lib/components/components-types/hooks.php:54
-#: ../lib/components/components-types/posts-list.php:205
+#: ../lib/components/components-types/hooks.php:61
+#: ../lib/components/components-types/posts-list.php:229
 msgid "Hook"
 msgstr "Hook"
 
 # @ wp-appkit
-#: ../lib/components/components-types/hooks.php:69
-#: ../lib/components/components-types/posts-list.php:309
+#: ../lib/components/components-types/hooks.php:76
+#: ../lib/components/components-types/posts-list.php:354
 msgid "Hook name"
 msgstr "Nom du hook"
 
 # @ wp-appkit
-#: ../lib/components/components-types/hooks.php:91
+#: ../lib/components/components-types/hooks.php:98
 msgid "Custom component, using hooks"
 msgstr "Composant personnalisé, en utilisant les hooks"
 
@@ -664,7 +684,7 @@ msgstr "Page introuvable"
 # @ wp-appkit
 #: ../lib/components/components-types/page.php:190
 #: ../lib/components/components-types/page.php:227
-#: ../lib/components/components-types/posts-list.php:224
+#: ../lib/components/components-types/posts-list.php:248
 msgid "Post type"
 msgstr "Post type"
 
@@ -696,53 +716,53 @@ msgstr "Page WordPress"
 
 # @ default
 # @ wp-appkit
-#: ../lib/components/components-types/posts-list.php:209
-#: ../lib/components/components-types/posts-list.php:257
+#: ../lib/components/components-types/posts-list.php:233
+#: ../lib/components/components-types/posts-list.php:302
 msgid "List type"
 msgstr "Type de liste"
 
-#: ../lib/components/components-types/posts-list.php:209
-#: ../lib/components/components-types/posts-list.php:263
+#: ../lib/components/components-types/posts-list.php:233
+#: ../lib/components/components-types/posts-list.php:308
 msgid "Latest posts"
 msgstr "Derniers articles"
 
 # @ default
 # @ wp-appkit
-#: ../lib/components/components-types/posts-list.php:227
-#: ../lib/components/components-types/posts-list.php:326
+#: ../lib/components/components-types/posts-list.php:251
+#: ../lib/components/components-types/posts-list.php:371
 msgid "Taxonomy"
 msgstr "Taxonomie"
 
 # @ default
-#: ../lib/components/components-types/posts-list.php:228
+#: ../lib/components/components-types/posts-list.php:252
 msgid "Term"
 msgstr "Terme"
 
 # @ wp-appkit
-#: ../lib/components/components-types/posts-list.php:264
+#: ../lib/components/components-types/posts-list.php:309
 msgid "Custom, using hooks"
 msgstr "Personnalisé, en utilisant des hooks"
 
 # @ default
 # @ wp-appkit
-#: ../lib/components/components-types/posts-list.php:329
+#: ../lib/components/components-types/posts-list.php:374
 msgid "No taxonomy"
 msgstr "Aucune taxonomie"
 
 # @ wp-appkit
-#: ../lib/components/components-types/posts-list.php:351
+#: ../lib/components/components-types/posts-list.php:396
 #, php-format
 msgid "No %s found"
 msgstr "%s non trouvé"
 
 # @ wp-appkit
-#: ../lib/components/components-types/posts-list.php:355
+#: ../lib/components/components-types/posts-list.php:400
 #, php-format
 msgid "No taxonomy found for post type %s"
 msgstr "Aucune taxonomie trouvée pour le post type %s"
 
 # @ wp-appkit
-#: ../lib/components/components-types/posts-list.php:372
+#: ../lib/components/components-types/posts-list.php:417
 msgid "Posts list"
 msgstr "Liste d'articles"
 
@@ -791,99 +811,81 @@ msgid "Menu Item"
 msgstr "Elément de menu"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:51
-msgid "Icon Slug"
-msgstr "Slug de l'icône"
-
-# @ wp-appkit
 #: ../lib/navigation/navigation-bo-settings.php:61
 msgid "No menu item yet!"
 msgstr "Aucun élément de menu pour l'instant !"
 
-#: ../lib/navigation/navigation-bo-settings.php:116
-msgid "none"
-msgstr "aucun"
-
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:118
-msgid "Edit icon"
-msgstr "Modifier l'icône"
-
-#: ../lib/navigation/navigation-bo-settings.php:124
-msgid "Ok"
-msgstr "Ok"
-
-# @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:167
+#: ../lib/navigation/navigation-bo-settings.php:172
 msgid "Component"
 msgstr "Composant"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:177
+#: ../lib/navigation/navigation-bo-settings.php:182
 msgid "All components are already in navigation!"
 msgstr "Tous les composants sont déjà dans la navigation!"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:188
+#: ../lib/navigation/navigation-bo-settings.php:193
 msgid "Add component to navigation"
 msgstr "Ajouter un composant à la navigation"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:194
+#: ../lib/navigation/navigation-bo-settings.php:199
 msgid "No component found!"
 msgstr "Aucun composant trouvé!"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:194
+#: ../lib/navigation/navigation-bo-settings.php:199
 msgid "Please create a component!"
 msgstr "Veuillez créer un composant!"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:225
+#: ../lib/navigation/navigation-bo-settings.php:230
 msgid "You must choose a component!"
 msgstr "Veuillez choisir un composant!"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:230
+#: ../lib/navigation/navigation-bo-settings.php:235
 msgid "This component doesn't exist!"
 msgstr "Ce composant n'existe pas"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:235
+#: ../lib/navigation/navigation-bo-settings.php:240
 msgid "This component is already in navigation!"
 msgstr "Ce composant est déjà dans la navigation"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:246
+#: ../lib/navigation/navigation-bo-settings.php:251
 msgid "New navigation item created successfuly"
 msgstr "Nouvel élément de navigation créé"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:256
+#: ../lib/navigation/navigation-bo-settings.php:261
 msgid "Could not delete navigation item"
 msgstr "Impossible de supprimer cet élément de navigation"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:260
+#: ../lib/navigation/navigation-bo-settings.php:265
 msgid "Navigation item deleted successfuly"
 msgstr "Elément de navigation supprimé"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:263
+#: ../lib/navigation/navigation-bo-settings.php:268
 msgid "Navigation item to delete not found"
 msgstr "L'élément de navigation à supprimer est introuvable"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:271
+#: ../lib/navigation/navigation-bo-settings.php:276
 msgid "Navigation order updated successfuly"
 msgstr "Ordre des éléments de navigation enregistré"
 
 # @ wp-appkit
-#: ../lib/navigation/navigation-bo-settings.php:287
+#: ../lib/navigation/navigation-bo-settings.php:292
 msgid "Navigation item updated successfuly"
 msgstr "Elément de navigation modifié"
 
-#: ../lib/navigation/navigation-bo-settings.php:321
+#: ../lib/navigation/navigation-bo-settings.php:326
 msgid "Error while retrieving components available for navigation"
 msgstr ""
 "Erreur lors de la récupération des composants disponibles pour la navigation"
@@ -990,8 +992,12 @@ msgstr "Par %s"
 msgid "Visit theme site"
 msgstr "Visiter le site"
 
+#: ../lib/themes/themes-bo-settings.php:71
+msgid "Requires WP-AppKit version"
+msgstr "Requiert WP-AppKit version"
+
 # @ wp-appkit
-#: ../lib/themes/themes-bo-settings.php:80
+#: ../lib/themes/themes-bo-settings.php:83
 msgid "Application Title (displayed in app top bar)"
 msgstr "Titre de l'application (affiché dans la top bar)"
 
@@ -1026,7 +1032,7 @@ msgstr "Le thème demandé n'est pas activé pour cette application"
 msgid "Wrong theme file"
 msgstr "Fichier de thème incorrect"
 
-#: ../lib/themes/themes.php:255
+#: ../lib/themes/themes.php:256
 msgid "Theme file mime type not authorized"
 msgstr "Type mime du fichier de thème non autorisé"
 
@@ -1181,6 +1187,33 @@ msgstr ""
 "Utilisation_des_permaliens#Choisir_votre_structure_de_permaliens\">section "
 "du codex \"Choisir votre structure de permaliens\"</a> pour plus "
 "d'informations sur comment activer les permaliens."
+
+# @ wp-appkit
+#~ msgid ""
+#~ "Write the phonegap plugins tags as defined in the PhoneGap documentation."
+#~ "<br/>Example : to include the \"In App Browser\" plugin for a Phonegap "
+#~ "Build compilation, enter &lt;gap:plugin name=\"org.apache.cordova."
+#~ "inappbrowser\" version=\"0.3.3\" /&gt; directly in the textarea."
+#~ msgstr ""
+#~ "Saisir les tags de plugins Phonegap comme définis dans la documentation "
+#~ "Phonegap.<br/>Par exemple : pour inclure le plugin \"In App Browser\" "
+#~ "lors de la compilation sous Phonegap Build, entrer  &lt;gap:plugin name="
+#~ "\"org.apache.cordova.inappbrowser\" version=\"0.3.3\" /&gt; directement "
+#~ "dans la zone de texte."
+
+# @ wp-appkit
+#~ msgid "Icon Slug"
+#~ msgstr "Slug de l'icône"
+
+#~ msgid "none"
+#~ msgstr "aucun"
+
+# @ wp-appkit
+#~ msgid "Edit icon"
+#~ msgstr "Modifier l'icône"
+
+#~ msgid "Ok"
+#~ msgstr "Ok"
 
 #~ msgid "Universal"
 #~ msgstr "Universelle"
