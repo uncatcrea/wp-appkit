@@ -390,16 +390,12 @@ define(function(require, exports) {
 
 	/**
 	 * Check if displaying a page that has a subtree
-	 * @param int page_id : Optional
 	 * @param object screen : Optional : use only if you want data from a different screen than the current one
 	 * @returns boolean
 	 */
-    themeTplTags.isTreePage = function(page_id, screen) {
+    themeTplTags.isTreePage = function(screen) {
         var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
         var is_tree_page = screen_data.screen_type == 'page' && screen_data.data.is_tree_page;
-        if (is_tree_page && page_id != undefined) {
-            is_tree_page = parseInt(page_id) == screen_data.item_id;
-        }
         return is_tree_page == true;
     };
 
@@ -543,7 +539,7 @@ define(function(require, exports) {
     themeTplTags.getPageChildren = function(screen) {
         var children = [];
 
-        if (themeTplTags.isTreePage()) {
+        if (themeTplTags.isTreePage(screen)) {
             var children_ids = getPageTreeData('children', screen);
             if (children_ids.length) {
                 children = App.getGlobalItems('pages', children_ids);
