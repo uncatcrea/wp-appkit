@@ -68,7 +68,7 @@ class WpakThemesBoSettings {
 							);
 						}
 						if ( ! empty( $theme_data['WpakVersionRequired'] ) ) {
-							$theme_meta[] = __( 'Requires WP-AppKit version', WpAppKit::i18n_domain ) .' '. $theme_data['WpakVersionRequired'];
+							$theme_meta[] = sprintf( __( 'Requires WP-AppKit version %s', WpAppKit::i18n_domain ), $theme_data['WpakVersionRequired'] );
 						}
 					?>
 

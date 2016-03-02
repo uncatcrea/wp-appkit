@@ -376,7 +376,7 @@ class WpakApps {
 				<div class="field-group">
 					<label><?php _e( 'Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_icons" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
-					<span class="description"><?php _e( 'Write the icons and splashscreens tags as defined in the PhoneGap documentation.<br/>Example: ', WpAppKit::i18n_domain ) ?>&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;<br><br></span>
+					<span class="description"><?php printf( __( 'Write the icons and splashscreens tags as defined in the PhoneGap documentation.<br/>Example: %s', WpAppKit::i18n_domain ), '&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;' ) ?><br><br></span>
 					<br>
 					<input type="checkbox" id="wpak_use_default_icons_and_splash" name="wpak_use_default_icons_and_splash" <?php checked( $main_infos['use_default_icons_and_splash'] ) ?> />
 					<label for="wpak_use_default_icons_and_splash"><?php _e( 'Use default WP-AppKit Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
@@ -407,7 +407,7 @@ class WpakApps {
 				<div class="field-group">
 					<label><?php _e( 'Plugins', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_phonegap_plugins" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
-					<span class="description"><?php _e( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter &lt;plugin name="org.apache.cordova.inappbrowser" spec="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
+					<span class="description"><?php printf( __( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter %s directly in the textarea.', WpAppKit::i18n_domain ), '&lt;plugin name="org.apache.cordova.inappbrowser" spec="0.3.3" /&gt;' ) ?></span>
 				</div>
 			</fieldset>
 			<div class="field-group wpak_phonegap_links">
