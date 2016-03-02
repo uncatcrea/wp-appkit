@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP AppKit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-23 16:59+0100\n"
+"POT-Creation-Date: 2016-03-02 11:03+0100\n"
 "PO-Revision-Date: 2015-11-07 22:51+0100\n"
 "Last-Translator: Lionel Pointet <lionel.pointet@gmail.com>\n"
 "Language-Team: \n"
@@ -202,9 +202,10 @@ msgid "Icons and Splashscreens"
 msgstr ""
 
 #: ../lib/apps/apps.php:379
+#, php-format
 msgid ""
 "Write the icons and splashscreens tags as defined in the PhoneGap "
-"documentation.<br/>Example: "
+"documentation.<br/>Example: %s"
 msgstr ""
 
 #: ../lib/apps/apps.php:382
@@ -238,11 +239,11 @@ msgid "Plugins"
 msgstr ""
 
 #: ../lib/apps/apps.php:410
+#, php-format
 msgid ""
 "Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/"
 ">Example : to include the \"In App Browser\" plugin for a Phonegap Build "
-"compilation, enter &lt;plugin name=\"org.apache.cordova.inappbrowser\" spec="
-"\"0.3.3\" /&gt; directly in the textarea."
+"compilation, enter %s directly in the textarea."
 msgstr ""
 
 #: ../lib/apps/apps.php:414
@@ -819,7 +820,8 @@ msgid "Visit theme site"
 msgstr ""
 
 #: ../lib/themes/themes-bo-settings.php:71
-msgid "Requires WP-AppKit version"
+#, php-format
+msgid "Requires WP-AppKit version %s"
 msgstr ""
 
 #: ../lib/themes/themes-bo-settings.php:83
@@ -977,7 +979,7 @@ msgstr ""
 msgid "Error : Web service not recognised"
 msgstr ""
 
-#: ../wp-appkit.php:86
+#: ../wp-appkit.php:108
 msgid ""
 "WP AppKit requires WordPress permalinks to be activated: see the <a href="
 "\"http://codex.wordpress.org/"

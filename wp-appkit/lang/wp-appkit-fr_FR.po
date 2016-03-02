@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP AppKit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-23 17:03+0100\n"
-"PO-Revision-Date: 2016-02-23 17:11+0100\n"
+"POT-Creation-Date: 2016-03-02 11:05+0100\n"
+"PO-Revision-Date: 2016-03-02 11:08+0100\n"
 "Last-Translator: UncatCrea <uncategorized.creations@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -227,12 +227,13 @@ msgid "Icons and Splashscreens"
 msgstr "Icônes et splashscreens"
 
 #: ../lib/apps/apps.php:379
+#, php-format
 msgid ""
 "Write the icons and splashscreens tags as defined in the PhoneGap "
-"documentation.<br/>Example: "
+"documentation.<br/>Example: %s"
 msgstr ""
 "Saisir les tags pour les icônes et splashscreens comme indiqué dans la "
-"documentation PhoneGap.<br/>Exemple : "
+"documentation PhoneGap.<br/>Exemple : %s"
 
 #: ../lib/apps/apps.php:382
 msgid "Use default WP-AppKit Icons and Splashscreens"
@@ -268,16 +269,16 @@ msgid "Plugins"
 msgstr "Plugins"
 
 #: ../lib/apps/apps.php:410
+#, php-format
 msgid ""
 "Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/"
 ">Example : to include the \"In App Browser\" plugin for a Phonegap Build "
-"compilation, enter &lt;plugin name=\"org.apache.cordova.inappbrowser\" spec="
-"\"0.3.3\" /&gt; directly in the textarea."
+"compilation, enter %s directly in the textarea."
 msgstr ""
 "Saisir les tags pour les plugins PhoneGap comme indiqué dans la "
 "documentation PhoneGap.<br/>Exemple : pour inclure la compilation du plugin "
-"\"In App Browser\" pour PhoneGap Build, entrer &lt;plugin name=\"org.apache."
-"cordova.inappbrowser\" spec=\"0.3.3\" /&gt; directement dans le champ texte."
+"\"In App Browser\" pour PhoneGap Build, entrer %s directement dans le champ "
+"texte."
 
 # @ wp-appkit
 #: ../lib/apps/apps.php:414
@@ -993,8 +994,9 @@ msgid "Visit theme site"
 msgstr "Visiter le site"
 
 #: ../lib/themes/themes-bo-settings.php:71
-msgid "Requires WP-AppKit version"
-msgstr "Requiert WP-AppKit version"
+#, php-format
+msgid "Requires WP-AppKit version %s"
+msgstr "Nécessite WP-AppKit version %s"
 
 # @ wp-appkit
 #: ../lib/themes/themes-bo-settings.php:83
@@ -1175,7 +1177,7 @@ msgstr "Mauvais jeton de sécurité"
 msgid "Error : Web service not recognised"
 msgstr "Erreur : Service Web non reconnu"
 
-#: ../wp-appkit.php:86
+#: ../wp-appkit.php:108
 msgid ""
 "WP AppKit requires WordPress permalinks to be activated: see the <a href="
 "\"http://codex.wordpress.org/"
@@ -1187,6 +1189,28 @@ msgstr ""
 "Utilisation_des_permaliens#Choisir_votre_structure_de_permaliens\">section "
 "du codex \"Choisir votre structure de permaliens\"</a> pour plus "
 "d'informations sur comment activer les permaliens."
+
+#~ msgid ""
+#~ "Write the icons and splashscreens tags as defined in the PhoneGap "
+#~ "documentation.<br/>Example: "
+#~ msgstr ""
+#~ "Saisir les tags pour les icônes et splashscreens comme indiqué dans la "
+#~ "documentation PhoneGap.<br/>Exemple : "
+
+#~ msgid ""
+#~ "Write the phonegap plugins tags as defined in the PhoneGap documentation."
+#~ "<br/>Example : to include the \"In App Browser\" plugin for a Phonegap "
+#~ "Build compilation, enter &lt;plugin name=\"org.apache.cordova.inappbrowser"
+#~ "\" spec=\"0.3.3\" /&gt; directly in the textarea."
+#~ msgstr ""
+#~ "Saisir les tags pour les plugins PhoneGap comme indiqué dans la "
+#~ "documentation PhoneGap.<br/>Exemple : pour inclure la compilation du "
+#~ "plugin \"In App Browser\" pour PhoneGap Build, entrer &lt;plugin name="
+#~ "\"org.apache.cordova.inappbrowser\" spec=\"0.3.3\" /&gt; directement dans "
+#~ "le champ texte."
+
+#~ msgid "Requires WP-AppKit version"
+#~ msgstr "Requiert WP-AppKit version"
 
 # @ wp-appkit
 #~ msgid ""
