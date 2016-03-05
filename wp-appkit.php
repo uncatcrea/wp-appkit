@@ -2,7 +2,7 @@
 /*
   Plugin Name: WP AppKit
   Description: Build Phonegap Mobile apps based on your WordPress content
-  Version: 0.4.1
+  Version: 0.5
  */
 
 /**
