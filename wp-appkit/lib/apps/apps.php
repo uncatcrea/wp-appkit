@@ -317,6 +317,16 @@ class WpakApps {
 			</div>
 
 			<div id="export-action">
+				
+				<?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+				
+				<?php 
+				/*
+				 * 2016-03-05: Export type select commented for now as we have to stabilize export features other 
+				 * than PhoneGap Build before releasing it.
+				 * Was added in https://github.com/uncatcrea/wp-appkit/commit/ac4af270f8ea6273f4d653878c69fceec85a9dd8 along with
+				 * the corresponding JS in apps.js.
+				 * 
 				<?php $default_export_type = 'phonegap-build'; ?>
 				<select name="export_type" id="wpak_export_type" >
 					<?php foreach( WpakBuild::get_allowed_export_types() as $export_type => $label ): ?>
@@ -324,6 +334,9 @@ class WpakApps {
 					<?php endforeach ?>
 				</select>
 				<a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => $default_export_type ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+				*/ 
+				?>
+				
 			</div>
 		</div>
 
