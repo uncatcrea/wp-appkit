@@ -861,7 +861,7 @@ define( function( require, exports ) {
 				break;
 			case 'page':
 				//For page, just return the current page object:
-				screen_object = screen_data.data.item;
+				screen_object = screen_data.data.post;
 				screen_object.component = TemplateTags.getComponent( screen_data.component_id );
 				break;
 			case 'custom-page':

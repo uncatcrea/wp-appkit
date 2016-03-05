@@ -140,7 +140,7 @@ define(function (require) {
 		        		if( component ){
 
 		        			var item_data = {
-			        			item:item.toJSON(),
+			        			post:item.toJSON(),
 			        			is_tree_page:component.data.is_tree,
 			        			is_tree_root:(page_id == component.data.root_id),
 			        			root_id:component.data.root_id,
@@ -151,7 +151,7 @@ define(function (require) {
 								RegionManager.show(
 									'page',
 									{item:item,global:item_global},
-									{screen_type:'page',component_id:component_id,item_id:parseInt(page_id),global:item_global,data:item_data,label:item_data.item.title}
+									{screen_type:'page',component_id:component_id,item_id:parseInt(page_id),global:item_global,data:item_data,label:item_data.post.title}
 								);
 							}
 

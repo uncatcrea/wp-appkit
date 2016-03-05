@@ -410,7 +410,7 @@ define(function(require, exports) {
 
         var tree_data = '';
 
-        var tree_data_raw = screen_data.data.item && screen_data.data.item.tree_data ? screen_data.data.item.tree_data : [0, [], [], 0, []];
+        var tree_data_raw = screen_data.data.post && screen_data.data.post.tree_data ? screen_data.data.post.tree_data : [0, [], [], 0, []];
 
         var parent = screen_data.data.is_tree_page && !screen_data.data.is_tree_root ? tree_data_raw[0] : 0;
         var siblings = screen_data.data.is_tree_page && !screen_data.data.is_tree_root ? tree_data_raw[1] : [];
