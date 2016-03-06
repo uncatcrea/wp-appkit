@@ -1,19 +1,36 @@
 # WP-AppKit
 Create mobile apps and connect them to WordPress.
+
+## Latest News
+
+### 03/10/2016: Version 0.5
+* Better Theme and Plugin API (19)
+* Minor enhancements to admin panel (6)
+* Better support for icons & splashscreens (3)
+* Bug fixes (8)
+* Evolutions (7)
+
+Please note this version breaks backward compatibilities on minor features.
+
+**Be sure to check the [changelog](https://github.com/uncatcrea/wp-app-kit/blob/master/CHANGELOG.md).**
+
 > Please keep in mind that WP-AppKit is currently in beta. Test it, break it! But be careful if you use it for professional purposes.
 
 > All versions under 1.0 are beta versions
 
-## News
+## Getting Started
+Creating apps with WP-AppKit means creating JavaScript based app themes. (More on that [here](https://github.com/uncatcrea/wp-appkit/blob/master/README.md#app-themes)).
 
-### 09/30/2015: Version 0.4.1
-* Upgrade to support the latest Phonegap Build changes (whitelisting and NPM)
-* Fixes transitions
+To get you started we propose 2 free starter themes (for iOS and Android):
+* [Wpak Off-Canvas](https://github.com/uncatcrea/wpak-off-canvas-themes)
+* [Wpak Tabs](https://github.com/uncatcrea/wpak-tabs-themes)
 
-### 08/03/2015: Version 0.4.
-* This version adds the long awaited **login feature** (meaning that you can now support a WordPress secured authentication in your apps)
-* You can also now use **WP CLI** to export your app's project
-* There's many other changes and fixes, check the [changelog](https://github.com/uncatcrea/wp-app-kit/blob/master/CHANGELOG.md)
+**Make sure to download one of these themes after you installed the plugin and preview the app in the browser.**
+
+![Wpkak Off-Canvas screenshot](https://cloud.githubusercontent.com/assets/6179747/8889585/5846e28e-32e0-11e5-9afa-0b9440fd6a62.png)
+
+## Developer Friendly
+Our plugin is fully documented and we are committed to support developers. Discover the plugin and themes API on [our website](http://uncategorized-creations.com/wp-appkit/doc/). We also publish regularly [tutorials](http://uncategorized-creations.com/tag/tutorials/) to help you build great apps.
 
 ## What Is WP-AppKit?
 It's a WordPress plugin which provides:
@@ -23,6 +40,8 @@ It's a WordPress plugin which provides:
 * Sample themes to trigger your natural inclination to unbridled creativity
 
 WP-AppKit uses the [Cordova](http://cordova.apache.org/) technology for the app. It means that the app is developed with HTML, CSS and JavaScript but still can be distribued in app stores.
+
+More on that [here](http://uncategorized-creations.com/wp-appkit/).
 
 ## The WordPress Admin Panel
 WP-AppKit adds a menu to the WordPress admin.
