@@ -36,8 +36,12 @@ define(function(require, exports) {
         return App.getCurrentScreenData();
     };
 	
+	/**
+	 * Retrieves useful data corresponding to the object that is currently displayed.
+	 * Alias of ThemeApp.getCurrentScreenObject()
+	 */
 	themeTplTags.getCurrentScreenObject = function() {
-		return App.getCurrentScreenObject();
+		return ThemeApp.getCurrentScreenObject();
 	};
 
     /**
