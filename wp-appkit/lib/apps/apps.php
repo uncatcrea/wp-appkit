@@ -29,8 +29,8 @@ class WpakApps {
 			$localize = array(
 				'phonegap_mandatory' => self::get_phonegap_mandatory_fields(),
 				'i18n' => array(
-					'show_help' => esc_js( __( 'Help me', WpAppKit::i18n_domain ) ),
-					'hide_help' => esc_js( __( 'Hide help texts', WpAppKit::i18n_domain ) ),
+					'show_help' => __( 'Help me', WpAppKit::i18n_domain ),
+					'hide_help' => __( 'Hide help texts', WpAppKit::i18n_domain ),
 				),
 			);
 			wp_localize_script( 'wpak_apps_js', 'Apps', $localize );
