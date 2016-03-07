@@ -186,12 +186,13 @@ class WpakThemes {
 	public static function get_theme_data( $theme_folder ) {
 		
 		$file_headers = array(
-			'Name'              => 'Theme Name',
-			'ThemeURI'          => 'Theme URI',
-			'Description'       => 'Description',
-			'Author'            => 'Author',
-			'AuthorURI'         => 'Author URI',
-			'Version'           => 'Version'
+			'Name'                => 'Theme Name',
+			'ThemeURI'            => 'Theme URI',
+			'Description'         => 'Description',
+			'Author'              => 'Author',
+			'AuthorURI'           => 'Author URI',
+			'Version'             => 'Version',
+			'WpakVersionRequired' => 'WP-AppKit Version Required'
 		);
 		
 		$theme_data = array();

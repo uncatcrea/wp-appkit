@@ -181,6 +181,7 @@ class WpakComponentsBoSettings {
 			<input type="hidden" name="component_id" value="<?php echo $component_id ?>"/>
 			<input type="hidden" name="component_post_id" value="<?php echo $post_id ?>" />
 			<p class="submit">
+				<span class="spinner"></span>
 				<a class="button-secondary alignleft cancel" title="<?php _e( 'Cancel', WpAppKit::i18n_domain ) ?>" href="#" <?php echo!$edit ? 'id="cancel-new-component"' : '' ?>><?php _e( 'Cancel', WpAppKit::i18n_domain ) ?></a>&nbsp;
 				<a class="button button-primary component-form-submit" data-id="<?php echo $component_id ?>"><?php echo $edit ? __( 'Save Changes', WpAppKit::i18n_domain ) : 'Save new component' ?></a>
 			</p>

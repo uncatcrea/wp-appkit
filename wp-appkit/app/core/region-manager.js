@@ -149,7 +149,7 @@ define(function (require) {
 	    			&& (!$(elMenu).html().length || (force_reload!=undefined && force_reload) ) ){
 		    		menuView.render();
 		    		vent.trigger('menu:refresh',App.getCurrentScreenData(),menuView);
-		    		Utils.log('Render navigation',{menu_view:menuView,force_reload:force_reload});
+		    		Utils.log('Render menu',{menu_view:menuView,force_reload:force_reload});
 	    		}
 	    	}else{
 	    		if( $(elMenu).html().length ){
@@ -376,7 +376,7 @@ define(function (require) {
 			 * is static or not. A static screen is never refreshed or re-rendered
 			 * by the app core.
 			 */
-			var is_static = Hooks.applyFilters( 'is-static-screen', false, [ queried_screen ] )
+			var is_static = Hooks.applyFilters( 'is-static-screen', false, [ queried_screen ] );
 
 			if ( is_static ) {
 				var screen_view = getScreenStaticView( queried_screen );
@@ -398,7 +398,7 @@ define(function (require) {
 					} );
 				} );
 			}
-		}
+		};
 
 	    region.getCurrentView = function(){
 	    	return currentView;

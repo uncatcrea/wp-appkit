@@ -35,23 +35,44 @@ define(function(require, exports) {
     themeTplTags.getCurrentScreen = function() {
         return App.getCurrentScreenData();
     };
-
+	
 	/**
+	 * Retrieves useful data corresponding to the object that is currently displayed.
+	 * Alias of ThemeApp.getCurrentScreenObject()
+	 */
+	themeTplTags.getCurrentScreenObject = function() {
+		return ThemeApp.getCurrentScreenObject();
+	};
+
+    /**
      * Retrieves previous screen infos :
      * @return JSON object containing :
      * - screen_type : list, single, comments, page
      * - fragment : unique screen url id (what's after # in url)
      * - component_id : component slug id, if displaying a component screen (list, page)
      * - item_id : current item id, if displaying single content (post,page)
-	 * - label : current item label (title of component, title of post)
+     * - label : current item label (title of component, title of post)
      * - data : contains more specific data depending on which screen type is displayed
-     * 	> total : total number of posts for lists
-     * 	> query : query vars used to retrieve contents (taxonomy, terms...)
-     * 	> ids : id of posts displayed in lists
-     * 	> any other specific data depending on currently displayed component
+     *  > total : total number of posts for lists
+     *  > query : query vars used to retrieve contents (taxonomy, terms...)
+     *  > ids : id of posts displayed in lists
+     *  > any other specific data depending on currently displayed component
      */
     themeTplTags.getPreviousScreen = function() {
         return App.getPreviousScreenData();
+    };
+
+	/**
+     * Check if the given or current screen is the default one
+     *
+     * @param   Object  screen_data     An object describing the screen we want to test, if not given, the current screen will be tested
+     *
+     * @return  bool            Whether the screen is the default one or not
+     */
+    themeTplTags.isDefaultScreen = function( screen_data ) {
+        var fragment = "undefined" != typeof screen_data && screen_data.hasOwnProperty( 'fragment' ) ? screen_data.fragment : Backbone.history.fragment;
+
+        return App.router.getDefaultRoute() == '#' + fragment;
     };
 
 	/**
@@ -79,6 +100,16 @@ define(function(require, exports) {
         return single_global != '' ? '#single/' + single_global + '/' + post_id : '';
     };
 
+	/**
+	 * Retrieves url fragment for a comments screen.
+	 * NOTE : It is better to use ThemeApp.displayPostComments() than to use this
+	 * function, as ThemeApp.displayPostComments() allows to handle success and error callback.
+	 * Using TplTags.getCommentsLink() directly, you won't be able to handle errors on
+	 * comments screens display.
+	 * 
+	 * @param {int} post_id Post id to retrieve comments for
+	 * @returns {String} Comment's screen fragment
+	 */
     themeTplTags.getCommentsLink = function(post_id) {
         //TODO Check if the post exists in the posts global
         return '#comments-' + post_id;
@@ -201,17 +232,34 @@ define(function(require, exports) {
 	themeTplTags.getComponent = function(component_id) {
         return App.getComponentData(component_id);
     };
+	
+	themeTplTags.componentExists = function(component_id) {
+        return App.componentExists(component_id);
+    };
+	
+	themeTplTags.getComponentLink = function( component_id ) {
+		var component_link = '';
+		if ( App.componentExists( component_id ) ) {
+			component_link = '#component-'+ component_id;
+		}
+        return component_link;
+    };
 
 	themeTplTags.getComponentItems = function( component_id, return_format ) {
 		return_format = return_format === undefined ? 'view_items' : return_format;
 		var items = [];
 		var component = themeTplTags.getComponent( component_id );
 		if ( component ) {
-			if ( return_format === 'view_items' ) {
+			if ( return_format === 'view_items' || return_format === 'json' ) {
+				
 				if ( component.view_data.hasOwnProperty( 'posts' ) ) {
 					items = component.view_data.posts;
 				} else if ( component.view_data.hasOwnProperty( 'items' ) ) {
 					items = component.view_data.items;
+				}
+				
+				if ( return_format === 'json' ) {
+					items = items.map( function( model ){ return model.toJSON(); } );
 				}
 			}
 		}
@@ -302,6 +350,15 @@ define(function(require, exports) {
 
 		return menu_items;
 	};
+	
+	themeTplTags.isComponentInMenu = function( component_id ) {
+		var component_in_menu = false;
+		var menu_view = RegionManager.getMenuView();
+		if ( menu_view ) {
+			component_in_menu = menu_view.menu.get( component_id ) !== undefined;
+		}
+		return component_in_menu;
+	};
 
 	/**********************************************
 	 * Addons
@@ -337,16 +394,12 @@ define(function(require, exports) {
 
 	/**
 	 * Check if displaying a page that has a subtree
-	 * @param int page_id : Optional
 	 * @param object screen : Optional : use only if you want data from a different screen than the current one
 	 * @returns boolean
 	 */
-    themeTplTags.isTreePage = function(page_id, screen) {
+    themeTplTags.isTreePage = function(screen) {
         var screen_data = screen !== undefined ? screen : App.getCurrentScreenData();
         var is_tree_page = screen_data.screen_type == 'page' && screen_data.data.is_tree_page;
-        if (is_tree_page && page_id != undefined) {
-            is_tree_page = parseInt(page_id) == screen_data.item_id;
-        }
         return is_tree_page == true;
     };
 
@@ -361,7 +414,7 @@ define(function(require, exports) {
 
         var tree_data = '';
 
-        var tree_data_raw = screen_data.data.item && screen_data.data.item.tree_data ? screen_data.data.item.tree_data : [0, [], [], 0, []];
+        var tree_data_raw = screen_data.data.post && screen_data.data.post.tree_data ? screen_data.data.post.tree_data : [0, [], [], 0, []];
 
         var parent = screen_data.data.is_tree_page && !screen_data.data.is_tree_root ? tree_data_raw[0] : 0;
         var siblings = screen_data.data.is_tree_page && !screen_data.data.is_tree_root ? tree_data_raw[1] : [];
@@ -490,7 +543,7 @@ define(function(require, exports) {
     themeTplTags.getPageChildren = function(screen) {
         var children = [];
 
-        if (themeTplTags.isTreePage()) {
+        if (themeTplTags.isTreePage(screen)) {
             var children_ids = getPageTreeData('children', screen);
             if (children_ids.length) {
                 children = App.getGlobalItems('pages', children_ids);

@@ -71,15 +71,15 @@ define( function( require, exports ) {
 		/**
 		 * "stop-theme-event" filter : use this filter to avoid an event from triggering in the theme.
 		 * Useful to deactivate some error events display for exemple.
-		 * 
+		 *
 		 * @param {boolean} Whether to stop the event or not. Default false.
 		 * @param {JSON Object} theme_event_data : Theme event data object
 		 * @param {String} event : Original (internal) event name
 		 */
 		var stop_theme_event = Hooks.applyFilters( 'stop-theme-event', false, [theme_event_data, event] );
-		
+
 		if ( !stop_theme_event ) {
-			
+
 			if ( theme_event_data.type == 'error'
 				 || theme_event_data.type == 'info'
 				 || theme_event_data.type == 'network'
@@ -88,7 +88,7 @@ define( function( require, exports ) {
 				vent.trigger( event, theme_event_data ); //Ex: bind directly to 'info:no-content'
 				vent.trigger( theme_event_data.type, theme_event_data ); //Ex: bind to general 'info', then filter with if( info.event == 'no-content' )
 			}
-			
+
 		}
 
 	} );
@@ -111,13 +111,13 @@ define( function( require, exports ) {
 	 * }
 	 */
 	var format_theme_event_data = function( event, data ) {
-		
-		var theme_event_data = { 
-			event: event, 
+
+		var theme_event_data = {
+			event: event,
 			type: '',
 			subtype: data !== undefined && data.hasOwnProperty( 'type' ) ? data.type : '',
-			message: '', 
-			data: data 
+			message: '',
+			core_data: data
 		};
 
 		if ( event.indexOf( 'error:' ) === 0 ) {
@@ -153,16 +153,16 @@ define( function( require, exports ) {
 			}
 
 		}
-		
+
 		/**
 		 * "theme-event-message" filter : use this hook to customize event messages
-		 * 
+		 *
 		 * @param {String} Event message to customize
 		 * @param {JSON Object} theme_event_data : Theme event data object
 		 * @param {String} event : Original (internal) event name
 		 */
 		theme_event_data.message = Hooks.applyFilters( 'theme-event-message', theme_event_data.message, [theme_event_data, event] );
-		
+
 		return theme_event_data;
 	};
 
@@ -302,6 +302,18 @@ define( function( require, exports ) {
 		App.router.default_route();
 	};
 
+	themeApp.navigateToPreviousScreen = function() {
+		var prev_screen_link = App.getPreviousScreenLink();
+
+		vent.trigger( 'navigate:previous-screen', {
+			previous_screen: App.getPreviousScreenData(),
+			current_screen: App.getCurrentScreenData(),
+			previous_screen_link: prev_screen_link
+		});
+
+		themeApp.navigate( prev_screen_link );
+	};
+
 	/**
 	 * Reload current screen : re-trigger current route.
 	 */
@@ -328,30 +340,6 @@ define( function( require, exports ) {
 	 */
 
 	/**
-	 * Automatically shows and hide Back button according to current screen (list, single, page, comments, etc...)
-	 * Use only if back button is not refreshed at each screen load! (otherwhise $go_back_btn will not be set correctly).
-	 * @param $go_back_btn Back button jQuery DOM element
-	 */
-	themeApp.setAutoBackButton = function( $go_back_btn, do_before_auto_action ) {
-		RegionManager.on( 'screen:showed', function( current_screen, view ) {
-			var display = themeApp.getBackButtonDisplay();
-			if ( display == 'show' ) {
-				if ( do_before_auto_action != undefined ) {
-					do_before_auto_action( true );
-				}
-				$go_back_btn.show();
-				themeApp.updateBackButtonEvents( $go_back_btn );
-			} else if ( display == 'hide' ) {
-				if ( do_before_auto_action != undefined ) {
-					do_before_auto_action( false );
-				}
-				themeApp.updateBackButtonEvents( $go_back_btn );
-				$go_back_btn.hide();
-			}
-		} );
-	};
-
-	/**
 	 * To know if the back button can be displayed on the current screen,
 	 * according to app history. Use this to configure back button
 	 * manually if you don't use themeApp.setAutoBackButton().
@@ -368,26 +356,6 @@ define( function( require, exports ) {
 		}
 
 		return display;
-	};
-
-	/**
-	 * Sets back buton click event. Use this to configure back button
-	 * manually if you don't use themeApp.setAutoBackButton().
-	 * @param $go_back_btn Back button jQuery DOM element
-	 */
-	themeApp.updateBackButtonEvents = function( $go_back_btn ) {
-		if ( $go_back_btn.length ) {
-			var display = themeApp.getBackButtonDisplay();
-			if ( display == 'show' ) {
-				$go_back_btn.unbind( 'click' ).click( function( e ) {
-					e.preventDefault();
-					var prev_screen_link = App.getPreviousScreenLink();
-					themeApp.navigate( prev_screen_link );
-				} );
-			} else if ( display == 'hide' ) {
-				$go_back_btn.unbind( 'click' );
-			}
-		}
 	};
 
 	/************************************************
@@ -416,21 +384,73 @@ define( function( require, exports ) {
 		return get_more_link_data;
 	};
 
-	themeApp.getMoreComponentItems = function( do_after ) {
+	themeApp.getMoreComponentItems = function( cb_after, cb_error ) {
 		var current_screen = App.getCurrentScreenData();
-		if ( current_screen.screen_type == 'list' ) {
+		if ( current_screen.screen_type === 'list' ) {
 			App.getMoreOfComponent(
 					current_screen.component_id,
-					function( new_items, is_last, data ) {
+					function( data ) {
 						var current_archive_view = RegionManager.getCurrentView();
-						current_archive_view.addPosts( new_items );
+						current_archive_view.addPosts( data.new_items );
 						current_archive_view.render();
-						do_after( is_last, new_items, data.nb_left );
+						cb_after( data.is_last, data.new_items, data.nb_left );
+					},
+					function( error ) {
+						var get_more_link_data = themeApp.getGetMoreLinkDisplay();
+						cb_error( format_theme_event_data( error.event, error ), get_more_link_data );
 					}
 			);
 		} else {
-			Hooks.doActions( 'get-more-component-items', [ current_screen, do_after ] );
+			Hooks.doActions( 'get-more-component-items', [ current_screen, cb_after, cb_error ] );
 		}
+	};
+
+	/************************************************
+	 * Comments
+	 */
+
+	/**
+	 * Displays the comments screen for a given post.
+	 * Retrieves the post comments from server or from memory if already cached,
+	 * then navigate to #comments-[post_id].
+	 * Using this function allows to use success and error callbacks (cb_ok/cb_error),
+	 * which you can't do if you navigate directly to #comments-[post_id] in your theme.
+	 *
+	 * Note that the cb_ok() callback is called after comments are retrieved, but can't
+	 * be called after the comments view is rendered (as view rendering is done in router).
+	 * If you need to do something after the comments screen is showed, you can use
+	 * the 'screen:showed' event where you'll test if ( current_screen.screen_type === 'comments' ) ).
+	 *
+	 * @param {int} post_id         Post we want to retrieve the comments for.
+	 * @param {function} cb_ok      What to do if coments are retrieved ok
+	 * @param {function} cb_error   What to do if an error occurs while retrieving comments
+	 */
+	themeApp.displayPostComments = function ( post_id, cb_ok, cb_error ) {
+
+		App.getPostComments(
+			post_id,
+			function ( comments, post, item_global ) {
+				cb_ok( comments.toJSON(), post.toJSON(), item_global );
+				themeApp.navigate( '#comments-'+ post_id );
+			},
+			function ( error ) {
+				cb_error( format_theme_event_data( error.event, error ) );
+			}
+		);
+
+	};
+
+	/************************************************
+	 * Components
+	 */
+
+	/**
+	 * Retrieve all app's components
+	 *
+	 * @returns {Array} Array of compoents as JSON objects
+	 */
+	themeApp.getComponents = function() {
+		return App.getComponents();
 	};
 
 	/************************************************
@@ -594,41 +614,41 @@ define( function( require, exports ) {
 	 */
 
 	/**
-	 * Returns the transition direction ("right", "left", "replace" or customized) according
+	 * Returns the transition direction ("next-screen", "previous-screen", "default" or customized) according
 	 * to current and previous screen.
-	 * 
+	 *
 	 * @param {Object} current_screen : The screen that is (going to be) displayed after transition
 	 * @param {Object} previous_screen : The screen we're leaving.
-	 * @returns {String} Transition direction (default 'replace', 'right' and 'left' but 
+	 * @returns {String} Transition direction (default 'default', 'next-screen' and 'previous-screen' but
 	 * can be customized with the "transition-direction" filter).
 	 */
 	themeApp.getTransitionDirection = function( current_screen, previous_screen ) {
-		var transition = 'replace';
+		var transition = 'default';
 
 		if ( current_screen.screen_type == 'list' || current_screen.screen_type == 'custom-component' ) {
 			if ( previous_screen.screen_type == 'single' ) {
-				transition = 'right';
+				transition = 'previous-screen';
 			} else {
-				transition = 'replace';
+				transition = 'default';
 			}
 		} else if ( current_screen.screen_type == 'single' ) {
 			if ( previous_screen.screen_type == 'list' || previous_screen.screen_type == 'custom-component' ) {
-				transition = 'left';
+				transition = 'next-screen';
 			} else if ( previous_screen.screen_type == 'comments' ) {
-				transition = 'right';
+				transition = 'previous-screen';
 			} else {
-				transition = 'replace';
+				transition = 'default';
 			}
 		} else if ( current_screen.screen_type == 'comments' ) {
-			transition = 'left';
+			transition = 'next-screen';
 		} else {
-			transition = 'replace';
+			transition = 'default';
 		}
-		
+
 		/**
 		 * "transition-direction" filter : use this filter to customize transitions
 		 * directions according to what are current (ie asked) and previous screen.
-		 * 
+		 *
 		 * @param {string} Transition direction to override if needed.
 		 * @param {Object} current_screen : The screen that is (going to be) displayed after transition.
 		 * @param {Object} previous_screen : The screen we're leaving.
@@ -639,13 +659,17 @@ define( function( require, exports ) {
 	};
 
 	/**
-	 * This allows to define your own left/right/replace transitions between screens.
-	 * 
-	 * @param {callback} transition_replace
-	 * @param {callback} transition_left
-	 * @param {callback} transition_right
+	 * This allows to define your own previous-screen/next-screen/default transitions between screens.
+	 * If you need more transition types than just previous/next/default (like single-to-comment, comment-to-single etc),
+	 * do the following (in functions.js) :
+	 * - App.setParam( 'custom-screen-rendering', true );
+	 * - use the 'screen-transition' action hook to define your own transitions.
+	 *
+	 * @param {callback} transition_default
+	 * @param {callback} transition_previous_screen
+	 * @param {callback} transition_next_screen
 	 */
-	themeApp.setAutoScreenTransitions = function( transition_replace, transition_left, transition_right ) {
+	themeApp.setAutoScreenTransitions = function( transition_default, transition_previous_screen, transition_next_screen ) {
 
 		//Set custom-screen-rendering param to true so that screen rendering
 		//uses the 'screen-transition' action to render :
@@ -656,17 +680,17 @@ define( function( require, exports ) {
 			var direction = themeApp.getTransitionDirection( current_screen, previous_screen );
 
 			switch ( direction ) {
-				case 'left':
-					transition_left( $wrapper, $current, $next, $deferred );
+				case 'previous-screen':
+					transition_previous_screen( $wrapper, $current, $next, $deferred );
 					break;
-				case 'right':
-					transition_right( $wrapper, $current, $next, $deferred );
+				case 'next-screen':
+					transition_next_screen( $wrapper, $current, $next, $deferred );
 					break;
-				case 'replace':
-					transition_replace( $wrapper, $current, $next, $deferred );
+				case 'default':
+					transition_default( $wrapper, $current, $next, $deferred );
 					break;
 				default:
-					transition_replace( $wrapper, $current, $next, $deferred );
+					transition_default( $wrapper, $current, $next, $deferred );
 					break;
 			}
 			;
@@ -728,12 +752,19 @@ define( function( require, exports ) {
 	 * Retrieve internal app data that can be useful in themes
 	 */
 
-	themeApp.getGlobalItems = function( global_key, items_ids, result_type ) {
+	/**
+	 * Retrieves a list of items (posts for example) from local storage
+	 *
+	 * @param {array} items_ids IDs of the items to retrieve
+	 * @param {string} global_key (Optional) global to retrieve the items from: 'posts' (default) or 'pages'.
+	 * @param {string} result_type 'slice' to retrieve a Backbone Collection (default), 'array' to retrieve an array.
+	 * @returns {Backbone Collection | Array | null} items list
+	 */
+	themeApp.getItems = function( items_ids, global_key, result_type ) {
 		var items = null;
 
-		if( result_type === undefined ) {
-			result_type = 'slice';
-		}
+		global_key = global_key || 'posts';
+		result_type = result_type || 'slice';
 
 		switch( result_type ) {
 			case 'slice' :
@@ -746,6 +777,120 @@ define( function( require, exports ) {
 
 		return items;
 	};
+
+	/**
+	 * Retrieves an item (post for example) from local storage
+	 *
+	 * @param {int} item_id Post ID of the post to retrieve
+	 * @param {string} global_key (Optional) global to retrieve the item from: 'posts' (default) or 'pages'.
+	 * @returns {JSON Object} item (post or page) object
+	 */
+	themeApp.getItem = function( item_id, global_key ) {
+
+		global_key = global_key || 'posts';
+
+		return App.getGlobalItem( global_key, item_id );
+	};
+
+	/**
+     * Retrieves current screen infos
+	 *
+	 * (Alias of theme-tpl-tags::getCurrentScreen(): because getting current
+	 * screen is needed very often, we need it both sides)
+	 *
+     * @return JSON object containing :
+     * - screen_type : list, single, comments, page
+     * - fragment : unique screen url id (what's after # in url)
+     * - component_id : component slug id, if displaying a component screen (list, page)
+     * - item_id : current item id, if displaying single content (post,page)
+	 * - label : current item label (title of component, title of post)
+     * - data : contains more specific data depending on which screen type is displayed
+     * 	> total : total number of posts for lists
+     * 	> query : query vars used to retrieve contents (taxonomy, terms...)
+     * 	> ids : id of posts displayed in lists
+     * 	> any other specific data depending on currently displayed component
+     */
+    themeApp.getCurrentScreen = function() {
+        return App.getCurrentScreenData();
+    };
+
+	/**
+	 * Retrieves useful data corresponding to the object that is currently displayed.
+	 * The returned set of data is a custom selection of data that can be found in
+	 * "Screen data" (ThemeApp.getCurrentScreen()) and "View data" (RegionManager.getCurrentView()).
+	 *
+	 * @returns JSON Object depending on current screen:
+	 * - for lists:             object containing: title (list title), posts (list of posts), ids (=post ids), total, component_id, query
+	 * - for single:            post object: id, post_type, date, title, content, excerpt, thumbnail, author, nb_comments, slug, permalink
+	 * - for comments:          object containing: post (post we retrieve the comments for) and comments (list of comments for this post)
+	 * - for pages:             page object: id, post_type, date, title, content, excerpt, thumbnail, author, nb_comments, slug, permalink, tree_data, component (page's component object)
+	 * - for custom pages:      object containing: id, route, title (if custom page data contains a 'title' property), data (custom page data), template.
+	 * - for custom components: object containing: component_id, title, route, data, template
+	 * - for all:               field 'screen_type': can be: 'list', 'single', 'comments', 'page', 'custom-page', 'custom-component'
+	 */
+	themeApp.getCurrentScreenObject = function() {
+		var screen_object = {};
+
+		var screen_data = App.getCurrentScreenData();
+		var current_view = RegionManager.getCurrentView();
+
+		switch( screen_data.screen_type ) {
+			case 'list':
+				//For lists, build a custom screen object from screen data and current view data:
+				screen_object = {
+					title: screen_data.label,
+					component_id: screen_data.component_id,
+					posts: current_view.posts.toJSON()
+				};
+				_.extend( screen_object, screen_data.data ); //Adds ids, query, total
+				break;
+			case 'single':
+				//For single, just return the current post object:
+				if ( screen_data.data.post ) {
+					screen_object = screen_data.data.post;
+				} else if ( screen_data.data.item ) {
+					screen_object = screen_data.data.item;
+				}
+				break;
+			case 'comments':
+				//For comments, build a custom screen object from screen data and current view data:
+				screen_object = {
+					post: current_view.post.toJSON(),
+					comments: current_view.comments.toJSON()
+				};
+				break;
+			case 'page':
+				//For page, just return the current page object:
+				screen_object = screen_data.data.post;
+				screen_object.component = TemplateTags.getComponent( screen_data.component_id );
+				break;
+			case 'custom-page':
+				//For custom pages, return page id, page route, page custom data, and page template:
+				//(id and route are the same thing, because a custom page is identified by its route)
+				screen_object = {
+					id: screen_data.item_id,
+					route: screen_data.item_id,
+					title: current_view.custom_page_data.hasOwnProperty( 'title' ) ? current_view.custom_page_data.title : '',
+					data: current_view.custom_page_data,
+					template: current_view.template_name
+				};
+				break;
+			case 'custom-component':
+				//For custom components, return component_id, title, route, data, template:
+				screen_object = {
+					component_id: screen_data.component_id,
+					title: screen_data.label,
+					route: screen_data.fragment,
+					data: screen_data.data,
+					template: current_view.template_name
+				};
+				break;
+		};
+
+		screen_object.screen_type = screen_data.screen_type;
+
+        return screen_object;
+    };
 
 	//Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
 	//a circular dependency for requirejs) can both be required at the same time

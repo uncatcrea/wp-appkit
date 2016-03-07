@@ -1,3 +1,67 @@
+## 0.5 (2016-03-07)
+
+### Better Theme and Plugin API
+- **Allow adding custom meta data to post list components** (allows passing WP4.4 terms meta) ([#150](https://github.com/uncatcrea/wp-appkit/issues/150), [@mleroi](https://github.com/mleroi))
+- **Allow platform detection from app** ([#146](https://github.com/uncatcrea/wp-appkit/issues/146), [@mleroi](https://github.com/mleroi))
+- **Check If We're In Default Screen** ([#16](https://github.com/uncatcrea/wp-appkit/issues/16), [@lpointet](https://github.com/lpointet))
+- **Preload templates at app launch** ([#149](https://github.com/uncatcrea/wp-appkit/issues/149), [@mleroi](https://github.com/mleroi))
+- **Allow to retrieve components and component links from theme** ([#157](https://github.com/uncatcrea/wp-appkit/issues/157), [@mleroi](https://github.com/mleroi))
+- **Add timezone offset to config.js** ([#158](https://github.com/uncatcrea/wp-appkit/issues/158), [@mleroi](https://github.com/mleroi))
+- **Add the minimum required WP-AppKit version to theme's readme header** ([#159](https://github.com/uncatcrea/wp-appkit/issues/159), [@mleroi](https://github.com/mleroi))
+- **Add a Theme API function that retrieves the current screen object in a standardized format** ([#153](https://github.com/uncatcrea/wp-appkit/issues/153), [@mleroi](https://github.com/mleroi))
+- **Better comments screen display error management** ([#156](https://github.com/uncatcrea/wp-appkit/issues/156), [@mleroi](https://github.com/mleroi))
+- **Add post slug and permalink to default web service data** ([#162](https://github.com/uncatcrea/wp-appkit/issues/162), [@mleroi](https://github.com/mleroi))
+- **Post data into comment:posted info event** ([#163](https://github.com/uncatcrea/wp-appkit/issues/163), [@mleroi](https://github.com/mleroi))
+- **Create a ThemeApp.navigateToPreviousScreen() function** ([#168](https://github.com/uncatcrea/wp-appkit/issues/168), [@lpointet](https://github.com/lpointet))
+- **Add error callback to ThemeApp.getMoreComponentItems()** ([#154](https://github.com/uncatcrea/wp-appkit/issues/154), [@mleroi](https://github.com/mleroi))
+- **Trigger a "component:get-more" info event in App.getMoreOfComponent()** ([#169](https://github.com/uncatcrea/wp-appkit/issues/169), [@lpointet](https://github.com/lpointet))
+- **Create a ThemeApp.getGlobalItem() method that allows to retrieve a specific item from local storage** ([#139](https://github.com/uncatcrea/wp-appkit/issues/139), [@mleroi](https://github.com/mleroi))
+- **"Post list" component : add a hook to allow filtering the available post types** ([#141](https://github.com/uncatcrea/wp-appkit/issues/141), [@mleroi](https://github.com/mleroi))
+- **Rename default transitions in App.getTransitionDirection()** ([#155](https://github.com/uncatcrea/wp-appkit/issues/155), [@mleroi](https://github.com/mleroi))
+- **Replace "data" property by "core_data" in format_theme_event_data()** ([#164](https://github.com/uncatcrea/wp-appkit/issues/164), [@mleroi](https://github.com/mleroi))
+- **Page screens : rename "item" to "post" in current_screen.data** ([#177](https://github.com/uncatcrea/wp-appkit/issues/177), [@mleroi](https://github.com/mleroi))
+
+### UI
+- **Platform column on application list** ([#142](https://github.com/uncatcrea/wp-appkit/issues/142), [@mleroi](https://github.com/mleroi))
+- **Add spinner to Save new component button** ([#97](https://github.com/uncatcrea/wp-appkit/issues/97), [@lpointet](https://github.com/lpointet))
+- **Add spinner to Add component to navigation button** ([#98](https://github.com/uncatcrea/wp-appkit/issues/98), [@lpointet](https://github.com/lpointet))
+- **Translations and cosmetics** ([#126](https://github.com/uncatcrea/wp-appkit/issues/126) to [#136](https://github.com/uncatcrea/wp-appkit/issues/136), [@lpointet](https://github.com/lpointet))
+- **Platform specific fields, be able to show/hide some metaboxes or fields depending on the selected platform** ([#58](https://github.com/uncatcrea/wp-appkit/issues/58), [@lpointet](https://github.com/lpointet))
+- **Hide menu icons management** ([#165](https://github.com/uncatcrea/wp-appkit/issues/165), [@mleroi](https://github.com/mleroi))
+
+### Icons & Splashscreens
+- **Embed WP-AppKit icons and splashscreens by default** ([#147](https://github.com/uncatcrea/wp-appkit/issues/147), [@mleroi](https://github.com/mleroi))
+- **Better support for splashscreens** ([#107](https://github.com/uncatcrea/wp-appkit/issues/107), [@mleroi](https://github.com/mleroi))
+- **Splashscreen fading delay to 300ms** ([#160](https://github.com/uncatcrea/wp-appkit/issues/160), [@mleroi](https://github.com/mleroi))
+
+### Bugfixes:
+- **Error navigating to a comments screen from a page screen** ([#117](https://github.com/uncatcrea/wp-appkit/issues/117), [@mleroi](https://github.com/mleroi))
+- **Fix Default to single for page appears to be broken** ([#18](https://github.com/uncatcrea/wp-appkit/issues/18), [@mleroi](https://github.com/mleroi))
+- **Default embedded Android splashscreen raises error in Phonegap Build** ([#173](https://github.com/uncatcrea/wp-appkit/issues/173), [@lpointet](https://github.com/lpointet)) 
+- **Fix 404 error for "Upload Theme" link** ([PR#151](https://github.com/uncatcrea/wp-appkit/pull/151), [@petitphp](https://github.com/petitphp)) 
+- **Fix Handle the case where the app has no component more gracefully** ([#116](https://github.com/uncatcrea/wp-appkit/issues/116), [@mleroi](https://github.com/mleroi))
+- **Fix Problem with read-more on singular post. Thanks Willy! :)** ([#106](https://github.com/uncatcrea/wp-appkit/issues/106), [@mleroi](https://github.com/mleroi))
+- **Translation : include texts** ([#175](https://github.com/uncatcrea/wp-appkit/issues/175), [@lpointet](https://github.com/lpointet)) 
+- **TemplateTags.isTreePage() called with wrong arguments** ([#176](https://github.com/uncatcrea/wp-appkit/issues/176), [@mleroi](https://github.com/mleroi))
+
+### Evolutions:
+- **Allow Web service authentication (Add an action hook that fires just before web services dispatch)** ([#145](https://github.com/uncatcrea/wp-appkit/issues/145), [@mleroi](https://github.com/mleroi))
+- **Finish testing iOS9 compatibility by making https tests** ([#110](https://github.com/uncatcrea/wp-appkit/issues/110), [@mleroi](https://github.com/mleroi))
+- **Add WP Network specific htaccess rules automatically at WP-AppKit installation** ([#167](https://github.com/uncatcrea/wp-appkit/issues/167), [@mleroi](https://github.com/mleroi))
+- **Config.xml plugin declarations** ([#172](https://github.com/uncatcrea/wp-appkit/issues/172), [@lpointet](https://github.com/lpointet)) 
+- **Activate whitelist plugin by default for iOS builds with Phonegap CLI** ([#113](https://github.com/uncatcrea/wp-appkit/issues/113), [@mleroi](https://github.com/mleroi))
+- **Allow all HTML tags in post content by default** ([#140](https://github.com/uncatcrea/wp-appkit/issues/140), [@mleroi](https://github.com/mleroi))
+- **Allow to git checkout directly the root of wp-appkit repository** ([#179](https://github.com/uncatcrea/wp-appkit/issues/179), [@mleroi](https://github.com/mleroi))
+
+### Backward compatibility note
+- [#139](https://github.com/uncatcrea/wp-appkit/issues/139) **ThemeApp.getGlobalItems() renamed ThemeApp.getItems()**
+- [#155](https://github.com/uncatcrea/wp-appkit/issues/155) **Screen transitions renamed: left > next-screen, right > previous-screen, replace > default**
+- [#164](https://github.com/uncatcrea/wp-appkit/issues/164) **Error and info events: event.data renamed event.core_data**
+- [#168](https://github.com/uncatcrea/wp-appkit/issues/168) **Removed ThemeApp.setAutoBackButton() and ThemeApp.updateBackButtonEvents()**
+- [#172](https://github.com/uncatcrea/wp-appkit/issues/172) **Config.xml: ```<gap:plugin>``` replaced by ```<plugin>``` + 'version' attribute replaced by 'spec'**
+- [#176](https://github.com/uncatcrea/wp-appkit/issues/176) **TemplateTags.isTreePage( page_id, screen ) replaced by TemplateTags.isTreePage( screen )**
+- [#177](https://github.com/uncatcrea/wp-appkit/issues/177) **current_screen.data.item replaced by current_screen.data.post for page screens**
+
 ## 0.4.1 (2015-09-30)
 
 ### Bugfixes:

@@ -48,7 +48,12 @@ jQuery().ready(function(){
         wizard_phonegap = $( '#wpak_app_wizard_phonegap' ),
         wizard_save = $( '#wpak_app_wizard_save' ),
         title = $( '#title' ),
-        app_title = $( '#wpak_app_title' );
+        app_title = $( '#wpak_app_title' ),
+        platform_select = $( '#wpak_app_platform' ),
+		export_select = $( '#wpak_export_type' ),
+		export_link = $( '#wpak_export_link' ),
+		app_icons = $( '#wpak_app_icons' ),
+		use_default_icons_checkbox = $( '#wpak_use_default_icons_and_splash' );
 
     var wizard_components_observer = {
         update: function() {
@@ -115,4 +120,36 @@ jQuery().ready(function(){
         }
     });
 
+    platform_select.on( 'change', function( e ) {
+        $( '.platform-specific' ).hide();
+        $( '.platform-specific.' + platform_select.val() ).show();
+    }).change();
+	
+	export_select.on( 'change', function() {
+		export_link.attr( 'href', export_link.attr( 'href' ).replace( /&export_type=[a-z\-_]+/, '&export_type='+ $( this ).val() ) );
+	} );
+
+	/**
+	 * Handle Icons and Splashscreens textarea and checkbox logig:
+	 */
+	var icons_memory = '';
+	app_icons.on( 'keyup', function() {
+		if ( $( this ).val().length ) {
+			use_default_icons_checkbox.removeAttr( 'checked' );	
+		} else {
+			use_default_icons_checkbox.attr( 'checked', 'checked' );	
+		}
+		icons_memory = '';
+	} );
+	
+	use_default_icons_checkbox.on( 'change', function() {
+		if ( $( this ).attr( 'checked' ) === 'checked' ) {
+			icons_memory = app_icons.val();
+			app_icons.val( '' );
+		} else {
+			app_icons.val( icons_memory );
+			icons_memory = '';
+		}
+	} );
+	
 });

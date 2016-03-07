@@ -14,6 +14,9 @@ class WpakComponentTypePostsList extends WpakComponentType {
 				$before_post_date = $before_post->post_date;
 			}
 		}
+		
+		//WP_Query args
+		$query_args = array();
 
 		if( $options['post-type'] == 'custom' ) {
 
@@ -37,9 +40,9 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			 *
 			 * @param array 			$posts_list_data    	An array of default data.
 			 * @param WpakComponent 	$component 				The component object.
-			 * @param array 			$options 				An array of options.
-			 * @param array 			$args 					An array of complementary arguments.
-			 * @param array 			$before_post_date 		The publication of the last displayed post.
+			 * @param array 			$options 				Options set in BO for the component.
+			 * @param array 			$args 					Args that can be passed via webservice's url $_GET parameters.
+			 * @param array 			$before_post_date 		The publication date of the last displayed post.
 			 */
 			$posts_list_data = apply_filters( 'wpak_posts_list_custom-' . $options['hook'], $posts_list_data, $component, $options, $args, $before_post_date );
 
@@ -62,8 +65,8 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			 *
 			 * @param int 			    					Default number of posts.
 			 * @param WpakComponent 	$component 			The component object.
-			 * @param array 			$options 			An array of options.
-			 * @param array 			$args 				An array of complementary arguments.
+			 * @param array 			$options 			Options set in BO for the component.
+			 * @param array 			$args 				Args that can be passed via webservice's url $_GET parameters.
 			 */
 			$query_args['posts_per_page'] = apply_filters('wpak_posts_list_posts_per_page', WpakSettings::get_setting( 'posts_per_page' ), $component, $options, $args );
 
@@ -112,11 +115,11 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			/**
 			 * Filter args used for the query made into a posts list component.
 			 *
-			 * @param array 			$query_args    		An array of default args.
+			 * @param array 			$query_args    		WP_Query query args to filter
 			 * @param WpakComponent 	$component 			The component object.
-			 * @param array 			$options 			An array of options.
-			 * @param array 			$args 				An array of complementary arguments.
-			 * @param array 			$query 				Data about the query to retrieve on the app side.
+			 * @param array 			$options 			Options set in BO for the component.
+			 * @param array 			$args 				Args that can be passed via webservice's url $_GET parameters.
+			 * @param array 			$query 				Summary data about the "post list" query. To be retrieved on app side.
 			 */
 			$query_args = apply_filters( 'wpak_posts_list_query_args', $query_args, $component, $options, $args, $query );
 
@@ -135,10 +138,31 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		foreach ( $posts as $post ) {
 			$posts_by_ids[$post->ID] = self::get_post_data( $component, $post );
 		}
+		
+		//Allow to return custom meta data (like term meta):
+		$post_list_meta = array();
+		
+		/**
+		 * Use this 'wpak_posts_list_meta' filter to send custom meta data along with the web service answer.
+		 * Can be used to add terms meta for example.
+		 * 
+		 * @param array             $post_list_meta     Set your meta here (default empty)
+		 * @param WpakComponent 	$component 			The component object.
+		 * @param array 			$query 				Summary data ('type', 'post_type', 'taxonomy', 'terms') about the current "post list" query.
+		 * @param array 			$query_args    		WP_Query query args
+		 * @param array 			$options 			Options set in BO for the component.
+		 * @param array 			$args 				Args that can be passed via webservice's url $_GET parameters.
+		 */
+		$post_list_meta = apply_filters( 'wpak_posts_list_meta', $post_list_meta, $component, $query, $query_args, $options, $args );
 
 		$this->set_specific( 'ids', array_keys( $posts_by_ids ) );
 		$this->set_specific( 'total', $total );
 		$this->set_specific( 'query', $query );
+		
+		if ( !empty( $post_list_meta ) ) {
+			$this->set_specific( 'meta', $post_list_meta );
+		}
+		
 		$this->set_globals( 'posts', $posts_by_ids );
 	}
 	
@@ -232,9 +256,30 @@ class WpakComponentTypePostsList extends WpakComponentType {
 	}
 
 	public function echo_form_fields( $component ) {
-		$post_types = get_post_types( array( 'public' => true ), 'objects' ); //TODO : hook on arg array
-		unset( $post_types['attachment'] );
+		
+		$post_types_slugs = array_keys( get_post_types( array( 'public' => true ), 'names' ) ); 
+		if ( in_array( 'attachment', $post_types_slugs ) ) {
+			unset( $post_types_slugs[array_search( 'attachment', $post_types_slugs )] );
+		}
 
+		/**
+		 * Use this "wpak_posts_list_post_types" to customize which post types are
+		 * available in post list components.
+		 * 
+		 * @param $post_types_slugs     array              Array of post types slugs to be filtered
+		 * @param $component            WpakComponent      Current "post list" component
+		 */
+		$post_types_slugs = apply_filters( 'wpak_posts_list_post_types', $post_types_slugs, $component );
+		
+		//Retrieve post types objects
+		$post_types = array();
+		foreach( $post_types_slugs as $post_type_slug ) {
+			$post_type_object = get_post_type_object( $post_type_slug );
+			if ( $post_type_object ) {
+				$post_types[$post_type_slug] = $post_type_object;
+			}
+		}
+		
 		$has_options = !empty( $component ) && !empty( $component->options );
 
 		reset( $post_types );

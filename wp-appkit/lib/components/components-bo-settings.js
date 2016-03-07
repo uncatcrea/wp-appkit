@@ -115,6 +115,7 @@ jQuery().ready(function(){
 	};
 
 	function display_feedback(type,message){
+		$( '.component-form .spinner' ).removeClass( 'is-active' );
 		$('#components-feedback').removeClass().addClass(type).html(message).show();
 	};
 
@@ -124,6 +125,7 @@ jQuery().ready(function(){
 
 	$('#components-wrapper').on('click','a.component-form-submit',function(e){
 		e.preventDefault();
+		$( '.component-form .spinner' ).addClass( 'is-active' );
 		$('#components-feedback').hide();
 		var component_id = $(this).data('id');
 		var edit = parseInt(component_id) != 0;
@@ -145,6 +147,9 @@ jQuery().ready(function(){
 				}
 				display_feedback(answer.type,answer.message);
 			});
+		}
+		else {
+			$( '.component-form .spinner' ).removeClass( 'is-active' );
 		}
 	});
 

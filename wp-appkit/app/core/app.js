@@ -42,18 +42,18 @@ define(function (require) {
 
 	/**
 	 * Triggers an info event. Use this to trigger your own App events from modules and addons.
-	 * 
+	 *
 	 * @param {String} info event name
 	 * @param {JSON Object} data Data that is passed to event callback
 	 */
 	app.triggerInfo = function( info, info_data, info_callback ) {
 
 		switch ( info ) {
-			
+
 			case 'no-content':
 				vent.trigger( 'info:no-content' );
 				break;
-				
+
 			case 'app-launched':
 				var stats = Stats.getStats();
 				vent.trigger( 'info:app-ready', { stats: stats } );
@@ -64,7 +64,7 @@ define(function (require) {
 					vent.trigger( 'info:app-version-changed', { stats: stats } );
 				}
 				break;
-				
+
 			default:
 				vent.trigger( 'info:' + info, info_data );
 				if ( info_callback != undefined ) {
@@ -72,12 +72,12 @@ define(function (require) {
 					info_callback( info_data );
 				}
 				break;
-				
+
 		}
-		
-		
+
+
 	};
-	
+
 	  //--------------------------------------------------------------------------
 	  //Custom pages and routes handling
 
@@ -170,7 +170,7 @@ define(function (require) {
 				var first_component = app.components.first();
 				default_route = '#component-'+ first_component.id;
 			}else{
-				Utils.log('No navigation, no component found. Could not set default route.');
+				Utils.log('No menu item, no component found. Could not set default route.');
 			}
 		}
 
@@ -262,11 +262,13 @@ define(function (require) {
 	  };
 
 	  /**
-	   * Called in router.js to set the queried screen according to the current route.
+	   * Called in region-manager.js to set the queried screen according to the current route.
 	   * This queried screen is then pushed to history in app.addQueriedScreenToHistory().
 	   */
-	  app.setQueriedScreen = function(screen_data){
-		  queried_screen_data = formatScreenData(_.extend(screen_data,{fragment: Backbone.history.fragment}));
+	  app.setQueriedScreen = function( screen_data ){
+		  queried_screen_data = formatScreenData( _.extend( screen_data, {
+		  	fragment: Backbone.history.fragment
+	  	  }));
 	  };
 
 	  app.getQueriedScreen = function(){
@@ -323,7 +325,12 @@ define(function (require) {
 					  }else{
 						  history_action = 'push';
 					  }
-
+				  }else if( current_screen.screen_type == 'comments' ){
+					  if( previous_screen.screen_type == 'page' && previous_screen.item_id == queried_screen_data.item_id ){
+						  history_action = 'pop';
+					  }else{
+						  history_action = 'empty-then-push';
+					  }
 				  }else{
 					  history_action = 'empty-then-push';
 				  }
@@ -420,13 +427,14 @@ define(function (require) {
 		current_screen_global = Hooks.applyFilters( 'current-screen-global', current_screen_global, [screen_data, global] );
 
         return current_screen_global;
-	  }
+	  };
 
 	  //--------------------------------------------------------------------------
 	  //App items data :
 	  app.components = new Components;
 	  app.navigation = new Navigation;
 	  app.options    = new Options;
+	  app.comments   = new Comments.CommentsMemory;
 
 	  //For globals, separate keys from values because localstorage on
 	  //collections of collections won't work :-(
@@ -456,6 +464,10 @@ define(function (require) {
 			Utils.log( 'app.addGlobalItem info: adding an item to globals', { type: type, item: item } );
             app.globals[type].add( item );
         }
+	};
+
+	app.componentExists = function( component_id ) {
+		return app.components.get( component_id ) !== undefined;
 	};
 
 	app.getComponents = function( filter ) {
@@ -508,7 +520,7 @@ define(function (require) {
 	    	    		 if( navigation.length == 0 ){
 	    	    			 syncWebService(cb_ok,cb_error);
 	    	    		 }else{
-	    	    			 Utils.log('Navigation retrieved from local storage.',{navigation:navigation});
+	    	    			 Utils.log('Menu items retrieved from local storage.',{navigation:navigation});
 	    	    			 globals_keys.fetch({'success': function(global_keys, response_global_keys, options_global_keys){
 	    	    	    		 if( global_keys.length == 0 ){
 	    	    	    			 syncWebService(cb_ok,cb_error);
@@ -627,13 +639,28 @@ define(function (require) {
 							} );
 							globals_keys.saveAll();
 
+							//Empty comments memory
+							app.comments.reset();
+
 							Stats.incrementContentLastUpdate();
 
 							Addons.setDynamicDataFromWebService( data.addons );
 
-							Utils.log( 'Components, navigation and globals retrieved from online.', { components: app.components, navigation: app.navigation, globals: app.globals } );
+							if ( data.components.length === 0 ) {
 
-							cb_ok();
+								app.triggerError(
+									'synchro:no-component',
+									{ type: 'ws-data', where: 'app::syncWebService', message: 'No component found for this App. Please add components to the App on WordPress side.', data: data },
+									cb_error
+								);
+
+							} else {
+
+								Utils.log( 'Components, menu items and globals retrieved from online.', { components: app.components, navigation: app.navigation, globals: app.globals } );
+								cb_ok();
+
+							}
+
 						} else {
 							app.triggerError(
 								'synchro:wrong-answer',
@@ -677,26 +704,42 @@ define(function (require) {
 			$.ajax( ajax_args );
 	  };
 
-	  app.getPostComments = function(post_id,cb_ok,cb_error){
-    	  var token = WsToken.getWebServiceUrlToken('comments-post');
-    	  var ws_url = token +'/comments-post/'+ post_id;
+	var fetchPostComments = function ( post_id, cb_ok, cb_error ) {
 
-    	  var comments = new Comments.Comments;
+		var token = WsToken.getWebServiceUrlToken( 'comments-post' );
+		var ws_url = token + '/comments-post/' + post_id;
 
-    	  var post = app.globals['posts'].get(post_id);
+		var comments = new Comments.Comments;
 
-    	  if( post != undefined ){
+		/**
+		 * Use this 'comments-globals' filter if you defined custom global
+		 * types (other than posts and pages) that have comments associated to.
+		 */
+		var comments_globals = Hooks.applyFilters( 'comments-globals', [ 'posts', 'pages' ], [ post_id ] );
+
+		var post = null;
+		var item_global = '';
+
+		comments_globals.every( function ( global ) {
+			post = app.globals[global].get( post_id );
+			if ( post != undefined ) {
+				item_global = global;
+			}
+			return post === undefined; //To make the loop break as soon as post != undefined
+		} );
+
+		if ( post != undefined && post != null ) {
 
 			/**
-			* Filter 'web-service-params' : use this to send custom key/value formated
-			* data along with the web service. Those params are passed to the server
-			* (via $_GET) when calling the web service.
-			*
-			* Filtered data : web_service_params : JSON object where you can add your custom web service params
+			 * Filter 'web-service-params' : use this to send custom key/value formated
+			 * data along with the web service. Those params are passed to the server
+			 * (via $_GET) when calling the web service.
+			 *
+			 * Filtered data : web_service_params : JSON object where you can add your custom web service params
 			 * Filter arguments :
 			 * - web_service_name : string : name of the current web service ('get-post-comments' here).
-			*/
-			var web_service_params = Hooks.applyFilters('web-service-params',{},['get-post-comments']);
+			 */
+			var web_service_params = Hooks.applyFilters( 'web-service-params', { }, [ 'get-post-comments' ] );
 
 			//Build the ajax query :
 			var ajax_args = {
@@ -712,7 +755,7 @@ define(function (require) {
 			 * Filter arguments :
 			 * - web_service_name : string : name of the current web service ('get-post-comments' here).
 			 */
-			ajax_args = Hooks.applyFilters( 'ajax-args', ajax_args, ['get-post-comments'] );
+			ajax_args = Hooks.applyFilters( 'ajax-args', ajax_args, [ 'get-post-comments' ] );
 
 			ajax_args.url = Config.wp_ws_url + ws_url;
 
@@ -720,37 +763,69 @@ define(function (require) {
 
 			ajax_args.dataType = 'json';
 
-			ajax_args.success = function( data ) {
-				_.each( data.items, function( value, key, list ) {
+			ajax_args.success = function ( data ) {
+				_.each( data.items, function ( value, key, list ) {
 					comments.add( value );
 				} );
-				cb_ok( comments, post );
+				cb_ok( comments, post, item_global );
 			};
 
-			ajax_args.error = function( jqXHR, textStatus, errorThrown ) {
+			ajax_args.error = function ( jqXHR, textStatus, errorThrown ) {
 				app.triggerError(
 					'comments:ajax',
-					{ type: 'ajax', where: 'app::getPostComments', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } },
+					{ type: 'ajax', where: 'app::fetchPostComments', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } },
 					cb_error
 				);
 			};
 
-	    	$.ajax( ajax_args );
+			$.ajax( ajax_args );
 
-    	  }else{
-    		  app.triggerError(
-    			  'comments:post-not-found',
-    			  {type:'not-found',where:'app::getPostComments',message:'Post '+ post_id +' not found.'},
-		  		  cb_error
-    		  );
-    	  }
-      };
+		} else {
+			app.triggerError(
+				'comments:post-not-found',
+				{ type: 'not-found', where: 'app::fetchPostComments', message: 'Post ' + post_id + ' not found.' },
+				cb_error
+			);
+		}
+	};
+
+	app.getPostComments = function ( post_id, cb_ok, cb_error ) {
+
+		var post_comments_memory = app.comments.get( post_id );
+		if ( post_comments_memory ) {
+
+			var post_comments = post_comments_memory.get( 'post_comments' );
+			var post = post_comments_memory.get( 'post' );
+			var item_global = post_comments_memory.get( 'item_global' );
+
+			Utils.log( 'Comments retrieved from cache.', { comments: post_comments, post: post, item_global: item_global });
+
+			cb_ok( post_comments, post, item_global );
+
+		} else {
+			fetchPostComments(
+				post_id,
+				function( post_comments, post, item_global ) {
+					Utils.log( 'Comments retrieved from online.', { comments: post_comments, post: post, item_global: item_global } );
+
+					//Memorize retrieved comments:
+					app.comments.addPostComments( post_id, post, item_global, post_comments );
+
+					cb_ok( post_comments, post, item_global );
+				},
+				function( error ) {
+					cb_error( error );
+				}
+			);
+		}
+
+	};
 
       app.getPostGlobal = function( id, global_default ) {
       	var global = app.getCurrentScreenGlobal( global_default );
 
       	return Hooks.applyFilters( 'post-global', global, [id, global_default] );
-      }
+      };
 
       app.getMoreOfComponent = function(component_id,cb_ok,cb_error){
 			var component = app.components.get( component_id );
@@ -825,8 +900,7 @@ define(function (require) {
 
 									Utils.log( 'More content retrieved for component', { component_id: component_id, new_ids: new_ids, new_items: new_items, component: component } );
 
-									cb_ok( new_items, is_last, { nb_left: nb_left, new_ids: new_ids, global: global, component: component } );
-
+									app.triggerInfo( 'component:get-more', { new_items: new_items, is_last: is_last, nb_left: nb_left, new_ids: new_ids, global: global, component: component }, cb_ok );
 								} else {
 									app.triggerError(
 										'getmore:global-not-found',
@@ -1106,7 +1180,7 @@ define(function (require) {
 
 		//persistent defaults to false :
 		var persistent = options.hasOwnProperty('persistent') && options.persistent === true;
-		
+
 		var token = WsToken.getWebServiceUrlToken( 'live-query' );
 		var ws_url = token + '/live-query';
 
@@ -1421,7 +1495,7 @@ define(function (require) {
 			}
 
 			return items;
-	  }
+	  };
 
       app.getGlobalItem = function(global_key,item_id){
     	  var item = null;

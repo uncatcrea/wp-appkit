@@ -19,8 +19,13 @@
     line-height:28px;
 }
 
+#wpak_export_type {
+    vertical-align:middle;
+}
+
 #wpak_export_link {
     margin-left:10px;
+    vertical-align:middle;
 }
 
 .link {
@@ -29,6 +34,10 @@
 
 .field-group {
     margin:10px 0;
+}
+
+.fix-align label {
+    vertical-align:baseline;
 }
 
 .description {

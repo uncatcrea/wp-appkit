@@ -46,32 +46,56 @@ define(function (require) {
 					
 			template_file += '.html';
 			
+			var fallback_template_failed = function( error ) {
+				Utils.log('Error : view templates "'+ _this.template_name +'.html" and fallback "'+ _this.fallback_template_name +'.html" not found in theme');
+				if( cb_error ){
+					cb_error();
+				}
+			};
+			
+			var default_template_failed = function( error ) {
+				if( _this.fallback_template_name != '' ){
+					Utils.log('View template "'+ _this.template_name +'.html" not found in theme : load fallback template "'+ _this.fallback_template_name +'"');
+					require(['text!theme/'+ _this.fallback_template_name +'.html'],
+						function(tpl){
+							if( tpl.length ) {
+								_this.template = _.template(tpl);
+								cb_ok();
+							} else {
+								//On mobile devices (but not in browsers) the require(['text!template'])
+								//is successful even if the template is not there...
+								//So we solve the problem by checking if tpl is empty, and
+								//if it is we consider that the template was not found :
+								fallback_template_failed();
+							}
+						},
+						function( fallback_error){
+							fallback_template_failed( fallback_error );
+						}
+					);
+				}else{
+					Utils.log('Error : view template "'+ _this.template_name +'.html" not found in theme');		
+					if( cb_error ){		
+						cb_error();		
+					}
+				}
+			};
+			
         	require([template_file],
   					function(tpl){
-  						_this.template = _.template(tpl);
-  						cb_ok();
+						if( tpl.length ) {
+							_this.template = _.template(tpl);
+							cb_ok();
+						} else {
+							//On mobile devices (but not in browsers) the require(['text!template'])
+							//is successful even if the template is not there...
+							//So we solve the problem by checking if tpl is empty, and
+							//if it is we consider that the template was not found :
+							default_template_failed();
+						}
   	      		  	},
-  	      		  	function(error){
-  	      		  		if( _this.fallback_template_name != '' ){
-	  	      		  		Utils.log('View template "'+ _this.template_name +'.html" not found in theme : load fallback template "'+ _this.fallback_template_name +'"');
-		  	      		  	require(['text!theme/'+ _this.fallback_template_name +'.html'],
-	  	    					function(tpl){
-	  	    						_this.template = _.template(tpl);
-	  	    						cb_ok();
-	  	    	      		  	},
-	  	    	      		  	function(error){
-	  	    	      		  		Utils.log('Error : view templates "'+ _this.template_name +'.html" and "'+ _this.fallback_template_name +'.html" not found in theme');
-	  	    	      		  		if( cb_error ){
-	  	    	      		  			cb_error();
-	  	    	      		  		}
-	  	    	      		  	}
-		  	    			);
-  	      		  		}else{
-	  	      		  		Utils.log('Error : view template "'+ _this.template_name +'.html" not found in theme');
-	  	      		  		if( cb_error ){
-	  	      		  			cb_error();
-	  	      		  		}
-  	      		  		}
+  	      		  	function( error ){
+  	      		  		default_template_failed( error );
   	      		  	}
   			);
         },

@@ -50,9 +50,12 @@ class WpakNavigationItem{
 	}
 
 	protected function merge_default_options( $options ) {
-		$navigation_item_default_options = apply_filters( 'wpak_navigation_item_default_options', array(
+		
+		$default_options = array(
 			'icon_slug' => ''
-		) );
+		);
+		
+		$navigation_item_default_options = apply_filters( 'wpak_navigation_item_default_options', $default_options );
 		
 		foreach( $options as $option => $value ) {
 			if( !array_key_exists( $option, $navigation_item_default_options ) ) {

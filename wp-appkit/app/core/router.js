@@ -140,7 +140,7 @@ define(function (require) {
 		        		if( component ){
 
 		        			var item_data = {
-			        			item:item.toJSON(),
+			        			post:item.toJSON(),
 			        			is_tree_page:component.data.is_tree,
 			        			is_tree_root:(page_id == component.data.root_id),
 			        			root_id:component.data.root_id,
@@ -151,7 +151,7 @@ define(function (require) {
 								RegionManager.show(
 									'page',
 									{item:item,global:item_global},
-									{screen_type:'page',component_id:component_id,item_id:parseInt(page_id),global:item_global,data:item_data,label:item_data.item.title}
+									{screen_type:'page',component_id:component_id,item_id:parseInt(page_id),global:item_global,data:item_data,label:item_data.post.title}
 								);
 							}
 
@@ -170,30 +170,51 @@ define(function (require) {
         	});
         },
 
-        comments: function (post_id) {
-			route_asked = 'comments-/'+ post_id;
-			
-        	require(["core/app"],function(App){
-        		RegionManager.startWaiting();
-	        	App.getPostComments(
-	        		post_id,
-	        		function(comments,post){
-	        			RegionManager.stopWaiting();
-	        			if( check_route('comments-/'+ post.id) ){
-							RegionManager.show(
-								'comments',
-								{comments:comments,post:post},
-								{screen_type:'comments',component_id:'',item_id:parseInt(post_id)}
-							);
-	        			}
-		        	},
-		        	function(error){
-		        		Utils.log('router.js error : App.getPostComments failed',error);
-		        		RegionManager.stopWaiting();
-		        	}
-		        );
-        	});
-        },
+        comments: function ( post_id ) {
+			route_asked = 'comments-' + post_id;
+
+			require( ["core/app"], function ( App ) {
+
+				function showCommentsScreen( comments, post, item_global ) {
+					if ( check_route( 'comments-' + post.id ) ) {
+						RegionManager.show(
+							'comments',
+							{ comments: comments, post: post },
+							{ screen_type: 'comments', component_id: '', item_id: parseInt( post.id ), data: { item_global: item_global } }
+						);
+					}
+				}
+
+				/**
+				 * If ThemeApp.displayPostComments() was used to display the comments screen (recommended),
+				 * post comments should already be in app's memory.
+				 * If not, we fetch it now.
+				 */
+				var post_comments_memory = App.comments.get( post_id );
+				if ( post_comments_memory ) {
+					
+					showCommentsScreen(
+						post_comments_memory.get( 'post_comments' ),
+						post_comments_memory.get( 'post' ),
+						post_comments_memory.get( 'item_global' )
+					);
+					
+				} else {
+					
+					App.getPostComments(
+						post_id,
+						function ( comments, post, item_global ) {
+							showCommentsScreen( comments, post, item_global );
+						},
+						function ( error ) {
+							Utils.log( 'router.js error : App.getPostComments failed', error );
+						}
+					);
+					
+				}
+				
+			} );
+		},
 
         custom_page: function(){
 			route_asked = 'custom-page';

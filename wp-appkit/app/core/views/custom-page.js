@@ -34,7 +34,7 @@ define(function (require) {
         	if( this.custom_page_data !== null ){
 				
 				var template_args =	{ 
-					data : this.custom_page_data,
+					data : this.custom_page_data
 				};
 				
 				template_args = _.extend( template_args, this.custom_page_data );

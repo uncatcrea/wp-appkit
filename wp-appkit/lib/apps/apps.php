@@ -17,6 +17,8 @@ class WpakApps {
 			add_filter( 'post_row_actions', array( __CLASS__, 'remove_quick_edit' ), 10, 2 );
 			add_action( 'admin_head', array( __CLASS__, 'add_icon' ) );
 			add_filter( 'post_updated_messages', array( __CLASS__, 'updated_messages' ) );
+			add_filter( 'manage_wpak_apps_posts_columns' , array( __CLASS__, 'add_platform_column' ) );
+			add_action( 'manage_wpak_apps_posts_custom_column' , array( __CLASS__, 'platform_column_content' ), 10, 2 );
 		}
 	}
 
@@ -107,6 +109,30 @@ class WpakApps {
 				}
 			</style>
 			<?php
+		}
+	}
+
+	/**
+	 * Add platfrom column after 'title' column
+	 */
+	public static function add_platform_column( $columns ) {
+
+		$additionnal_column = array( 'wpak_platform' => __( 'Platform', WpAppKit::i18n_domain ) );
+
+		$title_index = array_search( 'title', array_keys( $columns ) ) + 1;
+
+		$columns = array_slice( $columns, 0, $title_index, true ) + $additionnal_column + array_slice( $columns, $title_index, count( $columns ) - $title_index, true );
+
+		return $columns;
+	}
+
+	public static function platform_column_content( $column, $post_id ) {
+		if ( $column === 'wpak_platform' ) {
+			$app_info = self::get_app_main_infos( $post_id );
+			$available_platforms = self::get_platforms();
+			if ( array_key_exists( $app_info['platform'], $available_platforms ) ) {
+				echo esc_html( $available_platforms[$app_info['platform']] );
+			}
 		}
 	}
 
@@ -291,7 +317,26 @@ class WpakApps {
 			</div>
 
 			<div id="export-action">
+				
 				<?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+				
+				<?php 
+				/*
+				 * 2016-03-05: Export type select commented for now as we have to stabilize export features other 
+				 * than PhoneGap Build before releasing it.
+				 * Was added in https://github.com/uncatcrea/wp-appkit/commit/ac4af270f8ea6273f4d653878c69fceec85a9dd8 along with
+				 * the corresponding JS in apps.js.
+				 * 
+				<?php $default_export_type = 'phonegap-build'; ?>
+				<select name="export_type" id="wpak_export_type" >
+					<?php foreach( WpakBuild::get_allowed_export_types() as $export_type => $label ): ?>
+					<option value="<?php echo esc_attr( $export_type ) ?>" <?php selected( $export_type === $default_export_type )?>><?php echo esc_html( $label ) ?></option>
+					<?php endforeach ?>
+				</select>
+				<a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => $default_export_type ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+				*/ 
+				?>
+				
 			</div>
 		</div>
 
@@ -302,7 +347,7 @@ class WpakApps {
 		$main_infos = self::get_app_main_infos( $post->ID );
 		?>
 		<div class="wpak_settings">
-			<select name="wpak_app_platform">
+			<select id="wpak_app_platform" name="wpak_app_platform">
 				<?php foreach ( self::get_platforms() as $value => $label ): ?>
 					<?php $selected = $value == $main_infos['platform'] ? 'selected="selected"' : '' ?>
 					<option value="<?php echo $value ?>" <?php echo $selected ?>><?php echo $label ?></option>
@@ -337,14 +382,18 @@ class WpakApps {
 					<label><?php _e( 'Version', WpAppKit::i18n_domain ) ?></label>
 					<input type="text" name="wpak_app_version" value="<?php echo esc_attr( $main_infos['version'] ) ?>" id="wpak_app_version" />
 				</div>
-				<div class="field-group">
+				<div class="field-group platform-specific android">
 					<label><?php _e( 'VersionCode (Android only)', WpAppKit::i18n_domain ) ?></label>
 					<input type="text" name="wpak_app_version_code" value="<?php echo esc_attr( $main_infos['version_code'] ) ?>" id="wpak_app_version_code" />
 				</div>
 				<div class="field-group">
-					<label><?php _e( 'Icons and splashscreens', WpAppKit::i18n_domain ) ?></label>
+					<label><?php _e( 'Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_icons" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
-					<span class="description"><?php _e( 'Write the icons and splashscreens tags as defined in the PhoneGap documentation.<br/>Example: ', WpAppKit::i18n_domain ) ?>&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;</span>
+					<span class="description"><?php printf( __( 'Write the icons and splashscreens tags as defined in the PhoneGap documentation.<br/>Example: %s', WpAppKit::i18n_domain ), '&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;' ) ?><br><br></span>
+					<br>
+					<input type="checkbox" id="wpak_use_default_icons_and_splash" name="wpak_use_default_icons_and_splash" <?php checked( $main_infos['use_default_icons_and_splash'] ) ?> />
+					<label for="wpak_use_default_icons_and_splash"><?php _e( 'Use default WP-AppKit Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
+					<span class="description"><?php _e( 'If checked and "Icons and Splashscreens" is empty, the app export will embed the default WP-AppKit Icons and Splashscreens.', WpAppKit::i18n_domain )?></span>
 				</div>
 			</fieldset>
 			<fieldset>
@@ -371,7 +420,7 @@ class WpakApps {
 				<div class="field-group">
 					<label><?php _e( 'Plugins', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_phonegap_plugins" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
-					<span class="description"><?php _e( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter &lt;gap:plugin name="org.apache.cordova.inappbrowser" version="0.3.3" /&gt; directly in the textarea.', WpAppKit::i18n_domain ) ?></span>
+					<span class="description"><?php printf( __( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter %s directly in the textarea.', WpAppKit::i18n_domain ), '&lt;plugin name="org.apache.cordova.inappbrowser" spec="0.3.3" /&gt;' ) ?></span>
 				</div>
 			</fieldset>
 			<div class="field-group wpak_phonegap_links">
@@ -388,14 +437,14 @@ class WpakApps {
 		$simulation_secured = self::get_app_simulation_is_secured( $post->ID );
 		?>
 		<div class="field-group">
-			<label><?php _e( 'App Simulation Visibility', WpAppKit::i18n_domain ) ?></label> : <br/>
-			<span class="description"><?php _e( 'If activated, only connected users with right permissions can access the app simulation in web browser.<br/>If deactivated, the app simulation is publicly available in any browser, including the config.js and config.xml files, that can contain sensitive data.', WpAppKit::i18n_domain ) ?></span>
+			<label><?php _e( 'App Simulation Visibility', WpAppKit::i18n_domain ) ?></label><br/>
 		</div>
 		<div class="field-group">
 			<select name="wpak_app_simulation_secured">
 				<option value="1" <?php echo $simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Private', WpAppKit::i18n_domain ) ?></option>
 				<option value="0" <?php echo!$simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Public', WpAppKit::i18n_domain ) ?></option>
 			</select>
+			<span class="description"><?php _e( 'If activated, only connected users with right permissions can access the app simulation in web browser.<br/>If deactivated, the app simulation is publicly available in any browser, including the config.js and config.xml files, that can contain sensitive data.', WpAppKit::i18n_domain ) ?></span>
 		</div>
 		<?php wp_nonce_field( 'wpak-security-infos-' . $post->ID, 'wpak-nonce-security-infos' ) ?>
 		<?php
@@ -476,7 +525,20 @@ class WpakApps {
 
 		if ( isset( $_POST['wpak_app_icons'] ) ) {
 			$app_icons = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $_POST['wpak_app_icons'] );
-			update_post_meta( $post_id, '_wpak_app_icons', trim( $app_icons ) );
+			$app_icons = trim( $app_icons );
+			update_post_meta( $post_id, '_wpak_app_icons', $app_icons );
+
+			//Use default app icons and splash only if none is provided manually:
+			if ( empty( $app_icons ) ) {
+				//App that have no existent '_wpak_use_default_icons_and_splash' meta must
+				//be considered as using the default icons and splash. So it is important
+				//that we set it to 'off' and not delete the meta.
+				$use_default = !empty( $_POST['wpak_use_default_icons_and_splash'] ) ? 'on' : 'off';
+				update_post_meta( $post_id, '_wpak_use_default_icons_and_splash', $use_default );
+			} else {
+				update_post_meta( $post_id, '_wpak_use_default_icons_and_splash', 'off' );
+			}
+
 		}
 
 		if ( isset( $_POST['wpak_app_simulation_secured'] ) ) {
@@ -590,6 +652,9 @@ class WpakApps {
 		$author_email = get_post_meta( $post_id, '_wpak_app_author_email', true );
 		$icons = get_post_meta( $post_id, '_wpak_app_icons', true );
 
+		$use_default_icons_and_splash = get_post_meta( $post_id, '_wpak_use_default_icons_and_splash', true );
+		$use_default_icons_and_splash = ( empty( $use_default_icons_and_splash ) && empty( $icons ) ) || $use_default_icons_and_splash === 'on';
+
 		$phonegap_plugins = '';
 		if ( metadata_exists( 'post', $post_id, '_wpak_app_phonegap_plugins' ) ) {
 			$phonegap_plugins = get_post_meta( $post_id, '_wpak_app_phonegap_plugins', true );
@@ -602,12 +667,13 @@ class WpakApps {
 			'version' => $version,
 			'version_code' => $version_code,
 			'phonegap_version' => $phonegap_version,
-			'platform' => $platform,
+			'platform' => !empty( $platform ) ? $platform : '',
 			'author' => $author,
 			'author_website' => $author_website,
 			'author_email' => $author_email,
 			'phonegap_plugins' => $phonegap_plugins,
 			'icons' => $icons,
+			'use_default_icons_and_splash' => $use_default_icons_and_splash,
 		);
 	}
 
@@ -629,14 +695,14 @@ class WpakApps {
 	 * @param string $bo_plugins_xml Optional. Pass this if the BO plugins XML has already be computed.
 	 * @return string Merged BO and default plugins XML.
 	 */
-	public static function get_merged_phonegap_plugins_xml( $app_id, $bo_plugins_xml = '' ) {
+	public static function get_merged_phonegap_plugins_xml( $app_id, $export_type, $bo_plugins_xml = '' ) {
 
-		$merged_plugins = self::get_merged_phonegap_plugins( $app_id, $bo_plugins_xml );
-				
+		$merged_plugins = self::get_merged_phonegap_plugins( $app_id, $export_type, $bo_plugins_xml );
+
 		return self::get_plugins_xml($merged_plugins);
 	}
-	
-	public static function get_merged_phonegap_plugins( $app_id, $bo_plugins_xml = '' ) {
+
+	public static function get_merged_phonegap_plugins( $app_id, $export_type, $bo_plugins_xml = '' ) {
 		if ( empty( $bo_plugins_xml ) ) {
 			$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 			$bo_plugins_xml = $app_main_infos['phonegap_plugins'];
@@ -644,32 +710,37 @@ class WpakApps {
 
 		$bo_plugins_array = self::parse_plugins_from_xml( $bo_plugins_xml );
 
-		$merged_plugins = array_merge( self::get_default_phonegap_plugins( $app_id ), $bo_plugins_array );
+		$merged_plugins = array_merge( self::get_default_phonegap_plugins( $app_id, $export_type ), $bo_plugins_array );
 
 		return $merged_plugins;
 	}
 
-	protected static function get_default_phonegap_plugins( $app_id ) {
+	protected static function get_default_phonegap_plugins( $app_id, $export_type = 'phonegap-build' ) {
 
 		$default_plugins = array(
-			'cordova-plugin-inappbrowser' => array( 'version' => '', 'source' => 'npm' ),
-			'cordova-plugin-network-information' => array( 'version' => '', 'source' => 'npm' ),
-			'cordova-plugin-whitelist' => array( 'version' => '', 'source' => 'npm' )
+			'cordova-plugin-inappbrowser' => array( 'spec' => '', 'source' => 'npm' ),
+			'cordova-plugin-network-information' => array( 'spec' => '', 'source' => 'npm' ),
+			'cordova-plugin-whitelist' => array( 'spec' => '', 'source' => 'npm' ),
+			'cordova-plugin-splashscreen' => array( 'spec' => '', 'source' => 'npm' ),
+			'cordova-plugin-device' => array( 'spec' => '', 'source' => 'npm' ),
 		);
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		if( $app_main_infos['platform'] == 'ios' ) {
-			$default_plugins['cordova-plugin-statusbar'] = array( 'version' => '', 'source' => 'npm' );
-			unset( $default_plugins['cordova-plugin-whitelist'] );
+			$default_plugins['cordova-plugin-statusbar'] = array( 'spec' => '', 'source' => 'npm' );
+			if ( $export_type == 'phonegap-build' ) {
+				unset( $default_plugins['cordova-plugin-whitelist'] );
+			}
 		}
 
 		/**
 		 * Filter the Phonegap Build plugins that are included by default by WP AppKit
 		 *
 		 * @param array		$default_plugins	Array of default Phonegap plugins.
+		 * @param string    $export_type        Export type : 'phonegap-build', 'phonegap-cli' or 'webapp'
 		 * @param int		$app_id				Application id
 		 */
-		$default_plugins = apply_filters( 'wpak_default_phonegap_build_plugins', $default_plugins, $app_id );
+		$default_plugins = apply_filters( 'wpak_default_phonegap_build_plugins', $default_plugins, $export_type, $app_id );
 
 		return $default_plugins;
 	}
@@ -680,10 +751,10 @@ class WpakApps {
 		if ( is_array( $plugins ) ) {
 			$plugins_xml_array = array();
 			foreach ( $plugins as $plugin_name => $plugin_data ) {
-				$plugin_xml = '<gap:plugin name="' . $plugin_name . '"';
+				$plugin_xml = '<plugin name="' . $plugin_name . '"';
 				$xml_end = ' />';
-				if ( !empty( $plugin_data['version'] ) ) {
-					$plugin_xml .= ' version="'. $plugin_data['version'] .'"';
+				if ( !empty( $plugin_data['spec'] ) ) {
+					$plugin_xml .= ' spec="'. $plugin_data['spec'] .'"';
 				}
 				if ( !empty( $plugin_data['source'] ) ) {
 					$plugin_xml .= ' source="'. $plugin_data['source'] .'"';
@@ -697,7 +768,7 @@ class WpakApps {
 						$param_xml[] = '<param name="' . $param['name'] . '" value="' . $param['value'] . '" />';
 					}
 					$plugin_xml.= " >\n\t" . implode( "\n\t", $param_xml ) . "\n";
-					$xml_end = '</gap:plugin>';
+					$xml_end = '</plugin>';
 				}
 				$plugin_xml .= $xml_end;
 				$plugins_xml_array[] = $plugin_xml;
@@ -711,14 +782,13 @@ class WpakApps {
 	protected static function parse_plugins_from_xml( $plugins_xml ) {
 		$plugins_array = array();
 
-		if ( preg_match_all( '/(<gap:plugin [^>]+)(\/>|>(.*)<\/gap:plugin>)/sU', $plugins_xml, $matches ) ) {
+		if ( preg_match_all( '/(<(gap:)?plugin [^>]+)(\/>|>(.*)<\/(gap:)?plugin>)/sU', $plugins_xml, $matches ) ) {
 			foreach ( $matches[1] as $i => $match ) {
-				$name = '';
-				$version = '';
+				$spec = '';
 				$source = '';
 				if ( preg_match( '/name="([^"]+)"/', $match, $name_match ) && strlen( $name_match[1] ) > 0 ) {
-					if ( preg_match( '/version="([^"]+)"/', $match, $version_match ) && strlen( $version_match[1] ) > 0 ) {
-						$version = $version_match[1];
+					if ( preg_match( '/(version|spec)="([^"]+)"/', $match, $version_match ) && strlen( $version_match[2] ) > 0 ) {
+						$spec = $version_match[2];
 					}
 					if ( preg_match( '/source="([^"]+)"/', $match, $source_match ) && strlen( $source_match[1] ) > 0 ) {
 						$source = $source_match[1];
@@ -726,7 +796,7 @@ class WpakApps {
 
 					// Include params if any
 					$params = array();
-					if( !empty( $matches[3][$i] ) && preg_match_all( '/<param ([^>]+)>/U', $matches[3][$i], $param_matches ) ) {
+					if( !empty( $matches[4][$i] ) && preg_match_all( '/<param ([^>]+)>/U', $matches[4][$i], $param_matches ) ) {
 						foreach( $param_matches[1] as $param_match ) {
 							if( preg_match( '/name="([^"]+)"/', $param_match, $param_name_match ) && strlen( $param_name_match[1] ) > 0
 							 && preg_match( '/value="([^"]+)"/', $param_match, $param_value_match ) && strlen( $param_value_match[1] ) > 0 ) {
@@ -739,7 +809,7 @@ class WpakApps {
 					}
 
 					$plugins_array[$name_match[1]] = array(
-						'version' => $version,
+						'spec' => $spec,
 						'source' => $source,
 						'params' => array_values( $params ),
 					);

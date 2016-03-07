@@ -18,17 +18,23 @@ define(function (require) {
     	
     	initialize : function(args) {
     		this.component = args.component;
+			
+			//Allow to set the template directly from component definition on PHP side:
     		var template = this.component.data.hasOwnProperty('template') ? this.component.data.template : '';
-    		this.setTemplate(template);
+    		
+			this.setTemplate(template);
     		_.bindAll(this,'render');
         },
         
         render : function() {
         	if( this.template ){
-	        	var template_args = _.extend(this.component.view_data,{
-					component: this.component, 
-					TemplateTags : ThemeTplTags 
-				});
+	        	var template_args = _.extend(
+					_.clone( this.component.view_data ), //clone here so that component.view_data stays independant from template_args
+					{
+						component: this.component, 
+						TemplateTags : ThemeTplTags 
+					}
+				);
 				
 				/**
 				 * Use this 'template-args' filter to pass custom data to your
