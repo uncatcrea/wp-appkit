@@ -123,6 +123,11 @@ jQuery().ready(function(){
 		$('#components-feedback').hide();
 	};
 
+	function clear_form() {
+		$( '#new-component-form input.can-reset' ).attr( 'value','' );
+		$( '#new-component-form .component-type' ).val( 'posts-list' ).change();
+	}
+
 	$('#components-wrapper').on('click','a.component-form-submit',function(e){
 		e.preventDefault();
 		$( '.component-form .spinner' ).addClass( 'is-active' );
@@ -139,7 +144,7 @@ jQuery().ready(function(){
 						$('tr.no-component-yet',table).remove();
 						table.append(answer.html);
 						$('#new-component-form').slideUp();
-						$('#new-component-form input.can-reset').attr('value','');
+						clear_form();
 					}else{
 						form_tr.prev('tr').replaceWith(answer.html);
 						form_tr.remove();
@@ -194,7 +199,7 @@ jQuery().ready(function(){
 	$('#cancel-new-component').click(function(e){
 		e.preventDefault();
 		hide_feedback();
-		$('#new-component-form input.can-reset').attr('value','');
+		clear_form();
 		$('#new-component-form').slideUp();
 	});
 
