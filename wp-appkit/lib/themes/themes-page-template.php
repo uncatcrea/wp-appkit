@@ -134,8 +134,8 @@ wp_reset_vars( array( 'theme', 'search' ) );
 wp_localize_script( 'wpak-theme', '_wpThemeSettings', array(
     'themes'   => $themes,
     'settings' => array(
-        'canInstall'    => ( ! is_multisite() && current_user_can( 'install_themes' ) ),
-        'installURI'    => ( ! is_multisite() && current_user_can( 'install_themes' ) ) ? admin_url( 'theme-install.php' ) : null,
+        'canInstall'    => ( current_user_can( 'wpak_edit_apps' ) || current_user_can( 'manage_options' ) ),
+        'installURI'    => ( current_user_can( 'wpak_edit_apps' ) || current_user_can( 'manage_options' ) ) ? menu_page_url( WpakUploadThemes::menu_item, false ) : null,
         'confirmDelete' => __( "Are you sure you want to delete this theme?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete." ),
         'adminUrl'      => parse_url( admin_url(), PHP_URL_PATH ),
         'baseUrl'       => str_replace( admin_url(), '', menu_page_url( WpakThemesBoSettings::menu_item, false ) ),
@@ -155,6 +155,9 @@ add_thickbox();
 <div class="wrap">
     <h1><?php echo get_admin_page_title(); ?>
         <span class="title-count theme-count"><?php echo count( $themes ); ?></span>
+    <?php if ( current_user_can( 'wpak_edit_apps' ) || current_user_can( 'manage_options' ) ) : ?>
+        <a href="<?php menu_page_url( WpakUploadThemes::menu_item ); ?>" class="hide-if-no-js page-title-action"><?php echo esc_html_x( 'Add New', 'Add new theme' ); ?></a>
+    <?php endif; ?>
     </h1>
     <div class="theme-browser">
         <div class="themes">

@@ -8,6 +8,7 @@ class WpakThemesBoSettings {
 		add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
+		add_filter( 'admin_body_class', array( __CLASS__, 'admin_body_class' ) );
 	}
 
 	public static function add_meta_boxes() {
@@ -43,6 +44,11 @@ class WpakThemesBoSettings {
 		$suffix = SCRIPT_DEBUG ? '' : '.min';
 
 		wp_enqueue_script( 'wpak-theme', plugins_url( 'lib/themes/themes' . $suffix . '.js', dirname( dirname( __FILE__ ) ) ), array( 'wp-backbone', 'wp-a11y' ), WpAppKit::resources_version, true );
+	}
+
+	public static function admin_body_class( $class ) {
+		// Fake themes.css stylesheet to make some "theme.php" specific styles work on our page as well
+		return $class . ' themes-php';
 	}
 
 	public static function themes_page() {
