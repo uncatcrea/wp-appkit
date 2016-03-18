@@ -422,6 +422,22 @@ class WpakThemes {
 		return in_array( $theme_slug, $used_themes );
 	}
 
+	public static function get_apps_for_theme( $theme_slug, $return_objects = false ) {
+		$return = array();
+
+		$used_themes = WpakThemesStorage::get_used_themes( false, true );
+
+		if( !empty( $used_themes[$theme_slug] ) ) {
+			$return = $used_themes[$theme_slug];
+		}
+
+		if( $return_objects ) {
+			$return = array_map( 'get_post', $return );
+		}
+
+		return $return;
+	}
+
 }
 
 WpakThemes::hooks();

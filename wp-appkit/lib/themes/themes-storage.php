@@ -29,19 +29,23 @@ class WpakThemesStorage {
 		@$themes['themes'][$theme_slug]['options'] = $options;
 		self::update_themes( $post_id, $themes );
 	}
-	
+
 	/**
 	 * Get the themes currently used in all apps.
 	 * As this is used very often while apps simulation (see WpakThemes::theme_is_used()),
-	 * we use a transient to cache the value. The transient is re-computed each time 
+	 * we use a transient to cache the value. The transient is re-computed each time
 	 * we set a theme to an app (see self::update_themes());
 	 */
-	public static function get_used_themes( $force_compute = false ) {
+	public static function get_used_themes( $force_compute = false, $with_apps = false ) {
 
 		$used_themes = array();
 
 		if ( (false === ( $used_themes = get_transient( 'wpak_used_themes' ) ) ) || $force_compute ) {
 			$used_themes = self::compute_used_theme_transient();
+		}
+
+		if( !$with_apps ) {
+			$used_themes = array_keys( $used_themes );
 		}
 
 		return $used_themes;
@@ -68,8 +72,11 @@ class WpakThemesStorage {
 			foreach ( $all_apps_ids as $app_id ) {
 				$app_theme = self::get_current_theme( $app_id );
 				if ( !empty( $app_theme ) ) {
-					if ( !in_array( $app_theme, $used_themes ) ) {
-						$used_themes[] = $app_theme;
+					if( !isset( $used_themes[$app_theme] ) ) {
+						$used_themes[$app_theme] = array( $app_id );
+					}
+					else {
+						$used_themes[$app_theme][] = $app_id;
 					}
 				}
 			}
