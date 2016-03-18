@@ -7,6 +7,7 @@ class WpakThemesBoSettings {
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ), 11 );
 		add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
 	}
 
 	public static function add_meta_boxes() {
@@ -30,6 +31,18 @@ class WpakThemesBoSettings {
 			self::menu_item,
 			array( __CLASS__, 'themes_page' )
 		);
+	}
+
+	public static function admin_enqueue_scripts() {
+		global $plugin_page;
+
+		if( $plugin_page != self::menu_item ) {
+			return;
+		}
+
+		$suffix = SCRIPT_DEBUG ? '' : '.min';
+
+		wp_enqueue_script( 'wpak-theme', plugins_url( 'lib/themes/themes' . $suffix . '.js', dirname( dirname( __FILE__ ) ) ), array( 'wp-backbone', 'wp-a11y' ), WpAppKit::resources_version, true );
 	}
 
 	public static function themes_page() {

@@ -131,7 +131,7 @@ $themes = array_filter( array_values( $prepared_themes ) );
 wp_reset_vars( array( 'theme', 'search' ) );
 
 // TODO: duplicate 'theme' script to update and fit WP-AppKit needs
-wp_localize_script( 'theme', '_wpThemeSettings', array(
+wp_localize_script( 'wpak-theme', '_wpThemeSettings', array(
     'themes'   => $themes,
     'settings' => array(
         'canInstall'    => ( ! is_multisite() && current_user_can( 'install_themes' ) ),
@@ -149,7 +149,6 @@ wp_localize_script( 'theme', '_wpThemeSettings', array(
 ) );
 
 add_thickbox();
-wp_enqueue_script( 'theme' );
 ?>
 
 <div class="wrap">
