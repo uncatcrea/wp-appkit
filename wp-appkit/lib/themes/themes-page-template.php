@@ -138,6 +138,7 @@ wp_localize_script( 'wpak-theme', '_wpThemeSettings', array(
         'installURI'    => ( ! is_multisite() && current_user_can( 'install_themes' ) ) ? admin_url( 'theme-install.php' ) : null,
         'confirmDelete' => __( "Are you sure you want to delete this theme?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete." ),
         'adminUrl'      => parse_url( admin_url(), PHP_URL_PATH ),
+        'baseUrl'       => str_replace( admin_url(), '', menu_page_url( WpakThemesBoSettings::menu_item, false ) ),
     ),
     'l10n' => array(
         'addNew'            => __( 'Add New Theme' ),

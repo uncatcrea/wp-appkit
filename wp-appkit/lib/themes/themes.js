@@ -737,12 +737,14 @@ themes.view.Details = wp.Backbone.View.extend({
         var screenshot, image;
 
         screenshot = el.find( '.screenshot img' );
-        image = new Image();
-        image.src = screenshot.attr( 'src' );
+        if( screenshot.length ) {
+            image = new Image();
+            image.src = screenshot.attr( 'src' );
 
-        // Width check
-        if ( image.width && image.width <= 300 ) {
-            el.addClass( 'small-screenshot' );
+            // Width check
+            if ( image.width && image.width <= 300 ) {
+                el.addClass( 'small-screenshot' );
+            }
         }
     }
 });
@@ -1196,19 +1198,22 @@ themes.view.Search = wp.Backbone.View.extend({
 themes.Router = Backbone.Router.extend({
 
     routes: {
-        'themes.php?theme=:slug': 'theme',
-        'themes.php?search=:query': 'search',
-        'themes.php?s=:query': 'search',
-        'themes.php': 'themes',
         '': 'themes'
     },
 
-    baseUrl: function( url ) {
-        return 'themes.php' + url;
+    initialize: function() {
+        this.routes[themes.data.settings.baseUrl + '&theme=:slug'] = 'theme';
+        this.routes[themes.data.settings.baseUrl + '&search=:query'] = 'search';
+        this.routes[themes.data.settings.baseUrl + '&s=:query'] = 'search';
+        this.routes[themes.data.settings.baseUrl] = 'themes';
     },
 
-    themePath: '?theme=',
-    searchPath: '?search=',
+    baseUrl: function( url ) {
+        return themes.data.settings.baseUrl + url;
+    },
+
+    themePath: '&theme=',
+    searchPath: '&search=',
 
     search: function( query ) {
         $( '.wp-filter-search' ).val( query );
