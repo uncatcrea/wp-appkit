@@ -12,39 +12,56 @@ class WpakThemes {
 		add_action( 'template_redirect', array( __CLASS__, 'template_redirect' ), 5 );
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 	}
-	
+
 	public static function get_themes_directory(){
 		return WP_CONTENT_DIR .'/'. self::themes_directory;
 	}
-	
+
+	public static function get_default_themes_directory(){
+	 	return plugin_dir_path( dirname( dirname( __FILE__ ) ) ) . 'default-themes';
+	}
+
 	public static function rewrite_rules() {
 		add_rewrite_tag( '%wpak_theme_file%', '([^&]+)' );
-		
+
 		$home_url = home_url(); //Something like "http://my-site.com"
 		$url_to_theme_files = plugins_url( 'app/themes', dirname( dirname( __FILE__ ) ) ); //Something like "http://my-site.com/wp-content/plugins/wp-appkit/app/themes"
 		$theme_file_prefix = str_replace( trailingslashit($home_url), '', $url_to_theme_files ); //Something like "wp-content/plugins/wp-appkit/app/themes"
-		
+
 		add_rewrite_rule( '^' . $theme_file_prefix . '/(.*)$', 'index.php?wpak_theme_file=$matches[1]', 'top' );
 	}
-	
+
 	public static function admin_notices() {
-		if( !is_dir( self::get_themes_directory() ) ) {
-			if( !self::create_theme_directory() ) {
-				?>
-				<div class="error">
-					<p>
-						<?php 
-							echo sprintf( __( 'The WP AppKit themes directory %s can\'t be created. <br/>Please check that your WordPress install has the permissions to create this directory.', WpAppKit::i18n_domain ), 
-										  basename(WP_CONTENT_DIR) .'/'. self::themes_directory 
-							); 
-						?>
-					</p>
-				</div>
-				<?php
-			}
+		$error = '';
+
+		// Try to create WP-AppKit themes directory if it doesn't exist
+		if( !is_dir( self::get_themes_directory() ) && !self::create_theme_directory() ) {
+			$error = sprintf( __( 'The WP AppKit themes directory %s can\'t be created. <br/>Please check that your WordPress install has the permissions to create this directory.', WpAppKit::i18n_domain ),
+		  		self::get_themes_directory()
+			);
+		}
+
+		// Copy default themes to WP-AppKit themes directory, only if it exists
+		// TODO: find a better way to handle themes copy, as it's done each time now, and that's not what's needed
+		if( empty( $error ) && !self::copy_default_themes() ) {
+			$error = sprintf( __( 'We tried copying default themes into %s directory, and it seems it didn\'t work. You can do manually by <a href="%s">downloading these default themes</a> and <a href="%s">uploading them through the dedicated page</a>.', WpAppKit::i18n_domain ),
+				self::get_themes_directory(),
+				'#', // TODO: implement default themes direct download
+				menu_page_url( WpakUploadThemes::menu_item, false )
+			);
+		}
+
+		if( !empty( $error ) ) {
+			?>
+			<div class="error">
+				<p>
+					<?php echo $error; ?>
+				</p>
+			</div>
+			<?php
 		}
 	}
-	
+
 	public static function create_theme_directory() {
 		$theme_directory_ok = true;
 		if( !is_dir( self::get_themes_directory() ) ) {
@@ -52,27 +69,53 @@ class WpakThemes {
 		}
 		return $theme_directory_ok;
 	}
-				
+
+	public static function copy_default_themes() {
+		$access_type = get_filesystem_method( array(), self::get_themes_directory() );
+
+		if( $access_type != 'direct' || !WP_Filesystem( array(), self::get_themes_directory() ) ) {
+			return false;
+		}
+
+		// WP_Filtesystem initialization ran OK, we can perform our copy
+		global $wp_filesystem;
+		$result = true;
+
+		foreach( $wp_filesystem->dirlist( self::get_default_themes_directory(), false ) as $name => $struc ) {
+			if( $struc['type'] == 'd' ) {
+				continue;
+			}
+
+			$res = unzip_file( self::get_default_themes_directory() . '/' . $name, self::get_themes_directory() );
+
+			if( is_wp_error( $res ) ) {
+				$result = false;
+			}
+		}
+
+		return $result;
+	}
+
 	public static function template_redirect() {
 		global $wp_query;
 
 		//The following is only for app simulation in browser
-		
+
 		if ( isset( $wp_query->query_vars['wpak_theme_file'] ) && !empty( $wp_query->query_vars['wpak_theme_file'] ) ) {
 
 			$file = $wp_query->query_vars['wpak_theme_file'];
 
-			//For assets files like fonts, images or css we can't 
+			//For assets files like fonts, images or css we can't
 			//be sure that the wpak_app_id GET arg is there, because they can
 			//be included directly in themes sources (CSS/HTML) where the WP AppKit API can't
-			//be used. So, we can't check that the file comes from the right app 
-			//or theme > we just check that the theme the asset belongs to is a real 
+			//be used. So, we can't check that the file comes from the right app
+			//or theme > we just check that the theme the asset belongs to is a real
 			//WP AppKit theme and that at least one app uses this theme :
 			if( self::is_asset_file( $file ) ) {
 				if ( preg_match( '/([^\/]+?)\/(.+)$/', $file, $matches ) ) {
 					$theme_slug = $matches[1];
 					$theme_file = $matches[2];
-					
+
 					if ( self::is_theme( $theme_slug ) && self::theme_is_used( $theme_slug ) ) {
 						if ( $file_full_path = self::get_theme_file( $theme_slug, $theme_file ) ) {
 							self::exit_send_theme_file( $file_full_path );
@@ -82,16 +125,16 @@ class WpakThemes {
 						_e( 'Not a valid theme file', WpAppKit::i18n_domain );
 						exit();
 					}
-					
+
 				}else {
 					header("HTTP/1.0 404 Not Found");
 					_e( 'Not a valid theme file path', WpAppKit::i18n_domain );
 					exit();
 				}
-				
+
 			}else if ( !empty( $_GET['wpak_app_id'] ) ) {
-			
-				//For non considered asset files (like JS) we check that the file is 
+
+				//For non considered asset files (like JS) we check that the file is
 				//asked for the correct app and for the theme of the app:
 
 				$app_id = esc_attr( $_GET['wpak_app_id'] ); //can be ID or slug
@@ -143,7 +186,7 @@ class WpakThemes {
 			}
 		}
 	}
-	
+
 	public static function get_available_themes($with_data = false) {
 		$available_themes = array();
 
@@ -160,7 +203,7 @@ class WpakThemes {
 							}else{
 								$available_themes[] = $entry;
 							}
-							
+
 						}
 					}
 				}
@@ -182,9 +225,9 @@ class WpakThemes {
 			}
 		}
 	}
-	
+
 	public static function get_theme_data( $theme_folder ) {
-		
+
 		$file_headers = array(
 			'Name'                => 'Theme Name',
 			'ThemeURI'            => 'Theme URI',
@@ -194,15 +237,15 @@ class WpakThemes {
 			'Version'             => 'Version',
 			'WpakVersionRequired' => 'WP-AppKit Version Required'
 		);
-		
+
 		$theme_data = array();
 		foreach( array_keys($file_headers) as $key ) {
 			$theme_data[$key] = '';
 		}
-		
+
 		$themes_dir = self::get_themes_directory() .'/' . $theme_folder;
 		$theme_readme = $themes_dir . '/readme.md';
-		
+
 		if ( file_exists($theme_readme) ) {
 			$theme_data = get_file_data( $theme_readme, $file_headers, 'wp-appkit-theme' );
 		} else {
@@ -210,61 +253,61 @@ class WpakThemes {
 			$theme_readme = $themes_dir . '/README.md';
 			if ( file_exists($theme_readme) ) {
 				$theme_data = get_file_data( $theme_readme, $file_headers, 'wp-appkit-theme' );
-			} 
+			}
 		}
-		
+
 		if( empty($theme_data['Name']) ) {
 			$theme_data['Name'] = ucfirst($theme_folder);
 		}
-		
+
 		return $theme_data;
 	}
-	
+
 	public static function get_theme_file( $theme_slug, $file_relative_to_theme ) {
-		
+
 		$theme_file = self::get_themes_directory() .'/' . $theme_slug .'/'. $file_relative_to_theme;
-		
+
 		return file_exists( $theme_file ) ? $theme_file : false;
 	}
-	
+
 	/**
 	 * Serve theme files for app browser simulation.
-	 * 
-	 * This is not really nice to serve those files via PHP with readfile(), 
+	 *
+	 * This is not really nice to serve those files via PHP with readfile(),
 	 * but it seems to be the only way that it works on all platforms.
 	 * We could use X-Sendfile, but it requires a specific server config.
 	 */
 	protected static function exit_send_theme_file( $file ) {
-		
+
 		$mime_type = self::get_file_mime_type( $file );
-		
+
 		if( !empty( $mime_type) ) {
-			
+
 			//Assume that text files are encoded in utf-8...
 			if( in_array($mime_type, array('text/css', 'text/html', 'text/javascript') ) ) {
 				$mime_type .= ';  charset=utf-8';
 			}
-			
+
 			header( 'Content-Type: ' . $mime_type );
-			
+
 			if ( false === strpos( $_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS' ) ) {
 				header( 'Content-Length: ' . filesize( $file ) );
 			}
-			
+
 		} else {
 			header('HTTP/1.0 404 Not Found');
 			echo __( 'Theme file mime type not authorized', WpAppKit::i18n_domain ) . ' : ' . basename($file);
 			exit();
 		}
-		
+
 		//Security note : before serving this file with readfile() we checked :
 		//- that its mime type is authorized
 		//- that it belongs to a valid WP AppKit Theme currently used by an app
 		readfile( $file );
-		
+
 		exit();
 	}
-	
+
 	protected static function get_file_mime_type( $file ) {
 		$file_mime_type = '';
 		$all_mime_types = self::get_allowed_theme_mime_types();
@@ -277,14 +320,14 @@ class WpakThemes {
 		}
 		return $file_mime_type;
 	}
-	
+
 	protected static function get_allowed_theme_mime_types() {
 		/**
 		 * Use this filter to set file types that are allowed to be served
 		 * to themes for the app simulation in browser :
 		 */
 		return apply_filters(
-			'wpak_theme_allowed_mime_types', 
+			'wpak_theme_allowed_mime_types',
 			array(
 				//Most used
 				'css' => 'text/css',
@@ -336,29 +379,29 @@ class WpakThemes {
 			)
 		);
 	}
-	
+
 	protected static function is_asset_file( $file ) {
 		$mime_type = self::get_file_mime_type( $file );
-		
+
 		$is_asset_file = strpos( $mime_type, 'text/css' ) !== false
 			|| strpos( $mime_type, 'image' ) !== false
-			|| strpos( $mime_type, 'font' ) !== false 
+			|| strpos( $mime_type, 'font' ) !== false
 			|| strpos( $mime_type, 'video' ) !== false;
-		
+
 		/**
 		 * Use this 'wpak_theme_is_asset_file' filter to make
-		 * a file or a mime type accessible by the app without 
-		 * checking the app id and the app theme. 
+		 * a file or a mime type accessible by the app without
+		 * checking the app id and the app theme.
 		 * @see self::template_redirect()
 		 */
 		return apply_filters(
-			'wpak_theme_is_asset_file', 
+			'wpak_theme_is_asset_file',
 			$is_asset_file,
 			$file,
 			$mime_type
 		);
 	}
-	
+
 	/**
 	 * Checks if the given theme exists and has the mandatory themes files
 	 */
@@ -366,7 +409,7 @@ class WpakThemes {
 		$is_theme = false;
 		$theme_path = self::get_themes_directory() . '/' . $theme_slug .'/';
 		if ( is_dir( $theme_path ) ) {
-			$is_theme = file_exists($theme_path . 'layout.html') 
+			$is_theme = file_exists($theme_path . 'layout.html')
 						&& file_exists($theme_path . 'js/functions.js');
 		}
 		return $is_theme;
