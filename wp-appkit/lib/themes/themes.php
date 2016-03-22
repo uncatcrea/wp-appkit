@@ -6,6 +6,18 @@ require_once(dirname( __FILE__ ) . '/themes-bo-settings.php');
 class WpakThemes {
 
 	const themes_directory = 'themes-wp-appkit';
+	protected static $default_themes = array(
+		/*
+		// Structure example:
+		// TODO: add values when default themes will be ready
+		'default1' => array(
+			'id' => 'default1', // Same as the array key
+			'file' => 'default1.zip',
+			'name' => 'Default1 WP-AppKit Theme', // TODO: handle name change between versions?
+			'version' => '1.0.0',
+		),
+		*/
+	);
 
 	public static function hooks() {
 		add_action( 'init', array( __CLASS__, 'rewrite_rules' ) );
@@ -42,13 +54,31 @@ class WpakThemes {
 		}
 
 		// Copy default themes to WP-AppKit themes directory, only if it exists
-		// TODO: find a better way to handle themes copy, as it's done each time now, and that's not what's needed
-		if( empty( $error ) && !self::copy_default_themes() ) {
-			$error = sprintf( __( 'We tried copying default themes into %s directory, and it seems it didn\'t work. You can do manually by <a href="%s">downloading these default themes</a> and <a href="%s">uploading them through the dedicated page</a>.', WpAppKit::i18n_domain ),
-				self::get_themes_directory(),
-				'#', // TODO: implement default themes direct download
-				menu_page_url( WpakUploadThemes::menu_item, false )
-			);
+		if( empty( $error ) ) {
+			$check = self::check_default_themes();
+
+			// If we have something wrong with all themes, do something. Otherwise, we consider everything is OK if we have at least 1 default theme available
+			// TODO: remove this check to handle theme upgrades
+			if( count( $check ) == count( self::$default_themes ) ) {
+
+				$ok = false;
+				foreach( $check as $theme_key => $result ) {
+					// $result can be 'needs_upgrade', but we don't handle this case for now
+					// TODO: handle 'needs_upgrade' case
+					if( $result != 'unavailable' ) {
+						$ok = true;
+					}
+				}
+
+				// If all themes are unavailable, try to copy them
+				if( !$ok && !self::copy_default_themes() ) {
+					$error = sprintf( __( 'We tried copying default themes into %s directory, and it seems it didn\'t work. You can do it manually by <a href="%s">downloading these default themes</a> and <a href="%s">uploading them through the dedicated page</a>.', WpAppKit::i18n_domain ),
+						self::get_themes_directory(),
+						'#', // TODO: implement default themes direct download
+						menu_page_url( WpakUploadThemes::menu_item, false )
+					);
+				}
+			}
 		}
 
 		if( !empty( $error ) ) {
@@ -62,6 +92,39 @@ class WpakThemes {
 		}
 	}
 
+	/**
+	 * Check what are the installed themes compared to provided default ones: check if the theme is installed and is up-to-date.
+	 *
+	 * @return 	array 	$result 	Empty if everything is OK (all default themes installed and up-to-date), or containing a value for each theme: either 'unavailable' (not installed) or 'needs_upgrade' (if the installed version is lower than the embedded one).
+	 */
+	public static function check_default_themes() {
+		$available_themes = self::get_available_themes( true );
+
+		// Get an array with [ 'id' => 'name' ] for each default theme
+		$default_names = wp_list_pluck( self::$default_themes, 'name', 'id' );
+
+		$result = array_fill_keys( array_keys( $default_names ), 'unavailable' );
+
+		foreach( $available_themes as $slug => $data ) {
+			$id = array_search( $data['Name'], $default_names );
+
+			if( $id === false ) {
+				continue;
+			}
+
+			// The theme is a default one: check if it needs an upgrade
+			if( version_compare( $data['Version'], self::$default_themes[$id]['version'], '<' ) ) {
+				$result[$id] = 'needs_upgrade';
+			}
+			else {
+				// This theme is available and up-to-date
+				unset( $result[$id] );
+			}
+		}
+
+		return $result;
+	}
+
 	public static function create_theme_directory() {
 		$theme_directory_ok = true;
 		if( !is_dir( self::get_themes_directory() ) ) {
@@ -70,6 +133,14 @@ class WpakThemes {
 		return $theme_directory_ok;
 	}
 
+	/**
+	 * Install default themes provided with this plugin into 'wp-content/themes-wp-appkit/' folder.
+	 * This method will erase existing files, so it should be called after having checked and validated what's needed.
+	 *
+	 * TODO: add a param to choose which theme(s) should be copied, instead of all of them.
+	 *
+	 * @return 	bool 	$result 	Whether the copy is complete or not. It's considered OK when *all* themes have been copied.
+	 */
 	public static function copy_default_themes() {
 		$access_type = get_filesystem_method( array(), self::get_themes_directory() );
 
@@ -81,12 +152,13 @@ class WpakThemes {
 		global $wp_filesystem;
 		$result = true;
 
-		foreach( $wp_filesystem->dirlist( self::get_default_themes_directory(), false ) as $name => $struc ) {
-			if( $struc['type'] == 'd' ) {
+		foreach( self::$default_themes as $struc ) {
+			if( !$wp_filesystem->is_file( self::get_default_themes_directory() . '/' . $struc['file'] ) ) {
 				continue;
 			}
 
-			$res = unzip_file( self::get_default_themes_directory() . '/' . $name, self::get_themes_directory() );
+			// Warning: this will erase existing files, it's intended since this method should be called after some checks and validation about that fact
+			$res = unzip_file( self::get_default_themes_directory() . '/' . $struc['file'], self::get_themes_directory() );
 
 			if( is_wp_error( $res ) ) {
 				$result = false;
