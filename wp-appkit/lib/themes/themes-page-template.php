@@ -115,7 +115,7 @@ foreach ( $themes as $slug => $theme ) {
         'tags'         => '',
         'hasUpdate'    => false, // TODO: implement theme update feature
         'update'       => false, // TODO: implement theme update feature
-        'apps_ids'     => WpakThemes::get_apps_for_theme( $slug ),
+        'apps'         => WpakThemes::get_apps_for_theme( $slug, true ),
         'actions'      => array(
             // TODO: define what are the available actions and capabilities associated to them
             // 'delete'   => current_user_can( 'delete_themes' ) ? wp_nonce_url( admin_url( 'themes.php?action=delete&amp;stylesheet=' . $encoded_slug ), 'delete-theme_' . $slug ) : null,
@@ -243,6 +243,14 @@ foreach ( $themes as $theme ) :
 
                 <# if ( data.tags ) { #>
                     <p class="theme-tags"><span><?php _e( 'Tags:' ); ?></span> {{{ data.tags }}}</p>
+                <# } #>
+
+                <# if ( data.apps.length ) { #>
+                    <p class="theme-apps"><span><?php _e( 'Applications using this theme:', WpAppKit::i18n_domain ); ?></span>
+                        <# _.each( data.apps, function( post, i ) { #>
+                        <a href="{{ wp.themes.data.settings.adminUrl }}post.php?post={{ post.ID }}&action=edit">{{ post.post_title }}</a><# if( i < data.apps.length - 1 ){ #>,<# } #>
+                        <# }); #>
+                    </p>
                 <# } #>
             </div>
         </div>
