@@ -72,9 +72,19 @@ class WpakUploadThemes {
 			}
 
 		}else{
+			$default_themes = WpakThemes::get_default_themes();
 			?>
 			<div class="wrap" id="wpak-settings">
-				<h2><?php _e( 'WP AppKit Themes upload', WpAppKit::i18n_domain ) ?></h2>
+				<h2>
+					<?php
+					_e( 'WP AppKit Themes upload', WpAppKit::i18n_domain );
+
+					if( !empty( $default_themes ) ):
+					// TODO: add an URL to handle default themes reinstall
+					?>
+						<a href="#" class="hide-if-no-js page-title-action"><?php _e( 'Reinstall Default Themes', WpAppKit::i18n_domain ); ?></a>
+					<?php endif; ?>
+				</h2>
 
 				<?php if ( !empty( $result['message'] ) ): ?>
 					<div class="<?php echo $result['type'] ?>" ><p><?php echo $result['message'] ?></p></div>
@@ -88,6 +98,25 @@ class WpakUploadThemes {
 						<input type="file" id="themezip" name="themezip" />
 						<?php submit_button( __( 'Install Now' ), 'button', 'install-theme-submit', false ); ?>
 					</form>
+				</div>
+
+				<h2><?php _e( 'Download Default Themes Packages', WpAppKit::i18n_domain ); ?></h2>
+				<div>
+					<?php if( !empty( $default_themes ) ): ?>
+						<ul>
+						<?php foreach( $default_themes as $theme ):
+							if( !is_file( WpakThemes::get_default_themes_directory() . '/' . $theme['file'] ) ) {
+								continue;
+							}
+							?>
+							<li>
+								<a href="<?php echo WpakThemes::get_default_themes_directory_uri() . '/' . $theme['file']; ?>"><?php echo $theme['name'] . ' (' . $theme['version'] . ')'; ?></a>
+							</li>
+						<?php endforeach; ?>
+						</ul>
+					<?php else: ?>
+						<div><?php _e( 'Your WP-AppKit install doesn\'t seem to have any default theme available.', WpAppKit::i18n_domain ); ?></div>
+					<?php endif; ?>
 				</div>
 
 			</div>

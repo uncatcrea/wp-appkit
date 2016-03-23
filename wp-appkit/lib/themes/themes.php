@@ -6,6 +6,7 @@ require_once(dirname( __FILE__ ) . '/themes-bo-settings.php');
 class WpakThemes {
 
 	const themes_directory = 'themes-wp-appkit';
+	const default_themes_directory = 'default-themes';
 	protected static $default_themes = array(
 		/*
 		// Structure example:
@@ -30,7 +31,15 @@ class WpakThemes {
 	}
 
 	public static function get_default_themes_directory(){
-	 	return plugin_dir_path( dirname( dirname( __FILE__ ) ) ) . 'default-themes';
+	 	return plugin_dir_path( dirname( dirname( __FILE__ ) ) ) . self::default_themes_directory;
+	}
+
+	public static function get_default_themes_directory_uri(){
+	 	return plugins_url( self::default_themes_directory, dirname( dirname( __FILE__ ) ) );
+	}
+
+	public static function get_default_themes() {
+		return self::$default_themes;
 	}
 
 	public static function rewrite_rules() {
@@ -59,7 +68,7 @@ class WpakThemes {
 
 			// If we have something wrong with all themes, do something. Otherwise, we consider everything is OK if we have at least 1 default theme available
 			// TODO: remove this check to handle theme upgrades
-			if( count( $check ) == count( self::$default_themes ) ) {
+			if( count( $check ) == count( self::get_default_themes() ) ) {
 
 				$ok = false;
 				foreach( $check as $theme_key => $result ) {
@@ -72,9 +81,8 @@ class WpakThemes {
 
 				// If all themes are unavailable, try to copy them
 				if( !$ok && !self::copy_default_themes() ) {
-					$error = sprintf( __( 'We tried copying default themes into %s directory, and it seems it didn\'t work. You can do it manually by <a href="%s">downloading these default themes</a> and <a href="%s">uploading them through the dedicated page</a>.', WpAppKit::i18n_domain ),
+					$error = sprintf( __( 'We tried copying default themes into %s directory, and it seems it didn\'t work. You can do it manually by <a href="%s">downloading these default themes and uploading them through the dedicated page</a>.', WpAppKit::i18n_domain ),
 						self::get_themes_directory(),
-						'#', // TODO: implement default themes direct download
 						menu_page_url( WpakUploadThemes::menu_item, false )
 					);
 				}
@@ -99,9 +107,10 @@ class WpakThemes {
 	 */
 	public static function check_default_themes() {
 		$available_themes = self::get_available_themes( true );
+		$default_themes = self::get_default_themes();
 
 		// Get an array with [ 'id' => 'name' ] for each default theme
-		$default_names = wp_list_pluck( self::$default_themes, 'name', 'id' );
+		$default_names = wp_list_pluck( $default_themes, 'name', 'id' );
 
 		$result = array_fill_keys( array_keys( $default_names ), 'unavailable' );
 
@@ -113,7 +122,7 @@ class WpakThemes {
 			}
 
 			// The theme is a default one: check if it needs an upgrade
-			if( version_compare( $data['Version'], self::$default_themes[$id]['version'], '<' ) ) {
+			if( version_compare( $data['Version'], $default_themes[$id]['version'], '<' ) ) {
 				$result[$id] = 'needs_upgrade';
 			}
 			else {
@@ -152,12 +161,13 @@ class WpakThemes {
 		global $wp_filesystem;
 		$result = true;
 
-		foreach( self::$default_themes as $struc ) {
+		foreach( self::get_default_themes() as $struc ) {
 			if( !$wp_filesystem->is_file( self::get_default_themes_directory() . '/' . $struc['file'] ) ) {
 				continue;
 			}
 
 			// Warning: this will erase existing files, it's intended since this method should be called after some checks and validation about that fact
+			// TODO: use WP_Upgrader API
 			$res = unzip_file( self::get_default_themes_directory() . '/' . $struc['file'], self::get_themes_directory() );
 
 			if( is_wp_error( $res ) ) {
