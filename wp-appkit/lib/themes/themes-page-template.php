@@ -130,7 +130,7 @@ $themes = array_filter( array_values( $prepared_themes ) );
 
 wp_reset_vars( array( 'theme', 'search' ) );
 
-// TODO: duplicate 'theme' script to update and fit WP-AppKit needs
+// 'wpak-theme' is a duplicate of WP Core 'theme' script to fit WP-AppKit needs
 wp_localize_script( 'wpak-theme', '_wpThemeSettings', array(
     'themes'   => $themes,
     'settings' => array(
