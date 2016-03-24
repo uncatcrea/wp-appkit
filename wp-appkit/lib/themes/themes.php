@@ -210,7 +210,15 @@ class WpakThemes {
 			$theme_readme = $themes_dir . '/README.md';
 			if ( file_exists($theme_readme) ) {
 				$theme_data = get_file_data( $theme_readme, $file_headers, 'wp-appkit-theme' );
-			} 
+			}
+		}
+
+		$theme_data['screenshot'] = false;
+		foreach ( array( 'png', 'gif', 'jpg', 'jpeg' ) as $ext ) {
+			if ( file_exists( $themes_dir . "/screenshot.$ext" ) ) {
+				$theme_data['screenshot'] = 'screenshot.' . $ext;
+				break;
+			}
 		}
 		
 		if( empty($theme_data['Name']) ) {
