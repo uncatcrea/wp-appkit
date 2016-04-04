@@ -650,7 +650,7 @@ define(function (require) {
 
 								app.triggerError(
 									'synchro:no-component',
-									{ type: 'ws-data', where: 'app::syncWebService', message: 'No component found for this App. Please add components to the App on WordPress side.', data: data },
+									{ type: 'web-service', where: 'app::syncWebService', message: 'No component found for this App. Please add components to the App on WordPress side.', data: data },
 									cb_error
 								);
 
@@ -664,7 +664,7 @@ define(function (require) {
 						} else {
 							app.triggerError(
 								'synchro:wrong-answer',
-								{ type: 'ws-data', where: 'app::syncWebService', message: 'Wrong "synchronization" web service answer', data: data },
+								{ type: 'web-service', where: 'app::syncWebService', message: 'Wrong "synchronization" web service answer', data: data },
 								cb_error
 							);
 						}
@@ -672,13 +672,13 @@ define(function (require) {
 					} else if ( data.result.status == 0 ) {
 						app.triggerError(
 							'synchro:ws-return-error',
-							{ type: 'ws-data', where: 'app::syncWebService', message: 'Web service "synchronization" returned an error : [' + data.result.message + ']', data: data },
+							{ type: 'web-service', where: 'app::syncWebService', message: 'Web service "synchronization" returned an error : [' + data.result.message + ']', data: data },
 							cb_error
 						);
 					} else {
 						app.triggerError(
 							'synchro:wrong-status',
-							{ type: 'ws-data', where: 'app::syncWebService', message: 'Wrong web service answer status', data: data },
+							{ type: 'web-service', where: 'app::syncWebService', message: 'Wrong web service answer status', data: data },
 							cb_error
 						);
 					}
@@ -686,7 +686,7 @@ define(function (require) {
 				} else {
 					app.triggerError(
 						'synchro:wrong-format',
-						{ type: 'ws-data', where: 'app::syncWebService', message: 'Wrong web service answer format', data: data },
+						{ type: 'web-service', where: 'app::syncWebService', message: 'Wrong web service answer format', data: data },
 						cb_error
 					);
 				}

@@ -103,7 +103,7 @@ define( function( require, exports ) {
 	 *		type: string : 'error' | 'info',
 	 *		message: string : error or info message
 	 *		data: object : original core event data : {
-	 *			type: string : 'ajax' | 'ws-data' | 'not-found' | 'wrong-data',
+	 *			type: string : 'ajax' | 'web-service' | 'not-found' | 'wrong-data',
 	 *			where: string : core function where the event occured
 	 *			message: string : message associated to the event
 	 *			data: object : data associated to the core event
