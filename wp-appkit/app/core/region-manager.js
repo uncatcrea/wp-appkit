@@ -210,8 +210,6 @@ define(function (require) {
 
 			var $el = $(el);
 
-			vent.trigger('screen:before-transition',App.getCurrentScreenData(),currentView,custom_rendering);
-
 			if( custom_rendering ){
 				
 				/**
