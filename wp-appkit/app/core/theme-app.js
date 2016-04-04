@@ -658,47 +658,6 @@ define( function( require, exports ) {
 		return transition;
 	};
 
-	/**
-	 * This allows to define your own previous-screen/next-screen/default transitions between screens.
-	 * If you need more transition types than just previous/next/default (like single-to-comment, comment-to-single etc),
-	 * do the following (in functions.js) :
-	 * - App.setParam( 'custom-screen-rendering', true );
-	 * - use the 'screen-transition' action hook to define your own transitions.
-	 *
-	 * @param {callback} transition_default
-	 * @param {callback} transition_previous_screen
-	 * @param {callback} transition_next_screen
-	 */
-	themeApp.setAutoScreenTransitions = function( transition_default, transition_previous_screen, transition_next_screen ) {
-
-		//Set custom-screen-rendering param to true so that screen rendering
-		//uses the 'screen-transition' action to render :
-		themeApp.setParam( 'custom-screen-rendering', true );
-
-		themeApp.action( 'screen-transition', function( $wrapper, $current, $next, current_screen, previous_screen, $deferred ) {
-
-			var direction = themeApp.getTransitionDirection( current_screen, previous_screen );
-
-			switch ( direction ) {
-				case 'previous-screen':
-					transition_previous_screen( $wrapper, $current, $next, $deferred );
-					break;
-				case 'next-screen':
-					transition_next_screen( $wrapper, $current, $next, $deferred );
-					break;
-				case 'default':
-					transition_default( $wrapper, $current, $next, $deferred );
-					break;
-				default:
-					transition_default( $wrapper, $current, $next, $deferred );
-					break;
-			}
-			;
-
-		} );
-
-	};
-
 	/************************************************
 	 * App network management
 	 */
