@@ -32,8 +32,8 @@ require(['root/config'],function(Config){
 	    paths: dynamic_paths
 	});
 
-	require(['jquery', 'core/addons-internal', 'core/app-utils', 'core/app', 'core/router', 'core/region-manager', 'core/stats', 'core/phonegap/utils','core/lib/hooks'],
-			function ($, Addons, Utils, App, Router, RegionManager, Stats, PhoneGap, Hooks) {
+	require(['jquery', 'underscore', 'core/addons-internal', 'core/app-utils', 'core/app', 'core/router', 'core/region-manager', 'core/stats', 'core/phonegap/utils','core/lib/hooks'],
+			function ($, _, Addons, Utils, App, Router, RegionManager, Stats, PhoneGap, Hooks) {
 
 			var launch = function() {
 				
@@ -52,13 +52,28 @@ require(['root/config'],function(Config){
 									require(Addons.getJs('theme','before'),function(){
 										require(['theme/js/functions'],function(){
 											
-											var preloaded_templates = ['text!theme/single.html','text!theme/archive.html'];
+											/**
+											 * Templates that are preloaded by default for before perf.
+											 * Note: we can't require 'page' template here as it is not required in themes.
+											 * But when implementing a theme with a 'page' template, it is recommended to 
+											 * preload it with the following 'preloaded-templates'.
+											 */
+											var preloaded_templates = ['single','archive'];
 											
 											/**
 											 * Define templates that are preloaded so that we don't have any delay
 											 * when requiring them dynamically.
+											 * For example use this filter to preload the 'page' template if you implement one in your theme.
 											 */
 											preloaded_templates = Hooks.applyFilters('preloaded-templates',preloaded_templates,[]);
+											
+											//Build 'text!path/template.html' dependencies from preloaded templates:
+											preloaded_templates = _.map( preloaded_templates, function( template ) {
+												if( template.indexOf( '/' ) === -1 ) {
+													template = 'theme/'+ template;
+												}
+												return 'text!'+ template +'.html';
+											} );
 											
 											require(preloaded_templates,function(){
 											
