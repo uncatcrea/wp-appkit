@@ -616,30 +616,32 @@ define( function( require, exports ) {
 	/**
 	 * Returns the transition direction ("next-screen", "previous-screen", "default" or customized) according
 	 * to current and previous screen.
+	 * Use this to know the current transition direction when hooking on 'screen-transition' action hook.
+	 * And use the following 'transition-direction' hook to define your own kind of transition directions.
 	 *
-	 * @param {Object} current_screen : The screen that is (going to be) displayed after transition
-	 * @param {Object} previous_screen : The screen we're leaving.
+	 * @param {Object} current_screen : The screen we're leaving.
+	 * @param {Object} next_screen : The screen that is going to be displayed after transition
 	 * @returns {String} Transition direction (default 'default', 'next-screen' and 'previous-screen' but
 	 * can be customized with the "transition-direction" filter).
 	 */
-	themeApp.getTransitionDirection = function( current_screen, previous_screen ) {
+	themeApp.getTransitionDirection = function( current_screen, next_screen ) {
 		var transition = 'default';
 
-		if ( current_screen.screen_type == 'list' || current_screen.screen_type == 'custom-component' ) {
-			if ( previous_screen.screen_type == 'single' ) {
+		if ( next_screen.screen_type == 'list' || next_screen.screen_type == 'custom-component' ) {
+			if ( current_screen.screen_type == 'single' ) {
 				transition = 'previous-screen';
 			} else {
 				transition = 'default';
 			}
-		} else if ( current_screen.screen_type == 'single' ) {
-			if ( previous_screen.screen_type == 'list' || previous_screen.screen_type == 'custom-component' ) {
+		} else if ( next_screen.screen_type == 'single' ) {
+			if ( current_screen.screen_type == 'list' || current_screen.screen_type == 'custom-component' ) {
 				transition = 'next-screen';
-			} else if ( previous_screen.screen_type == 'comments' ) {
+			} else if ( current_screen.screen_type == 'comments' ) {
 				transition = 'previous-screen';
 			} else {
 				transition = 'default';
 			}
-		} else if ( current_screen.screen_type == 'comments' ) {
+		} else if ( next_screen.screen_type == 'comments' ) {
 			transition = 'next-screen';
 		} else {
 			transition = 'default';
@@ -650,10 +652,10 @@ define( function( require, exports ) {
 		 * directions according to what are current (ie asked) and previous screen.
 		 *
 		 * @param {string} Transition direction to override if needed.
-		 * @param {Object} current_screen : The screen that is (going to be) displayed after transition.
-		 * @param {Object} previous_screen : The screen we're leaving.
+		 * @param {Object} current_screen : The screen we're leaving.
+		 * @param {Object} next_screen : The screen that is going to be displayed after transition.
 		 */
-		var transition = Hooks.applyFilters( 'transition-direction', transition, [current_screen, previous_screen] );
+		var transition = Hooks.applyFilters( 'transition-direction', transition, [current_screen, next_screen] );
 
 		return transition;
 	};

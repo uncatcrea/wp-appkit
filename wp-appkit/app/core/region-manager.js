@@ -213,9 +213,20 @@ define(function (require) {
 			vent.trigger('screen:before-transition',App.getCurrentScreenData(),currentView,custom_rendering);
 
 			if( custom_rendering ){
+				
+				/**
+				 * 'screen-transition' action: allows to implement your own screen transitions using JS/CSS.
+				 * 
+				 * @param $wrapper:       jQuery Object corresponding to div#app-content-wrapper, which is the element wrapping $current and $next screens.
+				 * @param $current:       jQuery Object corresponding to the screen (div.app-screen) that we're leaving, to display $next instead.
+				 * @param $next:          jQuery Object corresponding to the new screen (div.app-screen) that we want to display (by replacing $current).
+				 * @param current_screen: JSON Object: screen object containing information about the screen we're leaving.
+				 * @param next_screen:    JSON Object: screen object containing information (screen type, screen item id, etc) about the new screen we want to display (see getCurrentScreen() for details about screen objects) .
+				 * @param $deferred:      jQuery deferred object that must be resolved at the end of the transition animation to tell app core that the new screen has finished rendering.
+				 */
 				Hooks.doActions(
 					'screen-transition',
-					[$el,$('div:first-child',$el),$(view.el),App.getCurrentScreenData(),App.getPreviousScreenMemoryData()]
+					[$el,$('div:first-child',$el),$(view.el),App.getPreviousScreenMemoryData(),App.getCurrentScreenData()]
 				).done(function(){
 					 renderSubRegions();
 					 vent.trigger('screen:showed',App.getCurrentScreenData(),currentView,first_static_opening);
@@ -225,6 +236,7 @@ define(function (require) {
 					renderSubRegions();
 					vent.trigger('screen:showed:failed',App.getCurrentScreenData(),currentView,first_static_opening);
 				});
+				
 			}else{
 				$el.empty().append(view.el);
 				renderSubRegions();
