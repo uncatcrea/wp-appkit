@@ -253,28 +253,7 @@ define(function (require) {
 			}
 	    };
 
-	    var showView = function(view,force_no_waiting){
-
-	    	var no_waiting = force_no_waiting != undefined && force_no_waiting == true;
-
-	    	if( !view.is_static || !$(view.el).html().length ){
-
-	    		if( !no_waiting ){
-	    			region.startWaiting();
-	    		}
-
-				showSimple(view);
-
-				if( !no_waiting ){
-					region.stopWaiting();
-				}
-
-	    	}else{
-	    		showSimple(view);
-	    	}
-	    };
-
-	    var showSimple = function(view) {
+	    var showView = function(view) {
 
 	    	var custom_rendering = App.getParam('custom-screen-rendering');
 
@@ -303,7 +282,7 @@ define(function (require) {
 			screen_static_views[getScreenId( screen )] = view;
 		};
 
-	    var switchScreen = function( view, force_flush, force_no_waiting ) {
+	    var switchScreen = function( view, force_flush ) {
 			var queried_screen = App.getQueriedScreen();
 			vent.trigger( 'screen:leave', App.getCurrentScreenData(), queried_screen, currentView );
 
@@ -312,7 +291,7 @@ define(function (require) {
 				memorizeScreenStaticView( queried_screen, view );
 			}
 
-			showView( view, force_no_waiting );
+			showView( view );
 		};
 
 		var createNewView = function( view_type, view_data, is_static, callback ) {
@@ -419,14 +398,6 @@ define(function (require) {
 
 	    region.getCurrentView = function(){
 	    	return currentView;
-	    };
-
-	    region.startWaiting = function(){
-	    	vent.trigger('waiting:start',App.getCurrentScreenData(),currentView);
-	    };
-
-	    region.stopWaiting = function(){
-	    	vent.trigger('waiting:stop',App.getCurrentScreenData(),currentView);
 	    };
 
 	    return region;

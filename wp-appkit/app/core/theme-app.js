@@ -45,9 +45,7 @@ define( function( require, exports ) {
 							'screen:showed',
 							'screen:before-transition',
 							'menu:rendered',
-							'header:rendered',
-							'waiting:start',
-							'waiting:stop'
+							'header:rendered'
 						],
 						event ) ) {
 			//Proxy RegionManager events :
