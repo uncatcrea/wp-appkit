@@ -67,7 +67,7 @@ define(function (require) {
             $( "#reset-options" )
                 .on( "touchend", self.resetOptions );
 
-			Hooks.doActions('debug-panel-render',[self]);
+			App.triggerInfo( 'debug-panel:render', { debug_view: self } );
 
             return $el;
         },
@@ -181,7 +181,7 @@ define(function (require) {
             var $panel = self.renderPanel();
 
             // Display a confirmation message
-            self.displayFeedback('Options successfully reset')
+            self.displayFeedback('Options successfully reset');
         },
 		
 		displayFeedback : function( message, type, timeout ) {
