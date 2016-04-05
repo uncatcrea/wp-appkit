@@ -148,8 +148,15 @@ define(function (require) {
 	    		if( $(elMenu).length
 	    			&& (!$(elMenu).html().length || (force_reload!=undefined && force_reload) ) ){
 		    		menuView.render();
-		    		vent.trigger('menu:refresh',App.getCurrentScreenData(),menuView);
-		    		Utils.log('Render menu',{menu_view:menuView,force_reload:force_reload});
+					
+					/**
+					 * Use this 'menu:rendered' event to bind JS events on menu's DOM once 
+					 * it is rendered. Useful for example when using JS lib that don't use
+					 * event delegation.
+					 */
+		    		vent.trigger( 'menu:rendered', App.getCurrentScreenData(), menuView );
+		    		
+					Utils.log('Render menu',{menu_view:menuView,force_reload:force_reload});
 	    		}
 	    	}else{
 	    		if( $(elMenu).html().length ){

@@ -44,7 +44,7 @@ define( function( require, exports ) {
 		if ( _.contains( [ 'screen:leave',
 							'screen:showed',
 							'screen:before-transition',
-							'menu:refresh',
+							'menu:rendered',
 							'header:render',
 							'waiting:start',
 							'waiting:stop'
