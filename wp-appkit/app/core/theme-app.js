@@ -400,8 +400,6 @@ define( function( require, exports ) {
 						cb_error( format_theme_event_data( error.event, error ), get_more_link_data );
 					}
 			);
-		} else {
-			Hooks.doActions( 'get-more-component-items', [ current_screen, cb_after, cb_error ] );
 		}
 	};
 
