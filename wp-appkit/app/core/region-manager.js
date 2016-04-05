@@ -176,7 +176,7 @@ define(function (require) {
 		    	if( headerView.containsMenu() ){
 		    		showMenu(true);
 		    	}
-			    vent.trigger('header:render',App.getCurrentScreenData(),headerView);
+			    vent.trigger('header:rendered',App.getCurrentScreenData(),headerView);
 	    	}
 	    };
 

@@ -45,7 +45,7 @@ define( function( require, exports ) {
 							'screen:showed',
 							'screen:before-transition',
 							'menu:rendered',
-							'header:render',
+							'header:rendered',
 							'waiting:start',
 							'waiting:stop'
 						],
