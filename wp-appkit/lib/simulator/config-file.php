@@ -394,24 +394,6 @@ define( function ( require ) {
 		return $app_icons_and_splashscreens_files;
 	}
 
-	protected static function get_phonegap_features( $app_id, $app_platform, $export_type ) {
-		$default_features = array();
-
-		/**
-		 * 'wpak_phonegap_features' filter.
-		 * Use this filter to customize features (and associated permissions) added to your app
-		 *
-		 * Example: $default_features = array( 'http://api.phonegap.com/1.0/battery', 'http://api.phonegap.com/1.0/camera' );
-		 * See here for a complete list of features: http://docs.build.phonegap.com/en_US/configuring_features.md.html
-		 *
-		 * @param $default_features         array    Default features (empty array)
-		 * @param $app_id                   int      App id
-		 * @param $app_platform             string   App platform
-		 * @param $export_type              string   'phonegap-build' (default), 'phonegap-cli' or 'webapp'
-		 */
-		return apply_filters( 'wpak_phonegap_features', $default_features, $app_id, $app_platform, $export_type );
-	}
-
 	public static function get_config_xml( $app_id, $echo = false, $export_type = 'phonegap-build' ) {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
@@ -429,8 +411,6 @@ define( function ( require ) {
 
 		$whitelist_settings = self::get_whitelist_settings( $app_id, $app_platform, $export_type );
 		$splashscreen_settings = self::get_splashscreen_settings( $app_id, $app_platform, $export_type );
-
-		$app_phonegap_features = self::get_phonegap_features( $app_id, $app_platform, $export_type );
 
 		//Merge our default Phonegap Build plugins to those set in BO :
 		$app_phonegap_plugins = WpakApps::get_merged_phonegap_plugins_xml( $app_id, $export_type, $app_main_infos['phonegap_plugins'] );
@@ -463,12 +443,6 @@ define( function ( require ) {
 	<preference name="phonegap-version" value="<?php echo $app_phonegap_version ?>" />
 <?php endif ?>
 	<preference name="permissions" value="none"/>
-
-	<?php if( !empty( $app_phonegap_features ) ): ?>
-		<?php foreach( $app_phonegap_features as $feature ): ?>
-			<preference name="<?php echo $feature; ?>" />
-		<?php endforeach; ?>
-	<?php endif; ?>
 <?php
 	/**
 	* Filter to handle the  "Webview bounce effect" on devices.
