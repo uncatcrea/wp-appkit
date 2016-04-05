@@ -200,17 +200,23 @@ define(function (require) {
 		 */
 		launch_route = Hooks.applyFilters('launch-route',launch_route,[Stats.getStats()]);
 
-		Hooks.doActions('pre-start-router',[launch_route,Stats.getStats()]);
-
-		if( launch_route.length > 0 ){
-			Backbone.history.start();
-			//Navigate to the launch_route :
-			app.router.navigate(launch_route, {trigger: true});
-		}else{
-			Backbone.history.start({silent:true});
-			//Hack : Trigger a non existent route so that no view is loaded :
-			app.router.navigate('#wpak-none', {trigger: true});
-		}
+		/**
+		 * 'pre-start-router' action: use this if you need to do some treatment
+		 * before Backbone routing starts.
+		 */
+		Hooks.doActions( 'pre-start-router', [ launch_route, Stats.getStats() ] ).done( function() {
+			
+			if( launch_route.length > 0 ){
+				Backbone.history.start();
+				//Navigate to the launch_route :
+				app.router.navigate(launch_route, {trigger: true});
+			}else{
+				Backbone.history.start({silent:true});
+				//Hack : Trigger a non existent route so that no view is loaded :
+				app.router.navigate('#wpak-none', {trigger: true});
+			}
+			
+		} );
 
 		/*
 		    //Keep this commented for now in case the problem comes back.
@@ -236,7 +242,7 @@ define(function (require) {
 			Backbone.history.stop();
 			Backbone.history.start({silent: false});
 		*/
-	  }
+	  };
 
 	  //--------------------------------------------------------------------------
 	  //History : allows to handle back button.
