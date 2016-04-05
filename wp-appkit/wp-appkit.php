@@ -53,9 +53,12 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			self::add_rewrite_rules();
 			flush_rewrite_rules();
 
-			WpakThemes::create_theme_directory();
-			
-			//If WordPress Network, add WP-AppKit custom rewrite rules to htacces, 
+			$directory = WpakThemes::create_theme_directory();
+			if( !empty( $directory ) ) {
+				WpakThemes::install_default_themes();
+			}
+
+			//If WordPress Network, add WP-AppKit custom rewrite rules to htacces,
 			//required for apps' preview to work.
 			if( is_multisite() ) {
 				WpakServerRewrite::prepend_wp_network_wpak_rules_to_htaccess();
@@ -64,21 +67,21 @@ if ( !class_exists( 'WpAppKit' ) ) {
 
 		public static function on_deactivation( $network_wide ) {
 			flush_rewrite_rules();
-			
+
 			//If this is a network wide uninstall, we can remove WP-AppKit rules.
 			//If this is not a network wide uninstall, we can't remove our rules
-			//as they may be needed by another site of the network. We could 
+			//as they may be needed by another site of the network. We could
 			//check all sites to see if WP-AppKit is installed somewhere, but this would
 			//require making switch_to_blog() for every sites, which we consider
-			//dangerous performance-wise, knowing that we can have > 10000 websites... 
+			//dangerous performance-wise, knowing that we can have > 10000 websites...
 			//So, unless we find a better solution, we don't remove our rules
-			//if this is not a network wide uninstall. (This should not cause any 
-			//problem as WP-AppKit rules only apply to WP-AppKit plugin 
+			//if this is not a network wide uninstall. (This should not cause any
+			//problem as WP-AppKit rules only apply to WP-AppKit plugin
 			//and can't interfer with other rules).
 			if( is_multisite() && $network_wide ) {
 				WpakServerRewrite::delete_wp_network_wpak_rules_from_htaccess();
 			}
-			
+
 		}
 
 		public static function init() {

@@ -63,30 +63,12 @@ class WpakThemes {
 		}
 
 		// Copy default themes to WP-AppKit themes directory, only if it exists
-		if( empty( $error ) ) {
-			$check = self::check_default_themes();
-
-			// If we have something wrong with all themes, do something. Otherwise, we consider everything is OK if we have at least 1 default theme available
-			// TODO: remove this check to handle theme upgrades
-			if( count( $check ) == count( self::get_default_themes() ) ) {
-
-				$ok = false;
-				foreach( $check as $theme_key => $result ) {
-					// $result can be 'needs_upgrade', but we don't handle this case for now
-					// TODO: handle 'needs_upgrade' case
-					if( $result != 'unavailable' ) {
-						$ok = true;
-					}
-				}
-
-				// If all themes are unavailable, try to copy them
-				if( !$ok && !self::copy_default_themes() ) {
-					$error = sprintf( __( 'We tried copying default themes into %s directory, and it seems it didn\'t work. You can do it manually by <a href="%s">downloading these default themes and uploading them through the dedicated page</a>.', WpAppKit::i18n_domain ),
-						self::get_themes_directory(),
-						menu_page_url( WpakUploadThemes::menu_item, false )
-					);
-				}
-			}
+		if( empty( $error ) && !self::install_default_themes() ) {
+			$error = sprintf( __( 'We tried copying default themes into %s directory, and it seems it didn\'t work. You can do it manually by <a href="%s">downloading these default themes and uploading them through the dedicated page</a>.',
+				WpAppKit::i18n_domain ),
+				self::get_themes_directory(),
+				menu_page_url( WpakUploadThemes::menu_item, false )
+			);
 		}
 
 		if( !empty( $error ) ) {
@@ -143,7 +125,7 @@ class WpakThemes {
 	}
 
 	/**
-	 * Install default themes provided with this plugin into 'wp-content/themes-wp-appkit/' folder.
+	 * Copy default themes provided with this plugin into 'wp-content/themes-wp-appkit/' folder.
 	 * This method will erase existing files, so it should be called after having checked and validated what's needed.
 	 *
 	 * TODO: add a param to choose which theme(s) should be copied, instead of all of them.
@@ -176,6 +158,38 @@ class WpakThemes {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Install default themes provided with this plugin into 'wp-content/themes-wp-appkit/' folder.
+	 * This method will check what's needed, and won't copy default themes if at least one is detected in the
+	 * destination directory.
+	 *
+	 * @return 	bool 	$result 	Whether the copy is complete or not. It's considered OK when *all* themes have been copied.
+	 */
+	public static function install_default_themes() {
+		$return = true;
+		$check = self::check_default_themes();
+
+		// If we have something wrong with all themes, do something. Otherwise, we consider everything is OK if we have at least 1 default theme available
+		// TODO: remove this check to handle theme upgrades
+		if( count( $check ) == count( self::get_default_themes() ) ) {
+			$ok = false;
+			foreach( $check as $theme_key => $result ) {
+				// $result can be 'needs_upgrade', but we don't handle this case for now
+				// TODO: handle 'needs_upgrade' case
+				if( $result != 'unavailable' ) {
+					$ok = true;
+				}
+			}
+
+			// If all themes are unavailable, try to copy them
+			if ( !$ok && !self::copy_default_themes() ) {
+				$return = false;
+			}
+		}
+
+		return $return;
 	}
 
 	public static function template_redirect() {
@@ -520,7 +534,6 @@ class WpakThemes {
 
 		return $return;
 	}
-
 }
 
 WpakThemes::hooks();
