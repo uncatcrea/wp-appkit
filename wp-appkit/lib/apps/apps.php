@@ -723,11 +723,11 @@ class WpakApps {
 			'cordova-plugin-whitelist' => array( 'spec' => '', 'source' => 'npm' ),
 			'cordova-plugin-splashscreen' => array( 'spec' => '', 'source' => 'npm' ),
 			'cordova-plugin-device' => array( 'spec' => '', 'source' => 'npm' ),
+			'cordova-plugin-statusbar' => array( 'spec' => '', 'source' => 'npm' ),
 		);
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		if( $app_main_infos['platform'] == 'ios' ) {
-			$default_plugins['cordova-plugin-statusbar'] = array( 'spec' => '', 'source' => 'npm' );
 			if ( $export_type == 'phonegap-build' ) {
 				unset( $default_plugins['cordova-plugin-whitelist'] );
 			}
