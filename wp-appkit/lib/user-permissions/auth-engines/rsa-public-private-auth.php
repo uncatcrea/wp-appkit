@@ -48,10 +48,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 				<label><?php _e( 'Private Key', WpAppKit::i18n_domain ) ?></label>
 				<textarea name="wpak_app_private_key" id="wpak_app_private_key" style="height:23em"><?php echo esc_textarea( $auth_settings['private_key'] ) ?></textarea>
 				<p class="description">
-					<?php _e( 'This private key is required to allow users to log in from the app using their WordPress credentials.', WpAppKit::i18n_domain ) ?><br/>
-					<?php _e( 'It is an OpenSSL RSA Encryption Key that can be generated with the openssl command line (Unix/OSX) or using PuTTYgen (Windows).', WpAppKit::i18n_domain ) ?><br/>
-					<?php _e( 'Here is the openssl command that generates the private key: openssl genrsa -out rsa_1024_priv.pem 1024.' ) ?><br/>
-					<?php _e( '(Note that WP-AppKit authentication is only compatible with 1024 bits authentication keys.)' ) ?>
+					<?php _e( 'Copy here an OpenSSL RSA Encryption Key to secure logins from your app.', WpAppKit::i18n_domain ) ?>
 					<?php //TODO : add a link to our soon coming tutorial about this :) ?>
 				</p>
 			</div>

@@ -317,16 +317,16 @@ class WpakApps {
 			</div>
 
 			<div id="export-action">
-				
+
 				<?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
-				
-				<?php 
+
+				<?php
 				/*
-				 * 2016-03-05: Export type select commented for now as we have to stabilize export features other 
+				 * 2016-03-05: Export type select commented for now as we have to stabilize export features other
 				 * than PhoneGap Build before releasing it.
 				 * Was added in https://github.com/uncatcrea/wp-appkit/commit/ac4af270f8ea6273f4d653878c69fceec85a9dd8 along with
 				 * the corresponding JS in apps.js.
-				 * 
+				 *
 				<?php $default_export_type = 'phonegap-build'; ?>
 				<select name="export_type" id="wpak_export_type" >
 					<?php foreach( WpakBuild::get_allowed_export_types() as $export_type => $label ): ?>
@@ -334,9 +334,9 @@ class WpakApps {
 					<?php endforeach ?>
 				</select>
 				<a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => $default_export_type ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
-				*/ 
+				*/
 				?>
-				
+
 			</div>
 		</div>
 
@@ -363,7 +363,7 @@ class WpakApps {
 		?>
 		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
 		<div class="wpak_settings">
-			<p class="description"><?php _e( 'PhoneGap config.xml informations that are going to be displayed on App Stores.<br/>They are required when exporting the App to Phonegap, but are not used for App debug and simulation in browsers.', WpAppKit::i18n_domain ) ?></p>
+			<p class="description"><?php _e( 'Information will be used when compiling your app and may be displayed in app stores. It will be stored in the config.xml file of your project.', WpAppKit::i18n_domain ) ?></p>
 			<fieldset>
 				<legend><?php _e( 'Application', WpAppKit::i18n_domain ); ?></legend>
 				<div class="field-group">
@@ -389,7 +389,7 @@ class WpakApps {
 				<div class="field-group">
 					<label><?php _e( 'Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_icons" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
-					<span class="description"><?php printf( __( 'Write the icons and splashscreens tags as defined in the PhoneGap documentation.<br/>Example: %s', WpAppKit::i18n_domain ), '&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;' ) ?><br><br></span>
+					<span class="description"><?php printf( __( 'Add here the tags defining where are the app icons and splashscreens.<br/>Example: %s', WpAppKit::i18n_domain ), '&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;' ) ?><br><br></span>
 					<br>
 					<input type="checkbox" id="wpak_use_default_icons_and_splash" name="wpak_use_default_icons_and_splash" <?php checked( $main_infos['use_default_icons_and_splash'] ) ?> />
 					<label for="wpak_use_default_icons_and_splash"><?php _e( 'Use default WP-AppKit Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
@@ -420,7 +420,8 @@ class WpakApps {
 				<div class="field-group">
 					<label><?php _e( 'Plugins', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_phonegap_plugins" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
-					<span class="description"><?php printf( __( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter %s directly in the textarea.', WpAppKit::i18n_domain ), '&lt;plugin name="org.apache.cordova.inappbrowser" spec="0.3.3" /&gt;' ) ?></span>
+					<span class="description"><?php __( 'Add here the tags defining the plugins you want to 
+					include in your app. Before adding a plugin, check which one is included by default.', WpAppKit::i18n_domain ) ?></span>
 				</div>
 			</fieldset>
 			<div class="field-group wpak_phonegap_links">
@@ -444,7 +445,7 @@ class WpakApps {
 				<option value="1" <?php echo $simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Private', WpAppKit::i18n_domain ) ?></option>
 				<option value="0" <?php echo!$simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Public', WpAppKit::i18n_domain ) ?></option>
 			</select>
-			<span class="description"><?php _e( 'If activated, only connected users with right permissions can access the app simulation in web browser.<br/>If deactivated, the app simulation is publicly available in any browser, including the config.js and config.xml files, that can contain sensitive data.', WpAppKit::i18n_domain ) ?></span>
+			<span class="description"><?php _e( 'Private means that only connected users with the right permissions can access the browser simulation. When public, anyone can access browser simulation. That includes the config.js and config.xml files which may contain sensitive data.', WpAppKit::i18n_domain ) ?></span>
 		</div>
 		<?php wp_nonce_field( 'wpak-security-infos-' . $post->ID, 'wpak-nonce-security-infos' ) ?>
 		<?php

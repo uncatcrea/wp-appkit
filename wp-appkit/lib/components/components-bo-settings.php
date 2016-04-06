@@ -80,6 +80,8 @@ class WpakComponentsBoSettings {
 
 		</div>
 
+		<?php // TODO: Use an external CSS file ?>
+
 		<style>
 			#components-wrapper{ margin-top:1em }
 			#components-table{ margin-top:5px }
