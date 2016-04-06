@@ -530,6 +530,11 @@ class WpakThemes {
 
 		if( $return_objects ) {
 			$return = array_map( 'get_post', $return );
+
+			// Post title may be empty
+			foreach( $return as &$post ) {
+				$post->post_title = _draft_or_post_title( $post->ID );
+			}
 		}
 
 		return $return;
