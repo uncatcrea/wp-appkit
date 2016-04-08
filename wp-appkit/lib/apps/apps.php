@@ -386,6 +386,13 @@ class WpakApps {
 					<label><?php _e( 'VersionCode (Android only)', WpAppKit::i18n_domain ) ?></label>
 					<input type="text" name="wpak_app_version_code" value="<?php echo esc_attr( $main_infos['version_code'] ) ?>" id="wpak_app_version_code" />
 				</div>
+				<div class="field-group platform-specific android">
+					<label><?php _e( 'Build Tool (Android only)', WpAppKit::i18n_domain ) ?></label><br>
+					<select name="wpak_app_build_tool">
+						<option value="gradle" <?php selected( $main_infos['build_tool'], 'gradle' ) ?>><?php echo esc_html( __( 'Gradle' ), WpAppKit::i18n_domain ) ?></option>
+						<option value="ant" <?php selected( $main_infos['build_tool'], 'ant' ) ?>><?php echo esc_html( __( 'Ant' ), WpAppKit::i18n_domain ) ?></option>
+					</select>
+				</div>
 				<div class="field-group">
 					<label><?php _e( 'Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_icons" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
@@ -497,6 +504,10 @@ class WpakApps {
 
 		if ( isset( $_POST['wpak_app_version_code'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_version_code', sanitize_text_field( $_POST['wpak_app_version_code'] ) );
+		}
+		
+		if ( isset( $_POST['wpak_app_build_tool'] ) ) {
+			update_post_meta( $post_id, '_wpak_app_build_tool', sanitize_text_field( $_POST['wpak_app_build_tool'] ) );
 		}
 
 		if ( isset( $_POST['wpak_app_phonegap_version'] ) ) {
@@ -656,6 +667,9 @@ class WpakApps {
 		$use_default_icons_and_splash = get_post_meta( $post_id, '_wpak_use_default_icons_and_splash', true );
 		$use_default_icons_and_splash = ( empty( $use_default_icons_and_splash ) && empty( $icons ) ) || $use_default_icons_and_splash === 'on';
 
+		$build_tool = get_post_meta( $post_id, '_wpak_app_build_tool', true );
+		$build_tool = empty( $build_tool ) ? 'gradle' : $build_tool; //Set gradle as default Android build tool
+		
 		$phonegap_plugins = '';
 		if ( metadata_exists( 'post', $post_id, '_wpak_app_phonegap_plugins' ) ) {
 			$phonegap_plugins = get_post_meta( $post_id, '_wpak_app_phonegap_plugins', true );
@@ -667,6 +681,7 @@ class WpakApps {
 			'desc' => $desc,
 			'version' => $version,
 			'version_code' => $version_code,
+			'build_tool' => $build_tool,
 			'phonegap_version' => $phonegap_version,
 			'platform' => !empty( $platform ) ? $platform : '',
 			'author' => $author,

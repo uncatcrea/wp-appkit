@@ -402,6 +402,7 @@ define( function ( require ) {
 		$app_phonegap_id = $app_main_infos['app_phonegap_id'];
 		$app_version = $app_main_infos['version'];
 		$app_version_code = $app_main_infos['version_code'];
+		$app_build_tool = $app_main_infos['build_tool'];
 		$app_phonegap_version = $app_main_infos['phonegap_version'];
 		$app_author = $app_main_infos['author'];
 		$app_author_email = $app_main_infos['author_email'];
@@ -438,6 +439,9 @@ define( function ( require ) {
 	<author href="<?php echo $app_author_website ?>" email="<?php echo $app_author_email ?>"><?php echo $app_author ?></author>
 
 	<gap:platform name="<?php echo $app_platform ?>" />
+<?php if( !empty( $app_build_tool ) && $app_platform == 'android' ): ?>
+	<preference name="android-build-tool" value="<?php echo $app_build_tool ?>" />
+<?php endif ?>
 <?php if( !empty( $app_phonegap_version ) ): ?>
 
 	<preference name="phonegap-version" value="<?php echo $app_phonegap_version ?>" />
