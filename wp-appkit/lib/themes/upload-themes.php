@@ -160,24 +160,22 @@ class WpakUploadThemes {
 						</form>
 					</div>
 
-					<h2><?php _e( 'Download Default Themes Packages', WpAppKit::i18n_domain ); ?></h2>
-					<div>
-						<?php if( !empty( $default_themes ) ): ?>
+					<?php if( !empty( $default_themes ) ): ?>
+						<h2><?php _e( 'Download Default Themes Packages', WpAppKit::i18n_domain ); ?></h2>
+						<div>
 							<ul>
-							<?php foreach( $default_themes as $theme ):
-								if( !is_file( WpakThemes::get_default_themes_directory() . '/' . $theme['file'] ) ) {
-									continue;
-								}
-								?>
-								<li>
-									<a href="<?php echo WpakThemes::get_default_themes_directory_uri() . '/' . $theme['file']; ?>"><?php echo $theme['name'] . ' (' . $theme['version'] . ')'; ?></a>
-								</li>
-							<?php endforeach; ?>
+								<?php foreach( $default_themes as $theme ):
+									if( !is_file( WpakThemes::get_default_themes_directory() . '/' . $theme['file'] ) ) {
+										continue;
+									}
+									?>
+									<li>
+										<a href="<?php echo WpakThemes::get_default_themes_directory_uri() . '/' . $theme['file']; ?>"><?php echo $theme['name'] . ' (' . $theme['version'] . ')'; ?></a>
+									</li>
+								<?php endforeach; ?>
 							</ul>
-						<?php else: ?>
-							<div><?php _e( 'Your WP-AppKit install doesn\'t seem to have any default theme available.', WpAppKit::i18n_domain ); ?></div>
-						<?php endif; ?>
-					</div>
+						</div>
+					<?php endif; ?>
 
 				</div>
 				<?php
