@@ -179,10 +179,10 @@ define( function ( require ) {
 		switch ( $app_platform ) {
 			case 'ios':
 				$splashcreen_settings['preferences']['AutoHideSplashScreen'] = 'false';
+				$splashcreen_settings['preferences']['FadeSplashScreenDuration'] = '1000';
 				$splashcreen_settings['preferences']['ShowSplashScreenSpinner'] = 'false';
 				$splashcreen_settings['gap:config-file']['UIStatusBarHidden'] = 'true';
 				$splashcreen_settings['gap:config-file']['UIViewControllerBasedStatusBarAppearance'] = 'false';
-				//Note:  we've not been able to make fading work when autohide is set to false.
 				break;
 			case 'android':
 				$splashcreen_settings['preferences']['SplashScreen'] = 'splash';
