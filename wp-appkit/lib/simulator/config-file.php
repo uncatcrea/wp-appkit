@@ -103,6 +103,7 @@ define( function ( require ) {
 	return {
 		app_slug : '<?php echo $app_slug ?>',
 		wp_ws_url : '<?php echo $wp_ws_url ?>',
+		wp_url : '<?php echo home_url() ?>',
 		theme : '<?php echo addslashes($theme) ?>',
 		version : '<?php echo $app_version ?>',
 		app_title : '<?php echo addslashes($app_title) ?>',
