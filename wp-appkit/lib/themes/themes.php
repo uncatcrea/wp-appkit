@@ -2,6 +2,7 @@
 
 require_once(dirname( __FILE__ ) . '/themes-storage.php');
 require_once(dirname( __FILE__ ) . '/themes-bo-settings.php');
+require_once(dirname( __FILE__ ) . '/themes-configjs-settings.php');
 
 class WpakThemes {
 
