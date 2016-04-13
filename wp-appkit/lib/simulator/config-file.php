@@ -39,6 +39,10 @@ class WpakConfigFile {
 					if ( WpakApps::get_app_simulation_is_secured( $app_id ) && !current_user_can( $capability ) ) {
 						wp_nonce_ays( $action );
 					}
+					
+					//If the app current theme has some PHP (hooks!) to be executed before
+					//config files are generated, include it here :
+					WpakThemes::include_app_theme_php( $app_id );
 
 					$file = $wp_query->query_vars['wpak_appli_file'];
 
