@@ -122,10 +122,11 @@ if ( !class_exists( 'WpAppKit' ) ) {
 
 		/**
 		 * Execute changes made in WP-AppKit 0.6.0.
-		 *
-		 * @TODO Complete the migration script for 0.6.0
 		 */
 		protected static function upgrade_060() {
+			// Remove 'wpak_used_themes' transient since its value's structure changed with this version
+			delete_transient( 'wpak_used_themes' );
+
 			// Everything went fine, update DB version not to run this script once again
 			update_option( 'wpak_version', 42 );
 		}
