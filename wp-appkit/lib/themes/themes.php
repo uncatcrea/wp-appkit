@@ -7,6 +7,19 @@ require_once(dirname( __FILE__ ) . '/themes-configjs-settings.php');
 class WpakThemes {
 
 	const themes_directory = 'themes-wp-appkit';
+	const default_themes_directory = 'default-themes';
+	protected static $default_themes = array(
+		/*
+		// Structure example:
+		// TODO: add values when default themes will be ready
+		'default1' => array(
+			'id' => 'default1', // Same as the array key
+			'file' => 'default1.zip',
+			'name' => 'Default1 WP-AppKit Theme', // TODO: handle name change between versions?
+			'version' => '1.0.0',
+		),
+		*/
+	);
 
 	public static function hooks() {
 		add_action( 'init', array( __CLASS__, 'rewrite_rules' ) );
@@ -14,12 +27,25 @@ class WpakThemes {
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 	}
 
-	public static function get_themes_directory() {
+
+	public static function get_themes_directory(){
 		return WP_CONTENT_DIR .'/'. self::themes_directory;
 	}
 
 	public static function get_themes_directory_uri() {
-		return WP_CONTENT_URL .'/'. self::themes_directory;
+		return WP_CONTENT_URL . '/' . self::themes_directory;
+	}
+
+	public static function get_default_themes_directory(){
+	 	return plugin_dir_path( dirname( dirname( __FILE__ ) ) ) . self::default_themes_directory;
+	}
+
+	public static function get_default_themes_directory_uri(){
+	 	return plugins_url( self::default_themes_directory, dirname( dirname( __FILE__ ) ) );
+	}
+
+	public static function get_default_themes() {
+		return self::$default_themes;
 	}
 
 	public static function rewrite_rules() {
@@ -33,21 +59,67 @@ class WpakThemes {
 	}
 
 	public static function admin_notices() {
-		if( !is_dir( self::get_themes_directory() ) ) {
-			if( !self::create_theme_directory() ) {
-				?>
-				<div class="error">
-					<p>
-						<?php
-							echo sprintf( __( 'The WP AppKit themes directory %s can\'t be created. <br/>Please check that your WordPress install has the permissions to create this directory.', WpAppKit::i18n_domain ),
-										  basename(WP_CONTENT_DIR) .'/'. self::themes_directory
-							);
-						?>
-					</p>
-				</div>
-				<?php
+		$error = '';
+
+		// Try to create WP-AppKit themes directory if it doesn't exist
+		if( !is_dir( self::get_themes_directory() ) && !self::create_theme_directory() ) {
+			$error = sprintf( __( 'The WP AppKit themes directory %s can\'t be created. <br/>Please check that your WordPress install has the permissions to create this directory.', WpAppKit::i18n_domain ),
+		  		self::get_themes_directory()
+			);
+		}
+
+		// Copy default themes to WP-AppKit themes directory, only if it exists
+		if( empty( $error ) && !self::install_default_themes() ) {
+			$error = sprintf( __( 'We tried copying default themes into %s directory, and it seems it didn\'t work. You can do it manually by <a href="%s">downloading these default themes and uploading them through the dedicated page</a>.',
+				WpAppKit::i18n_domain ),
+				self::get_themes_directory(),
+				menu_page_url( WpakUploadThemes::menu_item, false )
+			);
+		}
+
+		if( !empty( $error ) ) {
+			?>
+			<div class="error">
+				<p>
+					<?php echo $error; ?>
+				</p>
+			</div>
+			<?php
+		}
+	}
+
+	/**
+	 * Check what are the installed themes compared to provided default ones: check if the theme is installed and is up-to-date.
+	 *
+	 * @return 	array 	$result 	Empty if everything is OK (all default themes installed and up-to-date), or containing a value for each theme: either 'unavailable' (not installed) or 'needs_upgrade' (if the installed version is lower than the embedded one).
+	 */
+	public static function check_default_themes() {
+		$available_themes = self::get_available_themes( true );
+		$default_themes = self::get_default_themes();
+
+		// Get an array with [ 'id' => 'name' ] for each default theme
+		$default_names = wp_list_pluck( $default_themes, 'name', 'id' );
+
+		$result = array_fill_keys( array_keys( $default_names ), 'unavailable' );
+
+		foreach( $available_themes as $slug => $data ) {
+			$id = array_search( $data['Name'], $default_names );
+
+			if( $id === false ) {
+				continue;
+			}
+
+			// The theme is a default one: check if it needs an upgrade
+			if( version_compare( $data['Version'], $default_themes[$id]['version'], '<' ) ) {
+				$result[$id] = 'needs_upgrade';
+			}
+			else {
+				// This theme is available and up-to-date
+				unset( $result[$id] );
 			}
 		}
+
+		return $result;
 	}
 
 	public static function create_theme_directory() {
@@ -56,6 +128,74 @@ class WpakThemes {
 			$theme_directory_ok = mkdir( self::get_themes_directory() );
 		}
 		return $theme_directory_ok;
+	}
+
+	/**
+	 * Copy default themes provided with this plugin into 'wp-content/themes-wp-appkit/' folder.
+	 * This method will erase existing files, so it should be called after having checked and validated what's needed.
+	 *
+	 * TODO: add a param to choose which theme(s) should be copied, instead of all of them.
+	 *
+	 * @return 	bool 	$result 	Whether the copy is complete or not. It's considered OK when *all* themes have been copied.
+	 */
+	public static function copy_default_themes() {
+		$access_type = get_filesystem_method( array(), self::get_themes_directory() );
+
+		if( $access_type != 'direct' || !WP_Filesystem( array(), self::get_themes_directory() ) ) {
+			return false;
+		}
+
+		// WP_Filtesystem initialization ran OK, we can perform our copy
+		global $wp_filesystem;
+		$result = true;
+
+		foreach( self::get_default_themes() as $struc ) {
+			if( !$wp_filesystem->is_file( self::get_default_themes_directory() . '/' . $struc['file'] ) ) {
+				continue;
+			}
+
+			// Warning: this will erase existing files, it's intended since this method should be called after some checks and validation about that fact
+			// TODO: use WP_Upgrader API
+			$res = unzip_file( self::get_default_themes_directory() . '/' . $struc['file'], self::get_themes_directory() );
+
+			if( is_wp_error( $res ) ) {
+				$result = false;
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Install default themes provided with this plugin into 'wp-content/themes-wp-appkit/' folder.
+	 * This method will check what's needed, and won't copy default themes if at least one is detected in the
+	 * destination directory.
+	 *
+	 * @return 	bool 	$result 	Whether the copy is complete or not. It's considered OK when *all* themes have been copied.
+	 */
+	public static function install_default_themes() {
+		$return = true;
+		$check = self::check_default_themes();
+
+		// If we have something wrong with all themes, do something. Otherwise, we consider everything is OK if we have at least 1 default theme available
+		// TODO: remove this check to handle theme upgrades
+		if( count( $check ) == count( self::get_default_themes() ) ) {
+			$ok = false;
+			foreach( $check as $theme_key => $result ) {
+				// $result can be 'needs_upgrade', but we don't handle this case for now
+				// TODO: handle 'needs_upgrade' case
+				if( $result != 'unavailable' ) {
+					$ok = true;
+				}
+			}
+
+			// If all themes are unavailable, try to copy them
+			if ( !$ok && !self::copy_default_themes() ) {
+				$return = false;
+			}
+		}
+
+		return $return;
 	}
 
 	public static function template_redirect() {
@@ -397,6 +537,26 @@ class WpakThemes {
 		return in_array( $theme_slug, $used_themes );
 	}
 
+	public static function get_apps_for_theme( $theme_slug, $return_objects = false ) {
+		$return = array();
+
+		$used_themes = WpakThemesStorage::get_used_themes( false, true );
+
+		if( !empty( $used_themes[$theme_slug] ) ) {
+			$return = $used_themes[$theme_slug];
+		}
+
+		if( $return_objects ) {
+			$return = array_map( 'get_post', $return );
+
+			// Post title may be empty
+			foreach( $return as &$post ) {
+				$post->post_title = _draft_or_post_title( $post->ID );
+			}
+		}
+
+		return $return;
+	}
 }
 
 WpakThemes::hooks();

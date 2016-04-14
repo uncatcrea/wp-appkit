@@ -56,7 +56,10 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			self::add_rewrite_rules();
 			flush_rewrite_rules();
 
-			WpakThemes::create_theme_directory();
+			$directory = WpakThemes::create_theme_directory();
+			if( !empty( $directory ) ) {
+				WpakThemes::install_default_themes();
+			}
 
 			//If WordPress Network, add WP-AppKit custom rewrite rules to htacces,
 			//required for apps' preview to work.
