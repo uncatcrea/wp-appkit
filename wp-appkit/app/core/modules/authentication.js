@@ -115,7 +115,7 @@ define( function( require ) {
 
 		var web_service_params = {
 			user: user,
-			timestamp: timestamp,
+			timestamp: timestamp
 		};
 		
 		if ( add_data_to_ws_params ) {
@@ -525,7 +525,9 @@ define( function( require ) {
 							if ( data.user_auth_ok === 1 ) {
 
 								//The user is connected ok.
-								//Nothing more to do, simply return.
+								//Update its permissions from server's answer:
+								authenticationData.set( 'permissions', data.permissions );
+								
 								cb_ok( authentication.getCurrentUser() );
 
 							} else if ( data.hasOwnProperty( 'auth_error' ) ) {

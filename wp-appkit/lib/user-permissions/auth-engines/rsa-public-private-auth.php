@@ -320,26 +320,36 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 					 && !empty( $auth_params['control'] )
 					 && !empty( $auth_params['timestamp'] )
 					) {
+					
+					$user_wp = get_user_by( 'login', $auth_params['user'] );
 
-					if ( !empty( $auth_params['hash'] ) && !empty( $auth_params['hasher'] ) ) {
-						$result = $this->check_authenticated_action( $app_id, 'check_user_auth', $auth_params, array( $auth_params['hash'], $auth_params['hasher'] ) );
-						if ( $result['ok'] ) {
-							//Means that the user is authenticated ok on server side, with secret ok.
-							//Now, check that the public key has not changed :
-							$app_public_key = $this->get_app_public_key( $app_id );
-							$hash = $this->generate_hmac( $app_public_key, $auth_params['hasher'] );
-							if ( $auth_params['hash'] === $hash ) {
-								$service_answer['user_auth_ok'] = 1;
+					if ( $user_wp ) {
+						if ( !empty( $auth_params['hash'] ) && !empty( $auth_params['hasher'] ) ) {
+							$result = $this->check_authenticated_action( $app_id, 'check_user_auth', $auth_params, array( $auth_params['hash'], $auth_params['hasher'] ) );
+							if ( $result['ok'] ) {
+								//Means that the user is authenticated ok on server side, with secret ok.
+								//Now, check that the public key has not changed :
+								$app_public_key = $this->get_app_public_key( $app_id );
+								$hash = $this->generate_hmac( $app_public_key, $auth_params['hasher'] );
+								if ( $auth_params['hash'] === $hash ) {
+									$service_answer['user_auth_ok'] = 1;
+
+									//Re-send updated user permissions so that it can be checked on app side:
+									$service_answer['permissions'] = $this->get_user_permissions( $user_wp->ID, $app_id );
+
+								} else {
+									$service_answer['auth_error'] = 'wrong-public-key';
+								}
 							} else {
-								$service_answer['auth_error'] = 'wrong-public-key';
+								//Depending on $result['auth_error'], can mean that the user
+								//is not authenticated or that his secret has changed (if hmac check failed).
+								$service_answer['auth_error'] = $result['auth_error'];
 							}
 						} else {
-							//Depending on $result['auth_error'], can mean that the user
-							//is not authenticated or that his secret has changed (if hmac check failed).
-							$service_answer['auth_error'] = $result['auth_error'];
+							$service_answer['auth_error'] = 'no-hash';
 						}
 					} else {
-						$service_answer['auth_error'] = 'no-hash';
+						$service_answer['auth_error'] = 'wrong-user';
 					}
 				}else {
 					$service_answer['auth_error'] = 'wrong-auth-data';
