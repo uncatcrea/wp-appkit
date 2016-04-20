@@ -535,6 +535,9 @@ define( function( require ) {
 									case 'user-connection-expired':
 										authentication.logUserOut( 2 );
 										break;
+									case 'wrong-permissions':
+										authentication.logUserOut( 4 );
+										break;
 									default:
 										authentication.logUserOut( 3 );
 										break;
@@ -642,6 +645,9 @@ define( function( require ) {
 				break;
 			case 3:
 				logout_info_type = 'user-not-authenticated';
+				break;
+			case 4:
+				logout_info_type = 'user-wrong-permissions';
 				break;
 			default:
 				logout_info_type = 'unknown';
