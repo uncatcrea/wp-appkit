@@ -25,11 +25,12 @@ define( function( require ) {
 	var AuthenticationDataModel = Backbone.Model.extend( {
 		localStorage: new Backbone.LocalStorage( 'Authentication-' + Config.app_slug  ),
 		defaults: {
-			user_login: "",
+			user_login: "", //This is what the user used to login: can be login or email
 			secret: "",
 			public_key: "",
 			is_authenticated : false,
-			permissions: {}
+			permissions: {},
+			info: {}
 		}
 	} );
 
@@ -277,25 +278,28 @@ define( function( require ) {
 						if ( data.hasOwnProperty( 'authenticated' ) ) {
 							if ( data.authenticated === 1 ) {
 							
-									if (  data.hasOwnProperty( 'permissions' ) ) {
+									if ( data.hasOwnProperty( 'permissions' ) && data.hasOwnProperty( 'info' ) ) {
 							
 										//Check control hmac :
 										if ( checkHMAC( 'authenticated' + user, user_secret, data.control ) ) {
 
 											//Memorize current user login and secret : 
-											authenticationData.set( 'user_login', user );
+											authenticationData.set( 'user_login', user ); //This is what the user used to login: can be login or email
 											authenticationData.set( 'secret', user_secret );
 											authenticationData.set( 'is_authenticated', true );
 
 											//Memorize returned user permissions
 											authenticationData.set( 'permissions', data.permissions );
+											
+											//Memorize returned user info
+											authenticationData.set( 'info', data.info );
 
 											//Save all this to local storage
 											authenticationData.save();
 											
 											Utils.log( 'User "' + user + '" logged in successfully', authentication.getCurrentUser() );
 
-											cb_ok( { user: user, permissions: data.permissions } );
+											cb_ok( { user: user, permissions: data.permissions, info: data.info } );
 
 										} else {
 											cb_error( 'wrong-hmac' );
@@ -351,7 +355,7 @@ define( function( require ) {
 		
 		var user_authenticated = authenticationData.get( 'is_authenticated' ); 
 		if ( user_authenticated ) {
-			var user_login = authenticationData.get( 'user_login' );
+			var user_login = authenticationData.get( 'user_login' ); //This is what the user used to login: can be login or email
 			var user_secret = authenticationData.get( 'secret' );
 			if ( user_login && user_secret ) {
 				auth_data = getAuthWebServicesParams( action, user_login, true, control_data_keys, control_data, false );
@@ -364,10 +368,11 @@ define( function( require ) {
 	/** 
 	 * Get public info about the current user
 	 * 
-	 * @param {String} field  (Optional) to get a specific user data field (can be 'login', 'permissions')
+	 * @param {String} field  (Optional) to get a specific user data field (can be 'login', 'permissions', 'info')
 	 * @returns {JSON Object} :
 	 *			- login {String}
 	 *			- permissions {JSON Object} 
+	 *			- info {JSON Object} 
 	 */
 	authentication.getCurrentUser = function( field ) {
 		var user = null;
@@ -375,8 +380,9 @@ define( function( require ) {
 		var user_authenticated = authenticationData.get( 'is_authenticated' );
 		if ( user_authenticated ) {
 			user = {
-				login: authenticationData.get( 'user_login' ),
-				permissions: authenticationData.get( 'permissions' )
+				login: authenticationData.get( 'user_login' ), //This is what the user used to login: can be login or email
+				permissions: authenticationData.get( 'permissions' ),
+				info: authenticationData.get( 'info' )
 			};
 		}
 		
@@ -525,8 +531,10 @@ define( function( require ) {
 							if ( data.user_auth_ok === 1 ) {
 
 								//The user is connected ok.
-								//Update its permissions from server's answer:
+								//Update its permissions and info from server's answer:
 								authenticationData.set( 'permissions', data.permissions );
+								authenticationData.set( 'info', data.info );
+								authenticationData.save();
 								
 								cb_ok( authentication.getCurrentUser() );
 
@@ -656,8 +664,9 @@ define( function( require ) {
 		
 		var logout_info = {
 			type: 'authentication-info', //So that theme info event subtype is set
-			user: authenticationData.get( 'user_login' ), 
+			user: authenticationData.get( 'user_login' ), //This is what the user used to login: can be login or email
 			permissions: authenticationData.get( 'permissions' ),
+			info: authenticationData.get( 'info' ),
 			logout_type: logout_info_type
 		};
 		
@@ -668,6 +677,7 @@ define( function( require ) {
 		authenticationData.set( 'secret', '' );
 		authenticationData.set( 'is_authenticated', false );
 		authenticationData.set( 'permissions', {} );
+		authenticationData.set( 'info', {} );
 		authenticationData.save();
 		
 		App.triggerInfo( 'auth:user-logout', logout_info );

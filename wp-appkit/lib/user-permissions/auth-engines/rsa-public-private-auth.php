@@ -137,6 +137,19 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 
 		return $decrypted;
 	}
+	
+	protected function get_wp_user( $user_login ) {
+		
+		$user_login = sanitize_user( $user_login );
+		
+		$user_wp = get_user_by( 'login', $user_login );
+
+		if ( !$user_wp && strpos( $user_login, '@' ) ) {
+			$user_wp = get_user_by( 'email', $user_login );
+		}
+		
+		return !empty( $user_wp ) ? $user_wp : false;
+	}
 
 	public function get_webservice_answer( $app_id ) {
 		$service_answer = array();
@@ -150,8 +163,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 			case "get_public_key":
 				if ( !empty( $auth_params['user'] ) ) {
 
-					$user = $auth_params['user'];
-					$user_wp = get_user_by( 'login', $user );
+					$user_wp = $this->get_wp_user( $auth_params['user'] );
 
 					if ( $user_wp ) {
 
@@ -252,8 +264,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 
 									//Check user data :
 
-									$user = $decrypted['user'];
-									$user_wp = get_user_by( 'login', $user );
+									$user_wp = $this->get_wp_user( $user );
 
 									if ( $user_wp ) {
 
@@ -274,6 +285,9 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 
 													//Get user permissions :
 													$service_answer['permissions'] = $this->get_user_permissions( $user_wp->ID, $app_id );
+													
+													//Get user info :
+													$service_answer['info'] = $this->get_user_info( $user_wp->ID, $app_id );
 
 													//Add control key :
 													$service_answer['control'] = $this->generate_hmac( 'authenticated' . $user, $user_secret_key );
@@ -327,7 +341,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 					 && !empty( $auth_params['timestamp'] )
 					) {
 					
-					$user_wp = get_user_by( 'login', $auth_params['user'] );
+					$user_wp = $this->get_wp_user( $auth_params['user'] );
 
 					if ( $user_wp ) {
 						if ( !empty( $auth_params['hash'] ) && !empty( $auth_params['hasher'] ) ) {
@@ -344,8 +358,9 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 										
 										$service_answer['user_auth_ok'] = 1;
 
-										//Re-send updated user permissions so that it can be checked on app side:
+										//Re-send updated user permissions and info so that it can be checked on app side:
 										$service_answer['permissions'] = $this->get_user_permissions( $user_wp->ID, $app_id );
+										$service_answer['info'] = $this->get_user_info( $user_wp->ID, $app_id );
 								
 									} else {
 										$service_answer['auth_error'] = 'wrong-permissions';
@@ -400,10 +415,10 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		//First check user validity
 		if ( !empty( $auth_data['user'] ) ) {
 
-			$user = $auth_data['user'];
-
 			//Check user exists
-			$user_wp = get_user_by( 'login', $user );
+			$user = $auth_data['user'];
+			$user_wp = $this->get_wp_user( $user );
+			
 			if ( $user_wp ) {
 
 				//Check the user is not banned :
@@ -483,8 +498,8 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		}elseif ( is_a( $user, 'WP_User' ) ) {
 			$user_id = $user->ID;
 		} elseif( is_string( $user ) ) {
-			if ( $user = get_user_by( 'login', $user ) ) {
-				$user_id = $user->ID;
+			if ( $user_wp = $this->get_wp_user( $user ) ) {
+				$user_id = $user_wp->ID;
 			}
 		}
 
@@ -614,7 +629,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	}
 
 	/**
-	 * Retrieves user permisions (roles and capabilities) to return to the app.
+	 * Retrieves user permisions (roles and capabilities) to return to the app when a user logs in.
 	 */
 	protected function get_user_permissions( $user_id, $app_id ) {
 		$user_permissions = array( 'capabilities' => array(), 'roles' => array() );
@@ -631,9 +646,44 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 			}
 		}
 
+		/**
+		 * 'wpak_auth_user_permissions' filter: use this to add custom permissions info
+		 * (like membership levels from a membership level for example) to default WP permissions data.
+		 * 
+		 * @param array $user_permissions WP roles and capabilities by default. Add your own custom permissions to that array.
+		 * @param int   $user_id          User's WP ID
+		 * @param int   $app_id           The app we're retrieving user's permissions for.
+		 */
 		$user_permissions = apply_filters( 'wpak_auth_user_permissions', $user_permissions, $user_id, $app_id );
 
 		return $user_permissions;
+	}
+	
+	/**
+	 * Retrieves user info (login etc) to return to the app when a user logs in.
+	 */
+	protected function get_user_info( $user_id, $app_id ) {
+		
+		$wp_user = get_user_by( 'id', $user_id );
+		
+		if ( $wp_user ) {
+			
+			$user_info = array(
+				'login' => $wp_user->user_login
+			);
+
+			/**
+			 * 'wpak_auth_user_info' filter: use this to return custom user info to the app at login.
+			 * 
+			 * @param array $user_info  WP user info (by default, just user's login). Add your own custom user info to that array.
+			 * @param int   $user_id    User's WP ID
+			 * @param int   $app_id     The app we're retrieving user's info for.
+			 */
+			$user_info = apply_filters( 'wpak_auth_user_info', $user_info, $user_id, $app_id );
+			
+		}
+		
+		return $user_info;
 	}
 
 	protected function check_user_is_allowed_to_authenticate( $user_id, $app_id ) {
