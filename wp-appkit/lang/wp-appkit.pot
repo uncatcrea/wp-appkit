@@ -128,6 +128,10 @@ msgstr ""
 msgid "M j, Y @ H:i"
 msgstr ""
 
+#: ../lib/apps/apps.php:150
+msgid "Deep Linking"
+msgstr ""
+
 #: ../lib/apps/apps.php:224
 #, php-format
 msgid "Last saved on: <b>%1$s</b>"
@@ -167,6 +171,21 @@ msgstr ""
 
 #: ../lib/apps/apps.php:326 ../lib/apps/apps.php:415
 msgid "Export"
+msgstr ""
+
+#: ../lib/apps/apps.php:330
+msgid ""
+"Deep Linking allows you to create links to open the app. Enter here the "
+"custom scheme you want to use (e.g. \"urlscheme\" lets you create links like "
+"urlscheme://mylink)."
+msgstr ""
+
+#: ../lib/apps/apps.php:331
+msgid "Custom URL Scheme"
+msgstr ""
+
+#: ../lib/apps/apps.php:333
+msgid "If empty, deep linking feature won't be available for this app"
 msgstr ""
 
 #: ../lib/apps/apps.php:353

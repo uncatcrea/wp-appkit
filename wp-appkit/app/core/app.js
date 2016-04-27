@@ -17,7 +17,8 @@ define(function (require) {
           Hooks               = require('core/lib/hooks'),
 		  Stats               = require('core/stats'),
 		  Addons              = require('core/addons-internal'),
-		  WsToken             = require('core/lib/encryption/token');
+		  WsToken             = require('core/lib/encryption/token'),
+          DeepLink			  = require( 'core/modules/deep-link' );
 
 	  var app = {};
 
@@ -125,6 +126,8 @@ define(function (require) {
 	  //their value during a same app execution.
 	  //TODO : we should link (but not merge because they don't have the same usage)
 	  //those params to App options...
+	  // Beware when merging these because options are stored permanently while params are runtime-dependant (refreshed at each app launch)
+	  // Deep Link module especially is updating a param
 
 	  var params = {
 		  'refresh-at-app-launch' : true,
@@ -189,8 +192,21 @@ define(function (require) {
 	  app.launchRouting = function() {
 
 		var default_route = app.resetDefaultRoute(true);
-
 		var launch_route = default_route;
+		var deep_link_route = DeepLink.getLaunchRoute();
+
+		if( deep_link_route.length > 0 ) {
+            launch_route = deep_link_route;
+
+            //
+            // Disable refresh at app launch because:
+            //  1. it will cause going to default route right after, so our launch route won't be useful
+            //  2. if we're here, it's because we're in launching process, after having retrieved some data
+            //  3. if we disable 'go-to-default-route-after-refresh', we'd have to enable it again after the next refresh
+            //
+
+            app.setParam( 'refresh-at-app-launch', false );
+		}
 
 		/**
 		 * Use the 'launch-route' filter to display a specific screen at app launch
@@ -205,7 +221,10 @@ define(function (require) {
 		 * before Backbone routing starts.
 		 */
 		Hooks.doActions( 'pre-start-router', [ launch_route, Stats.getStats() ] ).done( function() {
-			
+
+			// Reset DeepLink launch route after hooks are fired to let scripts retrieve this route if needed
+			DeepLink.reset();
+
 			if( launch_route.length > 0 ){
 				Backbone.history.start();
 				//Navigate to the launch_route :
@@ -215,7 +234,7 @@ define(function (require) {
 				//Hack : Trigger a non existent route so that no view is loaded :
 				app.router.navigate('#wpak-none', {trigger: true});
 			}
-			
+
 		} );
 
 		/*
@@ -1553,10 +1572,13 @@ define(function (require) {
 
 	  /**
        * App init:
+       *  - register "resume" event
        *  - set options
 	   *  - initialize addons
        */
       app.initialize = function ( callback ) {
+
+      	document.addEventListener( 'resume', app.onResume, false );
 
 		fetchOptions(function(){
 
@@ -1577,6 +1599,22 @@ define(function (require) {
 
 		});
 
+      };
+
+      /**
+       * Fires when the application was in background and is called to be in foreground again.
+       * Handles:
+       *  - deep links
+       */
+      app.onResume = function() {
+      	// If there is a defined launch URL, use it
+      	var route = DeepLink.getLaunchRoute();
+
+      	route = Hooks.applyFilters( 'resume-route', route, [Stats.getStats()] );
+
+      	if( route.length ) {
+      		app.router.navigate( route, { trigger: true } );
+      	}
       };
 
 	//--------------------------------------------------------------------------

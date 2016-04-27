@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: WP AppKit\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-02 11:05+0100\n"
-"PO-Revision-Date: 2016-03-02 11:08+0100\n"
-"Last-Translator: UncatCrea <uncategorized.creations@gmail.com>\n"
+"PO-Revision-Date: 2016-04-27 22:06+0200\n"
+"Last-Translator: Lionel Pointet <lionel.pointet@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
@@ -142,6 +142,10 @@ msgstr "Prévisualiser"
 msgid "M j, Y @ H:i"
 msgstr "j F Y \\à G \\h i \\m\\i\\n "
 
+#: ../lib/apps/apps.php:150
+msgid "Deep Linking"
+msgstr "Liens profonds"
+
 #: ../lib/apps/apps.php:224
 #, php-format
 msgid "Last saved on: <b>%1$s</b>"
@@ -184,6 +188,26 @@ msgstr "Enregistrer votre application"
 #: ../lib/apps/apps.php:326 ../lib/apps/apps.php:415
 msgid "Export"
 msgstr "Exporter"
+
+#: ../lib/apps/apps.php:330
+msgid ""
+"Deep Linking allows you to create links to open the app. Enter here the "
+"custom scheme you want to use (e.g. \"urlscheme\" lets you create links like "
+"urlscheme://mylink)."
+msgstr ""
+"Les liens profonds vous permettent de créer des lens pour ouvrir l'app. "
+"Entrez ici le protocole spécifique que vous voulez utiliser (ex : \"urlscheme"
+"\" permet de créer des liens sous la forme urlscheme://monlien)"
+
+#: ../lib/apps/apps.php:331
+msgid "Custom URL Scheme"
+msgstr "Protocole spécifique"
+
+#: ../lib/apps/apps.php:333
+msgid "If empty, deep linking feature won't be available for this app"
+msgstr ""
+"Si ce champ est laissé vide, la fonctionnalité des liens profonds ne sera "
+"pas disponible pour cette application"
 
 # @ wp-appkit
 #: ../lib/apps/apps.php:353

@@ -171,6 +171,15 @@ class WpakApps {
 			'default'
 		);
 
+		add_meta_box(
+			'wpak_app_deep_linking',
+			__( 'Deep Linking', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_deep_linking_box' ),
+			'wpak_apps',
+			'side',
+			'default'
+		);
+
 	}
 
 	public static function add_phonegap_meta_box() {
@@ -358,6 +367,20 @@ class WpakApps {
 		<?php
 	}
 
+	public static function inner_deep_linking_box( $post, $current_box ) {
+		$main_infos = self::get_app_main_infos( $post->ID );
+		?>
+		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
+		<div class="wpak_setting field-group">
+			<p class="description"><?php _e( 'Deep Linking allows you to create links to open the app. Enter here the custom scheme you want to use (e.g. "urlscheme" lets you create links like urlscheme://mylink).', WpAppKit::i18n_domain ) ?></p>
+			<label for="wpak_app_url_scheme"><?php _e( 'Custom URL Scheme', WpAppKit::i18n_domain ) ?></label>
+			<input id="wpak_app_url_scheme" type="text" name="wpak_app_url_scheme" value="<?php echo esc_attr( $main_infos['url_scheme'] ); ?>" />
+			<span class="description"><?php _e( 'If empty, deep linking feature won\'t be available for this app', WpAppKit::i18n_domain ) ?></span>
+			<?php wp_nonce_field( 'wpak-deep-linking-' . $post->ID, 'wpak-nonce-deep-linking' ) ?>
+		</div>
+		<?php
+	}
+
 	public static function inner_phonegap_infos_box( $post, $current_box ) {
 		$main_infos = self::get_app_main_infos( $post->ID );
 		?>
@@ -480,7 +503,7 @@ class WpakApps {
 			return;
 		}
 
-		if ( !check_admin_referer( 'wpak-main-infos-' . $post_id, 'wpak-nonce-main-infos' ) || !check_admin_referer( 'wpak-phonegap-infos-' . $post_id, 'wpak-nonce-phonegap-infos' ) || !check_admin_referer( 'wpak-security-infos-' . $post_id, 'wpak-nonce-security-infos' )
+		if ( !check_admin_referer( 'wpak-main-infos-' . $post_id, 'wpak-nonce-main-infos' ) || !check_admin_referer( 'wpak-phonegap-infos-' . $post_id, 'wpak-nonce-phonegap-infos' ) || !check_admin_referer( 'wpak-security-infos-' . $post_id, 'wpak-nonce-security-infos' ) || !check_admin_referer( 'wpak-deep-linking-' . $post_id, 'wpak-nonce-deep-linking' )
 		) {
 			return;
 		}
@@ -505,7 +528,7 @@ class WpakApps {
 		if ( isset( $_POST['wpak_app_version_code'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_version_code', sanitize_text_field( $_POST['wpak_app_version_code'] ) );
 		}
-		
+
 		if ( isset( $_POST['wpak_app_build_tool'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_build_tool', sanitize_text_field( $_POST['wpak_app_build_tool'] ) );
 		}
@@ -555,6 +578,10 @@ class WpakApps {
 
 		if ( isset( $_POST['wpak_app_simulation_secured'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_simulation_secured', sanitize_text_field( $_POST['wpak_app_simulation_secured'] ) );
+		}
+
+		if ( isset( $_POST['wpak_app_url_scheme'] ) ) {
+			update_post_meta( $post_id, '_wpak_app_url_scheme', sanitize_text_field( $_POST['wpak_app_url_scheme'] ) );
 		}
 
 	}
@@ -663,13 +690,14 @@ class WpakApps {
 		$author_website = get_post_meta( $post_id, '_wpak_app_author_website', true );
 		$author_email = get_post_meta( $post_id, '_wpak_app_author_email', true );
 		$icons = get_post_meta( $post_id, '_wpak_app_icons', true );
+		$url_scheme = get_post_meta( $post_id, '_wpak_app_url_scheme', true );
 
 		$use_default_icons_and_splash = get_post_meta( $post_id, '_wpak_use_default_icons_and_splash', true );
 		$use_default_icons_and_splash = ( empty( $use_default_icons_and_splash ) && empty( $icons ) ) || $use_default_icons_and_splash === 'on';
 
 		$build_tool = get_post_meta( $post_id, '_wpak_app_build_tool', true );
 		$build_tool = empty( $build_tool ) ? 'gradle' : $build_tool; //Set gradle as default Android build tool
-		
+
 		$phonegap_plugins = '';
 		if ( metadata_exists( 'post', $post_id, '_wpak_app_phonegap_plugins' ) ) {
 			$phonegap_plugins = get_post_meta( $post_id, '_wpak_app_phonegap_plugins', true );
@@ -690,6 +718,7 @@ class WpakApps {
 			'phonegap_plugins' => $phonegap_plugins,
 			'icons' => $icons,
 			'use_default_icons_and_splash' => $use_default_icons_and_splash,
+			'url_scheme' => $url_scheme,
 		);
 	}
 
@@ -747,6 +776,19 @@ class WpakApps {
 			if ( $export_type == 'phonegap-build' ) {
 				unset( $default_plugins['cordova-plugin-whitelist'] );
 			}
+		}
+
+		// Activate Deep Linking if a Custom URL Scheme is present
+		if( !empty( $app_main_infos['url_scheme'] ) ) {
+			$default_plugins['cordova-plugin-customurlscheme'] = array(
+				'spec' => '3.2.0',
+				'params' => array(
+					array(
+						'name' => 'URL_SCHEME',
+						'value' => $app_main_infos['url_scheme'],
+					),
+				),
+			);
 		}
 
 		/**
