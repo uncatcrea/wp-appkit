@@ -104,10 +104,16 @@ get_current_screen()->set_help_sidebar(
 $themes = WpakThemes::get_available_themes( true );
 
 foreach ( $themes as $slug => $theme ) {
+    $screenshot = array();
+
+    if( !empty( $theme['screenshot'] ) ) {
+        $screenshot[] = WpakThemes::get_theme_file_uri( $slug, $theme['screenshot'] );
+    }
+
     $prepared_themes[ $slug ] = array(
         'id'           => $slug,
         'name'         => $theme['Name'],
-        'screenshot'   => array(), // TODO: define how theme screenshot should be retrieved
+        'screenshot'   => $screenshot,
         'description'  => $theme['Description'],
         'author'       => $theme['Author'],
         'authorAndUri' => $theme['Author'],
