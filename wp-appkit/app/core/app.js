@@ -360,9 +360,38 @@ define(function (require) {
 					  history_action = 'empty-then-push';
 				  }
 			  }else if( queried_screen_data.screen_type == 'comments' ){
-				  //if( current_screen.screen_type == 'single' && current_screen.item_id == item_id ){
+				  if( ( current_screen.screen_type == 'single' || current_screen.screen_type == 'page' ) && current_screen.item_id == queried_screen_data.item_id ){
 					  history_action = 'push';
-				  //}
+				  } else {
+					  //Trying to reach a comment screen directly without displaying its parent post or page.
+					  //Try to add the parent post or page manually, if it exists in the app:
+					  var parent_item_global = 'posts';
+					  var parent_item = app.getGlobalItem( 'posts', queried_screen_data.item_id );
+					  if ( !parent_item ) {
+						  parent_item = app.getGlobalItem( 'pages', queried_screen_data.item_id );
+						  if ( parent_item ) {
+							  parent_item_global = 'pages';
+						  }
+					  }
+					  
+					  if ( parent_item ) {
+						  
+						//Note: this is quite hacky as this is normally done from router and 
+						//we don't have all data about the parent screen here (especially for the page case)...
+						var parent_item_data = {
+							screen_type: parent_item_global === 'posts' ? 'single' : 'page',component_id:'',item_id:queried_screen_data.item_id,
+							global:parent_item_global,data:{post:parent_item},label:parent_item.title,
+							fragment: parent_item_global === 'posts' ? 'single/posts/'+ queried_screen_data.item_id : '' 
+							//we can't know page's fragment as we don't know page's component...
+						};
+						
+						//Push comments' parent screen to history:
+						history_push( formatScreenData( parent_item_data ) );
+						
+						//Then push the comments screen itself:
+						history_action = 'push';
+					  }
+				  }
 			  }else if( queried_screen_data.screen_type == 'custom-page' ){
 				  history_action = 'empty-then-push';
 			  }else if( queried_screen_data.screen_type == 'custom-component' ){
