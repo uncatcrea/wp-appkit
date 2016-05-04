@@ -43,6 +43,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			require_once(dirname( __FILE__ ) . '/lib/options/options.php');
 			require_once(dirname( __FILE__ ) . '/lib/simulator/simulator.php');
 			require_once(dirname( __FILE__ ) . '/lib/simulator/server-rewrite.php');
+			require_once(dirname( __FILE__ ) . '/lib/shortcodes/show_hide_in_apps.php');
 		}
 
 		public static function plugins_loaded() {
