@@ -39,7 +39,7 @@ class WpakConfigFile {
 					if ( WpakApps::get_app_simulation_is_secured( $app_id ) && !current_user_can( $capability ) ) {
 						wp_nonce_ays( $action );
 					}
-					
+
 					//If the app current theme has some PHP (hooks!) to be executed before
 					//config files are generated, include it here :
 					WpakThemes::include_app_theme_php( $app_id );
@@ -92,7 +92,7 @@ class WpakConfigFile {
 		//TODO : options to choose if the auth key is displayed in config.js.
 
 		$options = WpakOptions::get_app_options( $app_id );
-		
+
 		$theme_settings = WpakThemesConfigJsSettings::get_theme_settings( $app_id );
 
 		$addons = WpakAddons::get_app_addons_for_config( $app_id );
@@ -201,7 +201,7 @@ define( function ( require ) {
 				break;
 		}
 
-		//No splashscreen setting if the 'cordova-plugin-whitelist' plugin is not here :
+		//No splashscreen setting if the 'cordova-plugin-splashscreen' plugin is not here :
 		$splashcreen_plugin_here = true;
 		$current_phonegap_plugins = WpakApps::get_merged_phonegap_plugins( $app_id, $export_type );
 		if ( !array_key_exists( 'cordova-plugin-splashscreen', $current_phonegap_plugins ) ) {
