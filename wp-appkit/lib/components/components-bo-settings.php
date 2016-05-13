@@ -43,6 +43,8 @@ class WpakComponentsBoSettings {
 	public static function inner_components_box( $post, $current_box ) {
 		$components = WpakComponentsStorage::get_components( $post->ID );
 		?>
+		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
+		<p class="description"><?php _e( 'Click Add New to add the different components that compose your app. Most components are data sources and correspond to app\'s screens. They can be referenced in the app\'s menu.', WpAppKit::i18n_domain ) ?></p>
 
 		<div id="components-wrapper">
 

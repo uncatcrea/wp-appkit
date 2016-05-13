@@ -60,6 +60,7 @@ class WpakThemesBoSettings {
 		$current_theme = WpakThemesStorage::get_current_theme( $post->ID );
 		$main_infos = WpakApps::get_app_main_infos( $post->ID );
 		?>
+		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
 
 		<?php if ( !empty($available_themes) ): ?>
 			<label><?php _e( 'Choose theme', WpAppKit::i18n_domain ) ?> : </label>
@@ -69,6 +70,7 @@ class WpakThemesBoSettings {
 					<option value="<?php echo $theme_slug ?>" <?php echo $selected ?>><?php echo $theme_data['Name'] ?> </option>
 				<?php endforeach ?>
 			</select>
+			<p class="description"><?php _e( 'Choose a theme for your app. Theme defines how your app will look and behave. Themes can be uploaded in the Upload Themes panel. Themes are stored in the wp-content/themes-wp-appkit folder of your WordPress install.', WpAppKit::i18n_domain ) ?></p>
 		<?php else: ?>
 			<div class="wpak_no_theme">
 				<strong><?php _e( 'No WP AppKit theme found!', WpAppKit::i18n_domain ) ?></strong>
@@ -123,6 +125,7 @@ class WpakThemesBoSettings {
 
 		<?php wp_nonce_field( 'wpak-theme-data-' . $post->ID, 'wpak-nonce-theme-data' ) ?>
 
+		<?php // TODO: put this style in an external file ?>
 		<style>
 			.wpak-theme-data{ padding:9px 12px; margin-bottom: 10px }
 			.theme-data-content{ margin-top: 0 }

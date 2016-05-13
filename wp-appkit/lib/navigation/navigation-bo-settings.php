@@ -35,6 +35,7 @@ class WpakNavigationBoSettings{
 		?>
 		<div id="navigation-wrapper">
 			<p>Menu</p>
+			<p class="description"><?php _e( 'Click Add Component to Menu to reference a component in the app\'s menu.', WpAppKit::i18n_domain ) ?></p>
 			<a href="#" class="add-new-h2" id="add-new-item"><?php _e('Add Component to Menu',WpAppKit::i18n_domain) ?></a>
 
 			<div id="navigation-feedback" style="display:none"></div>
@@ -110,8 +111,8 @@ class WpakNavigationBoSettings{
 
 					<?php if ( empty( $error_message ) ): ?>
 
-						<?php /* Icon slug deactivated for now 
-					
+						<?php /* Icon slug deactivated for now
+
 						<?php $icon_value = $nav_item->options['icon_slug'] ?>
 
 						<div id="nav-item-value-<?php echo $nav_item_id ?>">
@@ -121,13 +122,13 @@ class WpakNavigationBoSettings{
 							</div>
 						</div>
 
-						
+
 						<div id="nav-item-input-<?php echo $nav_item_id ?>" style="display:none" >
 							<input type="text" id="icon-<?php echo $nav_item_id ?>" class="menu-item-icon-input" data-id="<?php echo $nav_item_id ?>" value="<?php echo $nav_item->options['icon_slug'] ?>"/>
 							&nbsp;<a href="#" id="change-icon-slug-ok-<?php echo $nav_item_id ?>" class="change-icon-slug-ok" data-id="<?php echo $nav_item_id ?>" data-post-id="<?php echo $post_id ?>" ><?php _e('Ok', WpAppKit::i18n_domain) ?></a>
 							&nbsp;&nbsp;<a href="#" class="change-icon-slug-cancel" data-id="<?php echo $nav_item_id ?>"><?php _e('Cancel', WpAppKit::i18n_domain) ?></a>
 						</div>
-						
+
 						*/ ?>
 
 					<?php else: ?>

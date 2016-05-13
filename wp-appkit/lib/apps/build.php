@@ -35,7 +35,7 @@ class WpakBuild {
 				<option value="off" <?php echo $debug_mode == 'off' ? 'selected="selected"' : '' ?>><?php _e( 'Off', WpAppKit::i18n_domain ) ?></option>
 				<option value="wp" <?php echo $debug_mode == 'wp' ? 'selected="selected"' : '' ?>><?php _e( 'Same as WordPress WP_DEBUG', WpAppKit::i18n_domain ) ?></option>
 			</select>
-			<span class="description"><?php _e( 'If activated, echoes debug infos in the browser javascript console while simulating the app.', WpAppKit::i18n_domain ) ?></span>
+			<span class="description"><?php _e( 'If activated, echoes debug information in the browser JavasSript console while simulating the app.', WpAppKit::i18n_domain ) ?></span>
 		</div>
 		<div class="field-group">
 			<a href="<?php echo self::get_appli_dir_url() . '/config.js?wpak_app_id=' . WpakApps::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a>
@@ -87,18 +87,18 @@ class WpakBuild {
 	}
 
 	public static function get_allowed_export_types() {
-		$allowed_export_types = array( 
-			'phonegap-build' => __( 'PhoneGap Build', WpAppKit::i18n_domain ), 
-			'phonegap-cli' => __( 'PhoneGap CLI', WpAppKit::i18n_domain ), 
-			'webapp' => __( 'WebApp', WpAppKit::i18n_domain ) 
+		$allowed_export_types = array(
+			'phonegap-build' => __( 'PhoneGap Build', WpAppKit::i18n_domain ),
+			'phonegap-cli' => __( 'PhoneGap CLI', WpAppKit::i18n_domain ),
+			'webapp' => __( 'WebApp', WpAppKit::i18n_domain )
 		);
 		return $allowed_export_types;
 	}
-	
+
 	public static function is_allowed_export_type( $export_type ) {
 		return array_key_exists( $export_type, self::get_allowed_export_types() );
 	}
-	
+
 	public static function download_app_sources() {
 
 		if ( !check_admin_referer( 'wpak_download_app_sources' ) || !isset( $_GET['post'] ) ) {
@@ -110,7 +110,7 @@ class WpakBuild {
 		if( $app_id <= 0 ) {
 			return;
 		}
-		
+
 		$export_type = isset( $_GET['export_type'] ) && self::is_allowed_export_type( $_GET['export_type'] ) ? $_GET['export_type'] : 'phonegap-build';
 
 		// Re-build sources
@@ -158,7 +158,7 @@ class WpakBuild {
 			$answer['msg'] = __( 'Unknown export type', WpAppKit::i18n_domain ) . ": '$export_type'";
 			return $answer;
 		}
-		
+
 		if ( !extension_loaded( 'zip' ) ) {
 			$answer['ok'] = 0;
 			$answer['msg'] = __( 'Zip PHP extension is required to run file export. See http://www.php.net/manual/fr/book.zip.php.', WpAppKit::i18n_domain );
@@ -182,15 +182,15 @@ class WpakBuild {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		$app_platform = $app_main_infos['platform'];
-		
-		$answer = self::build_zip( 
-				$app_id, 
-				$appli_dir, 
-				$export_filename_full, 
-				array( $current_theme ), 
-				WpakAddons::get_app_addons( $app_id ), 
+
+		$answer = self::build_zip(
+				$app_id,
+				$appli_dir,
+				$export_filename_full,
+				array( $current_theme ),
+				WpakAddons::get_app_addons( $app_id ),
 				WpakConfigFile::get_platform_icons_and_splashscreens_files( $app_id, $app_platform, $export_type ),
-				$export_type 
+				$export_type
 		);
 
 		$answer['export'] = $export_filename;
@@ -311,7 +311,7 @@ class WpakBuild {
 		if ( is_dir( $source ) === true ) {
 
 			$webapp_files = array();
-			
+
 			$source_root = '';
 
 			if ( $export_type === 'phonegap-cli' ) {
@@ -372,7 +372,7 @@ class WpakBuild {
 						}
 
 					}
-					
+
 					$webapp_files[] = $zip_filename;
 				}
 			}
@@ -401,7 +401,7 @@ class WpakBuild {
 						if ( preg_match( '|'. $theme .'[/\\\]php|', $filename ) ) {
 							continue;
 						}
-						
+
 						//Filter git files
 						if ( strpos( $filename, '.git' ) !== false ) {
 							continue;
@@ -418,15 +418,15 @@ class WpakBuild {
 								return $answer;
 							}
 						} elseif ( is_file( $file ) === true ) {
-							
+
 							if ( !$zip->addFile( $file, $zip_filename ) ) {
 								$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
 								$answer['ok'] = 0;
 								return $answer;
 							}
-							
+
 							$webapp_files[] = $zip_filename;
-							
+
 						}
 					}
 				}
@@ -443,42 +443,42 @@ class WpakBuild {
 					}
 				}
 			}
-			
+
 			//Add icons and splashscreens files :
-			if ( !empty( $icons_and_splashscreens ) 
-				 && array_key_exists( 'icons', $icons_and_splashscreens ) 
+			if ( !empty( $icons_and_splashscreens )
+				 && array_key_exists( 'icons', $icons_and_splashscreens )
 				 && array_key_exists( 'splashscreens', $icons_and_splashscreens )
 				) {
-				
+
 				$icons = $icons_and_splashscreens['icons'];
 				foreach ( $icons as $icon ) {
 					$zip_filename = $source_root . $icon['src'];
 					$zip->addFile( $icon['full_path'], $zip_filename );
 				}
-				
+
 				$splashscreens = $icons_and_splashscreens['splashscreens'];
 				foreach ( $splashscreens as $splashscreen ) {
 					$zip_filename = $source_root . $splashscreen['src'];
 					$zip->addFile( $splashscreen['full_path'], $zip_filename );
 				}
-				
+
 			}
 
 			//Create config.js file :
 			$zip->addFromString( $source_root .'config.js', WpakConfigFile::get_config_js( $app_id ) );
 			$webapp_files[] = $source_root .'config.js';
-			
+
 			if ( $export_type !== 'webapp' ) {
 				//Create config.xml file (stays at zip root) :
 				$zip->addFromString( 'config.xml', WpakConfigFile::get_config_xml( $app_id, false, $export_type ) );
 			}
-			
+
 			if ( $export_type === 'webapp' ) {
 				//Create html cache manifest file
 				$cache_manifest_content = self::get_cache_manifest_content( $webapp_files );
 				$zip->addFromString( 'wpak.appcache', $cache_manifest_content );
 			}
-			
+
 		} else {
 			$answer['msg'] = sprintf( __( 'Zip archive source directory [%s] could not be found.', WpAppKit::i18n_domain ), $source );
 			$answer['ok'] = 0;
@@ -497,44 +497,44 @@ class WpakBuild {
 	private static function filter_index( $index_content, $export_type ) {
 
 		if ( $export_type === 'webapp' ) {
-			
+
 			//Add reference to the cache manifest to the <html> tag:
 			$index_content = str_replace( '<html>', '<html manifest="wpak.appcache" >', $index_content );
-			
+
 			//Remove script used only for app simulation in web browser :
 			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)/is', '', $index_content );
-			
+
 		} else {
-			
+
 			//Add cordova.js script (set cordova.js instead of phonegap.js, because PhoneGap Developer App doesn't seem
 			//to support phonegap.js). PhoneGap Build can use indifferently cordova.js or phonegap.js.
 			$index_content = str_replace( '<head>', "<head>\r\n\t\t<script src=\"cordova.js\"></script>\r\n\t\t", $index_content );
-			
+
 		}
-		
+
 		//Remove script used only for app simulation in web browser :
 		$index_content = preg_replace( '/<script[^>]*>[^<]*var query[^<]*<\/script>\s*<script/is', '<script', $index_content );
 
 		return $index_content;
 	}
-	
+
 	private static function get_cache_manifest_content( $webapp_files ) {
 		$cache_manifest = '';
-		
+
 		if ( !empty( $webapp_files ) ) {
 			$cache_manifest .= "CACHE MANIFEST\n";
-			
+
 			$cache_manifest .= "# v". date( 'Y-m-d H:i:s' ) ."\n\n";
-			
+
 			foreach( $webapp_files as $file ) {
 				$cache_manifest .= $file ."\n";
 			}
-			
+
 			$cache_manifest .= "\nNETWORK:\n";
 			$cache_manifest .= "/wp-appkit-api\n";
 			$cache_manifest .= "/wp-content/uploads\n";
 		}
-		
+
 		return $cache_manifest;
 	}
 
