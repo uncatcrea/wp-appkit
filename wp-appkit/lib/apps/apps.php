@@ -779,6 +779,27 @@ class WpakApps {
 			}
 		}
 
+		if( $app_main_infos['platform'] == 'android' ) {
+			// Add CrossWalk Cordova plugin.
+			// This is useful to have a consistent behaviour between Android all webviews, and to have better performance as well. Especially with animations.
+			// Drawbacks are the app's weight and memory footprint that are higher than without the plugin.
+
+			/**
+			 * Filter the version used for CrossWalk plugin.
+			 *
+			 * This can be useful to fix another version if the default is broken are not up-to-date.
+			 * We provide the latest version we tested.
+			 * To completely remove this plugin from the build, use 'wpak_default_phonegap_build_plugins' filter.
+			 *
+			 * @param string    $crosswalk_version  Default version for CrossWalk Cordova plugin
+			 * @param string    $export_type        Export type : 'phonegap-build', 'phonegap-cli' or 'webapp'
+			 * @param int		$app_id				Application id
+			 */
+			$crosswalk_version = apply_filters( 'wpak_crosswalk_version', '1.7.0', $export_type, $app_id );
+
+			$default_plugins['cordova-plugin-crosswalk-webview'] = array( 'spec' => $crosswalk_version, 'source' => 'npm' );
+		}
+
 		// Activate Deep Linking if a Custom URL Scheme is present
 		if( !empty( $app_main_infos['url_scheme'] ) ) {
 			$default_plugins['cordova-plugin-customurlscheme'] = array(
