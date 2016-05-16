@@ -11,8 +11,6 @@ if ( !class_exists( 'WpAppKit' ) ) {
 	class WpAppKit {
 
 		const resources_version = '0.5';
-		// Holds the WP-AppKit DB revision, increments when changes are made that need an upgrade routine to run
-		const db_version = 42;
 		const i18n_domain = 'wp-appkit';
 
 		public static function hooks() {
@@ -110,13 +108,14 @@ if ( !class_exists( 'WpAppKit' ) ) {
 		 * based on database version and WP-AppKit version being updated-to.
 		 */
 		public static function upgrade() {
-			$current_version = get_option( 'wpak_version', 0 );
+			$current_version = get_option( 'wpak_version', null );
+			$data = get_file_data( __FILE__, array( 'version' => 'Version' ) );
 
 			// We are up-to-date. Nothing to do.
-			if ( self::db_version == $current_version )
+			if ( $data['version'] == $current_version )
 				return;
 
-			if( $current_version < 42 ) {
+			if( version_compare( $current_version, '0.6.0', '<' ) ) {
 				self::upgrade_060();
 			}
 		}
@@ -129,7 +128,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			delete_transient( 'wpak_used_themes' );
 
 			// Everything went fine, update DB version not to run this script once again
-			update_option( 'wpak_version', 42 );
+			update_option( 'wpak_version', '0.6.0' );
 		}
 
 		/**
