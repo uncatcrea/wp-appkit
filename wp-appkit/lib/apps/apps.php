@@ -450,7 +450,7 @@ class WpakApps {
 				<div class="field-group">
 					<label><?php _e( 'Plugins', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_phonegap_plugins" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
-					<span class="description"><?php __( 'Add here the tags defining the plugins you want to 
+					<span class="description"><?php __( 'Add here the tags defining the plugins you want to
 					include in your app. Before adding a plugin, check which one is included by default.', WpAppKit::i18n_domain ) ?></span>
 				</div>
 			</fieldset>
@@ -475,7 +475,7 @@ class WpakApps {
 				<option value="1" <?php echo $simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Private', WpAppKit::i18n_domain ) ?></option>
 				<option value="0" <?php echo!$simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Public', WpAppKit::i18n_domain ) ?></option>
 			</select>
-			<span class="description"><?php _e( 'Private means that only logged in users with the right permissions can 
+			<span class="description"><?php _e( 'Private means that only logged in users with the right permissions can
 			access the browser simulation. When public, anyone can access browser simulation. That includes the config.js and config.xml files which may contain sensitive data.', WpAppKit::i18n_domain ) ?></span>
 		</div>
 		<?php wp_nonce_field( 'wpak-security-infos-' . $post->ID, 'wpak-nonce-security-infos' ) ?>
@@ -783,21 +783,9 @@ class WpakApps {
 			// Add CrossWalk Cordova plugin.
 			// This is useful to have a consistent behaviour between Android all webviews, and to have better performance as well. Especially with animations.
 			// Drawbacks are the app's weight and memory footprint that are higher than without the plugin.
+			// Currently we include stable version 1.5.0, since 1.6.0, 1.6.1 and 1.7.0 don't work with PhoneGap Build
 
-			/**
-			 * Filter the version used for CrossWalk plugin.
-			 *
-			 * This can be useful to fix another version if the default is broken are not up-to-date.
-			 * We provide the latest version we tested.
-			 * To completely remove this plugin from the build, use 'wpak_default_phonegap_build_plugins' filter.
-			 *
-			 * @param string    $crosswalk_version  Default version for CrossWalk Cordova plugin
-			 * @param string    $export_type        Export type : 'phonegap-build', 'phonegap-cli' or 'webapp'
-			 * @param int		$app_id				Application id
-			 */
-			$crosswalk_version = apply_filters( 'wpak_crosswalk_version', '1.7.0', $export_type, $app_id );
-
-			$default_plugins['cordova-plugin-crosswalk-webview'] = array( 'spec' => $crosswalk_version, 'source' => 'npm' );
+			$default_plugins['cordova-plugin-crosswalk-webview'] = array( 'spec' => '1.5.0', 'source' => 'npm' );
 		}
 
 		// Activate Deep Linking if a Custom URL Scheme is present
