@@ -770,6 +770,22 @@ define( function( require, exports ) {
     themeApp.getCurrentScreen = function() {
         return App.getCurrentScreenData();
     };
+	
+	themeApp.getPreviousScreenInHistory = function() {
+		return App.getPreviousScreenData();
+	};
+	
+	themeApp.getPreviousScreen = function() {
+		return App.getPreviousScreenMemoryData();
+	};
+
+	themeApp.getHistory = function() {
+		return App.getHistory();
+	};
+	
+	themeApp.getLastHistoryAction = function() {
+		return App.getLastHistoryAction();
+	};
 
 	/**
 	 * Retrieves useful data corresponding to the object that is currently displayed.

@@ -269,6 +269,7 @@ define(function (require) {
 	  var history_stack = [];
 	  var queried_screen_data = {};
 	  var previous_screen_memory = {};
+	  var last_history_action = '';
 
 	  var history_push = function(screen_data){
 		  history_stack.push(screen_data);
@@ -309,7 +310,9 @@ define(function (require) {
 
 		  var current_screen = app.getCurrentScreenData();
 		  var previous_screen = app.getPreviousScreenData();
-
+		  
+		  //If we "pop" history current_screen is going to be removed from history_stack:
+		  //memorize it so that we can know where we came from (for screen transitions for example):
 		  previous_screen_memory = current_screen;
 
 		  if( current_screen.screen_type != queried_screen_data.screen_type || current_screen.component_id != queried_screen_data.component_id
@@ -403,6 +406,8 @@ define(function (require) {
 
 			history_action = Hooks.applyFilters( 'make-history', history_action, [ history_stack, queried_screen_data, current_screen, previous_screen ] );
 
+			last_history_action = history_action;
+
 			switch ( history_action ) {
 				case 'empty-then-push':
 					history_stack = [];
@@ -419,6 +424,15 @@ define(function (require) {
 					break;
 			}
 
+	  };
+	  
+	  app.getHistory = function() {
+		  //Clone the history_stack array so that it can't be modified from outside:
+		  return history_stack.slice(0); 
+	  };
+	  
+	  app.getLastHistoryAction = function() {
+		  return last_history_action;
 	  };
 
 	  /**
