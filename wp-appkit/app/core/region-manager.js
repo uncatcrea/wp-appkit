@@ -148,14 +148,14 @@ define(function (require) {
 	    		if( $(elMenu).length
 	    			&& (!$(elMenu).html().length || (force_reload!=undefined && force_reload) ) ){
 		    		menuView.render();
-					
+
 					/**
-					 * Use this 'menu:rendered' event to bind JS events on menu's DOM once 
+					 * Use this 'menu:rendered' event to bind JS events on menu's DOM once
 					 * it is rendered. Useful for example when using JS lib that don't use
 					 * event delegation.
 					 */
 		    		vent.trigger( 'menu:rendered', App.getCurrentScreenData(), menuView );
-		    		
+
 					Utils.log('Render menu',{menu_view:menuView,force_reload:force_reload});
 	    		}
 	    	}else{
@@ -218,10 +218,10 @@ define(function (require) {
 			var $el = $(el);
 
 			if( custom_rendering ){
-				
+
 				/**
 				 * 'screen-transition' action: allows to implement your own screen transitions using JS/CSS.
-				 * 
+				 *
 				 * @param $wrapper:       jQuery Object corresponding to div#app-content-wrapper, which is the element wrapping $current and $next screens.
 				 * @param $current:       jQuery Object corresponding to the screen (div.app-screen) that we're leaving, to display $next instead.
 				 * @param $next:          jQuery Object corresponding to the new screen (div.app-screen) that we want to display (by replacing $current).
@@ -241,7 +241,7 @@ define(function (require) {
 					renderSubRegions();
 					vent.trigger('screen:showed:failed',App.getCurrentScreenData(),currentView,first_static_opening);
 				});
-				
+
 			}else{
 				$el.empty().append(view.el);
 				renderSubRegions();
@@ -333,6 +333,7 @@ define(function (require) {
 					} );
 					break;
 				default:
+					// Allow customized not native view type created by an addon
 					var customView = Hooks.applyFilters( 'custom-view', "", [view_type] );
 					if( customView.length ) {
 						require( [ customView ], function( CustomViewObject ) {
@@ -340,26 +341,24 @@ define(function (require) {
 						});
 					}
 					break;
-				//TODO : we could add a filter here to allow using a
-				//customized not native view type created by an addon.
 			}
 
 		};
 
 		region.show = function( view_type, view_data, screen_data ) {
-			
+
 			App.setQueriedScreen( screen_data );
 			var queried_screen = App.getQueriedScreen();
 
 			/**
-			 * Use this 'redirect' filter to redirect to a different screen than the queried one, 
+			 * Use this 'redirect' filter to redirect to a different screen than the queried one,
 			 * just before it is showed.
-			 * 
-			 * To redirect to a different screen from the filter callback (in themes) : 
+			 *
+			 * To redirect to a different screen from the filter callback (in themes) :
 			 * - call App.navigate('your_screen_route');
 			 * - return true
-			 * 
-			 * Implementation note : This has to be a filter (not action) so that we 
+			 *
+			 * Implementation note : This has to be a filter (not action) so that we
 			 * can stop the showing process if true is returned.
 			 */
 			var redirect = Hooks.applyFilters( 'redirect', false, [queried_screen, App.getCurrentScreenData()] );
