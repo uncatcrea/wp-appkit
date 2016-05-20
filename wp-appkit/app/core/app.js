@@ -426,11 +426,19 @@ define(function (require) {
 
 	  };
 	  
+	  /**
+	   * Returns app's current history stack
+	   * @returns {Array} App's history stack (array of screen objects)
+	   */
 	  app.getHistory = function() {
 		  //Clone the history_stack array so that it can't be modified from outside:
 		  return history_stack.slice(0); 
 	  };
 	  
+	  /**
+	   * Returns last action applied to history stack
+	   * @returns {String} history action: push, pop, empty or empty-then-push
+	   */
 	  app.getLastHistoryAction = function() {
 		  return last_history_action;
 	  };

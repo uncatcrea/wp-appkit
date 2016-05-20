@@ -771,18 +771,60 @@ define( function( require, exports ) {
         return App.getCurrentScreenData();
     };
 	
+	/**
+	 * Retrieves the screen that is before current screen in app's history.
+	 * For example if your history is "Screen A > Screen B > Screen C then back button to Screen B",
+	 * getPreviousScreenInHistory() returns Screen A, which is where we will go from Screen B
+	 * if we press back button.
+	 * To retrieve Screen C in this case, you would use getPreviousScreen().
+	 * 
+	 * @returns {screen_type:string}
+	 */
 	themeApp.getPreviousScreenInHistory = function() {
 		return App.getPreviousScreenData();
 	};
 	
+	/**
+	 * Retrieves the screen that was displayed just before current screen.
+	 * For example if your history is "Screen A > Screen B > Screen C then back button to Screen B",
+	 * Screen C has been poped from history stack but you can still access it via 
+	 * this getPreviousScreen() function.
+	 * 
+	 * @returns {Screen object} Previous screen 
+	 * (see themeApp.getCurrentScreen() for screen object structure)
+	 */
 	themeApp.getPreviousScreen = function() {
 		return App.getPreviousScreenMemoryData();
 	};
 
+	/**
+	* Returns app's current history stack.
+	* For example if your history is "Screen A > Screen B > Screen C", 
+	* the history stack is [Screen object A, Screen object B, Screen object C].
+	* Then if you press back button, the history stack becomes
+	* [Screen object A, Screen object B] (Screen object C has been poped).
+	* 
+	* @returns {Array} App's history stack: array of screen objects 
+	* (see themeApp.getCurrentScreen() for screen object structure)
+	*/
 	themeApp.getHistory = function() {
 		return App.getHistory();
 	};
 	
+	/**
+	 * Returns the last action that was made on app's history stack (push, pop, empty or empty-then-push).
+	 * For example if your history is "List > Single then go to Single's Comments screen",
+	 * the last history action is a "push" (Comments screen was pushed after Single screen in the history stack).
+	 * 
+	 * Knowing last history action is particularly useful when implementing custom transitions
+	 * for example to differentiate transitions between "going from Single A to Single B" and 
+	 * "going back from Single B to Single A".
+	 * 
+	 * Note that the mapping between "Going from a screen to another screen" and "what
+	 * history action is triggered" is customizable using the "make-history" JS filter.
+	 * 
+	 * @returns {String} Last history action : push, pop, empty or empty-then-push
+	 */
 	themeApp.getLastHistoryAction = function() {
 		return App.getLastHistoryAction();
 	};
