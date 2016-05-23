@@ -1,3 +1,7 @@
+## 0.5.1 (2016-05-23)
+
+- Add GPL mention in plugin main file
+
 ## 0.5 (2016-03-07)
 
 ### Better Theme and Plugin API
