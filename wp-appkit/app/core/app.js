@@ -1252,7 +1252,7 @@ define(function (require) {
 		var auto_interpret_result = !options.hasOwnProperty('auto_interpret_result') || options.auto_interpret_result === true;
 
 		//interpretation_type defaults to 'update' :
-		var interpretation_type = options.hasOwnProperty('type') ? options.type : 'update';
+		var interpretation_type = options.hasOwnProperty('type') ? options.type : 'replace-keep-global-items';
 
 		//persistent defaults to false :
 		var persistent = options.hasOwnProperty('persistent') && options.persistent === true;
