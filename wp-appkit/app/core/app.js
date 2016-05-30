@@ -1116,9 +1116,9 @@ define(function (require) {
 		var existing_component = app.components.get( new_component.slug );
     	if( existing_component ) {
 
-			var existing_component_data = existing_component.data;
+			var existing_component_data = existing_component.get( 'data' );
 			var new_component_data = new_component.data;
-
+			
 			if ( new_component_data.hasOwnProperty( 'ids' ) ) { //List component
 
 				if( new_component.global ) {
@@ -1130,7 +1130,7 @@ define(function (require) {
 					}
 
 					var new_ids = [ ];
-					if ( type == "replace" || type == "replace-keep-global-items" ) {
+					if ( type === "replace" || type === "replace-keep-global-items" ) {
 						new_ids = new_component_data.ids;
 					} else {
 						new_ids = _.difference( new_component_data.ids, existing_component_data.ids );
@@ -1140,7 +1140,7 @@ define(function (require) {
 					existing_component.set( 'data', new_component_data );
 
 					var current_items = app.globals[global];
-					if ( type == "replace" ) {
+					if ( type === "replace" ) {
 						current_items.resetAll();
 					}
 
@@ -1152,7 +1152,7 @@ define(function (require) {
 					_.each( new_ids, function( item_id ) {
 						new_items.push( current_items.get( item_id ) );
 					} );
-
+					
 					if ( persistent ) {
 						existing_component.save();
 						current_items.saveAll();
