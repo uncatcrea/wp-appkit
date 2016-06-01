@@ -99,7 +99,7 @@ define(function (require) {
 			  args.id = id;
 		  }
 		  current_custom_page = new CustomPage(args);
-		  app.router.navigate('#custom-page',{trigger: true});
+		  app.router.navigate( app.getScreenFragment( 'custom-page' ), { trigger: true } );
 	  };
 
 	  app.addCustomRoute = function( fragment, template, data ) {
@@ -166,12 +166,12 @@ define(function (require) {
 		var is_app_launch = is_app_launch !== undefined && is_app_launch === true;
 		if( app.navigation.length > 0 ){
 			var first_nav_component_id = app.navigation.first().get('component_id');
-			default_route = '#component-'+ first_nav_component_id;
+			default_route = app.getScreenFragment( 'component', { component_id: first_nav_component_id } );
 		}else{
 			//No navigation item : set default route to first component found:
 			if( app.components.length ){
 				var first_component = app.components.first();
-				default_route = '#component-'+ first_component.id;
+				default_route = app.getScreenFragment( 'component', { component_id: first_component.id } );
 			}else{
 				Utils.log('No menu item, no component found. Could not set default route.');
 			}
@@ -262,6 +262,46 @@ define(function (require) {
 			Backbone.history.start({silent: false});
 		*/
 	  };
+	  
+	/**
+	 * Builds screen link according to given link type.
+	 * @param link_type    int          Can be 'single', 'page', 'comments', 'component' or 'custom-page'
+	 * @param data         JSON Object  Depends on link_type:
+	 * - for single: {global, item_id}
+	 * - for page: {component_id, item_id}
+	 * - for comments: {item_id}
+	 * - for component: {component_id}
+	 * - for custom-page: none
+	 */
+	app.getScreenFragment = function ( link_type, data ) {
+		
+		var screen_link = '';
+		
+		switch( link_type ) {
+			case 'single':
+				screen_link = '#single/' + data.global + '/' + data.item_id;
+				break;
+			case 'page':
+				screen_link = '#page/' + data.component_id + '/' + data.item_id;
+				break;
+			case 'comments':
+				screen_link = '#comments-' + data.item_id;
+				break;
+			case 'component':
+				var component = app.getComponentData( data.component_id );
+				if ( component ) {
+					//If page component, return directly page's screen fragment to avoid
+					//redirection in router, which leads to back button not working.
+					screen_link = component.type !== 'page' ? '#component-'+ component.id : '#page/'+ component.id +'/'+ component.data.root_id;
+				}
+				break;
+			case 'custom-page':
+				screen_link = '#custom-page';
+				break;
+		}
+		
+		return screen_link;
+	};
 
 	  //--------------------------------------------------------------------------
 	  //History : allows to handle back button.
@@ -384,7 +424,7 @@ define(function (require) {
 						var parent_item_data = {
 							screen_type: parent_item_global === 'posts' ? 'single' : 'page',component_id:'',item_id:queried_screen_data.item_id,
 							global:parent_item_global,data:{post:parent_item},label:parent_item.title,
-							fragment: parent_item_global === 'posts' ? 'single/posts/'+ queried_screen_data.item_id : '' 
+							fragment: parent_item_global === 'posts' ? app.getScreenFragment( 'single', { global: 'posts', item_id: queried_screen_data.item_id } ) : '' 
 							//we can't know page's fragment as we don't know page's component...
 						};
 						

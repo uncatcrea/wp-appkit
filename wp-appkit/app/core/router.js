@@ -60,7 +60,12 @@ define(function (require) {
                                 break;
 							case 'page':
 								//Directly redirect to "page" route :
-								_this.navigate('page/'+ component_id +'/'+ component.data.root_id, {trigger: true});
+								//Note : when displaying a page component, it is better to directly use the 
+								//page fragment (/page/:component_id/:page_id) rather than the component
+								//fragment, because the following redirection makes the native browser's back button 
+								//fail. To be sure to handle that correctly, just use App.getScreenFragment( 'component', ... )
+								//that will build the correct fragment for you for any component type.
+								_this.navigate( App.getScreenFragment( 'page', { component_id: component_id, item_id: component.data.root_id } ), {trigger: true} );
 								break;
 							case 'hooks-list':
 							case 'hooks-no-global':

@@ -427,7 +427,7 @@ define( function( require, exports ) {
 			post_id,
 			function ( comments, post, item_global ) {
 				cb_ok( comments.toJSON(), post.toJSON(), item_global );
-				themeApp.navigate( '#comments-'+ post_id );
+				themeApp.navigate( App.getScreenFragment( 'comments', { item_id: post_id } ) );
 			},
 			function ( error ) {
 				cb_error( format_theme_event_data( error.event, error ) );

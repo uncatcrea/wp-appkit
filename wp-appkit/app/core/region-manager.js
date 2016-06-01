@@ -113,7 +113,13 @@ define(function (require) {
 		    		App.navigation.each(function(element, index){
 		    			var component = App.components.get(element.get('component_id'));
 		    			if( component ){
-							menu_items.push({id:component.get('id'),label:component.get('label'),type:component.get('type'),link:'#component-'+ component.get('id'),options:element.get('options')});
+							menu_items.push( { 
+								id:component.get('id'),
+								label:component.get('label'),
+								type:component.get('type'),
+								link: App.getScreenFragment( 'component', { component_id: component.get('id') } ),
+								options:element.get('options')
+							} );
 		    			}
 		   		  	});
 
