@@ -467,8 +467,8 @@ define( function( require, exports ) {
 	 * - auto_interpret_result Boolean (default true). If false, web service answer must be interpreted in the cb_ok callback.
 	 * - type String : can be one of :
 	 *       -- "update" : merge new with existing component data,
-	 *       -- "replace" : delete current component data and replace with new
-	 *       -- "replace-keep-global-items" (default) : for list components : replace component ids and merge global items
+	 *       -- "replace" : delete current component data, empty the corresponding global, and replace with new
+	 *       -- "replace-keep-global-items" (default) : for list components : replace component items ids and merge global items
 	 * - persistent Boolean (default false). If true, new data is stored in local storage.
 	 */
 	themeApp.liveQuery = function( web_service_params, options ){
@@ -500,6 +500,11 @@ define( function( require, exports ) {
 	 *	- autoformat_answer {boolean} If true (default), the answer returned to the success
 	 *	  callback is automatically formated to return significant data. If false, the full
 	 *	  liveQuery answer is returned no matter what.
+	 *	- refresh_type {string} Can be:
+	 *		 -- "update" : merge new with existing component data,
+	 *       -- "replace" : delete current component data, empty the corresponding global, and replace with new
+	 *       -- "replace-keep-global-items" (default) : for list components : replace component items ids and merge global items
+	 *  - persistent {boolean} (default false). If true, new data is stored in local storage.
 	 */
 	themeApp.refreshComponentItems = function ( component_id, items_ids, options ) {
 		var existing_component = App.components.get( component_id );
@@ -523,12 +528,11 @@ define( function( require, exports ) {
 						wpak_query_action : 'get-items',
 						wpak_items_ids : items_ids
 					},
-					{	//Those are default liveQuery options values, but we set
-						//them explicitly for more clarity :
-						type : 'update',
+					{	
+						type : options.hasOwnProperty( 'refresh_type' ) ? options.refresh_type : 'replace-keep-global-items',
+						persistent : options.hasOwnProperty( 'persistent' ) ? options.persistent : false,
 						auto_interpret_result : true,
-						persistent : false,
-
+						
 						//Callbacks :
 						success : function ( answer ) {
 							if ( options !== undefined && options.success ) {

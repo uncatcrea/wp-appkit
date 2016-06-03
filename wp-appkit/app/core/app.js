@@ -1086,8 +1086,8 @@ define(function (require) {
 	 * @param array new_globals Array of new items referenced by the new component
 	 * @param string type Type of update. Can be :
 	 * - "update" : merge new with existing component data,
-	 * - "replace" : delete current component data and replace with new
-	 * - "replace-keep-global-items" (default) : for list components : replace component ids and merge global items
+	 * - "replace" : delete current component data, empty the corresponding global, and replace with new
+	 * - "replace-keep-global-items" (default) : for list components : replace component items ids and merge global items
 	 * @param boolean persistent (default false). If true, new data is stored in local storage.
 	 * @returns {JSON object} feedback data
 	 */
