@@ -1301,8 +1301,8 @@ define(function (require) {
 				//formated, we do the correct treatment according to answer fields :
 				if ( auto_interpret_result ) {
 
-					//See if components data were retured : if so,
-					//update the corresponding component(s) :
+					//See if components data were returned ("get-component" action): 
+					//if so, update the corresponding component(s) :
 					var new_components = {};
 					if ( answer.components ) {
 						new_components = answer.components;
@@ -1311,6 +1311,8 @@ define(function (require) {
 					}
 
 					if( !_.isEmpty( new_components ) ) {
+
+						//"get-component" case (as opposed to "get-items").
 
 						var error_message = '';
 						var update_results = {};
@@ -1343,7 +1345,8 @@ define(function (require) {
 
 					} else if ( answer.globals && !_.isEmpty( answer.globals ) ) {
 
-						//No component returned, but some global items :
+						//"get-items" case (as opposed to "get-component").
+						//> No component returned, but some global items :
 						//update current global items with new items sent :
 
 						var error_message = '';

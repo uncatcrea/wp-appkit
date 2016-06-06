@@ -244,6 +244,16 @@ define(function(require, exports) {
 		}
         return component_link;
     };
+	
+	/**
+	 * Check if current screen's component is the given component
+	 * 
+	 * @param   {string}  component_id   Id of the component (usually a string slug)
+	 * @returns {boolean} true if current screen correspond to given component id
+	 */
+	themeTplTags.isComponent = function( component_id ) {
+        return component_id.length > 0 && ThemeApp.getCurrentComponentId() === component_id;
+    };
 
 	themeTplTags.getComponentItems = function( component_id, return_format ) {
 		return_format = return_format === undefined ? 'view_items' : return_format;

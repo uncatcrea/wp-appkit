@@ -198,11 +198,11 @@ define( function( require, exports ) {
 	 */
 	themeApp.filter = function( filter, callback, priority ) {
 		Hooks.addFilter( filter, callback, priority );
-	}
+	};
 
 	themeApp.action = function( action, callback, priority ) {
 		Hooks.addAction( action, callback, priority );
-	}
+	};
 
 	themeApp.setParam = function( param, value ) {
 		App.setParam( param, value );
@@ -448,13 +448,30 @@ define( function( require, exports ) {
 	themeApp.getComponents = function() {
 		return App.getComponents();
 	};
+	
+	/**
+	 * Retrieves the id of the component corresponding to the current screen, if any.
+	 * 
+	 * @returns {string} Id of the current screen's component (usually a string slug)
+	 */
+	themeApp.getCurrentComponentId = function() {
+		var current_component_id = '';
+		
+		var current_screen = App.getCurrentScreenData();
+		if ( current_screen.component_id && App.componentExists( current_screen.component_id ) ) {
+			current_component_id = current_screen.component_id;
+		}
+		
+        return current_component_id;
+    };
 
 	/************************************************
 	 * "Live Query" Web Service
 	 */
 
 	/**
-	 * Call live query web service
+	 * Call "Live Query" web service.
+	 * Allows to refresh app components (or choosen component items) dynamically from server.
 	 *
 	 * @param JSON Object web_service_params Any params that you want to send to the server.
 	 *        The following params are automatically recognised and interpreted on server side :
@@ -490,15 +507,66 @@ define( function( require, exports ) {
 	};
 
 	/**
-	 * Refresh component items from server.
+	 * Refresh component data and items from server.
+	 * 
+	 * @param {JSON Object} options :
+	 *  - component_id {string} String (slug) idendifier provided when creating the component.
+	 *                          If none provided, will retrieve current screen component's id, if any.
+	 *	- success {callback}
+	 *	- error {callback}
+	 *	- refresh_type {string} Can be:
+	 *		 -- "update" : merge new with existing component data,
+	 *       -- "replace" : delete current component data, empty the corresponding global, and replace with new
+	 *       -- "replace-keep-global-items" (default) : for list components : replace component items ids and merge global items
+	 *  - persistent {boolean} (default false). If true, new data is stored in local storage.
+	 */
+	themeApp.refreshComponent = function( options ) {
+		
+		options = options || {};
+		
+		var component_id = options.component_id ? options.component_id : themeApp.getCurrentComponentId();
+		
+		var live_query_options = {};
+		
+		if ( options.success ) {
+			live_query_options.success = options.success; //Will be passed (answer, update_results)
+		}
+		
+		if ( options.error ) {
+			live_query_options.error = options.error; //Will be passed (answer_error)
+		}
+		
+		if ( options.refresh_type ) { //If none, will default to 'replace-keep-global-items'
+			live_query_options.type = options.refresh_type;
+		}
+		
+		if ( options.hasOwnProperty( 'persistent' ) ) { //If none, will default to false
+			live_query_options.persistent = options.persistent;
+		}
+					
+		themeApp.liveQuery(
+			{
+				wpak_component_slug: component_id,
+				wpak_query_action: 'get-component'
+			},
+			live_query_options
+		);
+
+	};
+
+	/**
+	 * Refresh given component items from server.
+	 * This only refreshes choosen items of a component, not the component itself. 
+	 * Use ThemeApp.refreshComponent() to update component data in addition to its items.
 	 *
-	 * @param {int} component_id
-	 * @param {int | array of int} items_ids. If none provided, will refresh all component items.
+	 * @param {string}   component_id   String (slug) idendifier provided when creating the component
+	 *                                  If none provided, will retrieve current screen component's id, if any.
+	 * @param {int | array of int}   items_ids   If none provided, will refresh all component items.
 	 * @param {JSON Object} options :
 	 *	- success {callback}
 	 *	- error {callback}
 	 *	- autoformat_answer {boolean} If true (default), the answer returned to the success
-	 *	  callback is automatically formated to return significant data. If false, the full
+	 *	  callback is automatically formated to return significant data (array of items). If false, the full
 	 *	  liveQuery answer is returned no matter what.
 	 *	- refresh_type {string} Can be:
 	 *		 -- "update" : merge new with existing component data,
@@ -507,6 +575,11 @@ define( function( require, exports ) {
 	 *  - persistent {boolean} (default false). If true, new data is stored in local storage.
 	 */
 	themeApp.refreshComponentItems = function ( component_id, items_ids, options ) {
+		
+		if ( component_id === undefined ) {
+			component_id = TemplateTags.getCurrentComponentId();
+		}
+		
 		var existing_component = App.components.get( component_id );
     	if( existing_component ) {
 
