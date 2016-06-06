@@ -1126,8 +1126,8 @@ define(function (require) {
 	 * @param array new_globals Array of new items referenced by the new component
 	 * @param string type Type of update. Can be :
 	 * - "update" : merge new with existing component data,
-	 * - "replace" : delete current component data and replace with new
-	 * - "replace-keep-global-items" (default) : for list components : replace component ids and merge global items
+	 * - "replace" : delete current component data, empty the corresponding global, and replace with new
+	 * - "replace-keep-global-items" (default) : for list components : replace component items ids and merge global items
 	 * @param boolean persistent (default false). If true, new data is stored in local storage.
 	 * @returns {JSON object} feedback data
 	 */
@@ -1156,9 +1156,9 @@ define(function (require) {
 		var existing_component = app.components.get( new_component.slug );
     	if( existing_component ) {
 
-			var existing_component_data = existing_component.data;
+			var existing_component_data = existing_component.get( 'data' );
 			var new_component_data = new_component.data;
-
+			
 			if ( new_component_data.hasOwnProperty( 'ids' ) ) { //List component
 
 				if( new_component.global ) {
@@ -1170,7 +1170,7 @@ define(function (require) {
 					}
 
 					var new_ids = [ ];
-					if ( type == "replace" || type == "replace-keep-global-items" ) {
+					if ( type === "replace" || type === "replace-keep-global-items" ) {
 						new_ids = new_component_data.ids;
 					} else {
 						new_ids = _.difference( new_component_data.ids, existing_component_data.ids );
@@ -1180,7 +1180,7 @@ define(function (require) {
 					existing_component.set( 'data', new_component_data );
 
 					var current_items = app.globals[global];
-					if ( type == "replace" ) {
+					if ( type === "replace" ) {
 						current_items.resetAll();
 					}
 
@@ -1192,7 +1192,7 @@ define(function (require) {
 					_.each( new_ids, function( item_id ) {
 						new_items.push( current_items.get( item_id ) );
 					} );
-
+					
 					if ( persistent ) {
 						existing_component.save();
 						current_items.saveAll();
@@ -1292,7 +1292,7 @@ define(function (require) {
 		var auto_interpret_result = !options.hasOwnProperty('auto_interpret_result') || options.auto_interpret_result === true;
 
 		//interpretation_type defaults to 'update' :
-		var interpretation_type = options.hasOwnProperty('type') ? options.type : 'update';
+		var interpretation_type = options.hasOwnProperty('type') ? options.type : 'replace-keep-global-items';
 
 		//persistent defaults to false :
 		var persistent = options.hasOwnProperty('persistent') && options.persistent === true;
@@ -1341,8 +1341,8 @@ define(function (require) {
 				//formated, we do the correct treatment according to answer fields :
 				if ( auto_interpret_result ) {
 
-					//See if components data were retured : if so,
-					//update the corresponding component(s) :
+					//See if components data were returned ("get-component" action): 
+					//if so, update the corresponding component(s) :
 					var new_components = {};
 					if ( answer.components ) {
 						new_components = answer.components;
@@ -1351,6 +1351,8 @@ define(function (require) {
 					}
 
 					if( !_.isEmpty( new_components ) ) {
+
+						//"get-component" case (as opposed to "get-items").
 
 						var error_message = '';
 						var update_results = {};
@@ -1383,7 +1385,8 @@ define(function (require) {
 
 					} else if ( answer.globals && !_.isEmpty( answer.globals ) ) {
 
-						//No component returned, but some global items :
+						//"get-items" case (as opposed to "get-component").
+						//> No component returned, but some global items :
 						//update current global items with new items sent :
 
 						var error_message = '';

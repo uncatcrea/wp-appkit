@@ -78,7 +78,7 @@ class WpakWebServiceLiveQuery {
 							$service_answer = WpakComponents::get_component_items( $app_id, $component_slug, $items_ids );
 						}
 						break;
-				};
+				}
 			}
 		}
 
