@@ -943,7 +943,37 @@ define(function (require) {
       	return Hooks.applyFilters( 'post-global', global, [id, global_default] );
       };
 
-      app.getMoreOfComponent = function(component_id,cb_ok,cb_error){
+      app.getMoreOfComponent = function( component_id, cb_ok, cb_error, use_standard_pagination ) {
+		  
+			use_standard_pagination = ( use_standard_pagination !== undefined ) && use_standard_pagination === true;
+			
+			var current_screen = app.getCurrentScreenData();
+			var current_component_id = '';
+			if ( current_screen.component_id && app.componentExists( current_screen.component_id ) ) {
+				current_component_id = current_screen.component_id;
+			}
+			
+			/**
+			 * Use this 'use-standard-pagination' filter to set standard pagination type for the component.
+			 * 
+			 * WP-AppKit supports 2 kind of pagination: 
+			 * 
+			 * - "Infinite Scroll pagination": we retrieve posts before the last post in the list (by passing its id in "before_id" param).
+			 *   It avoids post duplication when getting page>1 and a new post was created in the meantime.
+			 *   This is the default behaviour for the "Get More Posts" button in WP-AppKit's post lists.
+			 * 
+			 * - "Standard pagination": corresponds to the standard use of "paged" param in WP_Query.
+			 *   Return true as a result of this 'use-standard-pagination' filter to activate it.
+			 * 
+			 * Those 2 pagination types are exclusive: you can't use both at the same time.
+			 * If standard pagination is set, infinite scroll pagination is ignored.
+			 * 
+			 * @param use_standard_pagination   {boolean}     Set this to true to activate standard pagination (default false)
+			 * @param current_component_id      {string}      String identifier for the component the "get more" is called on
+			 * @param current_screen            {JSON Object} Current screen on which "get more" is called
+			 */
+			use_standard_pagination = Hooks.applyFilters( 'use-standard-pagination', use_standard_pagination, [ current_component_id, current_screen ] );
+		  
 			var component = app.components.get( component_id );
 			if ( component ) {
 
@@ -955,7 +985,16 @@ define(function (require) {
 					var ws_url = token + '/component/' + component_id;
 
 					var last_item_id = _.last( component_data.ids );
-					ws_url += '?before_item=' + last_item_id;
+					
+					var web_service_params = {};
+					
+					if ( use_standard_pagination ) {
+						var current_pagination_page = component_data.query.hasOwnProperty( 'pagination_page' ) && component_data.query.pagination_page > 0 ? 
+													  parseInt( component_data.query.pagination_page ) : 1;
+						web_service_params.pagination_page = current_pagination_page + 1;
+					} else {
+						web_service_params.before_item = last_item_id;
+					}
 
 					/**
 					* Filter 'web-service-params' : use this to send custom key/value formated
@@ -966,7 +1005,7 @@ define(function (require) {
 					* Filter arguments :
 					* - web_service_name : string : name of the current web service ('get-more-of-component' here).
 					*/
-					var web_service_params = Hooks.applyFilters('web-service-params',{},['get-more-of-component']);
+					var web_service_params = Hooks.applyFilters( 'web-service-params', web_service_params, ['get-more-of-component'] );
 
 					//Build the ajax query :
 					var ajax_args = {
@@ -997,6 +1036,8 @@ define(function (require) {
 								if ( app.globals.hasOwnProperty( global ) ) {
 
 									var new_ids = _.difference( answer.component.data.ids, component_data.ids );
+									
+									component_data.query.pagination_page = answer.component.data.query.pagination_page;
 
 									component_data.ids = _.union( component_data.ids, answer.component.data.ids ); //merge ids
 									component.set( 'data', component_data );

@@ -6,13 +6,35 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		global $wpdb;
 
 		do_action( 'wpak_before_component_posts_list', $component, $options );
-
-		$before_post_date = '';
-		if ( !empty( $args['before_item'] ) && is_numeric( $args['before_item'] ) ) {
+		
+		/**
+		 * Pagination:
+		 * 2 kinds of pagination supported: 
+		 * 
+		 * - "Infinite Scroll pagination": we retrieve posts before the given "before_item".
+		 *   It avoids post duplication when getting page>1 and a new post was created in the meantime.
+		 *   This is the default behaviour for the "Get More Posts" button in WP-AppKit's post lists.
+		 * 
+		 * - "Standard pagination": corresponds to the standard use of "paged" param in WP_Query.
+		 *   To use this standard pagination for a post list component you'll have to manually set it
+		 *   on appside using the 
+		 * 
+		 * Those 2 pagination types are exclusive: you can't use both at the same time.
+		 * If a standard pagination page is provided, infinite scroll pagination is ignored.
+		 */
+		$before_post_date = ''; //"Infinite Scroll" pagination type
+		$pagination_page = 0; //Standard pagination type
+		if ( !empty( $args['pagination_page'] ) && is_numeric( $args['pagination_page'] ) ) {
+			
+			$pagination_page = (int)$args['pagination_page'];
+			
+		} else if ( !empty( $args['before_item'] ) && is_numeric( $args['before_item'] ) ) {
+			
 			$before_post = get_post( $args['before_item'] );
 			if ( !empty( $before_post ) ) {
 				$before_post_date = $before_post->post_date;
 			}
+			
 		}
 		
 		//WP_Query args
@@ -32,7 +54,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			$posts_list_data = array(
 				'posts' => array(),
 				'total' => 0,
-				'query' => array( 'type' => 'custom-posts-list', 'taxonomy' => '', 'terms' => array(), 'is_last_page' => true, 'before_item' => 0 )
+				'query' => array( 'type' => 'custom-posts-list', 'taxonomy' => '', 'terms' => array(), 'is_last_page' => true, 'before_item' => 0, 'pagination_page' => $pagination_page )
 			);
 
 			/**
@@ -44,7 +66,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			 * @param array 			$args 					Args that can be passed via webservice's url $_GET parameters.
 			 * @param array 			$before_post_date 		The publication date of the last displayed post.
 			 */
-			$posts_list_data = apply_filters( 'wpak_posts_list_custom-' . $options['hook'], $posts_list_data, $component, $options, $args, $before_post_date );
+			$posts_list_data = apply_filters( 'wpak_posts_list_custom-' . $options['hook'], $posts_list_data, $component, $options, $args, $before_post_date, $pagination_page );
 
 			$posts = $posts_list_data['posts'];
 			$total = !empty( $posts_list_data['total'] ) ? $posts_list_data['total'] : count( $posts );
@@ -56,7 +78,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 
 			$post_type = !empty( $options['post-type'] ) && !$is_last_posts ? $options['post-type'] : 'post';
 
-			$query = array( 'post_type' => $post_type );
+			$query = array( 'post_type' => $post_type, 'pagination_page' => $pagination_page );
 
 			$query_args = array( 'post_type' => $post_type );
 
@@ -98,11 +120,16 @@ class WpakComponentTypePostsList extends WpakComponentType {
 				
 			}
 
-			if ( !empty( $before_post_date ) ) {
+			if ( !empty( $pagination_page ) ) {
+				
+				$query_args['paged'] = $pagination_page;
+				
+			} else if ( !empty( $before_post_date ) ) {
+
 				if ( is_numeric( $before_post_date ) ) { //timestamp
 					$before_post_date = date( 'Y-m-d H:i:s', $before_post_date );
 				}
-
+				
 				if ( preg_match( '/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/', $before_post_date ) ) {
 					$query['before_item'] = intval( $args['before_item'] );
 					$posts_where_callback = create_function( '$where', 'return $where .= " AND post_date < \'' . $before_post_date . '\'";' );
@@ -110,8 +137,9 @@ class WpakComponentTypePostsList extends WpakComponentType {
 				} else {
 					$before_post_date = '';
 				}
+				
 			}
-
+			
 			/**
 			 * Filter args used for the query made into a posts list component.
 			 *

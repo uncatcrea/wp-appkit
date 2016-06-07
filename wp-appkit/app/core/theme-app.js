@@ -386,17 +386,17 @@ define( function( require, exports ) {
 		var current_screen = App.getCurrentScreenData();
 		if ( current_screen.screen_type === 'list' ) {
 			App.getMoreOfComponent(
-					current_screen.component_id,
-					function( data ) {
-						var current_archive_view = RegionManager.getCurrentView();
-						current_archive_view.addPosts( data.new_items );
-						current_archive_view.render();
-						cb_after( data.is_last, data.new_items, data.nb_left );
-					},
-					function( error ) {
-						var get_more_link_data = themeApp.getGetMoreLinkDisplay();
-						cb_error( format_theme_event_data( error.event, error ), get_more_link_data );
-					}
+				current_screen.component_id,
+				function( data ) {
+					var current_archive_view = RegionManager.getCurrentView();
+					current_archive_view.addPosts( data.new_items );
+					current_archive_view.render();
+					cb_after( data.is_last, data.new_items, data.nb_left );
+				},
+				function( error ) {
+					var get_more_link_data = themeApp.getGetMoreLinkDisplay();
+					cb_error( format_theme_event_data( error.event, error ), get_more_link_data );
+				}
 			);
 		}
 	};
@@ -463,6 +463,22 @@ define( function( require, exports ) {
 		}
 		
         return current_component_id;
+    };
+	
+	/**
+	 * Retrieves the component corresponding to the current screen, if any.
+	 * 
+	 * @returns {JSON object} Current screen's component data
+	 */
+	themeApp.getCurrentComponent = function() {
+		var current_component = null;
+		
+		var current_component_id = themeApp.getCurrentComponentId();
+		if ( current_component_id !== '' ) {
+			current_component = App.getComponentData( current_component_id );
+		}
+		
+        return current_component;
     };
 
 	/************************************************
