@@ -188,7 +188,6 @@ define( function ( require ) {
 			case 'ios':
 				$splashcreen_settings['preferences']['AutoHideSplashScreen'] = 'false';
 				$splashcreen_settings['preferences']['FadeSplashScreenDuration'] = '1000';
-				$splashcreen_settings['preferences']['ShowSplashScreenSpinner'] = 'false';
 				$splashcreen_settings['gap:config-file']['UIStatusBarHidden'] = 'true';
 				$splashcreen_settings['gap:config-file']['UIViewControllerBasedStatusBarAppearance'] = 'false';
 				break;
@@ -200,6 +199,9 @@ define( function ( require ) {
 				//So the plan is to have a very long delay for the splashscreen and let Javascript hiding the splashscreen
 				break;
 		}
+
+		// For all platforms, hide the spinner
+		$splashcreen_settings['preferences']['ShowSplashScreenSpinner'] = 'false';
 
 		//No splashscreen setting if the 'cordova-plugin-splashscreen' plugin is not here :
 		$splashcreen_plugin_here = true;
