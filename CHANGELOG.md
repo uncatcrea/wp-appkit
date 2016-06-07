@@ -1,3 +1,63 @@
+## 0.6 (2016-06-10)
+
+### Demo themes included in core & New theme library!
+- **Include demo themes in default WP-AppKit plugin package** ([#152](https://github.com/uncatcrea/wp-appkit/issues/152), [@lpointet](https://github.com/lpointet))
+- **New UI for WP-AppKit themes browsing, based on WP Themes Library** ([#152](https://github.com/uncatcrea/wp-appkit/issues/152), [@lpointet](https://github.com/lpointet))
+- **Be able to add a screenshot to a theme** ([#192](https://github.com/uncatcrea/wp-appkit/issues/192), [@lpointet](https://github.com/lpointet))
+- **Default theme for iOS** ([#195](https://github.com/uncatcrea/wp-appkit/issues/195), [@blupu](https://github.com/blupu))
+- **Default theme for Android** ([#196](https://github.com/uncatcrea/wp-appkit/issues/196), [@blupu](https://github.com/blupu))
+
+### Features / Evolutions
+- **Deep Links** ([#215](https://github.com/uncatcrea/wp-appkit/issues/215), [@lpointet](https://github.com/lpointet))
+- **Authentication module: be compatible with WP 4.5 authentication using email** ([#210](https://github.com/uncatcrea/wp-appkit/issues/210), [@mleroi](https://github.com/mleroi))
+- **Shorttag to show/hide app specific content** ([#211](https://github.com/uncatcrea/wp-appkit/issues/211), [@mleroi](https://github.com/mleroi))
+- **Allow themes to add custom theme settings to config.js** ([#208](https://github.com/uncatcrea/wp-appkit/issues/208), [@mleroi](https://github.com/mleroi))
+- **Add WordPress url in config.js** ([#207](https://github.com/uncatcrea/wp-appkit/issues/207), [@mleroi](https://github.com/mleroi))
+- **Include theme's PHP folder in the config.js/config.xml process** ([#209](https://github.com/uncatcrea/wp-appkit/issues/209), [@mleroi](https://github.com/mleroi))
+- **Allow using standard pagination for post lists** ([#231](https://github.com/uncatcrea/wp-appkit/issues/231), [@mleroi](https://github.com/mleroi))
+
+### Cordova / Phonegap
+- **CrossWalk support** ([#188](https://github.com/uncatcrea/wp-appkit/issues/188), [@lpointet](https://github.com/lpointet))
+- **Gradle support** ([#187](https://github.com/uncatcrea/wp-appkit/issues/187), [@mleroi](https://github.com/mleroi))
+- **App permissions** ([#181](https://github.com/uncatcrea/wp-appkit/issues/181), [@lpointet](https://github.com/lpointet))
+- **Status bar support for Android** ([#190](https://github.com/uncatcrea/wp-appkit/issues/190), [@mleroi](https://github.com/mleroi))
+- **Missing splashscreen fading delay** ([#206](https://github.com/uncatcrea/wp-appkit/issues/206), [@mleroi](https://github.com/mleroi))
+- **Hide splashscreen spinner on Android** ([#191](https://github.com/uncatcrea/wp-appkit/issues/191), [@lpointet](https://github.com/lpointet))
+
+### Better Theme and Plugin API
+- **Add upgrade routines** ([#193](https://github.com/uncatcrea/wp-appkit/issues/193), [@lpointet](https://github.com/lpointet))
+- **Better history info in custom screen transitions** ([#219](https://github.com/uncatcrea/wp-appkit/issues/219), [@mleroi](https://github.com/mleroi))
+- **Remove ThemeApp.setAutoScreenTransitions()** ([#198](https://github.com/uncatcrea/wp-appkit/issues/198), [@mleroi](https://github.com/mleroi))
+- **Fix argument names and order in 'screen-transition' action** ([#197](https://github.com/uncatcrea/wp-appkit/issues/197), [@mleroi](https://github.com/mleroi))
+- **Remove 'screen:before-transition' event** ([#202](https://github.com/uncatcrea/wp-appkit/issues/202), [@mleroi](https://github.com/mleroi))
+- **Homogenize web service event types** ([#201](https://github.com/uncatcrea/wp-appkit/issues/201), [@mleroi](https://github.com/mleroi))
+- **Better "preloaded-templates" filter** ([#200](https://github.com/uncatcrea/wp-appkit/issues/200), [@mleroi](https://github.com/mleroi))
+- **JS action hooks clarification** ([#199](https://github.com/uncatcrea/wp-appkit/issues/199), [@mleroi](https://github.com/mleroi))
+- **Unused or misused events** ([#203](https://github.com/uncatcrea/wp-appkit/issues/203), [@mleroi](https://github.com/mleroi))
+- **Enhance web service context info retrieval** ([#217](https://github.com/uncatcrea/wp-appkit/issues/217), [@mleroi](https://github.com/mleroi))
+- **Make ThemeApp.refreshComponentItems() more flexible** ([#229](https://github.com/uncatcrea/wp-appkit/issues/229), [@mleroi](https://github.com/mleroi))
+- **Create ThemeApp.refreshComponent()** ([#230](https://github.com/uncatcrea/wp-appkit/issues/230), [@mleroi](https://github.com/mleroi))
+
+### Bugfixes
+- **Script localization and escaping, remove esc_js() calls** ([#180](https://github.com/uncatcrea/wp-appkit/issues/180), [@lpointet](https://github.com/lpointet))
+- **Metaboxes help texts** ([#57](https://github.com/uncatcrea/wp-appkit/issues/57), [@lpointet](https://github.com/lpointet))
+- **Display comments directly: add parent post/page to history** ([#216](https://github.com/uncatcrea/wp-appkit/issues/216), [@mleroi](https://github.com/mleroi))
+- **Reset component form** ([#96](https://github.com/uncatcrea/wp-appkit/issues/96), [@lpointet](https://github.com/lpointet))
+- **Default liveQuery type should be 'replace-keep-global-items' and not 'update'** ([#227](https://github.com/uncatcrea/wp-appkit/issues/227), [@mleroi](https://github.com/mleroi))
+- **LiveQuery error when type=update** ([#228](https://github.com/uncatcrea/wp-appkit/issues/228), [@mleroi](https://github.com/mleroi))
+- **Back action broken for pages** ([#221](https://github.com/uncatcrea/wp-appkit/issues/221), [@mleroi](https://github.com/mleroi))
+
+### Backward compatibility note regarding Theme API
+- [#197](https://github.com/uncatcrea/wp-appkit/issues/197) **Argument names and order changed in 'screen-transition' action**
+- [#198](https://github.com/uncatcrea/wp-appkit/issues/198) **ThemeApp.setAutoScreenTransitions() removed, replaced by manual hooks**
+- [#199](https://github.com/uncatcrea/wp-appkit/issues/199) **Changes on 3 asynchronous actions: "pre-start-router", "get-more-component-items", "debug-panel-render"**
+- [#200](https://github.com/uncatcrea/wp-appkit/issues/200) **Simplification of template format passed to "preloaded-templates" filter: "single" instead of "text!theme/single.html"**
+- [#201](https://github.com/uncatcrea/wp-appkit/issues/201) **Events prefix homogenization: use of "ws-data" replaced by "web-service"**
+- [#202](https://github.com/uncatcrea/wp-appkit/issues/202) **'screen:before-transition' event removed because not usable as is, potentially leading to errors**
+- [#203](https://github.com/uncatcrea/wp-appkit/issues/203) **Unused events removed: 'menu:refresh',’header:render','waiting:start','waiting:stop'**
+- [#227](https://github.com/uncatcrea/wp-appkit/issues/227) **LiveQuery webservice default type is now 'replace-keep-global-items' instead of 'update'**
+
+
 ## 0.5 (2016-03-07)
 
 ### Better Theme and Plugin API
