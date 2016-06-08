@@ -9,12 +9,17 @@ class WpakThemes {
 	const themes_directory = 'themes-wp-appkit';
 	const default_themes_directory = 'default-themes';
 	protected static $default_themes = array(
+		/**
+		 * Key is used for:
+		 *  - theme slug (to check if an installed theme is this one)
+		 *  - filename into default themes folder (key.zip)
+		 * Key should be the same as the theme's folder name (once unzipped)
+		 */
+
 		/*
 		// Structure example:
 		// TODO: add values when default themes will be ready
 		'default1' => array(
-			'id' => 'default1', // Same as the array key
-			'file' => 'default1.zip',
 			'name' => 'Default1 WP-AppKit Theme', // TODO: handle name change between versions?
 			'version' => '1.0.0',
 		),
@@ -42,6 +47,11 @@ class WpakThemes {
 
 	public static function get_default_themes_directory_uri(){
 	 	return plugins_url( self::default_themes_directory, dirname( dirname( __FILE__ ) ) );
+	}
+
+	public static function get_default_theme_filename( $slug ) {
+		// This file might not exist if $slug doesn't exist into default themes, but if you call this method, you'd have to check if the file exists anyway
+		return $slug . '.zip';
 	}
 
 	public static function get_default_themes() {
@@ -97,25 +107,22 @@ class WpakThemes {
 		$available_themes = self::get_available_themes( true );
 		$default_themes = self::get_default_themes();
 
-		// Get an array with [ 'id' => 'name' ] for each default theme
-		$default_names = wp_list_pluck( $default_themes, 'name', 'id' );
-
-		$result = array_fill_keys( array_keys( $default_names ), 'unavailable' );
+		// Pre-fill results: each theme is unavailable
+		$result = array_fill_keys( array_keys( $default_themes ), 'unavailable' );
 
 		foreach( $available_themes as $slug => $data ) {
-			$id = array_search( $data['Name'], $default_names );
-
-			if( $id === false ) {
+			// This theme is unavailable
+			if( !isset( $default_themes[$slug] ) ) {
 				continue;
 			}
 
 			// The theme is a default one: check if it needs an upgrade
-			if( version_compare( $data['Version'], $default_themes[$id]['version'], '<' ) ) {
-				$result[$id] = 'needs_upgrade';
+			if( version_compare( $data['Version'], $default_themes[$slug]['version'], '<' ) ) {
+				$result[$slug] = 'needs_upgrade';
 			}
 			else {
 				// This theme is available and up-to-date
-				unset( $result[$id] );
+				unset( $result[$slug] );
 			}
 		}
 
@@ -149,14 +156,15 @@ class WpakThemes {
 		global $wp_filesystem;
 		$result = true;
 
-		foreach( self::get_default_themes() as $struc ) {
-			if( !$wp_filesystem->is_file( self::get_default_themes_directory() . '/' . $struc['file'] ) ) {
+		foreach( array_keys( self::get_default_themes() ) as $slug ) {
+			$filename = self::get_default_theme_filename( $slug );
+			if( !$wp_filesystem->is_file( self::get_default_themes_directory() . '/' . $filename ) ) {
 				continue;
 			}
 
 			// Warning: this will erase existing files, it's intended since this method should be called after some checks and validation about that fact
 			// TODO: use WP_Upgrader API
-			$res = unzip_file( self::get_default_themes_directory() . '/' . $struc['file'], self::get_themes_directory() );
+			$res = unzip_file( self::get_default_themes_directory() . '/' . $filename, self::get_themes_directory() );
 
 			if( is_wp_error( $res ) ) {
 				$result = false;
@@ -293,6 +301,7 @@ class WpakThemes {
 		$available_themes = array();
 
 		$directory = self::get_themes_directory();
+		$default_themes_names = wp_list_pluck( self::get_default_themes(), 'name' );
 
 		if ( file_exists( $directory ) && is_dir( $directory ) ) {
 			if ( $handle = opendir( $directory ) ) {
@@ -302,6 +311,12 @@ class WpakThemes {
 						if ( is_dir( $entry_full_path ) ) {
 							if( $with_data ){
 								$available_themes[$entry] = WpakThemes::get_theme_data($entry);
+
+								// Update the name if this one has the same name as a default one: add the slug as a suffix
+								$default_slug = array_search( $available_themes[$entry]['Name'], $default_themes_names );
+								if( $default_slug !== false && $default_slug != $entry ) {
+									$available_themes[$entry]['Name'].= '/' . $entry;
+								}
 							}else{
 								$available_themes[] = $entry;
 							}

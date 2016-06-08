@@ -164,13 +164,14 @@ class WpakUploadThemes {
 						<h2><?php _e( 'Download Default Themes Packages', WpAppKit::i18n_domain ); ?></h2>
 						<div>
 							<ul>
-								<?php foreach( $default_themes as $theme ):
-									if( !is_file( WpakThemes::get_default_themes_directory() . '/' . $theme['file'] ) ) {
+								<?php foreach( $default_themes as $slug => $theme ):
+									$filename = WpakThemes::get_default_theme_filename( $slug );
+									if( !is_file( WpakThemes::get_default_themes_directory() . '/' . $filename ) ) {
 										continue;
 									}
 									?>
 									<li>
-										<a href="<?php echo WpakThemes::get_default_themes_directory_uri() . '/' . $theme['file']; ?>"><?php echo $theme['name'] . ' (' . $theme['version'] . ')'; ?></a>
+										<a href="<?php echo WpakThemes::get_default_themes_directory_uri() . '/' . $filename; ?>"><?php echo $theme['name'] . ' (' . $theme['version'] . ')'; ?></a>
 									</li>
 								<?php endforeach; ?>
 							</ul>
