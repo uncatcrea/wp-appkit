@@ -16,14 +16,17 @@ class WpakThemes {
 		 * Key should be the same as the theme's folder name (once unzipped)
 		 */
 
-		/*
 		// Structure example:
-		// TODO: add values when default themes will be ready
-		'default1' => array(
-			'name' => 'Default1 WP-AppKit Theme', // TODO: handle name change between versions?
+		'q-ios' => array(
+			'name' => 'Q for iOS', // TODO: handle name change between versions?
 			'version' => '1.0.0',
 		),
-		*/
+		
+		'q-android' => array(
+			'name' => 'Q for Android',
+			'version' => '1.0.0',
+		),
+		
 	);
 
 	public static function hooks() {
