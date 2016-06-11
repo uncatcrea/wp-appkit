@@ -142,16 +142,16 @@ wp_localize_script( 'wpak-theme', '_wpThemeSettings', array(
     'settings' => array(
         'canInstall'    => ( current_user_can( 'wpak_edit_apps' ) || current_user_can( 'manage_options' ) ),
         'installURI'    => ( current_user_can( 'wpak_edit_apps' ) || current_user_can( 'manage_options' ) ) ? menu_page_url( WpakUploadThemes::menu_item, false ) : null,
-        'confirmDelete' => __( "Are you sure you want to delete this theme?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete." ),
+        'confirmDelete' => __( "Are you sure you want to delete this theme?\n\nClick 'Cancel' to go back, 'OK' to confirm the delete.", WpAppKit::i18n_domain ),
         'adminUrl'      => parse_url( admin_url(), PHP_URL_PATH ),
         'baseUrl'       => str_replace( admin_url(), '', menu_page_url( WpakThemesBoSettings::menu_item, false ) ),
     ),
     'l10n' => array(
-        'addNew'            => __( 'Add New Theme' ),
-        'search'            => __( 'Search Installed Themes' ),
-        'searchPlaceholder' => __( 'Search installed themes...' ), // placeholder (no ellipsis)
-        'themesFound'       => __( 'Number of Themes found: %d' ),
-        'noThemesFound'     => __( 'No themes found. Try a different search.' ),
+        'addNew'            => __( 'Add New Theme', WpAppKit::i18n_domain ),
+        'search'            => __( 'Search Installed Themes', WpAppKit::i18n_domain ),
+        'searchPlaceholder' => __( 'Search installed themes...', WpAppKit::i18n_domain ), // placeholder (no ellipsis)
+        'themesFound'       => __( 'Number of Themes found: %d', WpAppKit::i18n_domain ),
+        'noThemesFound'     => __( 'No themes found. Try a different search.', WpAppKit::i18n_domain ),
     ),
 ) );
 
@@ -162,7 +162,7 @@ add_thickbox();
     <h1><?php echo get_admin_page_title(); ?>
         <span class="title-count theme-count"><?php echo count( $themes ); ?></span>
     <?php if ( current_user_can( 'wpak_edit_apps' ) || current_user_can( 'manage_options' ) ) : ?>
-        <a href="<?php menu_page_url( WpakUploadThemes::menu_item ); ?>" class="hide-if-no-js page-title-action"><?php echo esc_html_x( 'Add New', 'Add new theme' ); ?></a>
+        <a href="<?php menu_page_url( WpakUploadThemes::menu_item ); ?>" class="hide-if-no-js page-title-action"><?php echo esc_html_x( 'Add New', 'Add new theme', WpAppKit::i18n_domain ); ?></a>
     <?php endif; ?>
     </h1>
     <div class="theme-browser">
@@ -184,8 +184,8 @@ foreach ( $themes as $theme ) :
     <?php } else { ?>
         <div class="theme-screenshot blank"></div>
     <?php } ?>
-    <span class="more-details" id="<?php echo $aria_action; ?>"><?php _e( 'Theme Details' ); ?></span>
-    <div class="theme-author"><?php printf( __( 'By %s' ), $theme['author'] ); ?></div>
+    <span class="more-details" id="<?php echo $aria_action; ?>"><?php _e( 'Theme Details', WpAppKit::i18n_domain ); ?></span>
+    <div class="theme-author"><?php printf( __( 'By %s', WpAppKit::i18n_domain ), $theme['author'] ); ?></div>
 
     <h2 class="theme-name" id="<?php echo $aria_name; ?>"><?php echo $theme['name']; ?></h2>
 
@@ -198,7 +198,7 @@ foreach ( $themes as $theme ) :
 </div>
 <div class="theme-overlay"></div>
 
-<p class="no-themes"><?php _e( 'No themes found. Try a different search.' ); ?></p>
+<p class="no-themes"><?php _e( 'No themes found. Try a different search.', WpAppKit::i18n_domain ); ?></p>
 
 </div><!-- .wrap -->
 
@@ -215,8 +215,8 @@ foreach ( $themes as $theme ) :
     <# } else { #>
         <div class="theme-screenshot blank"></div>
     <# } #>
-    <span class="more-details" id="{{ data.id }}-action"><?php _e( 'Theme Details' ); ?></span>
-    <div class="theme-author"><?php printf( __( 'By %s' ), '{{{ data.author }}}' ); ?></div>
+    <span class="more-details" id="{{ data.id }}-action"><?php _e( 'Theme Details', WpAppKit::i18n_domain ); ?></span>
+    <div class="theme-author"><?php printf( __( 'By %s', WpAppKit::i18n_domain ), '{{{ data.author }}}' ); ?></div>
 
     <h2 class="theme-name" id="{{ data.id }}-name">{{{ data.name }}}</h2>
 
@@ -228,9 +228,9 @@ foreach ( $themes as $theme ) :
     <div class="theme-backdrop"></div>
     <div class="theme-wrap">
         <div class="theme-header">
-            <button class="left dashicons dashicons-no"><span class="screen-reader-text"><?php _e( 'Show previous theme' ); ?></span></button>
-            <button class="right dashicons dashicons-no"><span class="screen-reader-text"><?php _e( 'Show next theme' ); ?></span></button>
-            <button class="close dashicons dashicons-no"><span class="screen-reader-text"><?php _e( 'Close details dialog' ); ?></span></button>
+            <button class="left dashicons dashicons-no"><span class="screen-reader-text"><?php _e( 'Show previous theme', WpAppKit::i18n_domain ); ?></span></button>
+            <button class="right dashicons dashicons-no"><span class="screen-reader-text"><?php _e( 'Show next theme', WpAppKit::i18n_domain ); ?></span></button>
+            <button class="close dashicons dashicons-no"><span class="screen-reader-text"><?php _e( 'Close details dialog', WpAppKit::i18n_domain ); ?></span></button>
         </div>
         <div class="theme-about">
             <div class="theme-screenshots">
@@ -242,13 +242,13 @@ foreach ( $themes as $theme ) :
             </div>
 
             <div class="theme-info">
-                <h2 class="theme-name">{{{ data.name }}}<span class="theme-version"><?php printf( __( 'Version: %s' ), '{{ data.version }}' ); ?></span></h2>
-                <p class="theme-author"><?php printf( __( 'By %s' ), '{{{ data.authorAndUri }}}' ); ?></p>
+                <h2 class="theme-name">{{{ data.name }}}<span class="theme-version"><?php printf( __( 'Version: %s', WpAppKit::i18n_domain ), '{{ data.version }}' ); ?></span></h2>
+                <p class="theme-author"><?php printf( __( 'By %s', WpAppKit::i18n_domain ), '{{{ data.authorAndUri }}}' ); ?></p>
 
                 <p class="theme-description">{{{ data.description }}}</p>
 
                 <# if ( data.tags ) { #>
-                    <p class="theme-tags"><span><?php _e( 'Tags:' ); ?></span> {{{ data.tags }}}</p>
+                    <p class="theme-tags"><span><?php _e( 'Tags:', WpAppKit::i18n_domain ); ?></span> {{{ data.tags }}}</p>
                 <# } #>
 
                 <# if ( data.apps.length ) { #>
@@ -263,7 +263,7 @@ foreach ( $themes as $theme ) :
 
         <div class="theme-actions">
             <# if ( ! data.active && data.actions['delete'] ) { #>
-                <a href="{{{ data.actions['delete'] }}}" class="button button-secondary delete-theme"><?php _e( 'Delete' ); ?></a>
+                <a href="{{{ data.actions['delete'] }}}" class="button button-secondary delete-theme"><?php _e( 'Delete', WpAppKit::i18n_domain ); ?></a>
             <# } #>
         </div>
     </div>

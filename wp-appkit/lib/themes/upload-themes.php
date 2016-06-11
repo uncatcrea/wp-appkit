@@ -151,7 +151,7 @@ class WpakUploadThemes {
 					<?php endif ?>
 
 					<div class="upload-plugin">
-						<p class="install-help"><?php _e('If you have a WP AppKit theme in a .zip format, you may install it by uploading it here.'); ?></p>
+						<p class="install-help"><?php _e( 'If you have a WP AppKit theme in a .zip format, you may install it by uploading it here.', WpAppKit::i18n_domain ); ?></p>
 						<form method="post" enctype="multipart/form-data" class="wp-upload-form" action="<?php echo esc_url( add_query_arg( array( 'wpak_action' => 'upload-theme' ) ) ) ?>">
 							<?php wp_nonce_field( 'wpak-theme-upload' ); ?>
 							<label class="screen-reader-text" for="themezip"><?php _e('WP AppKit Theme zip file', WpAppKit::i18n_domain); ?></label>

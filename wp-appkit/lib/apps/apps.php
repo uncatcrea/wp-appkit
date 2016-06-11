@@ -450,8 +450,7 @@ class WpakApps {
 				<div class="field-group">
 					<label><?php _e( 'Plugins', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_phonegap_plugins" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
-					<span class="description"><?php __( 'Add here the tags defining the plugins you want to
-					include in your app. Before adding a plugin, check which one is included by default.', WpAppKit::i18n_domain ) ?></span>
+					<span class="description"><?php __( 'Add here the tags defining the plugins you want to include in your app. Before adding a plugin, check which one is included by default.', WpAppKit::i18n_domain ) ?></span>
 				</div>
 			</fieldset>
 			<div class="field-group wpak_phonegap_links">
@@ -475,8 +474,7 @@ class WpakApps {
 				<option value="1" <?php echo $simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Private', WpAppKit::i18n_domain ) ?></option>
 				<option value="0" <?php echo!$simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Public', WpAppKit::i18n_domain ) ?></option>
 			</select>
-			<span class="description"><?php _e( 'Private means that only logged in users with the right permissions can
-			access the browser simulation. When public, anyone can access browser simulation. That includes the config.js and config.xml files which may contain sensitive data.', WpAppKit::i18n_domain ) ?></span>
+			<span class="description"><?php _e( 'Private means that only logged in users with the right permissions can access the browser simulation. When public, anyone can access browser simulation. That includes the config.js and config.xml files which may contain sensitive data.', WpAppKit::i18n_domain ) ?></span>
 		</div>
 		<?php wp_nonce_field( 'wpak-security-infos-' . $post->ID, 'wpak-nonce-security-infos' ) ?>
 		<?php

@@ -48,7 +48,7 @@ class WpakComponentsBoSettings {
 
 		<div id="components-wrapper">
 
-			<a href="#" class="add-new-h2" id="add-new-component">Add New</a>
+			<a href="#" class="add-new-h2" id="add-new-component"><?php _ex( 'Add New', 'Add new component', WpAppKit::i18n_domain ); ?></a>
 
 			<div id="components-feedback" style="display:none"></div>
 
