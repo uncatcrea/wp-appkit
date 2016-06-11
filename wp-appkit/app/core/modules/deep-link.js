@@ -64,7 +64,7 @@ define( function( require ) {
      * Reset the launch URL
      */
     deepLink.reset = function() {
-        wpak_open_url = null;
+        wpak_open_url = '';
         query_string = {};
         cached_route = '';
     };
