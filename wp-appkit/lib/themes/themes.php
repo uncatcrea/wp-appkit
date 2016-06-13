@@ -19,12 +19,12 @@ class WpakThemes {
 		// Structure example:
 		'q-ios' => array(
 			'name' => 'Q for iOS', // TODO: handle name change between versions?
-			'version' => '1.0.0',
+			'version' => '1.0.1',
 		),
 		
 		'q-android' => array(
 			'name' => 'Q for Android',
-			'version' => '1.0.0',
+			'version' => '1.0.1',
 		),
 		
 	);
