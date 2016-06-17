@@ -1,14 +1,14 @@
 # WP-AppKit
-Create mobile apps and connect them to WordPress.
+WP-AppKit is a WordPress plugin to build mobile applications connected to WordPress. Applications are created with HTML, CSS and JavaScript (thanks to the Cordova/PhoneGap technology). Developers, you can extend and customize applications using our API.
 
 ## Latest News
 
-### 03/10/2016: Version 0.5
-* Better Theme and Plugin API (19)
-* Minor enhancements to admin panel (6)
-* Better support for icons & splashscreens (3)
-* Bug fixes (8)
-* Evolutions (7)
+### 06/20/2016: Version 0.6
+* **WP-AppKit now provides pre-installed starter themes.** You don't need to download and install them anymore :-)
+* **New starter themes.** _Wpak themes_ are deprecated. Discover the new shiny _Q themes_ for [iOS](https://github.com/uncatcrea/q-ios) and [Android](https://github.com/uncatcrea/q-android).
+* Along with new starter themes, we've added a **theme management panel** to the plugin's UI.
+* **Deep links**. WP-AppKit now provides an easy way to support deeplinks for your app.
+* As usual, we've fixed bugs and included a bunch of small evolutions (invcluding a lot of requests from users).
 
 Please note this version breaks backward compatibilities on minor features.
 
@@ -21,13 +21,7 @@ Please note this version breaks backward compatibilities on minor features.
 ## Getting Started
 Creating apps with WP-AppKit means creating JavaScript based app themes. (More on that [here](https://github.com/uncatcrea/wp-appkit/blob/master/README.md#app-themes)).
 
-To get you started we propose 2 free starter themes (for iOS and Android):
-* [Wpak Off-Canvas](https://github.com/uncatcrea/wpak-off-canvas-themes)
-* [Wpak Tabs](https://github.com/uncatcrea/wpak-tabs-themes)
-
-**Make sure to download one of these themes after you installed the plugin and preview the app in the browser.**
-
-![Wpkak Off-Canvas screenshot](https://cloud.githubusercontent.com/assets/6179747/8889585/5846e28e-32e0-11e5-9afa-0b9440fd6a62.png)
+By default, we provide 2 simple and elegant starter themes ([Q for iOS](https://www.youtube.com/watch?v=jkjtkH6wDys) and [Q for Android](https://www.youtube.com/watch?v=fSQVx8-rqCY)).
 
 ## Developer Friendly
 Our plugin is fully documented and we are committed to support developers. Discover the plugin and themes API on [our website](http://uncategorized-creations.com/wp-appkit/doc/). We also publish regularly [tutorials](http://uncategorized-creations.com/tag/tutorials/) to help you build great apps.
@@ -37,7 +31,7 @@ It's a WordPress plugin which provides:
 * An admin panel to configure your app
 * JSON web services to feed your app with WordPress content
 * A JavaScript engine to create app's themes
-* Sample themes to trigger your natural inclination to unbridled creativity
+* Starter themes to trigger your natural inclination to unbridled creativity
 
 WP-AppKit uses the [Cordova](http://cordova.apache.org/) technology for the app. It means that the app is developed with HTML, CSS and JavaScript but still can be distribued in app stores.
 
@@ -63,7 +57,7 @@ However an app's theme *is not* a WordPress theme.
 
 WP-AppKit themes use JavaScript (along with HTML and CSS) instead of PHP. Template Tags for example use [UnderscoreJS](http://underscorejs.org/).
 
-Developing app themes are at the heart of the WP-AppKit project. If you're ready to dive into the mysteries of app themes, head to the doc: http://uncategorized-creations.com/wp-appkit/doc/.
+Developing app themes are at the heart of the WP-AppKit project. If you're ready to dive into the mysteries of app themes, head to the doc: [http://uncategorized-creations.com/wp-appkit/doc/](http://uncategorized-creations.com/wp-appkit/doc/).
 
 ![Single.html edited into Brackets](https://cloud.githubusercontent.com/assets/6179747/6472801/32accb3a-c1f5-11e4-8ff8-f7286b082a7c.png)
 
@@ -71,6 +65,6 @@ Developing app themes are at the heart of the WP-AppKit project. If you're ready
 This project is done the [Uncategorized Creations](http://uncategorized-creations.com/) team. UncatCrea is a group of web professionals working with WordPress and Cordova/PhoneGap. facing the challenges to build content based mobile apps connected to WordPress, we've decided to create WP-AppKit.
 
 ### Meet the team
-* Benjamin Lupu: Product/Project Management
-* Mathieu Le Roi: Lead Developer
-* Lionel Pointet: Developer
+* Mathieu Le Roi: _Quiet and mystic_ developer
+* Benjamin Lupu: Product/Project Management and _junior theme developer_
+* Lionel Pointet: _A hell of great_ developer
