@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP AppKit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-02 11:03+0100\n"
+"POT-Creation-Date: 2016-06-11 19:29+0200\n"
 "PO-Revision-Date: 2015-11-07 22:51+0100\n"
 "Last-Translator: Lionel Pointet <lionel.pointet@gmail.com>\n"
 "Language-Team: \n"
@@ -14,7 +14,8 @@ msgstr ""
 "X-Generator: Poedit 1.8.7\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;"
-"_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2\n"
+"_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2;"
+"esc_html_x:1,2c\n"
 "X-Textdomain-Support: yes\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: ..\n"
@@ -31,12 +32,12 @@ msgstr ""
 msgid "Wrong addon file"
 msgstr ""
 
-#: ../lib/addons/addons.php:100 ../lib/simulator/config-file.php:59
-#: ../lib/themes/themes.php:136 ../lib/web-services/web-services.php:82
+#: ../lib/addons/addons.php:100 ../lib/simulator/config-file.php:63
+#: ../lib/themes/themes.php:292 ../lib/web-services/web-services.php:82
 msgid "App not found"
 msgstr ""
 
-#: ../lib/addons/addons.php:105 ../lib/themes/themes.php:141
+#: ../lib/addons/addons.php:105 ../lib/themes/themes.php:297
 msgid "App id not found in _GET parmeters"
 msgstr ""
 
@@ -48,7 +49,9 @@ msgstr ""
 msgid "Addons activated for this App"
 msgstr ""
 
-#: ../lib/apps/apps.php:32 ../lib/apps/apps.php:351 ../lib/apps/build.php:30
+#: ../lib/apps/apps.php:32 ../lib/apps/apps.php:373 ../lib/apps/apps.php:387
+#: ../lib/apps/build.php:30 ../lib/components/components-bo-settings.php:46
+#: ../lib/themes/themes-bo-settings.php:63
 #: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:46
 #: ../lib/web-services/web-services-bo-settings.php:25
 msgid "Help me"
@@ -62,7 +65,7 @@ msgstr ""
 msgid "Applications"
 msgstr ""
 
-#: ../lib/apps/apps.php:70 ../lib/apps/apps.php:355
+#: ../lib/apps/apps.php:70 ../lib/apps/apps.php:391
 msgid "Application"
 msgstr ""
 
@@ -74,7 +77,7 @@ msgstr ""
 msgid "Add an application"
 msgstr ""
 
-#: ../lib/apps/apps.php:74 ../lib/components/components-bo-settings.php:114
+#: ../lib/apps/apps.php:74 ../lib/components/components-bo-settings.php:118
 msgid "Edit"
 msgstr ""
 
@@ -112,169 +115,198 @@ msgstr ""
 msgid "My Project"
 msgstr ""
 
-#: ../lib/apps/apps.php:180 ../lib/apps/build.php:91
+#: ../lib/apps/apps.php:176
+msgid "Deep Linking"
+msgstr ""
+
+#: ../lib/apps/apps.php:189 ../lib/apps/apps.php:330 ../lib/apps/build.php:91
 msgid "PhoneGap Build"
 msgstr ""
 
-#: ../lib/apps/apps.php:206 ../lib/apps/apps.php:258 ../lib/apps/apps.php:261
+#: ../lib/apps/apps.php:215 ../lib/apps/apps.php:267 ../lib/apps/apps.php:270
 msgid "Save"
 msgstr ""
 
-#: ../lib/apps/apps.php:212
+#: ../lib/apps/apps.php:221
 msgid "Preview"
 msgstr ""
 
-#: ../lib/apps/apps.php:221
+#. translators: Publish box date format, see http://php.net/date
+#: ../lib/apps/apps.php:230
 msgid "M j, Y @ H:i"
 msgstr ""
 
-#: ../lib/apps/apps.php:224
+#: ../lib/apps/apps.php:233
 #, php-format
 msgid "Last saved on: <b>%1$s</b>"
 msgstr ""
 
-#: ../lib/apps/apps.php:226 ../lib/apps/apps.php:230
+#: ../lib/apps/apps.php:235 ../lib/apps/apps.php:239
 msgid "Not saved yet"
 msgstr ""
 
-#: ../lib/apps/apps.php:245
+#: ../lib/apps/apps.php:254
 msgid "Delete Permanently"
 msgstr ""
 
-#: ../lib/apps/apps.php:247
+#: ../lib/apps/apps.php:256
 msgid "Move to Trash"
 msgstr ""
 
-#: ../lib/apps/apps.php:298
+#: ../lib/apps/apps.php:307
 msgid "Define a title"
 msgstr ""
 
-#: ../lib/apps/apps.php:302
+#: ../lib/apps/apps.php:311
 msgid "Add components"
 msgstr ""
 
-#: ../lib/apps/apps.php:306
+#: ../lib/apps/apps.php:315
 msgid "Setup appearance and navigation"
 msgstr ""
 
-#: ../lib/apps/apps.php:310
+#: ../lib/apps/apps.php:319
 msgid "Setup PhoneGap config"
 msgstr ""
 
-#: ../lib/apps/apps.php:314
+#: ../lib/apps/apps.php:323
 msgid "Save your app"
 msgstr ""
 
-#: ../lib/apps/apps.php:326 ../lib/apps/apps.php:415
+#: ../lib/apps/apps.php:330 ../lib/apps/apps.php:458
 msgid "Export"
 msgstr ""
 
-#: ../lib/apps/apps.php:353
+#: ../lib/apps/apps.php:375
 msgid ""
-"PhoneGap config.xml informations that are going to be displayed on App "
-"Stores.<br/>They are required when exporting the App to Phonegap, but are "
-"not used for App debug and simulation in browsers."
+"Deep Linking allows you to create links to open the app. Enter here the "
+"custom scheme you want to use (e.g. \"urlscheme\" lets you create links like "
+"urlscheme://mylink)."
 msgstr ""
 
-#: ../lib/apps/apps.php:357 ../lib/apps/apps.php:389
-#: ../lib/components/components-bo-settings.php:61
+#: ../lib/apps/apps.php:376
+msgid "Custom URL Scheme"
+msgstr ""
+
+#: ../lib/apps/apps.php:378
+msgid "If empty, deep linking feature won't be available for this app"
+msgstr ""
+
+#: ../lib/apps/apps.php:389
+msgid ""
+"Information will be used when compiling your app and may be displayed in app "
+"stores. It will be stored in the config.xml file of your project."
+msgstr ""
+
+#: ../lib/apps/apps.php:393 ../lib/apps/apps.php:432
+#: ../lib/components/components-bo-settings.php:63
 msgid "Name"
 msgstr ""
 
-#: ../lib/apps/apps.php:361
+#: ../lib/apps/apps.php:397
 msgid "Description"
 msgstr ""
 
-#: ../lib/apps/apps.php:365
+#: ../lib/apps/apps.php:401
 msgid "ID"
 msgstr ""
 
-#: ../lib/apps/apps.php:369 ../lib/apps/apps.php:404
+#: ../lib/apps/apps.php:405 ../lib/apps/apps.php:447
 msgid "Version"
 msgstr ""
 
-#: ../lib/apps/apps.php:373
+#: ../lib/apps/apps.php:409
 msgid "VersionCode (Android only)"
 msgstr ""
 
-#: ../lib/apps/apps.php:377
+#: ../lib/apps/apps.php:413
+msgid "Build Tool (Android only)"
+msgstr ""
+
+#: ../lib/apps/apps.php:415
+msgid "Gradle"
+msgstr ""
+
+#: ../lib/apps/apps.php:416
+msgid "Ant"
+msgstr ""
+
+#: ../lib/apps/apps.php:420
 msgid "Icons and Splashscreens"
 msgstr ""
 
-#: ../lib/apps/apps.php:379
+#: ../lib/apps/apps.php:422
 #, php-format
 msgid ""
-"Write the icons and splashscreens tags as defined in the PhoneGap "
-"documentation.<br/>Example: %s"
+"Add here the tags defining where are the app icons and splashscreens.<br/"
+">Example: %s"
 msgstr ""
 
-#: ../lib/apps/apps.php:382
+#: ../lib/apps/apps.php:425
 msgid "Use default WP-AppKit Icons and Splashscreens"
 msgstr ""
 
-#: ../lib/apps/apps.php:383
+#: ../lib/apps/apps.php:426
 msgid ""
 "If checked and \"Icons and Splashscreens\" is empty, the app export will "
 "embed the default WP-AppKit Icons and Splashscreens."
 msgstr ""
 
-#: ../lib/apps/apps.php:387
+#: ../lib/apps/apps.php:430
 msgid "Author"
 msgstr ""
 
-#: ../lib/apps/apps.php:393
+#: ../lib/apps/apps.php:436
 msgid "Website"
 msgstr ""
 
-#: ../lib/apps/apps.php:397
+#: ../lib/apps/apps.php:440
 msgid "Email"
 msgstr ""
 
-#: ../lib/apps/apps.php:402
+#: ../lib/apps/apps.php:445
 msgid "PhoneGap"
 msgstr ""
 
-#: ../lib/apps/apps.php:408
+#: ../lib/apps/apps.php:451
 msgid "Plugins"
 msgstr ""
 
-#: ../lib/apps/apps.php:410
-#, php-format
+#: ../lib/apps/apps.php:453
 msgid ""
-"Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/"
-">Example : to include the \"In App Browser\" plugin for a Phonegap Build "
-"compilation, enter %s directly in the textarea."
+"Add here the tags defining the plugins you want to include in your app. "
+"Before adding a plugin, check which one is included by default."
 msgstr ""
 
-#: ../lib/apps/apps.php:414
+#: ../lib/apps/apps.php:457
 msgid "View config.xml"
 msgstr ""
 
-#: ../lib/apps/apps.php:427
+#: ../lib/apps/apps.php:470
 msgid "App Simulation Visibility"
 msgstr ""
 
-#: ../lib/apps/apps.php:431
+#: ../lib/apps/apps.php:474
 msgid "Private"
 msgstr ""
 
-#: ../lib/apps/apps.php:432
+#: ../lib/apps/apps.php:475
 msgid "Public"
 msgstr ""
 
-#: ../lib/apps/apps.php:434
+#: ../lib/apps/apps.php:477
 msgid ""
-"If activated, only connected users with right permissions can access the app "
-"simulation in web browser.<br/>If deactivated, the app simulation is "
-"publicly available in any browser, including the config.js and config.xml "
-"files, that can contain sensitive data."
+"Private means that only logged in users with the right permissions can "
+"access the browser simulation. When public, anyone can access browser "
+"simulation. That includes the config.js and config.xml files which may "
+"contain sensitive data."
 msgstr ""
 
-#: ../lib/apps/apps.php:558
+#: ../lib/apps/apps.php:609
 msgid "iOS"
 msgstr ""
 
-#: ../lib/apps/apps.php:559
+#: ../lib/apps/apps.php:610
 msgid "Android"
 msgstr ""
 
@@ -300,8 +332,8 @@ msgstr ""
 
 #: ../lib/apps/build.php:38
 msgid ""
-"If activated, echoes debug infos in the browser javascript console while "
-"simulating the app."
+"If activated, echoes debug information in the browser JavasSript console "
+"while simulating the app."
 msgstr ""
 
 #: ../lib/apps/build.php:41
@@ -447,117 +479,130 @@ msgstr ""
 msgid "Components"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:54
+#: ../lib/components/components-bo-settings.php:47
+msgid ""
+"Click Add New to add the different components that compose your app. Most "
+"components are data sources and correspond to app's screens. They can be "
+"referenced in the app's menu."
+msgstr ""
+
+#: ../lib/components/components-bo-settings.php:51
+msgctxt "Add new component"
+msgid "Add New"
+msgstr ""
+
+#: ../lib/components/components-bo-settings.php:56
 msgid "New Component"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:62
+#: ../lib/components/components-bo-settings.php:64
 msgid "Slug"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:63
+#: ../lib/components/components-bo-settings.php:65
 msgid "Type"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:64
+#: ../lib/components/components-bo-settings.php:66
 msgid "Options"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:74
+#: ../lib/components/components-bo-settings.php:76
 msgid "No Component yet!"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:105
-#: ../lib/navigation/navigation-bo-settings.php:94
+#: ../lib/components/components-bo-settings.php:109
+#: ../lib/navigation/navigation-bo-settings.php:95
 msgid ""
 "Component type doesn't exist, this component won't be included into the app"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:115
-#: ../lib/navigation/navigation-bo-settings.php:106
+#: ../lib/components/components-bo-settings.php:119
+#: ../lib/navigation/navigation-bo-settings.php:107
+#: ../lib/themes/themes-page-template.php:266
 msgid "Delete"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:154
+#: ../lib/components/components-bo-settings.php:158
 msgid "Component label"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:159
+#: ../lib/components/components-bo-settings.php:163
 msgid "Component slug"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:164
+#: ../lib/components/components-bo-settings.php:168
 msgid "Component type"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:175
+#: ../lib/components/components-bo-settings.php:179
 msgid "Component options"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:185
-#: ../lib/navigation/navigation-bo-settings.php:191
+#: ../lib/components/components-bo-settings.php:189
+#: ../lib/navigation/navigation-bo-settings.php:192
 msgid "Cancel"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:186
+#: ../lib/components/components-bo-settings.php:190
 msgid "Save Changes"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:243
+#: ../lib/components/components-bo-settings.php:247
 msgid "Application not found."
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:254
+#: ../lib/components/components-bo-settings.php:258
 msgid "You must provide a label for the component!"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:259
+#: ../lib/components/components-bo-settings.php:263
 msgid "The component label can't be numeric."
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:267
+#: ../lib/components/components-bo-settings.php:271
 msgid "You must provide a slug for the component."
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:272
+#: ../lib/components/components-bo-settings.php:276
 msgid "The component slug can't be numeric."
-msgstr ""
-
-#: ../lib/components/components-bo-settings.php:303
-#, php-format
-msgid "Component \"%s\" updated successfuly"
 msgstr ""
 
 #: ../lib/components/components-bo-settings.php:307
 #, php-format
+msgid "Component \"%s\" updated successfuly"
+msgstr ""
+
+#: ../lib/components/components-bo-settings.php:311
+#, php-format
 msgid "Component \"%s\" created successfuly"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:317
+#: ../lib/components/components-bo-settings.php:321
 msgid ""
 "The component to delete is in the app navigation. Please remove the "
 "component from app navigation before deleting it."
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:320
+#: ../lib/components/components-bo-settings.php:324
 msgid "Could not delete component"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:324
+#: ../lib/components/components-bo-settings.php:328
 msgid "Component deleted successfuly"
 msgstr ""
 
-#: ../lib/components/components-bo-settings.php:328
+#: ../lib/components/components-bo-settings.php:332
 msgid "Component to delete not found"
 msgstr ""
 
 #: ../lib/components/components-types/hooks.php:61
-#: ../lib/components/components-types/posts-list.php:229
+#: ../lib/components/components-types/posts-list.php:257
 msgid "Hook"
 msgstr ""
 
 #: ../lib/components/components-types/hooks.php:76
-#: ../lib/components/components-types/posts-list.php:354
+#: ../lib/components/components-types/posts-list.php:382
 msgid "Hook name"
 msgstr ""
 
@@ -571,7 +616,7 @@ msgstr ""
 
 #: ../lib/components/components-types/page.php:190
 #: ../lib/components/components-types/page.php:227
-#: ../lib/components/components-types/posts-list.php:248
+#: ../lib/components/components-types/posts-list.php:276
 msgid "Post type"
 msgstr ""
 
@@ -596,44 +641,44 @@ msgstr ""
 msgid "WordPress page"
 msgstr ""
 
-#: ../lib/components/components-types/posts-list.php:233
-#: ../lib/components/components-types/posts-list.php:302
+#: ../lib/components/components-types/posts-list.php:261
+#: ../lib/components/components-types/posts-list.php:330
 msgid "List type"
 msgstr ""
 
-#: ../lib/components/components-types/posts-list.php:233
-#: ../lib/components/components-types/posts-list.php:308
+#: ../lib/components/components-types/posts-list.php:261
+#: ../lib/components/components-types/posts-list.php:336
 msgid "Latest posts"
 msgstr ""
 
-#: ../lib/components/components-types/posts-list.php:251
-#: ../lib/components/components-types/posts-list.php:371
+#: ../lib/components/components-types/posts-list.php:279
+#: ../lib/components/components-types/posts-list.php:399
 msgid "Taxonomy"
 msgstr ""
 
-#: ../lib/components/components-types/posts-list.php:252
+#: ../lib/components/components-types/posts-list.php:280
 msgid "Term"
 msgstr ""
 
-#: ../lib/components/components-types/posts-list.php:309
+#: ../lib/components/components-types/posts-list.php:337
 msgid "Custom, using hooks"
 msgstr ""
 
-#: ../lib/components/components-types/posts-list.php:374
+#: ../lib/components/components-types/posts-list.php:402
 msgid "No taxonomy"
 msgstr ""
 
-#: ../lib/components/components-types/posts-list.php:396
+#: ../lib/components/components-types/posts-list.php:424
 #, php-format
 msgid "No %s found"
 msgstr ""
 
-#: ../lib/components/components-types/posts-list.php:400
+#: ../lib/components/components-types/posts-list.php:428
 #, php-format
 msgid "No taxonomy found for post type %s"
 msgstr ""
 
-#: ../lib/components/components-types/posts-list.php:417
+#: ../lib/components/components-types/posts-list.php:445
 msgid "Posts list"
 msgstr ""
 
@@ -659,78 +704,82 @@ msgid ""
 msgstr ""
 
 #: ../lib/navigation/navigation-bo-settings.php:38
+msgid "Click Add Component to Menu to reference a component in the app's menu."
+msgstr ""
+
+#: ../lib/navigation/navigation-bo-settings.php:39
 msgid "Add Component to Menu"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:43
+#: ../lib/navigation/navigation-bo-settings.php:44
 msgid "New Menu Item"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:50
+#: ../lib/navigation/navigation-bo-settings.php:51
 msgid "Menu Item"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:61
+#: ../lib/navigation/navigation-bo-settings.php:62
 msgid "No menu item yet!"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:172
+#: ../lib/navigation/navigation-bo-settings.php:173
 msgid "Component"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:182
+#: ../lib/navigation/navigation-bo-settings.php:183
 msgid "All components are already in navigation!"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:193
+#: ../lib/navigation/navigation-bo-settings.php:194
 msgid "Add component to navigation"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:199
+#: ../lib/navigation/navigation-bo-settings.php:200
 msgid "No component found!"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:199
+#: ../lib/navigation/navigation-bo-settings.php:200
 msgid "Please create a component!"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:230
+#: ../lib/navigation/navigation-bo-settings.php:231
 msgid "You must choose a component!"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:235
+#: ../lib/navigation/navigation-bo-settings.php:236
 msgid "This component doesn't exist!"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:240
+#: ../lib/navigation/navigation-bo-settings.php:241
 msgid "This component is already in navigation!"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:251
+#: ../lib/navigation/navigation-bo-settings.php:252
 msgid "New navigation item created successfuly"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:261
+#: ../lib/navigation/navigation-bo-settings.php:262
 msgid "Could not delete navigation item"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:265
+#: ../lib/navigation/navigation-bo-settings.php:266
 msgid "Navigation item deleted successfuly"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:268
+#: ../lib/navigation/navigation-bo-settings.php:269
 msgid "Navigation item to delete not found"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:276
+#: ../lib/navigation/navigation-bo-settings.php:277
 msgid "Navigation order updated successfuly"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:292
+#: ../lib/navigation/navigation-bo-settings.php:293
 msgid "Navigation item updated successfuly"
 msgstr ""
 
-#: ../lib/navigation/navigation-bo-settings.php:326
+#: ../lib/navigation/navigation-bo-settings.php:327
 msgid "Error while retrieving components available for navigation"
 msgstr ""
 
@@ -740,8 +789,8 @@ msgstr ""
 
 #: ../lib/options/options-bo-settings.php:30
 msgid ""
-"Use 0 to avoid intervals between refreshes. The content will be fetched from "
-"the server at each app launch (default value)"
+"Interval in seconds between attempts to refresh app's content. 0 means that "
+"content will be refreshed at each app's launch."
 msgstr ""
 
 #: ../lib/settings/settings.php:20
@@ -778,7 +827,7 @@ msgstr ""
 msgid "Settings saved"
 msgstr ""
 
-#: ../lib/simulator/config-file.php:63
+#: ../lib/simulator/config-file.php:67
 msgid "App id not found in _GET parameters"
 msgstr ""
 
@@ -786,76 +835,167 @@ msgstr ""
 msgid "View in browser"
 msgstr ""
 
-#: ../lib/themes/themes-bo-settings.php:13
+#: ../lib/themes/themes-bo-settings.php:17
 msgid "Appearance"
 msgstr ""
 
-#: ../lib/themes/themes-bo-settings.php:28
+#: ../lib/themes/themes-bo-settings.php:29
+msgid "WP-AppKit Themes"
+msgstr ""
+
+#: ../lib/themes/themes-bo-settings.php:30
+msgid "Themes"
+msgstr ""
+
+#: ../lib/themes/themes-bo-settings.php:66
 msgid "Choose theme"
 msgstr ""
 
-#: ../lib/themes/themes-bo-settings.php:37
+#: ../lib/themes/themes-bo-settings.php:73
+#, php-format
+msgid ""
+"Choose a theme for your app. Theme defines how your app will look and "
+"behave. Themes can be uploaded in the Upload Themes panel. Themes are stored "
+"in the %s folder of your WordPress install."
+msgstr ""
+
+#: ../lib/themes/themes-bo-settings.php:76
 msgid "No WP AppKit theme found!"
 msgstr ""
 
-#: ../lib/themes/themes-bo-settings.php:39
+#: ../lib/themes/themes-bo-settings.php:78
 #, php-format
 msgid ""
 "Please upload a WP AppKit theme from the \"<a href=\"%s\" >Upload Themes</a>"
 "\" panel or copy a theme directly to the %s directory."
 msgstr ""
 
-#: ../lib/themes/themes-bo-settings.php:55
+#: ../lib/themes/themes-bo-settings.php:94
 #, php-format
 msgid "Version %s"
 msgstr ""
 
-#: ../lib/themes/themes-bo-settings.php:62
+#: ../lib/themes/themes-bo-settings.php:101
+#: ../lib/themes/themes-page-template.php:188
+#: ../lib/themes/themes-page-template.php:219
+#: ../lib/themes/themes-page-template.php:246
 #, php-format
 msgid "By %s"
 msgstr ""
 
-#: ../lib/themes/themes-bo-settings.php:67
+#: ../lib/themes/themes-bo-settings.php:106
 msgid "Visit theme site"
 msgstr ""
 
-#: ../lib/themes/themes-bo-settings.php:71
+#: ../lib/themes/themes-bo-settings.php:110
 #, php-format
 msgid "Requires WP-AppKit version %s"
 msgstr ""
 
-#: ../lib/themes/themes-bo-settings.php:83
+#: ../lib/themes/themes-bo-settings.php:122
 msgid "Application Title (displayed in app top bar)"
 msgstr ""
 
-#: ../lib/themes/themes.php:37
+#: ../lib/themes/themes-page-template.php:145
+msgid ""
+"Are you sure you want to delete this theme?\n"
+"\n"
+"Click 'Cancel' to go back, 'OK' to confirm the delete."
+msgstr ""
+
+#: ../lib/themes/themes-page-template.php:150
+msgid "Add New Theme"
+msgstr ""
+
+#: ../lib/themes/themes-page-template.php:151
+msgid "Search Installed Themes"
+msgstr ""
+
+#: ../lib/themes/themes-page-template.php:152
+msgid "Search installed themes..."
+msgstr ""
+
+#: ../lib/themes/themes-page-template.php:153
+#, php-format
+msgid "Number of Themes found: %d"
+msgstr ""
+
+#: ../lib/themes/themes-page-template.php:154
+#: ../lib/themes/themes-page-template.php:201
+msgid "No themes found. Try a different search."
+msgstr ""
+
+#: ../lib/themes/themes-page-template.php:165
+msgctxt "Add new theme"
+msgid "Add New"
+msgstr ""
+
+#: ../lib/themes/themes-page-template.php:187
+#: ../lib/themes/themes-page-template.php:218
+msgid "Theme Details"
+msgstr ""
+
+#: ../lib/themes/themes-page-template.php:231
+msgid "Show previous theme"
+msgstr ""
+
+#: ../lib/themes/themes-page-template.php:232
+msgid "Show next theme"
+msgstr ""
+
+#: ../lib/themes/themes-page-template.php:233
+msgid "Close details dialog"
+msgstr ""
+
+#: ../lib/themes/themes-page-template.php:245
+#, php-format
+msgid "Version: %s"
+msgstr ""
+
+#: ../lib/themes/themes-page-template.php:251
+msgid "Tags:"
+msgstr ""
+
+#: ../lib/themes/themes-page-template.php:255
+msgid "Applications using this theme:"
+msgstr ""
+
+#: ../lib/themes/themes.php:79
 #, php-format
 msgid ""
 "The WP AppKit themes directory %s can't be created. <br/>Please check that "
 "your WordPress install has the permissions to create this directory."
 msgstr ""
 
-#: ../lib/themes/themes.php:82
+#: ../lib/themes/themes.php:86
+#, php-format
+msgid ""
+"We tried copying default themes into %s directory, and it seems it didn't "
+"work. You can do it manually by <a href=\"%s\">downloading these default "
+"themes and uploading them through the dedicated page</a>."
+msgstr ""
+
+#: ../lib/themes/themes.php:238
 msgid "Not a valid theme file"
 msgstr ""
 
-#: ../lib/themes/themes.php:88
+#: ../lib/themes/themes.php:244
 msgid "Not a valid theme file path"
 msgstr ""
 
-#: ../lib/themes/themes.php:121
+#: ../lib/themes/themes.php:277
 msgid "Theme file not found"
 msgstr ""
 
-#: ../lib/themes/themes.php:126
+#: ../lib/themes/themes.php:282
 msgid "Asked theme is not activated for the given app"
 msgstr ""
 
-#: ../lib/themes/themes.php:131
+#: ../lib/themes/themes.php:287
 msgid "Wrong theme file"
 msgstr ""
 
-#: ../lib/themes/themes.php:256
+#: ../lib/themes/themes.php:431
 msgid "Theme file mime type not authorized"
 msgstr ""
 
@@ -863,54 +1003,82 @@ msgstr ""
 msgid "Upload Themes"
 msgstr ""
 
-#: ../lib/themes/upload-themes.php:26
+#: ../lib/themes/upload-themes.php:27 ../lib/themes/upload-themes.php:77
 msgid ""
 "You do not have sufficient permissions to install WP AppKit themes on this "
 "site."
 msgstr ""
 
-#: ../lib/themes/upload-themes.php:38
+#: ../lib/themes/upload-themes.php:39
 #, php-format
 msgid "Installing WP AppKit from uploaded file: %s"
 msgstr ""
 
-#: ../lib/themes/upload-themes.php:60
+#: ../lib/themes/upload-themes.php:61
 #, php-format
 msgid "WP AppKit theme '%s' installed successfully!"
 msgstr ""
 
-#: ../lib/themes/upload-themes.php:62
+#: ../lib/themes/upload-themes.php:63
 msgid "An error occured"
 msgstr ""
 
-#: ../lib/themes/upload-themes.php:66
+#: ../lib/themes/upload-themes.php:67 ../lib/themes/upload-themes.php:129
 msgid "Back to theme upload form"
 msgstr ""
 
-#: ../lib/themes/upload-themes.php:68
+#: ../lib/themes/upload-themes.php:69
 msgid "Go to my WP AppKit app list"
 msgstr ""
 
-#: ../lib/themes/upload-themes.php:71
+#: ../lib/themes/upload-themes.php:72
 msgid "Uploaded file must be a valid zip file"
 msgstr ""
 
-#: ../lib/themes/upload-themes.php:77
+#: ../lib/themes/upload-themes.php:105
+msgid "Default themes have correctly been reinstalled."
+msgstr ""
+
+#: ../lib/themes/upload-themes.php:111
+msgid ""
+"An error occured while reinstalling default themes. Please do it manually by "
+"downloading the packages below."
+msgstr ""
+
+#: ../lib/themes/upload-themes.php:119 ../lib/themes/upload-themes.php:145
+msgid "Reinstall Default Themes"
+msgstr ""
+
+#: ../lib/themes/upload-themes.php:123
+msgid ""
+"We found at least one theme that is already installed. This process will "
+"override all existing files. Are you sure you want to continue?"
+msgstr ""
+
+#: ../lib/themes/upload-themes.php:128
+msgid "I understand and want to continue"
+msgstr ""
+
+#: ../lib/themes/upload-themes.php:141
 msgid "WP AppKit Themes upload"
 msgstr ""
 
-#: ../lib/themes/upload-themes.php:84
+#: ../lib/themes/upload-themes.php:154
 msgid ""
 "If you have a WP AppKit theme in a .zip format, you may install it by "
 "uploading it here."
 msgstr ""
 
-#: ../lib/themes/upload-themes.php:87
+#: ../lib/themes/upload-themes.php:157
 msgid "WP AppKit Theme zip file"
 msgstr ""
 
-#: ../lib/themes/upload-themes.php:89
+#: ../lib/themes/upload-themes.php:159
 msgid "Install Now"
+msgstr ""
+
+#: ../lib/themes/upload-themes.php:164
+msgid "Download Default Themes Packages"
 msgstr ""
 
 #: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:18
@@ -932,27 +1100,7 @@ msgid "Private Key"
 msgstr ""
 
 #: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:51
-msgid ""
-"This private key is required to allow users to log in from the app using "
-"their WordPress credentials."
-msgstr ""
-
-#: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:52
-msgid ""
-"It is an OpenSSL RSA Encryption Key that can be generated with the openssl "
-"command line (Unix/OSX) or using PuTTYgen (Windows)."
-msgstr ""
-
-#: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:53
-msgid ""
-"Here is the openssl command that generates the private key: openssl genrsa -"
-"out rsa_1024_priv.pem 1024."
-msgstr ""
-
-#: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:54
-msgid ""
-"(Note that WP-AppKit authentication is only compatible with 1024 bits "
-"authentication keys.)"
+msgid "Copy here an OpenSSL RSA Encryption Key to secure logins from your app."
 msgstr ""
 
 #: ../lib/user-permissions/authentication-settings.php:46
@@ -975,11 +1123,11 @@ msgstr ""
 msgid "Wrong security token"
 msgstr ""
 
-#: ../lib/web-services/web-services.php:220
+#: ../lib/web-services/web-services.php:217
 msgid "Error : Web service not recognised"
 msgstr ""
 
-#: ../wp-appkit.php:108
+#: ../wp-appkit.php:143
 msgid ""
 "WP AppKit requires WordPress permalinks to be activated: see the <a href="
 "\"http://codex.wordpress.org/"

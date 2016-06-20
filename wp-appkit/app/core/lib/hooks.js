@@ -120,6 +120,7 @@ define( function( require ) {
 					}
 				}
 
+				params.pop(); //remove filtered_params
 				params.pop(); //remove deferred
 			}
 

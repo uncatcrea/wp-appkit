@@ -43,10 +43,12 @@ class WpakComponentsBoSettings {
 	public static function inner_components_box( $post, $current_box ) {
 		$components = WpakComponentsStorage::get_components( $post->ID );
 		?>
+		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
+		<p class="description"><?php _e( 'Click Add New to add the different components that compose your app. Most components are data sources and correspond to app\'s screens. They can be referenced in the app\'s menu.', WpAppKit::i18n_domain ) ?></p>
 
 		<div id="components-wrapper">
 
-			<a href="#" class="add-new-h2" id="add-new-component">Add New</a>
+			<a href="#" class="add-new-h2" id="add-new-component"><?php _ex( 'Add New', 'Add new component', WpAppKit::i18n_domain ); ?></a>
 
 			<div id="components-feedback" style="display:none"></div>
 
@@ -79,6 +81,8 @@ class WpakComponentsBoSettings {
 			<?php WpakComponentsTypes::echo_components_javascript() ?>
 
 		</div>
+
+		<?php // TODO: Use an external CSS file ?>
 
 		<style>
 			#components-wrapper{ margin-top:1em }

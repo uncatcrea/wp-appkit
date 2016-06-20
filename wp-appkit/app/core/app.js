@@ -17,7 +17,8 @@ define(function (require) {
           Hooks               = require('core/lib/hooks'),
 		  Stats               = require('core/stats'),
 		  Addons              = require('core/addons-internal'),
-		  WsToken             = require('core/lib/encryption/token');
+		  WsToken             = require('core/lib/encryption/token'),
+          DeepLink			  = require( 'core/modules/deep-link' );
 
 	  var app = {};
 
@@ -98,7 +99,7 @@ define(function (require) {
 			  args.id = id;
 		  }
 		  current_custom_page = new CustomPage(args);
-		  app.router.navigate('#custom-page',{trigger: true});
+		  app.router.navigate( app.getScreenFragment( 'custom-page' ), { trigger: true } );
 	  };
 
 	  app.addCustomRoute = function( fragment, template, data ) {
@@ -125,6 +126,8 @@ define(function (require) {
 	  //their value during a same app execution.
 	  //TODO : we should link (but not merge because they don't have the same usage)
 	  //those params to App options...
+	  // Beware when merging these because options are stored permanently while params are runtime-dependant (refreshed at each app launch)
+	  // Deep Link module especially is updating a param
 
 	  var params = {
 		  'refresh-at-app-launch' : true,
@@ -163,12 +166,12 @@ define(function (require) {
 		var is_app_launch = is_app_launch !== undefined && is_app_launch === true;
 		if( app.navigation.length > 0 ){
 			var first_nav_component_id = app.navigation.first().get('component_id');
-			default_route = '#component-'+ first_nav_component_id;
+			default_route = app.getScreenFragment( 'component', { component_id: first_nav_component_id } );
 		}else{
 			//No navigation item : set default route to first component found:
 			if( app.components.length ){
 				var first_component = app.components.first();
-				default_route = '#component-'+ first_component.id;
+				default_route = app.getScreenFragment( 'component', { component_id: first_component.id } );
 			}else{
 				Utils.log('No menu item, no component found. Could not set default route.');
 			}
@@ -189,8 +192,21 @@ define(function (require) {
 	  app.launchRouting = function() {
 
 		var default_route = app.resetDefaultRoute(true);
-
 		var launch_route = default_route;
+		var deep_link_route = DeepLink.getLaunchRoute();
+
+		if( deep_link_route.length > 0 ) {
+            launch_route = deep_link_route;
+
+            //
+            // Disable refresh at app launch because:
+            //  1. it will cause going to default route right after, so our launch route won't be useful
+            //  2. if we're here, it's because we're in launching process, after having retrieved some data
+            //  3. if we disable 'go-to-default-route-after-refresh', we'd have to enable it again after the next refresh
+            //
+
+            app.setParam( 'refresh-at-app-launch', false );
+		}
 
 		/**
 		 * Use the 'launch-route' filter to display a specific screen at app launch
@@ -200,17 +216,26 @@ define(function (require) {
 		 */
 		launch_route = Hooks.applyFilters('launch-route',launch_route,[Stats.getStats()]);
 
-		Hooks.doActions('pre-start-router',[launch_route,Stats.getStats()]);
+		/**
+		 * 'pre-start-router' action: use this if you need to do some treatment
+		 * before Backbone routing starts.
+		 */
+		Hooks.doActions( 'pre-start-router', [ launch_route, Stats.getStats() ] ).done( function() {
 
-		if( launch_route.length > 0 ){
-			Backbone.history.start();
-			//Navigate to the launch_route :
-			app.router.navigate(launch_route, {trigger: true});
-		}else{
-			Backbone.history.start({silent:true});
-			//Hack : Trigger a non existent route so that no view is loaded :
-			app.router.navigate('#wpak-none', {trigger: true});
-		}
+			// Reset DeepLink launch route after hooks are fired to let scripts retrieve this route if needed
+			DeepLink.reset();
+
+			if( launch_route.length > 0 ){
+				Backbone.history.start();
+				//Navigate to the launch_route :
+				app.router.navigate(launch_route, {trigger: true});
+			}else{
+				Backbone.history.start({silent:true});
+				//Hack : Trigger a non existent route so that no view is loaded :
+				app.router.navigate('#wpak-none', {trigger: true});
+			}
+
+		} );
 
 		/*
 		    //Keep this commented for now in case the problem comes back.
@@ -236,7 +261,47 @@ define(function (require) {
 			Backbone.history.stop();
 			Backbone.history.start({silent: false});
 		*/
-	  }
+	  };
+	  
+	/**
+	 * Builds screen link according to given link type.
+	 * @param link_type    int          Can be 'single', 'page', 'comments', 'component' or 'custom-page'
+	 * @param data         JSON Object  Depends on link_type:
+	 * - for single: {global, item_id}
+	 * - for page: {component_id, item_id}
+	 * - for comments: {item_id}
+	 * - for component: {component_id}
+	 * - for custom-page: none
+	 */
+	app.getScreenFragment = function ( link_type, data ) {
+		
+		var screen_link = '';
+		
+		switch( link_type ) {
+			case 'single':
+				screen_link = '#single/' + data.global + '/' + data.item_id;
+				break;
+			case 'page':
+				screen_link = '#page/' + data.component_id + '/' + data.item_id;
+				break;
+			case 'comments':
+				screen_link = '#comments-' + data.item_id;
+				break;
+			case 'component':
+				var component = app.getComponentData( data.component_id );
+				if ( component ) {
+					//If page component, return directly page's screen fragment to avoid
+					//redirection in router, which leads to back button not working.
+					screen_link = component.type !== 'page' ? '#component-'+ component.id : '#page/'+ component.id +'/'+ component.data.root_id;
+				}
+				break;
+			case 'custom-page':
+				screen_link = '#custom-page';
+				break;
+		}
+		
+		return screen_link;
+	};
 
 	  //--------------------------------------------------------------------------
 	  //History : allows to handle back button.
@@ -244,6 +309,7 @@ define(function (require) {
 	  var history_stack = [];
 	  var queried_screen_data = {};
 	  var previous_screen_memory = {};
+	  var last_history_action = '';
 
 	  var history_push = function(screen_data){
 		  history_stack.push(screen_data);
@@ -284,7 +350,9 @@ define(function (require) {
 
 		  var current_screen = app.getCurrentScreenData();
 		  var previous_screen = app.getPreviousScreenData();
-
+		  
+		  //If we "pop" history current_screen is going to be removed from history_stack:
+		  //memorize it so that we can know where we came from (for screen transitions for example):
 		  previous_screen_memory = current_screen;
 
 		  if( current_screen.screen_type != queried_screen_data.screen_type || current_screen.component_id != queried_screen_data.component_id
@@ -335,9 +403,38 @@ define(function (require) {
 					  history_action = 'empty-then-push';
 				  }
 			  }else if( queried_screen_data.screen_type == 'comments' ){
-				  //if( current_screen.screen_type == 'single' && current_screen.item_id == item_id ){
+				  if( ( current_screen.screen_type == 'single' || current_screen.screen_type == 'page' ) && current_screen.item_id == queried_screen_data.item_id ){
 					  history_action = 'push';
-				  //}
+				  } else {
+					  //Trying to reach a comment screen directly without displaying its parent post or page.
+					  //Try to add the parent post or page manually, if it exists in the app:
+					  var parent_item_global = 'posts';
+					  var parent_item = app.getGlobalItem( 'posts', queried_screen_data.item_id );
+					  if ( !parent_item ) {
+						  parent_item = app.getGlobalItem( 'pages', queried_screen_data.item_id );
+						  if ( parent_item ) {
+							  parent_item_global = 'pages';
+						  }
+					  }
+					  
+					  if ( parent_item ) {
+						  
+						//Note: this is quite hacky as this is normally done from router and 
+						//we don't have all data about the parent screen here (especially for the page case)...
+						var parent_item_data = {
+							screen_type: parent_item_global === 'posts' ? 'single' : 'page',component_id:'',item_id:queried_screen_data.item_id,
+							global:parent_item_global,data:{post:parent_item},label:parent_item.title,
+							fragment: parent_item_global === 'posts' ? app.getScreenFragment( 'single', { global: 'posts', item_id: queried_screen_data.item_id } ) : '' 
+							//we can't know page's fragment as we don't know page's component...
+						};
+						
+						//Push comments' parent screen to history:
+						history_push( formatScreenData( parent_item_data ) );
+						
+						//Then push the comments screen itself:
+						history_action = 'push';
+					  }
+				  }
 			  }else if( queried_screen_data.screen_type == 'custom-page' ){
 				  history_action = 'empty-then-push';
 			  }else if( queried_screen_data.screen_type == 'custom-component' ){
@@ -348,6 +445,8 @@ define(function (require) {
 			}
 
 			history_action = Hooks.applyFilters( 'make-history', history_action, [ history_stack, queried_screen_data, current_screen, previous_screen ] );
+
+			last_history_action = history_action;
 
 			switch ( history_action ) {
 				case 'empty-then-push':
@@ -365,6 +464,23 @@ define(function (require) {
 					break;
 			}
 
+	  };
+	  
+	  /**
+	   * Returns app's current history stack
+	   * @returns {Array} App's history stack (array of screen objects)
+	   */
+	  app.getHistory = function() {
+		  //Clone the history_stack array so that it can't be modified from outside:
+		  return history_stack.slice(0); 
+	  };
+	  
+	  /**
+	   * Returns last action applied to history stack
+	   * @returns {String} history action: push, pop, empty or empty-then-push
+	   */
+	  app.getLastHistoryAction = function() {
+		  return last_history_action;
 	  };
 
 	  /**
@@ -650,7 +766,7 @@ define(function (require) {
 
 								app.triggerError(
 									'synchro:no-component',
-									{ type: 'ws-data', where: 'app::syncWebService', message: 'No component found for this App. Please add components to the App on WordPress side.', data: data },
+									{ type: 'web-service', where: 'app::syncWebService', message: 'No component found for this App. Please add components to the App on WordPress side.', data: data },
 									cb_error
 								);
 
@@ -664,7 +780,7 @@ define(function (require) {
 						} else {
 							app.triggerError(
 								'synchro:wrong-answer',
-								{ type: 'ws-data', where: 'app::syncWebService', message: 'Wrong "synchronization" web service answer', data: data },
+								{ type: 'web-service', where: 'app::syncWebService', message: 'Wrong "synchronization" web service answer', data: data },
 								cb_error
 							);
 						}
@@ -672,13 +788,13 @@ define(function (require) {
 					} else if ( data.result.status == 0 ) {
 						app.triggerError(
 							'synchro:ws-return-error',
-							{ type: 'ws-data', where: 'app::syncWebService', message: 'Web service "synchronization" returned an error : [' + data.result.message + ']', data: data },
+							{ type: 'web-service', where: 'app::syncWebService', message: 'Web service "synchronization" returned an error : [' + data.result.message + ']', data: data },
 							cb_error
 						);
 					} else {
 						app.triggerError(
 							'synchro:wrong-status',
-							{ type: 'ws-data', where: 'app::syncWebService', message: 'Wrong web service answer status', data: data },
+							{ type: 'web-service', where: 'app::syncWebService', message: 'Wrong web service answer status', data: data },
 							cb_error
 						);
 					}
@@ -686,7 +802,7 @@ define(function (require) {
 				} else {
 					app.triggerError(
 						'synchro:wrong-format',
-						{ type: 'ws-data', where: 'app::syncWebService', message: 'Wrong web service answer format', data: data },
+						{ type: 'web-service', where: 'app::syncWebService', message: 'Wrong web service answer format', data: data },
 						cb_error
 					);
 				}
@@ -827,7 +943,37 @@ define(function (require) {
       	return Hooks.applyFilters( 'post-global', global, [id, global_default] );
       };
 
-      app.getMoreOfComponent = function(component_id,cb_ok,cb_error){
+      app.getMoreOfComponent = function( component_id, cb_ok, cb_error, use_standard_pagination ) {
+		  
+			use_standard_pagination = ( use_standard_pagination !== undefined ) && use_standard_pagination === true;
+			
+			var current_screen = app.getCurrentScreenData();
+			var current_component_id = '';
+			if ( current_screen.component_id && app.componentExists( current_screen.component_id ) ) {
+				current_component_id = current_screen.component_id;
+			}
+			
+			/**
+			 * Use this 'use-standard-pagination' filter to set standard pagination type for the component.
+			 * 
+			 * WP-AppKit supports 2 kind of pagination: 
+			 * 
+			 * - "Infinite Scroll pagination": we retrieve posts before the last post in the list (by passing its id in "before_id" param).
+			 *   It avoids post duplication when getting page>1 and a new post was created in the meantime.
+			 *   This is the default behaviour for the "Get More Posts" button in WP-AppKit's post lists.
+			 * 
+			 * - "Standard pagination": corresponds to the standard use of "paged" param in WP_Query.
+			 *   Return true as a result of this 'use-standard-pagination' filter to activate it.
+			 * 
+			 * Those 2 pagination types are exclusive: you can't use both at the same time.
+			 * If standard pagination is set, infinite scroll pagination is ignored.
+			 * 
+			 * @param use_standard_pagination   {boolean}     Set this to true to activate standard pagination (default false)
+			 * @param current_component_id      {string}      String identifier for the component the "get more" is called on
+			 * @param current_screen            {JSON Object} Current screen on which "get more" is called
+			 */
+			use_standard_pagination = Hooks.applyFilters( 'use-standard-pagination', use_standard_pagination, [ current_component_id, current_screen ] );
+		  
 			var component = app.components.get( component_id );
 			if ( component ) {
 
@@ -839,7 +985,16 @@ define(function (require) {
 					var ws_url = token + '/component/' + component_id;
 
 					var last_item_id = _.last( component_data.ids );
-					ws_url += '?before_item=' + last_item_id;
+					
+					var web_service_params = {};
+					
+					if ( use_standard_pagination ) {
+						var current_pagination_page = component_data.query.hasOwnProperty( 'pagination_page' ) && component_data.query.pagination_page > 0 ? 
+													  parseInt( component_data.query.pagination_page ) : 1;
+						web_service_params.pagination_page = current_pagination_page + 1;
+					} else {
+						web_service_params.before_item = last_item_id;
+					}
 
 					/**
 					* Filter 'web-service-params' : use this to send custom key/value formated
@@ -850,7 +1005,7 @@ define(function (require) {
 					* Filter arguments :
 					* - web_service_name : string : name of the current web service ('get-more-of-component' here).
 					*/
-					var web_service_params = Hooks.applyFilters('web-service-params',{},['get-more-of-component']);
+					var web_service_params = Hooks.applyFilters( 'web-service-params', web_service_params, ['get-more-of-component'] );
 
 					//Build the ajax query :
 					var ajax_args = {
@@ -881,6 +1036,8 @@ define(function (require) {
 								if ( app.globals.hasOwnProperty( global ) ) {
 
 									var new_ids = _.difference( answer.component.data.ids, component_data.ids );
+									
+									component_data.query.pagination_page = answer.component.data.query.pagination_page;
 
 									component_data.ids = _.union( component_data.ids, answer.component.data.ids ); //merge ids
 									component.set( 'data', component_data );
@@ -1010,8 +1167,8 @@ define(function (require) {
 	 * @param array new_globals Array of new items referenced by the new component
 	 * @param string type Type of update. Can be :
 	 * - "update" : merge new with existing component data,
-	 * - "replace" : delete current component data and replace with new
-	 * - "replace-keep-global-items" (default) : for list components : replace component ids and merge global items
+	 * - "replace" : delete current component data, empty the corresponding global, and replace with new
+	 * - "replace-keep-global-items" (default) : for list components : replace component items ids and merge global items
 	 * @param boolean persistent (default false). If true, new data is stored in local storage.
 	 * @returns {JSON object} feedback data
 	 */
@@ -1040,9 +1197,9 @@ define(function (require) {
 		var existing_component = app.components.get( new_component.slug );
     	if( existing_component ) {
 
-			var existing_component_data = existing_component.data;
+			var existing_component_data = existing_component.get( 'data' );
 			var new_component_data = new_component.data;
-
+			
 			if ( new_component_data.hasOwnProperty( 'ids' ) ) { //List component
 
 				if( new_component.global ) {
@@ -1054,7 +1211,7 @@ define(function (require) {
 					}
 
 					var new_ids = [ ];
-					if ( type == "replace" || type == "replace-keep-global-items" ) {
+					if ( type === "replace" || type === "replace-keep-global-items" ) {
 						new_ids = new_component_data.ids;
 					} else {
 						new_ids = _.difference( new_component_data.ids, existing_component_data.ids );
@@ -1064,7 +1221,7 @@ define(function (require) {
 					existing_component.set( 'data', new_component_data );
 
 					var current_items = app.globals[global];
-					if ( type == "replace" ) {
+					if ( type === "replace" ) {
 						current_items.resetAll();
 					}
 
@@ -1076,7 +1233,7 @@ define(function (require) {
 					_.each( new_ids, function( item_id ) {
 						new_items.push( current_items.get( item_id ) );
 					} );
-
+					
 					if ( persistent ) {
 						existing_component.save();
 						current_items.saveAll();
@@ -1176,7 +1333,7 @@ define(function (require) {
 		var auto_interpret_result = !options.hasOwnProperty('auto_interpret_result') || options.auto_interpret_result === true;
 
 		//interpretation_type defaults to 'update' :
-		var interpretation_type = options.hasOwnProperty('type') ? options.type : 'update';
+		var interpretation_type = options.hasOwnProperty('type') ? options.type : 'replace-keep-global-items';
 
 		//persistent defaults to false :
 		var persistent = options.hasOwnProperty('persistent') && options.persistent === true;
@@ -1225,8 +1382,8 @@ define(function (require) {
 				//formated, we do the correct treatment according to answer fields :
 				if ( auto_interpret_result ) {
 
-					//See if components data were retured : if so,
-					//update the corresponding component(s) :
+					//See if components data were returned ("get-component" action): 
+					//if so, update the corresponding component(s) :
 					var new_components = {};
 					if ( answer.components ) {
 						new_components = answer.components;
@@ -1235,6 +1392,8 @@ define(function (require) {
 					}
 
 					if( !_.isEmpty( new_components ) ) {
+
+						//"get-component" case (as opposed to "get-items").
 
 						var error_message = '';
 						var update_results = {};
@@ -1267,7 +1426,8 @@ define(function (require) {
 
 					} else if ( answer.globals && !_.isEmpty( answer.globals ) ) {
 
-						//No component returned, but some global items :
+						//"get-items" case (as opposed to "get-component").
+						//> No component returned, but some global items :
 						//update current global items with new items sent :
 
 						var error_message = '';
@@ -1547,10 +1707,13 @@ define(function (require) {
 
 	  /**
        * App init:
+       *  - register "resume" event
        *  - set options
 	   *  - initialize addons
        */
       app.initialize = function ( callback ) {
+
+      	document.addEventListener( 'resume', app.onResume, false );
 
 		fetchOptions(function(){
 
@@ -1571,6 +1734,22 @@ define(function (require) {
 
 		});
 
+      };
+
+      /**
+       * Fires when the application was in background and is called to be in foreground again.
+       * Handles:
+       *  - deep links
+       */
+      app.onResume = function() {
+      	// If there is a defined launch URL, use it
+      	var route = DeepLink.getLaunchRoute();
+
+      	route = Hooks.applyFilters( 'resume-route', route, [Stats.getStats()] );
+
+      	if( route.length ) {
+      		app.router.navigate( route, { trigger: true } );
+      	}
       };
 
 	//--------------------------------------------------------------------------

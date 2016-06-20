@@ -12,11 +12,7 @@ class WpakWebServiceComponent {
 		$app_id = WpakApps::get_app_id( $app_id );
 		$component_slug = addslashes( $id );
 
-		$args = array();
-
-		if ( isset( $_GET['before_item'] ) && !empty( $_GET['before_item'] ) ) {
-			$args['before_item'] = addslashes( $_GET['before_item'] );
-		}
+		$args = $_GET; //Check on data sent through $_GET is made inside of each component.
 
 		$service_answer = WpakComponents::get_component_data( $app_id, $component_slug, $args );
 

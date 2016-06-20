@@ -97,7 +97,7 @@ define(function(require, exports) {
 
         var single_global = App.getCurrentScreenGlobal( global );
 
-        return single_global != '' ? '#single/' + single_global + '/' + post_id : '';
+        return single_global !== '' ? App.getScreenFragment( 'single', { global: single_global, item_id: post_id } ) : '';
     };
 
 	/**
@@ -112,7 +112,7 @@ define(function(require, exports) {
 	 */
     themeTplTags.getCommentsLink = function(post_id) {
         //TODO Check if the post exists in the posts global
-        return '#comments-' + post_id;
+        return App.getScreenFragment( 'comments', { item_id: post_id } );
     };
 
 	themeTplTags.getDefaultRouteLink = function() {
@@ -238,11 +238,18 @@ define(function(require, exports) {
     };
 	
 	themeTplTags.getComponentLink = function( component_id ) {
-		var component_link = '';
-		if ( App.componentExists( component_id ) ) {
-			component_link = '#component-'+ component_id;
-		}
+		var component_link = App.getScreenFragment( 'component', { component_id: component_id } );
         return component_link;
+    };
+	
+	/**
+	 * Check if current screen's component is the given component
+	 * 
+	 * @param   {string}  component_id   Id of the component (usually a string slug)
+	 * @returns {boolean} true if current screen correspond to given component id
+	 */
+	themeTplTags.isComponent = function( component_id ) {
+        return component_id.length > 0 && ThemeApp.getCurrentComponentId() === component_id;
     };
 
 	themeTplTags.getComponentItems = function( component_id, return_format ) {
@@ -602,7 +609,7 @@ define(function(require, exports) {
 		}
 
 		//TODO Check if the exists exists in the pages global
-		link = '#page/' + component_id + '/' + page_id;
+		link = App.getScreenFragment( 'page', { component_id: component_id, item_id: page_id } );
 
         return link;
     };

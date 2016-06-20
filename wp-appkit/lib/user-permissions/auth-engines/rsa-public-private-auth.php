@@ -48,10 +48,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 				<label><?php _e( 'Private Key', WpAppKit::i18n_domain ) ?></label>
 				<textarea name="wpak_app_private_key" id="wpak_app_private_key" style="height:23em"><?php echo esc_textarea( $auth_settings['private_key'] ) ?></textarea>
 				<p class="description">
-					<?php _e( 'This private key is required to allow users to log in from the app using their WordPress credentials.', WpAppKit::i18n_domain ) ?><br/>
-					<?php _e( 'It is an OpenSSL RSA Encryption Key that can be generated with the openssl command line (Unix/OSX) or using PuTTYgen (Windows).', WpAppKit::i18n_domain ) ?><br/>
-					<?php _e( 'Here is the openssl command that generates the private key: openssl genrsa -out rsa_1024_priv.pem 1024.' ) ?><br/>
-					<?php _e( '(Note that WP-AppKit authentication is only compatible with 1024 bits authentication keys.)' ) ?>
+					<?php _e( 'Copy here an OpenSSL RSA Encryption Key to secure logins from your app.', WpAppKit::i18n_domain ) ?>
 					<?php //TODO : add a link to our soon coming tutorial about this :) ?>
 				</p>
 			</div>
@@ -140,6 +137,19 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 
 		return $decrypted;
 	}
+	
+	protected function get_wp_user( $user_login ) {
+		
+		$user_login = sanitize_user( $user_login );
+		
+		$user_wp = get_user_by( 'login', $user_login );
+
+		if ( !$user_wp && strpos( $user_login, '@' ) ) {
+			$user_wp = get_user_by( 'email', $user_login );
+		}
+		
+		return !empty( $user_wp ) ? $user_wp : false;
+	}
 
 	public function get_webservice_answer( $app_id ) {
 		$service_answer = array();
@@ -153,8 +163,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 			case "get_public_key":
 				if ( !empty( $auth_params['user'] ) ) {
 
-					$user = $auth_params['user'];
-					$user_wp = get_user_by( 'login', $user );
+					$user_wp = $this->get_wp_user( $auth_params['user'] );
 
 					if ( $user_wp ) {
 
@@ -255,8 +264,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 
 									//Check user data :
 
-									$user = $decrypted['user'];
-									$user_wp = get_user_by( 'login', $user );
+									$user_wp = $this->get_wp_user( $user );
 
 									if ( $user_wp ) {
 
@@ -267,18 +275,27 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 											$pass = $decrypted['pass'];
 											if ( wp_check_password( $pass, $user_wp->data->user_pass, $user_wp->ID ) ) {
 
-												//Memorize user as registered and store its secret control key
-												$this->authenticate_user( $user_wp->ID, $user_secret_key, $app_id );
+												if ( $this->check_user_permissions( $user_wp->ID, $app_id ) ) {
+													
+													//Memorize user as registered and store its secret control key
+													$this->authenticate_user( $user_wp->ID, $user_secret_key, $app_id );
 
-												//Return authentication result to client :
-												$service_answer['authenticated'] = 1;
+													//Return authentication result to client :
+													$service_answer['authenticated'] = 1;
 
-												//Get user permissions :
-												$service_answer['permissions'] = $this->get_user_permissions( $user_wp->ID, $app_id );
+													//Get user permissions :
+													$service_answer['permissions'] = $this->get_user_permissions( $user_wp->ID, $app_id );
+													
+													//Get user info :
+													$service_answer['info'] = $this->get_user_info( $user_wp->ID, $app_id );
 
-												//Add control key :
-												$service_answer['control'] = $this->generate_hmac( 'authenticated' . $user, $user_secret_key );
-
+													//Add control key :
+													$service_answer['control'] = $this->generate_hmac( 'authenticated' . $user, $user_secret_key );
+													
+												} else {
+													$service_answer['auth_error'] = 'wrong-permissions';
+												}
+												
 											} else {
 												$service_answer['auth_error'] = 'wrong-pass';
 											}
@@ -323,26 +340,45 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 					 && !empty( $auth_params['control'] )
 					 && !empty( $auth_params['timestamp'] )
 					) {
+					
+					$user_wp = $this->get_wp_user( $auth_params['user'] );
 
-					if ( !empty( $auth_params['hash'] ) && !empty( $auth_params['hasher'] ) ) {
-						$result = $this->check_authenticated_action( $app_id, 'check_user_auth', $auth_params, array( $auth_params['hash'], $auth_params['hasher'] ) );
-						if ( $result['ok'] ) {
-							//Means that the user is authenticated ok on server side, with secret ok.
-							//Now, check that the public key has not changed :
-							$app_public_key = $this->get_app_public_key( $app_id );
-							$hash = $this->generate_hmac( $app_public_key, $auth_params['hasher'] );
-							if ( $auth_params['hash'] === $hash ) {
-								$service_answer['user_auth_ok'] = 1;
+					if ( $user_wp ) {
+						if ( !empty( $auth_params['hash'] ) && !empty( $auth_params['hasher'] ) ) {
+							$result = $this->check_authenticated_action( $app_id, 'check_user_auth', $auth_params, array( $auth_params['hash'], $auth_params['hasher'] ) );
+							if ( $result['ok'] ) {
+								//Means that the user is authenticated ok on server side, with secret ok.
+								//Now, check that the public key has not changed :
+								$app_public_key = $this->get_app_public_key( $app_id );
+								$hash = $this->generate_hmac( $app_public_key, $auth_params['hasher'] );
+								if ( $auth_params['hash'] === $hash ) {
+									
+									//Check if user permissions have not changed:
+									if ( $this->check_user_permissions( $user_wp->ID, $app_id ) ) {
+										
+										$service_answer['user_auth_ok'] = 1;
+
+										//Re-send updated user permissions and info so that it can be checked on app side:
+										$service_answer['permissions'] = $this->get_user_permissions( $user_wp->ID, $app_id );
+										$service_answer['info'] = $this->get_user_info( $user_wp->ID, $app_id );
+								
+									} else {
+										$service_answer['auth_error'] = 'wrong-permissions';
+									}
+									
+								} else {
+									$service_answer['auth_error'] = 'wrong-public-key';
+								}
 							} else {
-								$service_answer['auth_error'] = 'wrong-public-key';
+								//Depending on $result['auth_error'], can mean that the user
+								//is not authenticated or that his secret has changed (if hmac check failed).
+								$service_answer['auth_error'] = $result['auth_error'];
 							}
 						} else {
-							//Depending on $result['auth_error'], can mean that the user
-							//is not authenticated or that his secret has changed (if hmac check failed).
-							$service_answer['auth_error'] = $result['auth_error'];
+							$service_answer['auth_error'] = 'no-hash';
 						}
 					} else {
-						$service_answer['auth_error'] = 'no-hash';
+						$service_answer['auth_error'] = 'wrong-user';
 					}
 				}else {
 					$service_answer['auth_error'] = 'wrong-auth-data';
@@ -379,10 +415,10 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		//First check user validity
 		if ( !empty( $auth_data['user'] ) ) {
 
-			$user = $auth_data['user'];
-
 			//Check user exists
-			$user_wp = get_user_by( 'login', $user );
+			$user = $auth_data['user'];
+			$user_wp = $this->get_wp_user( $user );
+			
 			if ( $user_wp ) {
 
 				//Check the user is not banned :
@@ -462,8 +498,8 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		}elseif ( is_a( $user, 'WP_User' ) ) {
 			$user_id = $user->ID;
 		} elseif( is_string( $user ) ) {
-			if ( $user = get_user_by( 'login', $user ) ) {
-				$user_id = $user->ID;
+			if ( $user_wp = $this->get_wp_user( $user ) ) {
+				$user_id = $user_wp->ID;
 			}
 		}
 
@@ -593,7 +629,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	}
 
 	/**
-	 * Retrieves user permisions (roles and capabilities) to return to the app.
+	 * Retrieves user permisions (roles and capabilities) to return to the app when a user logs in.
 	 */
 	protected function get_user_permissions( $user_id, $app_id ) {
 		$user_permissions = array( 'capabilities' => array(), 'roles' => array() );
@@ -610,9 +646,44 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 			}
 		}
 
+		/**
+		 * 'wpak_auth_user_permissions' filter: use this to add custom permissions info
+		 * (like membership levels from a membership level for example) to default WP permissions data.
+		 * 
+		 * @param array $user_permissions WP roles and capabilities by default. Add your own custom permissions to that array.
+		 * @param int   $user_id          User's WP ID
+		 * @param int   $app_id           The app we're retrieving user's permissions for.
+		 */
 		$user_permissions = apply_filters( 'wpak_auth_user_permissions', $user_permissions, $user_id, $app_id );
 
 		return $user_permissions;
+	}
+	
+	/**
+	 * Retrieves user info (login etc) to return to the app when a user logs in.
+	 */
+	protected function get_user_info( $user_id, $app_id ) {
+		
+		$wp_user = get_user_by( 'id', $user_id );
+		
+		if ( $wp_user ) {
+			
+			$user_info = array(
+				'login' => $wp_user->user_login
+			);
+
+			/**
+			 * 'wpak_auth_user_info' filter: use this to return custom user info to the app at login.
+			 * 
+			 * @param array $user_info  WP user info (by default, just user's login). Add your own custom user info to that array.
+			 * @param int   $user_id    User's WP ID
+			 * @param int   $app_id     The app we're retrieving user's info for.
+			 */
+			$user_info = apply_filters( 'wpak_auth_user_info', $user_info, $user_id, $app_id );
+			
+		}
+		
+		return $user_info;
 	}
 
 	protected function check_user_is_allowed_to_authenticate( $user_id, $app_id ) {
@@ -625,5 +696,23 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		 * @param $app_id Integer Application ID
 		 */
 		return apply_filters( 'wpak_auth_user_is_allowed_to_authenticate', true, $user_id, $app_id );
+	}
+	
+	protected function check_user_permissions( $user_id, $app_id ) {
+		
+		$user_permissions = $this->get_user_permissions( $user_id, $app_id );
+				
+		/**
+		 * Filter 'wpak_auth_user_permissions_ok' :
+		 * this filter triggers when log in is ok, to allow further tests on user's permissions
+		 * before considering the user as authenticated. Use this to base user log in on
+		 * specific user permissions (for example user capabilities set by membership plugins).
+		 *
+		 * @param $user_permissions_ok Boolean Whether the user is allowed to authenticate (default true)
+		 * @param $user_permissions array User permissions retrieved by self::get_user_permissions();
+		 * @param $user_id Integer User ID
+		 * @param $app_id Integer Application ID
+		 */
+		return apply_filters( 'wpak_auth_user_permissions_ok', true, $user_permissions, $user_id, $app_id );
 	}
 }

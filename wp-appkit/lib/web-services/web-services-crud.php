@@ -10,7 +10,7 @@ class WpakWebServiceCrud {
 	
 	public static function create( $app_id, $service_slug, $data ) {
 
-		WpakWebServiceContext::$crud_action = 'create';
+		WpakWebServiceContext::set_context( $app_id, $service_slug, 'create', $data );
 				
 		self::before_webservice( $app_id, $service_slug, 'create', $data );
 		
@@ -25,7 +25,7 @@ class WpakWebServiceCrud {
 
 	public static function read( $app_id, $service_slug, $query_vars ) {
 
-		WpakWebServiceContext::$crud_action = 'read';
+		WpakWebServiceContext::set_context( $app_id, $service_slug, 'read', $query_vars );
 		
 		self::before_webservice( $app_id, $service_slug, 'read', $query_vars );
 		
@@ -40,7 +40,7 @@ class WpakWebServiceCrud {
 
 	public static function read_one( $app_id, $service_slug, $id ) {
 
-		WpakWebServiceContext::$crud_action = 'read_one';
+		WpakWebServiceContext::set_context( $app_id, $service_slug, 'read_one', $id );
 		
 		self::before_webservice( $app_id, $service_slug, 'read_one', $id );
 		
@@ -55,7 +55,7 @@ class WpakWebServiceCrud {
 
 	public static function update( $app_id, $service_slug, $data ) {
 
-		WpakWebServiceContext::$crud_action = 'update';
+		WpakWebServiceContext::set_context( $app_id, $service_slug, 'update', $data );
 		
 		self::before_webservice( $app_id, $service_slug, 'update', $data );
 		
@@ -70,7 +70,7 @@ class WpakWebServiceCrud {
 
 	public static function delete( $app_id, $service_slug, $id ) {
 
-		WpakWebServiceContext::$crud_action = 'delete';
+		WpakWebServiceContext::set_context( $app_id, $service_slug, 'delete', $id );
 		
 		self::before_webservice( $app_id, $service_slug, 'delete', $id );
 		

@@ -29,8 +29,8 @@ class WpakApps {
 			$localize = array(
 				'phonegap_mandatory' => self::get_phonegap_mandatory_fields(),
 				'i18n' => array(
-					'show_help' => esc_js( __( 'Help me', WpAppKit::i18n_domain ) ),
-					'hide_help' => esc_js( __( 'Hide help texts', WpAppKit::i18n_domain ) ),
+					'show_help' => __( 'Help me', WpAppKit::i18n_domain ),
+					'hide_help' => __( 'Hide help texts', WpAppKit::i18n_domain ),
 				),
 			);
 			wp_localize_script( 'wpak_apps_js', 'Apps', $localize );
@@ -168,6 +168,15 @@ class WpakApps {
 			array( __CLASS__, 'inner_main_infos_box' ),
 			'wpak_apps',
 			'normal',
+			'default'
+		);
+
+		add_meta_box(
+			'wpak_app_deep_linking',
+			__( 'Deep Linking', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_deep_linking_box' ),
+			'wpak_apps',
+			'side',
 			'default'
 		);
 
@@ -317,16 +326,16 @@ class WpakApps {
 			</div>
 
 			<div id="export-action">
-				
+
 				<?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
-				
-				<?php 
+
+				<?php
 				/*
-				 * 2016-03-05: Export type select commented for now as we have to stabilize export features other 
+				 * 2016-03-05: Export type select commented for now as we have to stabilize export features other
 				 * than PhoneGap Build before releasing it.
 				 * Was added in https://github.com/uncatcrea/wp-appkit/commit/ac4af270f8ea6273f4d653878c69fceec85a9dd8 along with
 				 * the corresponding JS in apps.js.
-				 * 
+				 *
 				<?php $default_export_type = 'phonegap-build'; ?>
 				<select name="export_type" id="wpak_export_type" >
 					<?php foreach( WpakBuild::get_allowed_export_types() as $export_type => $label ): ?>
@@ -334,9 +343,9 @@ class WpakApps {
 					<?php endforeach ?>
 				</select>
 				<a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => $default_export_type ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
-				*/ 
+				*/
 				?>
-				
+
 			</div>
 		</div>
 
@@ -358,12 +367,26 @@ class WpakApps {
 		<?php
 	}
 
+	public static function inner_deep_linking_box( $post, $current_box ) {
+		$main_infos = self::get_app_main_infos( $post->ID );
+		?>
+		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
+		<div class="wpak_setting field-group">
+			<p class="description"><?php _e( 'Deep Linking allows you to create links to open the app. Enter here the custom scheme you want to use (e.g. "urlscheme" lets you create links like urlscheme://mylink).', WpAppKit::i18n_domain ) ?></p>
+			<label for="wpak_app_url_scheme"><?php _e( 'Custom URL Scheme', WpAppKit::i18n_domain ) ?></label>
+			<input id="wpak_app_url_scheme" type="text" name="wpak_app_url_scheme" value="<?php echo esc_attr( $main_infos['url_scheme'] ); ?>" />
+			<span class="description"><?php _e( 'If empty, deep linking feature won\'t be available for this app', WpAppKit::i18n_domain ) ?></span>
+			<?php wp_nonce_field( 'wpak-deep-linking-' . $post->ID, 'wpak-nonce-deep-linking' ) ?>
+		</div>
+		<?php
+	}
+
 	public static function inner_phonegap_infos_box( $post, $current_box ) {
 		$main_infos = self::get_app_main_infos( $post->ID );
 		?>
 		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
 		<div class="wpak_settings">
-			<p class="description"><?php _e( 'PhoneGap config.xml informations that are going to be displayed on App Stores.<br/>They are required when exporting the App to Phonegap, but are not used for App debug and simulation in browsers.', WpAppKit::i18n_domain ) ?></p>
+			<p class="description"><?php _e( 'Information will be used when compiling your app and may be displayed in app stores. It will be stored in the config.xml file of your project.', WpAppKit::i18n_domain ) ?></p>
 			<fieldset>
 				<legend><?php _e( 'Application', WpAppKit::i18n_domain ); ?></legend>
 				<div class="field-group">
@@ -386,10 +409,17 @@ class WpakApps {
 					<label><?php _e( 'VersionCode (Android only)', WpAppKit::i18n_domain ) ?></label>
 					<input type="text" name="wpak_app_version_code" value="<?php echo esc_attr( $main_infos['version_code'] ) ?>" id="wpak_app_version_code" />
 				</div>
+				<div class="field-group platform-specific android">
+					<label><?php _e( 'Build Tool (Android only)', WpAppKit::i18n_domain ) ?></label><br>
+					<select name="wpak_app_build_tool">
+						<option value="gradle" <?php selected( $main_infos['build_tool'], 'gradle' ) ?>><?php echo esc_html( __( 'Gradle' ), WpAppKit::i18n_domain ) ?></option>
+						<option value="ant" <?php selected( $main_infos['build_tool'], 'ant' ) ?>><?php echo esc_html( __( 'Ant' ), WpAppKit::i18n_domain ) ?></option>
+					</select>
+				</div>
 				<div class="field-group">
 					<label><?php _e( 'Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_icons" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
-					<span class="description"><?php printf( __( 'Write the icons and splashscreens tags as defined in the PhoneGap documentation.<br/>Example: %s', WpAppKit::i18n_domain ), '&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;' ) ?><br><br></span>
+					<span class="description"><?php printf( __( 'Add here the tags defining where are the app icons and splashscreens.<br/>Example: %s', WpAppKit::i18n_domain ), '&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;' ) ?><br><br></span>
 					<br>
 					<input type="checkbox" id="wpak_use_default_icons_and_splash" name="wpak_use_default_icons_and_splash" <?php checked( $main_infos['use_default_icons_and_splash'] ) ?> />
 					<label for="wpak_use_default_icons_and_splash"><?php _e( 'Use default WP-AppKit Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
@@ -420,7 +450,7 @@ class WpakApps {
 				<div class="field-group">
 					<label><?php _e( 'Plugins', WpAppKit::i18n_domain ) ?></label>
 					<textarea name="wpak_app_phonegap_plugins" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
-					<span class="description"><?php printf( __( 'Write the phonegap plugins tags as defined in the PhoneGap documentation.<br/>Example : to include the "In App Browser" plugin for a Phonegap Build compilation, enter %s directly in the textarea.', WpAppKit::i18n_domain ), '&lt;plugin name="org.apache.cordova.inappbrowser" spec="0.3.3" /&gt;' ) ?></span>
+					<span class="description"><?php __( 'Add here the tags defining the plugins you want to include in your app. Before adding a plugin, check which one is included by default.', WpAppKit::i18n_domain ) ?></span>
 				</div>
 			</fieldset>
 			<div class="field-group wpak_phonegap_links">
@@ -444,7 +474,7 @@ class WpakApps {
 				<option value="1" <?php echo $simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Private', WpAppKit::i18n_domain ) ?></option>
 				<option value="0" <?php echo!$simulation_secured ? 'selected="selected"' : '' ?>><?php _e( 'Public', WpAppKit::i18n_domain ) ?></option>
 			</select>
-			<span class="description"><?php _e( 'If activated, only connected users with right permissions can access the app simulation in web browser.<br/>If deactivated, the app simulation is publicly available in any browser, including the config.js and config.xml files, that can contain sensitive data.', WpAppKit::i18n_domain ) ?></span>
+			<span class="description"><?php _e( 'Private means that only logged in users with the right permissions can access the browser simulation. When public, anyone can access browser simulation. That includes the config.js and config.xml files which may contain sensitive data.', WpAppKit::i18n_domain ) ?></span>
 		</div>
 		<?php wp_nonce_field( 'wpak-security-infos-' . $post->ID, 'wpak-nonce-security-infos' ) ?>
 		<?php
@@ -472,7 +502,7 @@ class WpakApps {
 			return;
 		}
 
-		if ( !check_admin_referer( 'wpak-main-infos-' . $post_id, 'wpak-nonce-main-infos' ) || !check_admin_referer( 'wpak-phonegap-infos-' . $post_id, 'wpak-nonce-phonegap-infos' ) || !check_admin_referer( 'wpak-security-infos-' . $post_id, 'wpak-nonce-security-infos' )
+		if ( !check_admin_referer( 'wpak-main-infos-' . $post_id, 'wpak-nonce-main-infos' ) || !check_admin_referer( 'wpak-phonegap-infos-' . $post_id, 'wpak-nonce-phonegap-infos' ) || !check_admin_referer( 'wpak-security-infos-' . $post_id, 'wpak-nonce-security-infos' ) || !check_admin_referer( 'wpak-deep-linking-' . $post_id, 'wpak-nonce-deep-linking' )
 		) {
 			return;
 		}
@@ -496,6 +526,10 @@ class WpakApps {
 
 		if ( isset( $_POST['wpak_app_version_code'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_version_code', sanitize_text_field( $_POST['wpak_app_version_code'] ) );
+		}
+
+		if ( isset( $_POST['wpak_app_build_tool'] ) ) {
+			update_post_meta( $post_id, '_wpak_app_build_tool', sanitize_text_field( $_POST['wpak_app_build_tool'] ) );
 		}
 
 		if ( isset( $_POST['wpak_app_phonegap_version'] ) ) {
@@ -543,6 +577,10 @@ class WpakApps {
 
 		if ( isset( $_POST['wpak_app_simulation_secured'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_simulation_secured', sanitize_text_field( $_POST['wpak_app_simulation_secured'] ) );
+		}
+
+		if ( isset( $_POST['wpak_app_url_scheme'] ) ) {
+			update_post_meta( $post_id, '_wpak_app_url_scheme', sanitize_text_field( $_POST['wpak_app_url_scheme'] ) );
 		}
 
 	}
@@ -651,9 +689,13 @@ class WpakApps {
 		$author_website = get_post_meta( $post_id, '_wpak_app_author_website', true );
 		$author_email = get_post_meta( $post_id, '_wpak_app_author_email', true );
 		$icons = get_post_meta( $post_id, '_wpak_app_icons', true );
+		$url_scheme = get_post_meta( $post_id, '_wpak_app_url_scheme', true );
 
 		$use_default_icons_and_splash = get_post_meta( $post_id, '_wpak_use_default_icons_and_splash', true );
 		$use_default_icons_and_splash = ( empty( $use_default_icons_and_splash ) && empty( $icons ) ) || $use_default_icons_and_splash === 'on';
+
+		$build_tool = get_post_meta( $post_id, '_wpak_app_build_tool', true );
+		$build_tool = empty( $build_tool ) ? 'gradle' : $build_tool; //Set gradle as default Android build tool
 
 		$phonegap_plugins = '';
 		if ( metadata_exists( 'post', $post_id, '_wpak_app_phonegap_plugins' ) ) {
@@ -666,6 +708,7 @@ class WpakApps {
 			'desc' => $desc,
 			'version' => $version,
 			'version_code' => $version_code,
+			'build_tool' => $build_tool,
 			'phonegap_version' => $phonegap_version,
 			'platform' => !empty( $platform ) ? $platform : '',
 			'author' => $author,
@@ -674,6 +717,7 @@ class WpakApps {
 			'phonegap_plugins' => $phonegap_plugins,
 			'icons' => $icons,
 			'use_default_icons_and_splash' => $use_default_icons_and_splash,
+			'url_scheme' => $url_scheme,
 		);
 	}
 
@@ -723,14 +767,36 @@ class WpakApps {
 			'cordova-plugin-whitelist' => array( 'spec' => '', 'source' => 'npm' ),
 			'cordova-plugin-splashscreen' => array( 'spec' => '', 'source' => 'npm' ),
 			'cordova-plugin-device' => array( 'spec' => '', 'source' => 'npm' ),
+			'cordova-plugin-statusbar' => array( 'spec' => '', 'source' => 'npm' ),
 		);
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		if( $app_main_infos['platform'] == 'ios' ) {
-			$default_plugins['cordova-plugin-statusbar'] = array( 'spec' => '', 'source' => 'npm' );
 			if ( $export_type == 'phonegap-build' ) {
 				unset( $default_plugins['cordova-plugin-whitelist'] );
 			}
+		}
+
+		if( $app_main_infos['platform'] == 'android' ) {
+			// Add CrossWalk Cordova plugin.
+			// This is useful to have a consistent behaviour between Android all webviews, and to have better performance as well. Especially with animations.
+			// Drawbacks are the app's weight and memory footprint that are higher than without the plugin.
+			// Currently we include stable version 1.5.0, since 1.6.0, 1.6.1 and 1.7.0 don't work with PhoneGap Build
+
+			$default_plugins['cordova-plugin-crosswalk-webview'] = array( 'spec' => '1.5.0', 'source' => 'npm' );
+		}
+
+		// Activate Deep Linking if a Custom URL Scheme is present
+		if( !empty( $app_main_infos['url_scheme'] ) ) {
+			$default_plugins['cordova-plugin-customurlscheme'] = array(
+				'spec' => '4.2.0',
+				'params' => array(
+					array(
+						'name' => 'URL_SCHEME',
+						'value' => $app_main_infos['url_scheme'],
+					),
+				),
+			);
 		}
 
 		/**

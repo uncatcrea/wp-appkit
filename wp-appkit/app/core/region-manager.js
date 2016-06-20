@@ -113,7 +113,13 @@ define(function (require) {
 		    		App.navigation.each(function(element, index){
 		    			var component = App.components.get(element.get('component_id'));
 		    			if( component ){
-							menu_items.push({id:component.get('id'),label:component.get('label'),type:component.get('type'),link:'#component-'+ component.get('id'),options:element.get('options')});
+							menu_items.push( { 
+								id:component.get('id'),
+								label:component.get('label'),
+								type:component.get('type'),
+								link: App.getScreenFragment( 'component', { component_id: component.get('id') } ),
+								options:element.get('options')
+							} );
 		    			}
 		   		  	});
 
@@ -148,8 +154,15 @@ define(function (require) {
 	    		if( $(elMenu).length
 	    			&& (!$(elMenu).html().length || (force_reload!=undefined && force_reload) ) ){
 		    		menuView.render();
-		    		vent.trigger('menu:refresh',App.getCurrentScreenData(),menuView);
-		    		Utils.log('Render menu',{menu_view:menuView,force_reload:force_reload});
+
+					/**
+					 * Use this 'menu:rendered' event to bind JS events on menu's DOM once
+					 * it is rendered. Useful for example when using JS lib that don't use
+					 * event delegation.
+					 */
+		    		vent.trigger( 'menu:rendered', App.getCurrentScreenData(), menuView );
+
+					Utils.log('Render menu',{menu_view:menuView,force_reload:force_reload});
 	    		}
 	    	}else{
 	    		if( $(elMenu).html().length ){
@@ -169,7 +182,7 @@ define(function (require) {
 		    	if( headerView.containsMenu() ){
 		    		showMenu(true);
 		    	}
-			    vent.trigger('header:render',App.getCurrentScreenData(),headerView);
+			    vent.trigger('header:rendered',App.getCurrentScreenData(),headerView);
 	    	}
 	    };
 
@@ -210,12 +223,21 @@ define(function (require) {
 
 			var $el = $(el);
 
-			vent.trigger('screen:before-transition',App.getCurrentScreenData(),currentView,custom_rendering);
-
 			if( custom_rendering ){
+
+				/**
+				 * 'screen-transition' action: allows to implement your own screen transitions using JS/CSS.
+				 *
+				 * @param $wrapper:       jQuery Object corresponding to div#app-content-wrapper, which is the element wrapping $current and $next screens.
+				 * @param $current:       jQuery Object corresponding to the screen (div.app-screen) that we're leaving, to display $next instead.
+				 * @param $next:          jQuery Object corresponding to the new screen (div.app-screen) that we want to display (by replacing $current).
+				 * @param current_screen: JSON Object: screen object containing information about the screen we're leaving.
+				 * @param next_screen:    JSON Object: screen object containing information (screen type, screen item id, etc) about the new screen we want to display (see getCurrentScreen() for details about screen objects) .
+				 * @param $deferred:      jQuery deferred object that must be resolved at the end of the transition animation to tell app core that the new screen has finished rendering.
+				 */
 				Hooks.doActions(
 					'screen-transition',
-					[$el,$('div:first-child',$el),$(view.el),App.getCurrentScreenData(),App.getPreviousScreenMemoryData()]
+					[$el,$('div:first-child',$el),$(view.el),App.getPreviousScreenMemoryData(),App.getCurrentScreenData()]
 				).done(function(){
 					 renderSubRegions();
 					 vent.trigger('screen:showed',App.getCurrentScreenData(),currentView,first_static_opening);
@@ -225,6 +247,7 @@ define(function (require) {
 					renderSubRegions();
 					vent.trigger('screen:showed:failed',App.getCurrentScreenData(),currentView,first_static_opening);
 				});
+
 			}else{
 				$el.empty().append(view.el);
 				renderSubRegions();
@@ -236,28 +259,7 @@ define(function (require) {
 			}
 	    };
 
-	    var showView = function(view,force_no_waiting){
-
-	    	var no_waiting = force_no_waiting != undefined && force_no_waiting == true;
-
-	    	if( !view.is_static || !$(view.el).html().length ){
-
-	    		if( !no_waiting ){
-	    			region.startWaiting();
-	    		}
-
-				showSimple(view);
-
-				if( !no_waiting ){
-					region.stopWaiting();
-				}
-
-	    	}else{
-	    		showSimple(view);
-	    	}
-	    };
-
-	    var showSimple = function(view) {
+	    var showView = function(view) {
 
 	    	var custom_rendering = App.getParam('custom-screen-rendering');
 
@@ -286,7 +288,7 @@ define(function (require) {
 			screen_static_views[getScreenId( screen )] = view;
 		};
 
-	    var switchScreen = function( view, force_flush, force_no_waiting ) {
+	    var switchScreen = function( view, force_flush ) {
 			var queried_screen = App.getQueriedScreen();
 			vent.trigger( 'screen:leave', App.getCurrentScreenData(), queried_screen, currentView );
 
@@ -295,7 +297,7 @@ define(function (require) {
 				memorizeScreenStaticView( queried_screen, view );
 			}
 
-			showView( view, force_no_waiting );
+			showView( view );
 		};
 
 		var createNewView = function( view_type, view_data, is_static, callback ) {
@@ -337,6 +339,7 @@ define(function (require) {
 					} );
 					break;
 				default:
+					// Allow customized not native view type created by an addon
 					var customView = Hooks.applyFilters( 'custom-view', "", [view_type] );
 					if( customView.length ) {
 						require( [ customView ], function( CustomViewObject ) {
@@ -344,26 +347,24 @@ define(function (require) {
 						});
 					}
 					break;
-				//TODO : we could add a filter here to allow using a
-				//customized not native view type created by an addon.
 			}
 
 		};
 
 		region.show = function( view_type, view_data, screen_data ) {
-			
+
 			App.setQueriedScreen( screen_data );
 			var queried_screen = App.getQueriedScreen();
 
 			/**
-			 * Use this 'redirect' filter to redirect to a different screen than the queried one, 
+			 * Use this 'redirect' filter to redirect to a different screen than the queried one,
 			 * just before it is showed.
-			 * 
-			 * To redirect to a different screen from the filter callback (in themes) : 
+			 *
+			 * To redirect to a different screen from the filter callback (in themes) :
 			 * - call App.navigate('your_screen_route');
 			 * - return true
-			 * 
-			 * Implementation note : This has to be a filter (not action) so that we 
+			 *
+			 * Implementation note : This has to be a filter (not action) so that we
 			 * can stop the showing process if true is returned.
 			 */
 			var redirect = Hooks.applyFilters( 'redirect', false, [queried_screen, App.getCurrentScreenData()] );
@@ -402,14 +403,6 @@ define(function (require) {
 
 	    region.getCurrentView = function(){
 	    	return currentView;
-	    };
-
-	    region.startWaiting = function(){
-	    	vent.trigger('waiting:start',App.getCurrentScreenData(),currentView);
-	    };
-
-	    region.stopWaiting = function(){
-	    	vent.trigger('waiting:stop',App.getCurrentScreenData(),currentView);
 	    };
 
 	    return region;

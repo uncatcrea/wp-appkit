@@ -1,10 +1,14 @@
 <?php
 
 class WpakThemesBoSettings {
+	const menu_item = 'wpak_bo_themes';
 
 	public static function hooks() {
 		add_action( 'add_meta_boxes', array( __CLASS__, 'add_meta_boxes' ), 11 );
 		add_action( 'save_post', array( __CLASS__, 'save_post' ) );
+		add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
+		add_filter( 'admin_body_class', array( __CLASS__, 'admin_body_class' ) );
 	}
 
 	public static function add_meta_boxes() {
@@ -18,11 +22,45 @@ class WpakThemesBoSettings {
 		);
 	}
 
+	public static function admin_menu() {
+		$capability_required = current_user_can( 'wpak_edit_apps' ) ? 'wpak_edit_apps' : 'manage_options';
+		add_submenu_page(
+			WpakApps::menu_item,
+			__( 'WP-AppKit Themes', WpAppKit::i18n_domain ),
+			__( 'Themes', WpAppKit::i18n_domain ),
+			$capability_required,
+			self::menu_item,
+			array( __CLASS__, 'themes_page' )
+		);
+	}
+
+	public static function admin_enqueue_scripts() {
+		global $plugin_page;
+
+		if( $plugin_page != self::menu_item ) {
+			return;
+		}
+
+		$suffix = SCRIPT_DEBUG ? '' : '.min';
+
+		wp_enqueue_script( 'wpak-theme', plugins_url( 'lib/themes/themes' . $suffix . '.js', dirname( dirname( __FILE__ ) ) ), array( 'wp-backbone', 'wp-a11y' ), WpAppKit::resources_version, true );
+	}
+
+	public static function admin_body_class( $class ) {
+		// Fake themes.css stylesheet to make some "theme.php" specific styles work on our page as well
+		return $class . ' themes-php';
+	}
+
+	public static function themes_page() {
+		require_once 'themes-page-template.php';
+	}
+
 	public static function inner_main_infos_box( $post, $current_box ) {
 		$available_themes = WpakThemes::get_available_themes(true);
 		$current_theme = WpakThemesStorage::get_current_theme( $post->ID );
 		$main_infos = WpakApps::get_app_main_infos( $post->ID );
 		?>
+		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
 
 		<?php if ( !empty($available_themes) ): ?>
 			<label><?php _e( 'Choose theme', WpAppKit::i18n_domain ) ?> : </label>
@@ -32,6 +70,7 @@ class WpakThemesBoSettings {
 					<option value="<?php echo $theme_slug ?>" <?php echo $selected ?>><?php echo $theme_data['Name'] ?> </option>
 				<?php endforeach ?>
 			</select>
+			<p class="description"><?php echo sprintf( __( 'Choose a theme for your app. Theme defines how your app will look and behave. Themes can be uploaded in the Upload Themes panel. Themes are stored in the %s folder of your WordPress install.', WpAppKit::i18n_domain ), basename(WP_CONTENT_DIR) .'/'. WpakThemes::themes_directory ) ?></p>
 		<?php else: ?>
 			<div class="wpak_no_theme">
 				<strong><?php _e( 'No WP AppKit theme found!', WpAppKit::i18n_domain ) ?></strong>
@@ -86,6 +125,7 @@ class WpakThemesBoSettings {
 
 		<?php wp_nonce_field( 'wpak-theme-data-' . $post->ID, 'wpak-nonce-theme-data' ) ?>
 
+		<?php // TODO: put this style in an external file ?>
 		<style>
 			.wpak-theme-data{ padding:9px 12px; margin-bottom: 10px }
 			.theme-data-content{ margin-top: 0 }

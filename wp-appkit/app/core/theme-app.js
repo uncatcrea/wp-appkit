@@ -44,10 +44,8 @@ define( function( require, exports ) {
 		if ( _.contains( [ 'screen:leave',
 							'screen:showed',
 							'screen:before-transition',
-							'menu:refresh',
-							'header:render',
-							'waiting:start',
-							'waiting:stop'
+							'menu:rendered',
+							'header:rendered'
 						],
 						event ) ) {
 			//Proxy RegionManager events :
@@ -103,7 +101,7 @@ define( function( require, exports ) {
 	 *		type: string : 'error' | 'info',
 	 *		message: string : error or info message
 	 *		data: object : original core event data : {
-	 *			type: string : 'ajax' | 'ws-data' | 'not-found' | 'wrong-data',
+	 *			type: string : 'ajax' | 'web-service' | 'not-found' | 'wrong-data',
 	 *			where: string : core function where the event occured
 	 *			message: string : message associated to the event
 	 *			data: object : data associated to the core event
@@ -200,11 +198,11 @@ define( function( require, exports ) {
 	 */
 	themeApp.filter = function( filter, callback, priority ) {
 		Hooks.addFilter( filter, callback, priority );
-	}
+	};
 
 	themeApp.action = function( action, callback, priority ) {
 		Hooks.addAction( action, callback, priority );
-	}
+	};
 
 	themeApp.setParam = function( param, value ) {
 		App.setParam( param, value );
@@ -388,20 +386,18 @@ define( function( require, exports ) {
 		var current_screen = App.getCurrentScreenData();
 		if ( current_screen.screen_type === 'list' ) {
 			App.getMoreOfComponent(
-					current_screen.component_id,
-					function( data ) {
-						var current_archive_view = RegionManager.getCurrentView();
-						current_archive_view.addPosts( data.new_items );
-						current_archive_view.render();
-						cb_after( data.is_last, data.new_items, data.nb_left );
-					},
-					function( error ) {
-						var get_more_link_data = themeApp.getGetMoreLinkDisplay();
-						cb_error( format_theme_event_data( error.event, error ), get_more_link_data );
-					}
+				current_screen.component_id,
+				function( data ) {
+					var current_archive_view = RegionManager.getCurrentView();
+					current_archive_view.addPosts( data.new_items );
+					current_archive_view.render();
+					cb_after( data.is_last, data.new_items, data.nb_left );
+				},
+				function( error ) {
+					var get_more_link_data = themeApp.getGetMoreLinkDisplay();
+					cb_error( format_theme_event_data( error.event, error ), get_more_link_data );
+				}
 			);
-		} else {
-			Hooks.doActions( 'get-more-component-items', [ current_screen, cb_after, cb_error ] );
 		}
 	};
 
@@ -431,7 +427,7 @@ define( function( require, exports ) {
 			post_id,
 			function ( comments, post, item_global ) {
 				cb_ok( comments.toJSON(), post.toJSON(), item_global );
-				themeApp.navigate( '#comments-'+ post_id );
+				themeApp.navigate( App.getScreenFragment( 'comments', { item_id: post_id } ) );
 			},
 			function ( error ) {
 				cb_error( format_theme_event_data( error.event, error ) );
@@ -452,13 +448,46 @@ define( function( require, exports ) {
 	themeApp.getComponents = function() {
 		return App.getComponents();
 	};
+	
+	/**
+	 * Retrieves the id of the component corresponding to the current screen, if any.
+	 * 
+	 * @returns {string} Id of the current screen's component (usually a string slug)
+	 */
+	themeApp.getCurrentComponentId = function() {
+		var current_component_id = '';
+		
+		var current_screen = App.getCurrentScreenData();
+		if ( current_screen.component_id && App.componentExists( current_screen.component_id ) ) {
+			current_component_id = current_screen.component_id;
+		}
+		
+        return current_component_id;
+    };
+	
+	/**
+	 * Retrieves the component corresponding to the current screen, if any.
+	 * 
+	 * @returns {JSON object} Current screen's component data
+	 */
+	themeApp.getCurrentComponent = function() {
+		var current_component = null;
+		
+		var current_component_id = themeApp.getCurrentComponentId();
+		if ( current_component_id !== '' ) {
+			current_component = App.getComponentData( current_component_id );
+		}
+		
+        return current_component;
+    };
 
 	/************************************************
 	 * "Live Query" Web Service
 	 */
 
 	/**
-	 * Call live query web service
+	 * Call "Live Query" web service.
+	 * Allows to refresh app components (or choosen component items) dynamically from server.
 	 *
 	 * @param JSON Object web_service_params Any params that you want to send to the server.
 	 *        The following params are automatically recognised and interpreted on server side :
@@ -471,8 +500,8 @@ define( function( require, exports ) {
 	 * - auto_interpret_result Boolean (default true). If false, web service answer must be interpreted in the cb_ok callback.
 	 * - type String : can be one of :
 	 *       -- "update" : merge new with existing component data,
-	 *       -- "replace" : delete current component data and replace with new
-	 *       -- "replace-keep-global-items" (default) : for list components : replace component ids and merge global items
+	 *       -- "replace" : delete current component data, empty the corresponding global, and replace with new
+	 *       -- "replace-keep-global-items" (default) : for list components : replace component items ids and merge global items
 	 * - persistent Boolean (default false). If true, new data is stored in local storage.
 	 */
 	themeApp.liveQuery = function( web_service_params, options ){
@@ -494,18 +523,79 @@ define( function( require, exports ) {
 	};
 
 	/**
-	 * Refresh component items from server.
+	 * Refresh component data and items from server.
+	 * 
+	 * @param {JSON Object} options :
+	 *  - component_id {string} String (slug) idendifier provided when creating the component.
+	 *                          If none provided, will retrieve current screen component's id, if any.
+	 *	- success {callback}
+	 *	- error {callback}
+	 *	- refresh_type {string} Can be:
+	 *		 -- "update" : merge new with existing component data,
+	 *       -- "replace" : delete current component data, empty the corresponding global, and replace with new
+	 *       -- "replace-keep-global-items" (default) : for list components : replace component items ids and merge global items
+	 *  - persistent {boolean} (default false). If true, new data is stored in local storage.
+	 */
+	themeApp.refreshComponent = function( options ) {
+		
+		options = options || {};
+		
+		var component_id = options.component_id ? options.component_id : themeApp.getCurrentComponentId();
+		
+		var live_query_options = {};
+		
+		if ( options.success ) {
+			live_query_options.success = options.success; //Will be passed (answer, update_results)
+		}
+		
+		if ( options.error ) {
+			live_query_options.error = options.error; //Will be passed (answer_error)
+		}
+		
+		if ( options.refresh_type ) { //If none, will default to 'replace-keep-global-items'
+			live_query_options.type = options.refresh_type;
+		}
+		
+		if ( options.hasOwnProperty( 'persistent' ) ) { //If none, will default to false
+			live_query_options.persistent = options.persistent;
+		}
+					
+		themeApp.liveQuery(
+			{
+				wpak_component_slug: component_id,
+				wpak_query_action: 'get-component'
+			},
+			live_query_options
+		);
+
+	};
+
+	/**
+	 * Refresh given component items from server.
+	 * This only refreshes choosen items of a component, not the component itself. 
+	 * Use ThemeApp.refreshComponent() to update component data in addition to its items.
 	 *
-	 * @param {int} component_id
-	 * @param {int | array of int} items_ids. If none provided, will refresh all component items.
+	 * @param {string}   component_id   String (slug) idendifier provided when creating the component
+	 *                                  If none provided, will retrieve current screen component's id, if any.
+	 * @param {int | array of int}   items_ids   If none provided, will refresh all component items.
 	 * @param {JSON Object} options :
 	 *	- success {callback}
 	 *	- error {callback}
 	 *	- autoformat_answer {boolean} If true (default), the answer returned to the success
-	 *	  callback is automatically formated to return significant data. If false, the full
+	 *	  callback is automatically formated to return significant data (array of items). If false, the full
 	 *	  liveQuery answer is returned no matter what.
+	 *	- refresh_type {string} Can be:
+	 *		 -- "update" : merge new with existing component data,
+	 *       -- "replace" : delete current component data, empty the corresponding global, and replace with new
+	 *       -- "replace-keep-global-items" (default) : for list components : replace component items ids and merge global items
+	 *  - persistent {boolean} (default false). If true, new data is stored in local storage.
 	 */
 	themeApp.refreshComponentItems = function ( component_id, items_ids, options ) {
+		
+		if ( component_id === undefined ) {
+			component_id = TemplateTags.getCurrentComponentId();
+		}
+		
 		var existing_component = App.components.get( component_id );
     	if( existing_component ) {
 
@@ -527,12 +617,11 @@ define( function( require, exports ) {
 						wpak_query_action : 'get-items',
 						wpak_items_ids : items_ids
 					},
-					{	//Those are default liveQuery options values, but we set
-						//them explicitly for more clarity :
-						type : 'update',
+					{	
+						type : options.hasOwnProperty( 'refresh_type' ) ? options.refresh_type : 'replace-keep-global-items',
+						persistent : options.hasOwnProperty( 'persistent' ) ? options.persistent : false,
 						auto_interpret_result : true,
-						persistent : false,
-
+						
 						//Callbacks :
 						success : function ( answer ) {
 							if ( options !== undefined && options.success ) {
@@ -616,30 +705,32 @@ define( function( require, exports ) {
 	/**
 	 * Returns the transition direction ("next-screen", "previous-screen", "default" or customized) according
 	 * to current and previous screen.
+	 * Use this to know the current transition direction when hooking on 'screen-transition' action hook.
+	 * And use the following 'transition-direction' hook to define your own kind of transition directions.
 	 *
-	 * @param {Object} current_screen : The screen that is (going to be) displayed after transition
-	 * @param {Object} previous_screen : The screen we're leaving.
+	 * @param {Object} current_screen : The screen we're leaving.
+	 * @param {Object} next_screen : The screen that is going to be displayed after transition
 	 * @returns {String} Transition direction (default 'default', 'next-screen' and 'previous-screen' but
 	 * can be customized with the "transition-direction" filter).
 	 */
-	themeApp.getTransitionDirection = function( current_screen, previous_screen ) {
+	themeApp.getTransitionDirection = function( current_screen, next_screen ) {
 		var transition = 'default';
 
-		if ( current_screen.screen_type == 'list' || current_screen.screen_type == 'custom-component' ) {
-			if ( previous_screen.screen_type == 'single' ) {
+		if ( next_screen.screen_type == 'list' || next_screen.screen_type == 'custom-component' ) {
+			if ( current_screen.screen_type == 'single' ) {
 				transition = 'previous-screen';
 			} else {
 				transition = 'default';
 			}
-		} else if ( current_screen.screen_type == 'single' ) {
-			if ( previous_screen.screen_type == 'list' || previous_screen.screen_type == 'custom-component' ) {
+		} else if ( next_screen.screen_type == 'single' ) {
+			if ( current_screen.screen_type == 'list' || current_screen.screen_type == 'custom-component' ) {
 				transition = 'next-screen';
-			} else if ( previous_screen.screen_type == 'comments' ) {
+			} else if ( current_screen.screen_type == 'comments' ) {
 				transition = 'previous-screen';
 			} else {
 				transition = 'default';
 			}
-		} else if ( current_screen.screen_type == 'comments' ) {
+		} else if ( next_screen.screen_type == 'comments' ) {
 			transition = 'next-screen';
 		} else {
 			transition = 'default';
@@ -650,53 +741,12 @@ define( function( require, exports ) {
 		 * directions according to what are current (ie asked) and previous screen.
 		 *
 		 * @param {string} Transition direction to override if needed.
-		 * @param {Object} current_screen : The screen that is (going to be) displayed after transition.
-		 * @param {Object} previous_screen : The screen we're leaving.
+		 * @param {Object} current_screen : The screen we're leaving.
+		 * @param {Object} next_screen : The screen that is going to be displayed after transition.
 		 */
-		var transition = Hooks.applyFilters( 'transition-direction', transition, [current_screen, previous_screen] );
+		var transition = Hooks.applyFilters( 'transition-direction', transition, [current_screen, next_screen] );
 
 		return transition;
-	};
-
-	/**
-	 * This allows to define your own previous-screen/next-screen/default transitions between screens.
-	 * If you need more transition types than just previous/next/default (like single-to-comment, comment-to-single etc),
-	 * do the following (in functions.js) :
-	 * - App.setParam( 'custom-screen-rendering', true );
-	 * - use the 'screen-transition' action hook to define your own transitions.
-	 *
-	 * @param {callback} transition_default
-	 * @param {callback} transition_previous_screen
-	 * @param {callback} transition_next_screen
-	 */
-	themeApp.setAutoScreenTransitions = function( transition_default, transition_previous_screen, transition_next_screen ) {
-
-		//Set custom-screen-rendering param to true so that screen rendering
-		//uses the 'screen-transition' action to render :
-		themeApp.setParam( 'custom-screen-rendering', true );
-
-		themeApp.action( 'screen-transition', function( $wrapper, $current, $next, current_screen, previous_screen, $deferred ) {
-
-			var direction = themeApp.getTransitionDirection( current_screen, previous_screen );
-
-			switch ( direction ) {
-				case 'previous-screen':
-					transition_previous_screen( $wrapper, $current, $next, $deferred );
-					break;
-				case 'next-screen':
-					transition_next_screen( $wrapper, $current, $next, $deferred );
-					break;
-				case 'default':
-					transition_default( $wrapper, $current, $next, $deferred );
-					break;
-				default:
-					transition_default( $wrapper, $current, $next, $deferred );
-					break;
-			}
-			;
-
-		} );
-
 	};
 
 	/************************************************
@@ -813,6 +863,64 @@ define( function( require, exports ) {
     themeApp.getCurrentScreen = function() {
         return App.getCurrentScreenData();
     };
+	
+	/**
+	 * Retrieves the screen that is before current screen in app's history.
+	 * For example if your history is "Screen A > Screen B > Screen C then back button to Screen B",
+	 * getPreviousScreenInHistory() returns Screen A, which is where we will go from Screen B
+	 * if we press back button.
+	 * To retrieve Screen C in this case, you would use getPreviousScreen().
+	 * 
+	 * @returns {screen_type:string}
+	 */
+	themeApp.getPreviousScreenInHistory = function() {
+		return App.getPreviousScreenData();
+	};
+	
+	/**
+	 * Retrieves the screen that was displayed just before current screen.
+	 * For example if your history is "Screen A > Screen B > Screen C then back button to Screen B",
+	 * Screen C has been poped from history stack but you can still access it via 
+	 * this getPreviousScreen() function.
+	 * 
+	 * @returns {Screen object} Previous screen 
+	 * (see themeApp.getCurrentScreen() for screen object structure)
+	 */
+	themeApp.getPreviousScreen = function() {
+		return App.getPreviousScreenMemoryData();
+	};
+
+	/**
+	* Returns app's current history stack.
+	* For example if your history is "Screen A > Screen B > Screen C", 
+	* the history stack is [Screen object A, Screen object B, Screen object C].
+	* Then if you press back button, the history stack becomes
+	* [Screen object A, Screen object B] (Screen object C has been poped).
+	* 
+	* @returns {Array} App's history stack: array of screen objects 
+	* (see themeApp.getCurrentScreen() for screen object structure)
+	*/
+	themeApp.getHistory = function() {
+		return App.getHistory();
+	};
+	
+	/**
+	 * Returns the last action that was made on app's history stack (push, pop, empty or empty-then-push).
+	 * For example if your history is "List > Single then go to Single's Comments screen",
+	 * the last history action is a "push" (Comments screen was pushed after Single screen in the history stack).
+	 * 
+	 * Knowing last history action is particularly useful when implementing custom transitions
+	 * for example to differentiate transitions between "going from Single A to Single B" and 
+	 * "going back from Single B to Single A".
+	 * 
+	 * Note that the mapping between "Going from a screen to another screen" and "what
+	 * history action is triggered" is customizable using the "make-history" JS filter.
+	 * 
+	 * @returns {String} Last history action : push, pop, empty or empty-then-push
+	 */
+	themeApp.getLastHistoryAction = function() {
+		return App.getLastHistoryAction();
+	};
 
 	/**
 	 * Retrieves useful data corresponding to the object that is currently displayed.

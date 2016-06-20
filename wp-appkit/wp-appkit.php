@@ -3,7 +3,7 @@
 Plugin Name: WP-AppKit
 Plugin URI:  https://github.com/uncatcrea/wp-appkit
 Description: Build Phonegap Mobile apps based on your WordPress content.
-Version:     0.5.1
+Version:     0.6
 Author:      Uncategorized Creations
 Author URI:  http://getwpappkit.com
 Text Domain: wp-appkit
@@ -13,13 +13,13 @@ Copyright:   2013-2016 Uncategorized Creations
 
 This plugin, like WordPress, is licensed under the GPL.
 Use it to make something cool, have fun, and share what you've learned with others.
- */
+*/
 
 if ( !class_exists( 'WpAppKit' ) ) {
 
 	class WpAppKit {
 
-		const resources_version = '0.5';
+		const resources_version = '0.6';
 		const i18n_domain = 'wp-appkit';
 
 		public static function hooks() {
@@ -32,6 +32,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			add_action( 'template_redirect', array( __CLASS__, 'template_redirect' ), 5 );
 
 			add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
+			add_action( 'admin_init', array( __CLASS__, 'upgrade' ) );
 		}
 
 		protected static function lib_require() {
@@ -49,6 +50,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			require_once(dirname( __FILE__ ) . '/lib/options/options.php');
 			require_once(dirname( __FILE__ ) . '/lib/simulator/simulator.php');
 			require_once(dirname( __FILE__ ) . '/lib/simulator/server-rewrite.php');
+			require_once(dirname( __FILE__ ) . '/lib/shortcodes/show_hide_in_apps.php');
 		}
 
 		public static function plugins_loaded() {
@@ -62,9 +64,12 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			self::add_rewrite_rules();
 			flush_rewrite_rules();
 
-			WpakThemes::create_theme_directory();
-			
-			//If WordPress Network, add WP-AppKit custom rewrite rules to htacces, 
+			$directory = WpakThemes::create_theme_directory();
+			if( !empty( $directory ) ) {
+				WpakThemes::install_default_themes();
+			}
+
+			//If WordPress Network, add WP-AppKit custom rewrite rules to htacces,
 			//required for apps' preview to work.
 			if( is_multisite() ) {
 				WpakServerRewrite::prepend_wp_network_wpak_rules_to_htaccess();
@@ -73,21 +78,21 @@ if ( !class_exists( 'WpAppKit' ) ) {
 
 		public static function on_deactivation( $network_wide ) {
 			flush_rewrite_rules();
-			
+
 			//If this is a network wide uninstall, we can remove WP-AppKit rules.
 			//If this is not a network wide uninstall, we can't remove our rules
-			//as they may be needed by another site of the network. We could 
+			//as they may be needed by another site of the network. We could
 			//check all sites to see if WP-AppKit is installed somewhere, but this would
 			//require making switch_to_blog() for every sites, which we consider
-			//dangerous performance-wise, knowing that we can have > 10000 websites... 
+			//dangerous performance-wise, knowing that we can have > 10000 websites...
 			//So, unless we find a better solution, we don't remove our rules
-			//if this is not a network wide uninstall. (This should not cause any 
-			//problem as WP-AppKit rules only apply to WP-AppKit plugin 
+			//if this is not a network wide uninstall. (This should not cause any
+			//problem as WP-AppKit rules only apply to WP-AppKit plugin
 			//and can't interfer with other rules).
 			if( is_multisite() && $network_wide ) {
 				WpakServerRewrite::delete_wp_network_wpak_rules_from_htaccess();
 			}
-			
+
 		}
 
 		public static function init() {
@@ -103,6 +108,36 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			WpakWebServices::add_rewrite_tags_and_rules();
 			WpakConfigFile::rewrite_rules();
 			WpakThemes::rewrite_rules();
+		}
+
+		/**
+		 * Check if WP-AppKit Plugin has been upgraded, and run corresponding upgrade routine(s).
+		 *
+		 * Contains conditional checks to determine which upgrade scripts to run,
+		 * based on database version and WP-AppKit version being updated-to.
+		 */
+		public static function upgrade() {
+			$current_version = get_option( 'wpak_version', null );
+			$data = get_file_data( __FILE__, array( 'version' => 'Version' ) );
+
+			// We are up-to-date. Nothing to do.
+			if ( $data['version'] == $current_version )
+				return;
+
+			if( version_compare( $current_version, '0.6.0', '<' ) ) {
+				self::upgrade_060();
+			}
+		}
+
+		/**
+		 * Execute changes made in WP-AppKit 0.6.0.
+		 */
+		protected static function upgrade_060() {
+			// Remove 'wpak_used_themes' transient since its value's structure changed with this version
+			delete_transient( 'wpak_used_themes' );
+
+			// Everything went fine, update DB version not to run this script once again
+			update_option( 'wpak_version', '0.6.0' );
 		}
 
 		/**

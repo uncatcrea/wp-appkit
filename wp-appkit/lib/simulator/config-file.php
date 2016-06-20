@@ -9,11 +9,11 @@ class WpakConfigFile {
 
 	public static function rewrite_rules() {
 		add_rewrite_tag( '%wpak_appli_file%', '([^&]+)' );
-		
+
 		$home_url = home_url(); //Something like "http://my-site.com"
 		$url_to_config_file = plugins_url( 'app', dirname( dirname( __FILE__ ) ) ); //Something like "http://my-site.com/wp-content/plugins/wp-appkit/app"
 		$config_file_prefix = str_replace( trailingslashit($home_url), '', $url_to_config_file ); //Something like "wp-content/plugins/wp-appkit/app"
-		
+
 		add_rewrite_rule( '^' . $config_file_prefix . '/(config\.js)$', 'index.php?wpak_appli_file=$matches[1]', 'top' );
 		add_rewrite_rule( '^' . $config_file_prefix . '/(config\.xml)$', 'index.php?wpak_appli_file=$matches[1]', 'top' );
 	}
@@ -39,6 +39,10 @@ class WpakConfigFile {
 					if ( WpakApps::get_app_simulation_is_secured( $app_id ) && !current_user_can( $capability ) ) {
 						wp_nonce_ays( $action );
 					}
+
+					//If the app current theme has some PHP (hooks!) to be executed before
+					//config files are generated, include it here :
+					WpakThemes::include_app_theme_php( $app_id );
 
 					$file = $wp_query->query_vars['wpak_appli_file'];
 
@@ -74,20 +78,22 @@ class WpakConfigFile {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		$app_title = $app_main_infos['title'];
-		
+
 		$app_platform = $app_main_infos['platform'];
 		$app_platform = empty( $app_platform ) ? 'all' : $app_platform;
 
 		$app_version = WpakApps::sanitize_app_version( $app_main_infos['version'] );
 
 		$gmt_offset = (int)get_option( 'gmt_offset' );
-		
+
 		$debug_mode = WpakBuild::get_app_debug_mode( $app_id );
 
 		$auth_key = WpakApps::get_app_is_secured( $app_id ) ? WpakToken::get_hash_key() : '';
 		//TODO : options to choose if the auth key is displayed in config.js.
 
 		$options = WpakOptions::get_app_options( $app_id );
+
+		$theme_settings = WpakThemesConfigJsSettings::get_theme_settings( $app_id );
 
 		$addons = WpakAddons::get_app_addons_for_config( $app_id );
 
@@ -103,6 +109,7 @@ define( function ( require ) {
 	return {
 		app_slug : '<?php echo $app_slug ?>',
 		wp_ws_url : '<?php echo $wp_ws_url ?>',
+		wp_url : '<?php echo home_url() ?>',
 		theme : '<?php echo addslashes($theme) ?>',
 		version : '<?php echo $app_version ?>',
 		app_title : '<?php echo addslashes($app_title) ?>',
@@ -115,6 +122,7 @@ define( function ( require ) {
 		endif
 		?>,
 		options : <?php echo json_encode( $options ); ?>,
+		theme_settings : <?php echo json_encode( $theme_settings ); ?>,
 		addons : <?php echo json_encode( $addons ) ?>
 
 	};
@@ -129,24 +137,24 @@ define( function ( require ) {
 
 		return !$echo ? $content : '';
 	}
-	
+
 	/**
-	 * Retrieves whitelist settings. 
+	 * Retrieves whitelist settings.
 	 * Will be active only if the "cordova-plugin-whitelist" plugin is added to config.xml.
 	 * (see https://github.com/apache/cordova-plugin-whitelist).
-	 * 
+	 *
 	 * @param int $app_id Application ID
 	 * @param string $export_type 'phonegap-build' (default), 'phonegap-cli' or 'webapp'
 	 */
 	protected static function get_whitelist_settings( $app_id, $app_platform, $export_type = 'phonegap-build' ) {
-		
+
 		//By default we allow everything :
 		$whitelist_settings = array(
 			'access' => array( 'origin' => '*' ),
 			'allow-intent' => array( 'href' => '*' ),
 			'allow-navigation' => array( 'href' => '*' )
 		);
-		
+
 		//No whitelist setting if the 'cordova-plugin-whitelist' plugin is not here :
 		$whitelist_plugin_here = true;
 		$current_phonegap_plugins = WpakApps::get_merged_phonegap_plugins( $app_id, $export_type );
@@ -154,7 +162,7 @@ define( function ( require ) {
 			$whitelist_settings = array();
 			$whitelist_plugin_here = false;
 		}
-		
+
 		/**
 		 * Filter : allows to modify config.xml whitelist configuration.
 		 * See https://github.com/apache/cordova-plugin-whitelist for detailed info.
@@ -169,38 +177,40 @@ define( function ( require ) {
 		 * @param boolean   $whitelist_plugin_here  Whether or not the whitelist plugin is activated for this app.
 		 */
 		$whitelist_settings = apply_filters( 'wpak_config_xml_whitelist', $whitelist_settings, $app_id, $app_platform, $export_type, $current_phonegap_plugins, $whitelist_plugin_here );
-		
+
 		return $whitelist_settings;
 	}
-	
+
 	protected static function get_splashscreen_settings( $app_id, $app_platform, $export_type ) {
 		$splashcreen_settings = array( 'preferences' => array(), 'gap:config-file' => array() );
-		
+
 		switch ( $app_platform ) {
 			case 'ios':
 				$splashcreen_settings['preferences']['AutoHideSplashScreen'] = 'false';
-				$splashcreen_settings['preferences']['ShowSplashScreenSpinner'] = 'false';
+				$splashcreen_settings['preferences']['FadeSplashScreenDuration'] = '1000';
 				$splashcreen_settings['gap:config-file']['UIStatusBarHidden'] = 'true';
 				$splashcreen_settings['gap:config-file']['UIViewControllerBasedStatusBarAppearance'] = 'false';
-				//Note:  we've not been able to make fading work when autohide is set to false.
 				break;
 			case 'android':
 				$splashcreen_settings['preferences']['SplashScreen'] = 'splash';
 				$splashcreen_settings['preferences']['SplashScreenDelay'] = '10000';
 				$splashcreen_settings['preferences']['FadeSplashScreenDuration'] = '300';
-				//Auto hiding doesn't work on Android (https://issues.apache.org/jira/browse/CB-8396). 
+				//Auto hiding doesn't work on Android (https://issues.apache.org/jira/browse/CB-8396).
 				//So the plan is to have a very long delay for the splashscreen and let Javascript hiding the splashscreen
 				break;
 		}
-		
-		//No splashscreen setting if the 'cordova-plugin-whitelist' plugin is not here :
+
+		// For all platforms, hide the spinner
+		$splashcreen_settings['preferences']['ShowSplashScreenSpinner'] = 'false';
+
+		//No splashscreen setting if the 'cordova-plugin-splashscreen' plugin is not here :
 		$splashcreen_plugin_here = true;
 		$current_phonegap_plugins = WpakApps::get_merged_phonegap_plugins( $app_id, $export_type );
 		if ( !array_key_exists( 'cordova-plugin-splashscreen', $current_phonegap_plugins ) ) {
 			$splashcreen_settings = array();
 			$splashcreen_plugin_here = false;
 		}
-		
+
 		/**
 		 * Filter : allows to modify config.xml splashscreen configuration.
 		 * See https://github.com/apache/cordova-plugin-splashscreen for detailed info.
@@ -211,14 +221,14 @@ define( function ( require ) {
 		 * @param string    $export_type              'phonegap-build' (default), 'phonegap-cli' or 'webapp'
 		 * @param boolean   $splashcreen_plugin_here  Whether or not the splashscreen plugin is activated for this app.
 		 */
-		
+
 		$splashcreen_settings = apply_filters( 'wpak_config_xml_splashscreen', $splashcreen_settings, $app_id, $app_platform, $export_type, $current_phonegap_plugins, $splashcreen_plugin_here );
-		
+
 		return $splashcreen_settings;
 	}
-	
+
 	protected static function get_default_icons_and_splashscreens( $app_id, $export_type ) {
-	
+
 		$default_icons = array(
 			'android' => array (
 				array( 'src' => 'icon.png', 'qualifier' => '', 'width' => '', 'height' => '' ),
@@ -241,7 +251,7 @@ define( function ( require ) {
 				array( 'src' => 'icons/icon-small.png', 'qualifier' => '', 'width' => '29', 'height' => '29'  ),
 			)
 		);
-			
+
 		$default_splashscreens = array(
 			'android' => array (
 				array( 'src' => 'splash.9.png', 'qualifier' => '', 'width' => '', 'height' => '' ),
@@ -252,7 +262,7 @@ define( function ( require ) {
 				array( 'src' => 'splashscreens/splashscreen-wp-appkit-xxhdpi.9.png', 'qualifier' => 'xxhdpi', 'width' => '', 'height' => '' ),
 				array( 'src' => 'splashscreens/splashscreen-wp-appkit-xxxhdpi.9.png', 'qualifier' => 'xxxhdpi', 'width' => '', 'height' => '' ),
 			),
-			'ios' => array( 
+			'ios' => array(
 				array( 'src' => 'splashscreens/Default-736h-Lanscape@3x~iphone.png', 'qualifier' => '', 'width' => '2208', 'height' => '1242' ),
 				array( 'src' => 'splashscreens/Default-736h-Portrait@3x~iphone.png', 'qualifier' => '', 'width' => '1242', 'height' => '2208' ),
 				array( 'src' => 'splashscreens/Default-667h-Landscape@2x~iphone.png', 'qualifier' => '', 'width' => '1334', 'height' => '750' ),
@@ -265,54 +275,54 @@ define( function ( require ) {
 				array( 'src' => 'splashscreens/Default-Portrait~iphone.png', 'qualifier' => '', 'width' => '320', 'height' => '480' ),
 			)
 		);
-		
+
 		$icons_and_splashscreens = array( 'icons' => $default_icons, 'splashscreens' => $default_splashscreens );
-		
+
 		/**
 		 * 'wpak_default_icons_and_splashscreens' filter.
 		 * Use this filter to customize icons and splashscreens file names or attributes
-		 * 
+		 *
 		 * @param $icons_and_splashscreens    array    Icon and splashscreens to modify
 		 * @param $app_id                     int      App id
 		 * @param $export_type                string   'phonegap-build' (default), 'phonegap-cli' or 'webapp'
 		 */
 		$icons_and_splashscreens = apply_filters( 'wpak_default_icons_and_splashscreens', $icons_and_splashscreens, $app_id, $export_type );
-		
+
 		return $icons_and_splashscreens;
 	}
-	
+
 	protected static function get_icons_splashscreens_dir( $app_id, $app_platform, $export_type ) {
-		
+
 		$default_icons_splashscreens_dir = dirname( __FILE__ ) .'/../../images/icons-splashscreens';
-		
+
 		/**
 		 * 'wpak_icons_and_splashscreens_dir' filter.
 		 * Use this filter to customize icons and splashscreens files directory
-		 * 
+		 *
 		 * @param $icons_and_splashscreens    array    Icon and splashscreens to modify
 		 * @param $app_id                     int      App id
 		 * @param $app_platform               string   App platform
 		 * @param $export_type                string   'phonegap-build' (default), 'phonegap-cli' or 'webapp'
 		 */
 		$default_icons_splashscreens_dir = apply_filters( 'wpak_icons_and_splashscreens_dir', $default_icons_splashscreens_dir, $app_id, $app_platform, $export_type );
-		
+
 		return $default_icons_splashscreens_dir;
 	}
-	
+
 	public static function get_platform_icons_and_splashscreens_files( $app_id, $app_platform, $export_type ) {
-		
+
 		$app_icons_and_splashscreens_files = array( 'icons' => array(), 'splashscreens' => array() );
-		
+
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
-		
+
 		if ( $app_main_infos['use_default_icons_and_splash'] ) {
-		
+
 			$default_icons_and_splash = self::get_default_icons_and_splashscreens( $app_id, $export_type );
 			$default_icons = $default_icons_and_splash['icons'];
 			$default_splashscreens = $default_icons_and_splash['splashscreens'];
 
 			//Handle universal platform (case empty( $app_platform ) ):
-			$platforms = $app_platform === '' ? array( 'ios', 'android' ) : array( $app_platform ); 
+			$platforms = $app_platform === '' ? array( 'ios', 'android' ) : array( $app_platform );
 
 			$icons_splashscreens_dir = self::get_icons_splashscreens_dir( $app_id, $app_platform, $export_type );
 
@@ -341,27 +351,27 @@ define( function ( require ) {
 				}
 
 			}
-			
+
 		}
-		
+
 		return $app_icons_and_splashscreens_files;
 	}
-	
+
 	/**
 	 * Retrieves icons and splashscreens for build export.
 	 */
 	protected static function get_icons_and_splashscreens_xml( $app_id, $app_platform, $export_type ) {
-		
+
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		$app_icons_and_splashscreens_files = $app_main_infos['icons'];
 		$app_use_default_icons_and_splashscreens = $app_main_infos['use_default_icons_and_splash'];
-		
+
 		if ( empty( $app_icons_and_splashscreens_files ) && $app_use_default_icons_and_splashscreens ) {
-			
+
 			$icons_and_splash = self::get_platform_icons_and_splashscreens_files( $app_id, $app_platform, $export_type );
 			$icons = $icons_and_splash['icons'];
 			$splashscreens = $icons_and_splash['splashscreens'];
-			
+
 			$icons_str = '';
 			if ( !empty( $icons ) ) {
 				foreach( $icons as $icon ) {
@@ -374,7 +384,7 @@ define( function ( require ) {
 					.'/>'."\n";
 				}
 			}
-			
+
 			$splashscreens_str = '';
 			if ( !empty( $splashscreens) ) {
 				foreach( $splashscreens as $splashscreen ) {
@@ -387,13 +397,13 @@ define( function ( require ) {
 						.'/>'."\n";
 				}
 			}
-			
+
 			$app_icons_and_splashscreens_files = $icons_str ."\n". $splashscreens_str;
 		}
-		
+
 		return $app_icons_and_splashscreens_files;
 	}
-	
+
 	public static function get_config_xml( $app_id, $echo = false, $export_type = 'phonegap-build' ) {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
@@ -402,6 +412,7 @@ define( function ( require ) {
 		$app_phonegap_id = $app_main_infos['app_phonegap_id'];
 		$app_version = $app_main_infos['version'];
 		$app_version_code = $app_main_infos['version_code'];
+		$app_build_tool = $app_main_infos['build_tool'];
 		$app_phonegap_version = $app_main_infos['phonegap_version'];
 		$app_author = $app_main_infos['author'];
 		$app_author_email = $app_main_infos['author_email'];
@@ -411,7 +422,7 @@ define( function ( require ) {
 
 		$whitelist_settings = self::get_whitelist_settings( $app_id, $app_platform, $export_type );
 		$splashscreen_settings = self::get_splashscreen_settings( $app_id, $app_platform, $export_type );
-		
+
 		//Merge our default Phonegap Build plugins to those set in BO :
 		$app_phonegap_plugins = WpakApps::get_merged_phonegap_plugins_xml( $app_id, $export_type, $app_main_infos['phonegap_plugins'] );
 
@@ -438,10 +449,14 @@ define( function ( require ) {
 	<author href="<?php echo $app_author_website ?>" email="<?php echo $app_author_email ?>"><?php echo $app_author ?></author>
 
 	<gap:platform name="<?php echo $app_platform ?>" />
+<?php if( !empty( $app_build_tool ) && $app_platform == 'android' ): ?>
+	<preference name="android-build-tool" value="<?php echo $app_build_tool ?>" />
+<?php endif ?>
 <?php if( !empty( $app_phonegap_version ) ): ?>
 
 	<preference name="phonegap-version" value="<?php echo $app_phonegap_version ?>" />
 <?php endif ?>
+	<preference name="permissions" value="none"/>
 <?php
 	/**
 	* Filter to handle the  "Webview bounce effect" on devices.
@@ -462,14 +477,14 @@ define( function ( require ) {
 
 <?php endif ?>
 <?php if ( !empty( $whitelist_settings ) ): ?>
-	
+
 	<!-- Whitelist policy  -->
 <?php foreach( $whitelist_settings as $whitelist_setting => $attributes ): ?>
-<?php 
+<?php
 		if ( empty( $attributes ) || !is_array( $attributes ) ) {
 			continue;
-		}  
-		
+		}
+
 		$attributes_str = '';
 		foreach( $attributes as $attribute => $value ) {
 			$attributes_str .= ' ' . $attribute .'="'. $value .'"';
@@ -492,7 +507,7 @@ define( function ( require ) {
 <?php endforeach ?>
 <?php endif ?>
 <?php endif ?>
-	
+
 	<!-- Icons and Splashscreens declaration -->
 <?php if( !empty( $app_icons_splashscreens ) ): ?>
 
