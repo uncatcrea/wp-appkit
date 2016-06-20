@@ -1,4 +1,4 @@
-## 0.6 (2016-06-10)
+## 0.6 (2016-06-20)
 
 ### Demo themes included in core & New theme library!
 - **Include demo themes in default WP-AppKit plugin package** ([#152](https://github.com/uncatcrea/wp-appkit/issues/152), [@lpointet](https://github.com/lpointet))
@@ -10,7 +10,7 @@
 ### Features / Evolutions
 - **Deep Links** ([#215](https://github.com/uncatcrea/wp-appkit/issues/215), [@lpointet](https://github.com/lpointet))
 - **Authentication module: be compatible with WP 4.5 authentication using email** ([#210](https://github.com/uncatcrea/wp-appkit/issues/210), [@mleroi](https://github.com/mleroi))
-- **Shorttag to show/hide app specific content** ([#211](https://github.com/uncatcrea/wp-appkit/issues/211), [@mleroi](https://github.com/mleroi))
+- **Shortcodes to show/hide app specific content** ([#211](https://github.com/uncatcrea/wp-appkit/issues/211), [@mleroi](https://github.com/mleroi))
 - **Allow themes to add custom theme settings to config.js** ([#208](https://github.com/uncatcrea/wp-appkit/issues/208), [@mleroi](https://github.com/mleroi))
 - **Add WordPress url in config.js** ([#207](https://github.com/uncatcrea/wp-appkit/issues/207), [@mleroi](https://github.com/mleroi))
 - **Include theme's PHP folder in the config.js/config.xml process** ([#209](https://github.com/uncatcrea/wp-appkit/issues/209), [@mleroi](https://github.com/mleroi))
