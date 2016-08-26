@@ -1586,10 +1586,13 @@ define(function (require) {
 	        				  };
 		    			  }
     		  		  }else{
+						  //No component.data, which should not happen, unless something went wrong on server side
+						  //when building the component data. This can happen for example when a custom component 
+						  //is added to an app without providing the correct hook name or not setting correct data 
+						  //in hook.
     		  			  app.triggerError(
   			    			  'getcomponentdata:hooks:no-data',
-  			    			  {type:'wrong-data',where:'app::getComponentData',message: 'Custom component has no data attribute',data:{component:component}},
-  			    			  cb_error
+  			    			  {type:'wrong-data',where:'app::getComponentData',message: 'Custom component ['+ component_id +'] has no data attribute: please check that the component\'s hook is set correctly.',data:{component:component}}
   			    		  );
     		  		  }
 	    			  break;
