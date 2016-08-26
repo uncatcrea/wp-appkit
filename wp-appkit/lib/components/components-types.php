@@ -16,8 +16,8 @@ abstract class WpakComponentType {
 
 	abstract public function get_options_from_posted_form( $data );
 
-	public function get_data( WpakComponent $component, $globals, $args = array() ) {
-		$this->data['globals'] = $globals;
+	public function get_data( WpakComponent $component, $component_globals, $args = array() ) {
+		$this->data['globals'] = $component_globals;
 		$this->data['specific']['label'] = $component->label;
 		$this->data['specific']['type'] = $component->type;
 		$this->data['specific']['slug'] = $component->slug;
@@ -66,10 +66,10 @@ class WpakComponentsTypes {
 		return self::$component_types;
 	}
 
-	public static function get_component_data( WpakComponent $component, $globals, $args = array() ) {
+	public static function get_component_data( WpakComponent $component, $component_globals, $args = array() ) {
 		$data = null;
 		if ( self::component_type_exists( $component->type ) ) {
-			$data = self::factory( $component->type )->get_data( $component, $globals, $args );
+			$data = self::factory( $component->type )->get_data( $component, $component_globals, $args );
 		}
 		return $data;
 	}
