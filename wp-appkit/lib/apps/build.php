@@ -135,7 +135,7 @@ class WpakBuild {
 			header( "Content-Disposition: attachment; filename=\"" . $filename . "\"" );
 			header( "Content-Transfer-Encoding: binary" );
 			header( "Content-Length: " . filesize( $filename_full ) );
-			ob_end_flush();
+			ob_end_clean();
 			@readfile( $filename_full );
 			exit;
 		} else {

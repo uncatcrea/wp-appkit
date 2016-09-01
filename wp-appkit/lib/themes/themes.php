@@ -411,6 +411,12 @@ class WpakThemes {
 	 */
 	protected static function exit_send_theme_file( $file ) {
 
+		//Remove any previous output before serving file:
+		$content_already_echoed = ob_get_contents();
+		if ( !empty( $content_already_echoed ) ) {
+			ob_end_clean();
+		}
+		
 		$mime_type = self::get_file_mime_type( $file );
 
 		if( !empty( $mime_type) ) {
