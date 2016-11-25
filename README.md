@@ -1,5 +1,7 @@
 # WP-AppKit
-WP-AppKit is a WordPress plugin to build mobile applications connected to WordPress. Applications are created with HTML, CSS and JavaScript (thanks to the Cordova/PhoneGap technology). Developers, you can extend and customize applications using our API.
+WP-AppKit is an open source WordPress plugin to **build mobile applications connected to WordPress**. Applications are created with HTML, CSS and JavaScript (thanks to the Cordova/PhoneGap technology). Developers, you can extend and customize applications using our API.
+
+> Get Started: [all you need to know to get your first app up and running](http://uncategorized-creations.com/wp-appkit/doc/getting-started/)
 
 ## Latest News
 
