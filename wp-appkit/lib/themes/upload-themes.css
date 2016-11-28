@@ -1,0 +1,6 @@
+/**
+ * Fix #271 upload box hidden in WP > 4.6.1
+ */
+#wpak-settings .upload-plugin{ 
+    display: block; 
+}

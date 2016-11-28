@@ -10,12 +10,20 @@ class WpakUploadThemes {
 	public static function hooks() {
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array( __CLASS__, 'add_settings_panels' ), 30 ); //30 to pass after Settings
+			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'add_theme_upload_styles' ) );
 		}
 	}
 
 	public static function add_settings_panels() {
 		$capability_required = current_user_can( 'wpak_edit_apps' ) ? 'wpak_edit_apps' : 'manage_options';
 		add_submenu_page( WpakApps::menu_item, __( 'Upload Themes', WpAppKit::i18n_domain ), __( 'Upload Themes', WpAppKit::i18n_domain ), $capability_required, self::menu_item, array( __CLASS__, 'settings_panel' ) );
+	}
+	
+	public static function add_theme_upload_styles() {
+		global $pagenow, $plugin_page;
+		if ( ($pagenow === 'admin.php' ) && $plugin_page === 'wpak_bo_upload_themes' ) {
+			wp_enqueue_style( 'add_theme_upload_styles', plugins_url( 'lib/themes/upload-themes.css', dirname( dirname( __FILE__ ) ) ), array(), WpAppKit::resources_version );
+		}
 	}
 
 	public static function settings_panel() {
@@ -159,7 +167,7 @@ class WpakUploadThemes {
 							<?php submit_button( __( 'Install Now' ), 'button', 'install-theme-submit', false ); ?>
 						</form>
 					</div>
-
+						
 					<?php if( !empty( $default_themes ) ): ?>
 						<h2><?php _e( 'Download Default Themes Packages', WpAppKit::i18n_domain ); ?></h2>
 						<div>
