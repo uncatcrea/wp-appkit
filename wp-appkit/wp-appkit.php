@@ -3,7 +3,7 @@
 Plugin Name: WP-AppKit
 Plugin URI:  https://github.com/uncatcrea/wp-appkit
 Description: Build Phonegap Mobile apps based on your WordPress content.
-Version:     0.6
+Version:     0.6.1
 Author:      Uncategorized Creations
 Author URI:  http://getwpappkit.com
 Text Domain: wp-appkit
@@ -19,7 +19,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 
 	class WpAppKit {
 
-		const resources_version = '0.6';
+		const resources_version = '0.6.1';
 		const i18n_domain = 'wp-appkit';
 
 		public static function hooks() {
