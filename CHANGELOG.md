@@ -1,3 +1,8 @@
+## 0.6.1 (2016-11-29)
+
+### Bugfixes
+- **WP-AppKit Upload Theme panel hidden in last WP version** ([#271](https://github.com/uncatcrea/wp-appkit/issues/271), [@mleroi](https://github.com/mleroi))
+
 ## 0.6 (2016-06-20)
 
 ### Demo themes included in core & New theme library!
@@ -57,6 +62,9 @@
 - [#203](https://github.com/uncatcrea/wp-appkit/issues/203) **Unused events removed: 'menu:refresh',’header:render','waiting:start','waiting:stop'**
 - [#227](https://github.com/uncatcrea/wp-appkit/issues/227) **LiveQuery webservice default type is now 'replace-keep-global-items' instead of 'update'**
 
+## 0.5.1 (2016-05-23)
+
+- Add GPL mention in plugin main file
 
 ## 0.5 (2016-03-07)
 
