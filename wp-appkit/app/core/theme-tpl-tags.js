@@ -318,7 +318,7 @@ define(function(require, exports) {
 	themeTplTags.getThemeAssetUrl = function( theme_asset_url, bust ) {
 
 		if( bust === undefined ) {
-			bust = Config.debug_mode == 'on';
+			bust = Config.debug_mode === 'on' && Config.app_type !== 'pwa';
 		}else{
 			bust = bust === true;
 		}
