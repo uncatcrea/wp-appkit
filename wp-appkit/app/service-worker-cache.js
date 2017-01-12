@@ -1,6 +1,11 @@
 var cacheName = ''; //Set dynamically in /lib/apps/build.php::build_service_worker_cache()
 var filesToCache = []; //Set dynamically in /lib/apps/build.php::build_service_worker_cache()
 
+filesToCache = filesToCache.map( function( item ) {
+	var subdir = location.pathname.replace( '/service-worker-cache.js', '' );
+	return subdir + item;
+} );
+
 self.addEventListener( 'install', function ( e ) {
 	console.log( '[WP-AppKit Service Worker] Install' );
 	e.waitUntil(
