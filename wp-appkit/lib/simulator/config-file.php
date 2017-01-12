@@ -73,7 +73,7 @@ class WpakConfigFile {
 		}
 	}
 
-	public static function get_config_js( $app_id, $echo = false ) {
+	public static function get_config_js( $app_id, $echo = false, $export_type = '' ) {
 		$wp_ws_url = WpakWebServices::get_app_web_service_base_url( $app_id );
 		$theme = WpakThemesStorage::get_current_theme( $app_id );
 
@@ -115,6 +115,7 @@ define( function ( require ) {
 		wp_url : '<?php echo home_url() ?>',
 		theme : '<?php echo addslashes($theme) ?>',
 		version : '<?php echo $app_version ?>',
+		app_type : '<?php echo !empty( $export_type ) ? $export_type : 'preview' ?>',
 		app_title : '<?php echo addslashes($app_title) ?>',
 		app_platform : '<?php echo addslashes($app_platform) ?>',
 		gmt_offset : <?php echo addslashes($gmt_offset) ?>,
