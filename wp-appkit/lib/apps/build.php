@@ -90,7 +90,9 @@ class WpakBuild {
 		$allowed_export_types = array(
 			'phonegap-build' => __( 'PhoneGap Build', WpAppKit::i18n_domain ),
 			'phonegap-cli' => __( 'PhoneGap CLI', WpAppKit::i18n_domain ),
-			'webapp' => __( 'WebApp', WpAppKit::i18n_domain )
+			'webapp' => __( 'WebApp', WpAppKit::i18n_domain ),
+			//'webapp-appcache' => __( 'WebApp avec Manifest AppCache', WpAppKit::i18n_domain ), //AppCache is Deprectated
+			'pwa' => __( 'Progressive Web Apps', WpAppKit::i18n_domain ),
 		);
 		return $allowed_export_types;
 	}
@@ -313,6 +315,7 @@ class WpakBuild {
 			$webapp_files = array();
 
 			$source_root = '';
+			$sw_cache_file_data = array();
 
 			if ( $export_type === 'phonegap-cli' ) {
 				//PhoneGap CLI export is made in www subdirectory
@@ -335,15 +338,19 @@ class WpakBuild {
 				$filename = str_replace( $source, '', $file );
 				$filename = wp_normalize_path( $filename );
 				$filename = ltrim( $filename, '/\\' );
-
+				
 				//Themes are included separately from the wpak themes directory
 				if ( preg_match( '|themes[/\\\].+|', $filename ) ) {
 					continue;
 				}
 
 				$zip_filename = $source_root . $filename;
-
+				
 				if ( is_dir( $file ) === true ) {
+					
+					if ( $filename === 'service-workers' && $export_type !== 'pwa' ) {
+						continue;
+					}
 
 					if ( !$zip->addEmptyDir( $zip_filename ) ) {
 						$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
@@ -353,7 +360,7 @@ class WpakBuild {
 
 				} elseif ( is_file( $file ) === true ) {
 
-					if ( $filename == 'index.html' ) {
+					if ( $filename === 'index.html' ) {
 
 						$index_content = self::filter_index( file_get_contents( $file ), $export_type );
 
@@ -362,6 +369,18 @@ class WpakBuild {
 							$answer['ok'] = 0;
 							return $answer;
 						}
+
+					} else if ( $filename === 'service-workers/service-worker-cache.js' ) {
+
+						//Only include 'service-worker-cache.js' for progressive web apps:
+						if ( $export_type === 'pwa' ) {
+							//We add the service worker file at the end of the export because we need $webapp_files to be all set.
+							//Here we just memorize info about service worker file:
+							$sw_cache_file_data = array( 'file' => $file, 'filename' => $filename, 'zip_filename' => $zip_filename );
+						}
+						
+						//Even if progressive web app, don't include service worker in cached files
+						continue;
 
 					} else {
 
@@ -465,18 +484,30 @@ class WpakBuild {
 			}
 
 			//Create config.js file :
-			$zip->addFromString( $source_root .'config.js', WpakConfigFile::get_config_js( $app_id ) );
+			$zip->addFromString( $source_root .'config.js', WpakConfigFile::get_config_js( $app_id, false, $export_type ) );
 			$webapp_files[] = $source_root .'config.js';
 
-			if ( $export_type !== 'webapp' ) {
+			if ( !in_array( $export_type, array( 'webapp', 'webapp-appcache', 'pwa' ) ) ) {
 				//Create config.xml file (stays at zip root) :
 				$zip->addFromString( 'config.xml', WpakConfigFile::get_config_xml( $app_id, false, $export_type ) );
 			}
 
-			if ( $export_type === 'webapp' ) {
+			if ( $export_type === 'webapp-appcache' ) {
 				//Create html cache manifest file
 				$cache_manifest_content = self::get_cache_manifest_content( $webapp_files );
 				$zip->addFromString( 'wpak.appcache', $cache_manifest_content );
+			}
+			
+			if ( $export_type === 'pwa' && !empty( $sw_cache_file_data ) ) {
+							
+				$sw_cache_content = self::build_service_worker_cache( $app_id, file_get_contents( $sw_cache_file_data['file'] ), $webapp_files, $export_type );
+
+				if ( !$zip->addFromString( $sw_cache_file_data['zip_filename'], $sw_cache_content ) ) {
+					$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $sw_cache_file_data['zip_filename'] );
+					$answer['ok'] = 0;
+					return $answer;
+				}
+
 			}
 
 		} else {
@@ -496,13 +527,23 @@ class WpakBuild {
 
 	private static function filter_index( $index_content, $export_type ) {
 
-		if ( $export_type === 'webapp' ) {
+		if ( $export_type === 'webapp-appcache' ) {
 
-			//Add reference to the cache manifest to the <html> tag:
+			//Add reference to the AppCache manifest to the <html> tag:
 			$index_content = str_replace( '<html>', '<html manifest="wpak.appcache" >', $index_content );
 
 			//Remove script used only for app simulation in web browser :
-			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)/is', '', $index_content );
+			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)\s*/is', '', $index_content );
+
+		} else if ( $export_type === 'webapp' ) {
+
+			//Remove script used only for app simulation in web browser :
+			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)\s*/is', '', $index_content );
+
+		} else if ( $export_type === 'pwa' ) {
+
+			//Remove script used only for app simulation in web browser :
+			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)\s*/is', '', $index_content );
 
 		} else {
 
@@ -516,6 +557,25 @@ class WpakBuild {
 		$index_content = preg_replace( '/<script[^>]*>[^<]*var query[^<]*<\/script>\s*<script/is', '<script', $index_content );
 
 		return $index_content;
+	}
+	
+	private static function build_service_worker_cache( $app_id, $content, $webapp_files, $export_type ) {
+		
+		$cache_version = 'wpak-app-'. $app_id .'-'. date( 'Ymd-his');
+		
+		$cache_files = '';
+		if ( !empty( $webapp_files ) ) {
+			foreach( $webapp_files as $file ) {
+				$cache_files .= "'/". $file ."',\n";
+			}
+			$cache_files = rtrim( $cache_files, ",\n" );
+		}
+		
+		//Set cache version and cached files:
+		$content = preg_replace( "/(var cacheName = ')(';).*/", "$1". $cache_version ."$2", $content );
+		$content = preg_replace( "/(var filesToCache = \[)(\];).*/", "$1". $cache_files ."$2", $content );
+		
+		return $content;
 	}
 
 	private static function get_cache_manifest_content( $webapp_files ) {

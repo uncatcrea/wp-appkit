@@ -24,8 +24,16 @@ require.config({
 
 require(['root/config'],function(Config){
 
+	if ( 'serviceWorker' in navigator ) {
+		navigator.serviceWorker
+				.register( '/service-workers/service-worker-cache.js' )
+				.then( function () {
+					console.log( '[WP-AppKit Service Worker] Registered' );
+				} );
+	}
+
 	var dynamic_paths = {
-		theme: '../themes/'+ Config.theme,
+		theme: '../themes/'+ Config.theme
 	};
 
 	require.config({
