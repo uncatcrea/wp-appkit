@@ -348,10 +348,6 @@ class WpakBuild {
 				
 				if ( is_dir( $file ) === true ) {
 					
-					if ( $filename === 'service-workers' && $export_type !== 'pwa' ) {
-						continue;
-					}
-
 					if ( !$zip->addEmptyDir( $zip_filename ) ) {
 						$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
 						$answer['ok'] = 0;
@@ -370,7 +366,7 @@ class WpakBuild {
 							return $answer;
 						}
 
-					} else if ( $filename === 'service-workers/service-worker-cache.js' ) {
+					} else if ( $filename === 'service-worker-cache.js' ) {
 
 						//Only include 'service-worker-cache.js' for progressive web apps:
 						if ( $export_type === 'pwa' ) {
@@ -565,6 +561,7 @@ class WpakBuild {
 		
 		$cache_files = '';
 		if ( !empty( $webapp_files ) ) {
+			$cache_files .= "'/',\n";
 			foreach( $webapp_files as $file ) {
 				$cache_files .= "'/". $file ."',\n";
 			}
