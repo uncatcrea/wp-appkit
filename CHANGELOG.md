@@ -1,3 +1,8 @@
+## 0.6.2 (2017-02-06)
+
+### Bugfixes
+- **Update Crosswalk plugin version from 1.5.0 to 2.3.0** ([#281](https://github.com/uncatcrea/wp-appkit/issues/281), [@blupu](https://github.com/blupu))
+
 ## 0.6.1 (2016-11-29)
 
 ### Bugfixes
