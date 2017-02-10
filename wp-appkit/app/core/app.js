@@ -561,7 +561,7 @@ define(function (require) {
 		if( undefined === globals_keys.get( type ) ) {
 			Utils.log( 'app.addGlobalType info: adding a type to globals', { type: type } );
 			globals_keys.add( { id: type } );
-            app.globals[type] = new Items.Items( { global: type } );
+            app.globals[type] = new Items.Items( [], { global: type } );
 		}
 	};
 
@@ -651,7 +651,7 @@ define(function (require) {
 	    	    	    			 var fetches = [];
 	    	    	    			 global_keys.each(function(value, key, list){
 	    	    	    				 var global_id = value.get('id');
-	    	    	    				 var items = new Items.Items({global:global_id});
+	    	    	    				 var items = new Items.Items( [], {global:global_id} );
 	    	    	    				 fetches.push(fetch(items,global_id));
 	    	    	    			 });
 
@@ -735,7 +735,7 @@ define(function (require) {
 							//Delete all existing items from local storage :
 							globals_keys.each(function(value, key, list){
 								var global_id = value.get('id');
-								var items = new Items.Items({global:global_id});
+								var items = new Items.Items( [], {global:global_id} );
 								items.resetAll();
 							});
 
@@ -744,7 +744,7 @@ define(function (require) {
 							//Then reload new items from web service :
 							globals_keys.resetAll();
 							_.each( data.globals, function( global, key, list ) {
-								var items = new Items.Items( { global: key } );
+								var items = new Items.Items( [], { global: key } );
 								items.resetAll();
 								_.each( global, function( item, id ) {
 									items.add( _.extend( { id: id }, item ) );
