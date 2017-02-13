@@ -4,7 +4,8 @@
     src: url('fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('fonts/glyphicons-halflings-regular.woff') format('woff'), url('fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 
-#wpak_app_publish .inside, #wpak_app_project .inside {
+#wpak_app_publish .inside, #wpak_app_project .inside, 
+#wpak_app_export_phonegap_build .inside, #wpak_app_export_pwa .inside  {
     margin: 0;
     padding: 0;
 }
@@ -26,6 +27,22 @@
 #wpak_export_link {
     margin-left:10px;
     vertical-align:middle;
+}
+
+#wpak_export_pwa_feedback{
+	line-height: 20px;
+    margin: 11px 10px 6px 10px;
+    box-shadow: none;
+    border-right: 4px solid #fff;
+    border-left: none;
+}
+
+#wpak_export_pwa_feedback.error{
+	border-right-color: #dc3232;
+}
+
+#wpak_export_pwa_feedback.updated{
+	border-right-color: #46b450;
 }
 
 .link {

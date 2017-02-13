@@ -92,7 +92,8 @@ class WpakBuild {
 			'phonegap-cli' => __( 'PhoneGap CLI', WpAppKit::i18n_domain ),
 			'webapp' => __( 'WebApp', WpAppKit::i18n_domain ),
 			//'webapp-appcache' => __( 'WebApp avec Manifest AppCache', WpAppKit::i18n_domain ), //AppCache is Deprectated
-			'pwa' => __( 'Progressive Web Apps', WpAppKit::i18n_domain ),
+			'pwa' => __( 'Progressive Web App Sources', WpAppKit::i18n_domain ),
+			'pwa-install' => __( 'Progressive Web App Install', WpAppKit::i18n_domain ),
 		);
 		return $allowed_export_types;
 	}
@@ -116,7 +117,7 @@ class WpakBuild {
 		$export_type = isset( $_GET['export_type'] ) && self::is_allowed_export_type( $_GET['export_type'] ) ? $_GET['export_type'] : 'phonegap-build';
 
 		// Re-build sources
-		$answer = self::build_app_sources( $app_id, $export_type );
+		$answer = self::build_app_sources ($app_id, $export_type );
 
 		if( 1 === $answer['ok'] && !empty( $answer['export'] ) ) {
 			$filename = $answer['export'] . '.zip';
@@ -154,6 +155,10 @@ class WpakBuild {
 	*/
 	public static function build_app_sources( $app_id, $export_type = 'phonegap-build' ) {
 		$answer = array();
+		
+		if ( $export_type === 'pwa-install' ) {
+			$export_type = 'pwa';
+		}
 
 		if ( !self::is_allowed_export_type( $export_type ) ) {
 			$answer['ok'] = 0;
@@ -186,7 +191,7 @@ class WpakBuild {
 		$plugin_dir = plugin_dir_path( dirname( dirname( __FILE__ ) ) );
 		$appli_dir = $plugin_dir . 'app';
 
-		$export_filename = self::get_export_file_base_name( $app_id );
+		$export_filename = self::get_export_file_base_name( $app_id, $export_type );
 		$export_filename_full = self::get_export_files_path() . "/" . $export_filename . '.zip';
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
@@ -201,7 +206,7 @@ class WpakBuild {
 				WpakConfigFile::get_platform_icons_and_splashscreens_files( $app_id, $app_platform, $export_type ),
 				$export_type
 		);
-
+		
 		$answer['export'] = $export_filename;
 		$answer['export_full_name'] = $export_filename_full;
 
@@ -222,12 +227,84 @@ class WpakBuild {
 		if ( !check_admin_referer( 'wpak_build_app_sources_' . $app_id, 'nonce' ) ) {
 			return;
 		}
+		
+		$export_type = isset( $_POST['export_type'] ) ? addslashes( $_POST['export_type'] ) : 'phonegap-build';
+		
+		$answer = self::build_app_sources( $app_id, $export_type );
+		
+		if ( $answer['ok'] === 1 && $export_type === 'pwa-install' ) {
+			
+			$answer['export_uri'] = self::get_pwa_directory_uri( $app_id );
 
-		$answer = self::build_app_sources( $app_id );
+			//Extract sources to Progressive Web App folder:
+			
+			$zip_file = $answer['export_full_name'];
+			
+			$target_directory = self::get_pwa_directory( $app_id );
+			$check = self::check_pwa_directory( $target_directory );
+			if ( ! $check['ok'] ) {
+				$answer['ok'] = 0;
+				$answer['msg'] = $check['msg'];
+				self::exit_sending_json( $answer );
+			}
+					
+			WP_Filesystem();
+			$result = unzip_file( $zip_file, $target_directory );
+			if ( is_wp_error( $result ) ) {
+				$answer['ok'] = 0;
+				$answer['msg'] = __( 'Could not extract ZIP export to : '. $target_directory, WpAppKit::i18n_domain );
+				self::exit_sending_json( $answer );
+			}
+		}
 
 		self::exit_sending_json( $answer );
 	}
 
+	public static function get_pwa_directory_uri( $app_id ) {
+		return apply_filters( 'wpak_pwa_uri', get_option('siteurl') . '/' . 'pwa', $app_id );
+	}
+	
+	private static function get_pwa_directory( $app_id ){
+		return apply_filters( 'wpak_pwa_path', ABSPATH .'/'. 'pwa', $app_id );
+	}
+
+	private static function create_pwa_directory( $app_id ) {
+		$ok = true;
+		$app_pwa_directory = self::get_pwa_directory( $app_id );
+		if( !is_dir( $app_pwa_directory ) ) {
+			$ok = mkdir( $app_pwa_directory );
+		}
+		return $ok;
+	}
+	
+	private static function delete_pwa_directory( $app_id ) {
+		$target_directory = self::get_pwa_directory( $app_id );
+		$files = glob( $target_directory . '/*' );
+		foreach ( $files as $file ) {
+			if ( is_file( $file ) ) {
+				if ( !unlink( $file ) ) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private static function check_pwa_directory( $app_id ) {
+		$result = array( 'ok' => 1, 'msg' => '' );
+		
+		if ( !self::create_pwa_directory( $app_id ) ) {
+			$app_pwa_directory = self::get_pwa_directory( $app_id );
+			$result['ok'] = 0;
+			$result['message'] = sprintf( 
+				__( 'The Progressive Web App directory %s can\'t be created. <br/>Please check that your WordPress install has the permissions to create this directory.', WpAppKit::i18n_domain ),
+		  		$app_pwa_directory
+			);
+		}
+		
+		return $result;
+	}
+	
 	private static function exit_sending_json( $answer ) {
 		//If something was displayed before, clean it so that our answer can
 		//be valid json (and store it in an "echoed_before_json" answer key
@@ -248,8 +325,8 @@ class WpakBuild {
 		return empty( $upload_dir['error'] ) ? $upload_dir['basedir'] . '/wpak-export' : '';
 	}
 
-	private static function get_export_file_base_name( $app_id ) {
-		return 'phonegap-export-' . WpakApps::get_app_slug( $app_id );
+	private static function get_export_file_base_name( $app_id, $export_type ) {
+		return $export_type .'-export-' . WpakApps::get_app_slug( $app_id );
 	}
 
 	private static function create_export_directory_if_doesnt_exist() {
