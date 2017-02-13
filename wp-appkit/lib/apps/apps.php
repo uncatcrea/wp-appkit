@@ -34,6 +34,16 @@ class WpakApps {
 				),
 			);
 			wp_localize_script( 'wpak_apps_js', 'Apps', $localize );
+			
+			global $post;
+			wp_enqueue_script( 'wpak_apps_pwa_js', plugins_url( 'lib/apps/pwa.js', dirname( dirname( __FILE__ ) ) ), array( 'jquery' ), WpAppKit::resources_version );
+			wp_localize_script( 'wpak_apps_pwa_js', 'wpak_pwa_export', array(
+				'app_id' => $post->ID,
+				'nonce' => wp_create_nonce( 'wpak_build_app_sources_' . $post->ID ),
+				'messages' => array(
+					'install_successfull' => __( 'Progressive Web App installed successfully', WpAppKit::i18n_domain ),
+				)
+			) );
 		}
 	}
 
@@ -161,6 +171,24 @@ class WpakApps {
 			'side',
 			'high'
 		);
+		
+		add_meta_box(
+			'wpak_app_export_phonegap_build',
+			__( 'Export - PhoneGap Build', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_export_phonegap_build' ),
+			'wpak_apps',
+			'side',
+			'high'
+		);
+		
+		add_meta_box(
+			'wpak_app_export_pwa',
+			__( 'Export - Progressive Web App', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_export_pwa' ),
+			'wpak_apps',
+			'side',
+			'high'
+		);
 
 		add_meta_box(
 			'wpak_app_main_infos',
@@ -280,23 +308,14 @@ class WpakApps {
 	public static function inner_project_box( $post, $current_box ) {
 		$first_save = !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID;
 		$main_infos = self::get_app_main_infos( $post->ID );
-		$mandatory = self::get_phonegap_mandatory_fields();
 		$components = WpakComponents::get_app_components( $post->ID );
 		$navigation = WpakNavigation::get_app_navigation( $post->ID );
 		$checked = array(
 			'title' => !empty( $post->post_title ),
 			'components' => !empty( $components ),
 			'navigation' => !empty( $navigation ),
-			'phonegap' => true,
 			'save' => !$first_save,
 		);
-
-		foreach( $mandatory as $key ) {
-			if( '' === $main_infos[$key] ) {
-				$checked['phonegap'] = false;
-				break;
-			}
-		}
 		?>
 
 		<div class="submitbox">
@@ -314,13 +333,42 @@ class WpakApps {
 						<span class="glyphicon glyphicon-<?php echo $checked['navigation'] ? 'check' : 'unchecked'; ?>"></span>
 						<?php _e( 'Setup appearance and navigation', WpAppKit::i18n_domain ); ?>
 					</li>
-					<li id="wpak_app_wizard_phonegap" class="list-group-item <?php echo $checked['phonegap'] ? 'list-group-item-success' : ''; ?>">
-						<span class="glyphicon glyphicon-<?php echo $checked['phonegap'] ? 'check' : 'unchecked'; ?>"></span>
-						<?php _e( 'Setup PhoneGap config', WpAppKit::i18n_domain ); ?>
-					</li>
 					<li id="wpak_app_wizard_save" class="list-group-item <?php echo $checked['save'] ? 'list-group-item-success' : ''; ?>">
 						<span class="glyphicon glyphicon-<?php echo $checked['save'] ? 'check' : 'unchecked'; ?>"></span>
 						<?php _e( 'Save your app', WpAppKit::i18n_domain ); ?>
+					</li>
+				</ul>
+			</div>
+
+		</div>
+
+		<?php
+	}
+	
+	public static function inner_export_phonegap_build( $post, $current_box ) {
+		
+		$main_infos = self::get_app_main_infos( $post->ID );
+		$mandatory = self::get_phonegap_mandatory_fields();
+		$checked = array(
+			'phonegap' => true,
+		);
+
+		foreach( $mandatory as $key ) {
+			if( '' === $main_infos[$key] ) {
+				$checked['phonegap'] = false;
+				break;
+			}
+		}
+		
+		?>
+			
+		<div class="submitbox">
+			
+			<div>
+				<ul class="list-group">
+					<li id="wpak_app_wizard_phonegap" class="list-group-item <?php echo $checked['phonegap'] ? 'list-group-item-success' : ''; ?>">
+						<span class="glyphicon glyphicon-<?php echo $checked['phonegap'] ? 'check' : 'unchecked'; ?>"></span>
+						<?php _e( 'Setup PhoneGap config', WpAppKit::i18n_domain ); ?>
 					</li>
 				</ul>
 			</div>
@@ -347,8 +395,51 @@ class WpakApps {
 				?>
 
 			</div>
+			
 		</div>
+			
+		<?php
+	}
+	
+	public static function inner_export_pwa( $post, $current_box ) {
+		
+		$main_infos = self::get_app_main_infos( $post->ID );
+		$checked = array(
+			'pwa' => true,
+		);
+		
+		?>
+			
+			<div>
+				<ul class="list-group">
+					<li id="wpak_app_wizard_phonegap" class="list-group-item <?php echo $checked['pwa'] ? 'list-group-item-success' : ''; ?>">
+						<span class="glyphicon glyphicon-<?php echo $checked['pwa'] ? 'check' : 'unchecked'; ?>"></span>
+						<?php _e( 'Setup Progressive Web App config', WpAppKit::i18n_domain ); ?>
+					</li>
+				</ul>
+			</div>
 
+			<div id="export-action">
+
+				<?php
+					$pwa_export_types = array( 
+						'pwa-install' => __( 'Install PWA', WpAppKit::i18n_domain ),
+						'pwa' => __( 'Download PWA sources', WpAppKit::i18n_domain ),
+					);
+				?>
+				
+				<?php $default_export_type = 'pwa-install'; ?>
+				<select name="export_type" id="wpak_export_type_pwa" >
+					<?php foreach( $pwa_export_types as $export_type => $label ): ?>
+						<option value="<?php echo esc_attr( $export_type ) ?>" <?php selected( $export_type === $default_export_type )?>><?php echo esc_html( $label ) ?></option>
+					<?php endforeach ?>
+				</select>
+				<a id="wpak_export_link_pwa" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => 'pwa' ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+
+				<div id="wpak_export_pwa_feedback"></div>
+				
+			</div>
+			
 		<?php
 	}
 
