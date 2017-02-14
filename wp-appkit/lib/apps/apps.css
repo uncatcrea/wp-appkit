@@ -24,12 +24,19 @@
     vertical-align:middle;
 }
 
-#wpak_export_link {
+#wpak_export_link, .wpak_export_link_pwa {
     margin-left:10px;
     vertical-align:middle;
 }
 
-#wpak_export_pwa_feedback{
+#wpak_app_export_pwa .inside .view-app-pwa {
+	text-align: center;
+    padding: 0;
+    margin: 0 auto 15px;
+    display: block;
+}
+
+.wpak_export_pwa_feedback{
 	line-height: 20px;
     margin: 11px 10px 6px 10px;
     box-shadow: none;
@@ -37,11 +44,16 @@
     border-left: none;
 }
 
-#wpak_export_pwa_feedback.error{
+div.updated.wpak_export_pwa_feedback {
+	border-left: none;
+	box-shadow: none;
+}
+
+.wpak_export_pwa_feedback.error{
 	border-right-color: #dc3232;
 }
 
-#wpak_export_pwa_feedback.updated{
+.wpak_export_pwa_feedback.updated{
 	border-right-color: #46b450;
 }
 
@@ -63,6 +75,10 @@
 
 .wpak_settings input[type=text] {
     width:100%;
+}
+
+.wpak_settings input[name=wpak_app_pwa_path] {
+	width:60%;
 }
 
 .wpak_settings textarea {
@@ -1093,4 +1109,8 @@ a.list-group-item-danger.active:focus {
 }
 .wp-list-table tr.error td:last-child {
     border-right: 1px solid #f00;
+}
+
+.pwa-infos-install{
+	float:right;
 }

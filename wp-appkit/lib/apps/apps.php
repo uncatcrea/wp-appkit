@@ -11,7 +11,7 @@ class WpakApps {
 			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
 			add_action( 'admin_print_styles', array( __CLASS__, 'admin_print_styles' ) );
 			add_action( 'add_meta_boxes', array( __CLASS__, 'add_main_meta_box' ), 29 );
-			add_action( 'add_meta_boxes', array( __CLASS__, 'add_phonegap_meta_box' ), 30 ); //30 to pass after the "Simulation" and "Export" boxes (see WpakBuild)
+			add_action( 'add_meta_boxes', array( __CLASS__, 'add_secondary_meta_boxes' ), 30 ); //30 to pass after the "Simulation" and "Export" boxes (see WpakBuild)
 			add_action( 'wpak_inner_simulation_box', array( __CLASS__, 'inner_security_box' ), 10, 2 );
 			add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 			add_filter( 'post_row_actions', array( __CLASS__, 'remove_quick_edit' ), 10, 2 );
@@ -42,6 +42,7 @@ class WpakApps {
 				'nonce' => wp_create_nonce( 'wpak_build_app_sources_' . $post->ID ),
 				'messages' => array(
 					'install_successfull' => __( 'Progressive Web App installed successfully', WpAppKit::i18n_domain ),
+					'see_pwa' => __( 'View Progressive Web App', WpAppKit::i18n_domain )
 				)
 			) );
 		}
@@ -210,7 +211,7 @@ class WpakApps {
 
 	}
 
-	public static function add_phonegap_meta_box() {
+	public static function add_secondary_meta_boxes() {
 
 		add_meta_box(
 			'wpak_app_phonegap_data',
@@ -220,7 +221,16 @@ class WpakApps {
 			'normal',
 			'default'
 		);
-
+		
+		add_meta_box(
+			'wpak_app_pwa_data',
+			__( 'Progressive Web App', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_pwa_infos_box' ),
+			'wpak_apps',
+			'normal',
+			'default'
+		);
+		
 	}
 
 	public static function get_phonegap_mandatory_fields() {
@@ -420,23 +430,29 @@ class WpakApps {
 			</div>
 
 			<div id="export-action">
+				
+				<?php $pwa_uri = WpakBuild::get_pwa_directory_uri( $post->ID ); ?>
+				<?php $pwa_installed = WpakBuild::app_pwa_is_installed( $post->ID ); ?>
+				<?php if ( $pwa_installed ): ?>
+					<a href="<?php echo $pwa_uri ?>" target="_blank" class="view-app-pwa"><?php _e( 'View Progressive Web App', WpAppKit::i18n_domain ) ?></a>
+				<?php endif ?>
 
 				<?php
 					$pwa_export_types = array( 
-						'pwa-install' => __( 'Install PWA', WpAppKit::i18n_domain ),
+						'pwa-install' => !$pwa_installed ? __( 'Install PWA', WpAppKit::i18n_domain ) : __( 'Update PWA', WpAppKit::i18n_domain ),
 						'pwa' => __( 'Download PWA sources', WpAppKit::i18n_domain ),
 					);
 				?>
 				
 				<?php $default_export_type = 'pwa-install'; ?>
-				<select name="export_type" id="wpak_export_type_pwa" >
+				<select name="export_type" class="wpak_export_type_pwa" >
 					<?php foreach( $pwa_export_types as $export_type => $label ): ?>
 						<option value="<?php echo esc_attr( $export_type ) ?>" <?php selected( $export_type === $default_export_type )?>><?php echo esc_html( $label ) ?></option>
 					<?php endforeach ?>
 				</select>
-				<a id="wpak_export_link_pwa" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => 'pwa' ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+				<a class="wpak_export_link_pwa button" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => 'pwa' ) ), 'wpak_download_app_sources' ) ?>" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
 
-				<div id="wpak_export_pwa_feedback"></div>
+				<div class="wpak_export_pwa_feedback"></div>
 				
 			</div>
 			
@@ -547,6 +563,55 @@ class WpakApps {
 			<div class="field-group wpak_phonegap_links">
 				<a href="<?php echo WpakBuild::get_appli_dir_url() . '/config.xml?wpak_app_id=' . self::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.xml', WpAppKit::i18n_domain ) ?></a>
 				<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ) ?>" class="button wpak_phonegap_export" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+			</div>
+			<?php wp_nonce_field( 'wpak-phonegap-infos-' . $post->ID, 'wpak-nonce-phonegap-infos' ) ?>
+		</div>
+		<?php
+	}
+	
+	public static function inner_pwa_infos_box( $post, $current_box ) {
+		$main_infos = self::get_app_main_infos( $post->ID );
+		$pwa_uri = WpakBuild::get_pwa_directory_uri( $post->ID );
+		?>
+		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
+		<div class="wpak_settings">
+			<p class="description"><?php _e( '', WpAppKit::i18n_domain ) ?></p>
+			<fieldset>
+				<legend><?php _e( 'Paths', WpAppKit::i18n_domain ); ?></legend>
+				<div class="field-group">
+					<label><?php _e( 'Progressive Web App install path', WpAppKit::i18n_domain ) ?></label>
+					<br><span><?php echo get_option( 'siteurl' ) .'/'; ?></span>
+					<input type="text" name="wpak_app_pwa_path" value="<?php echo esc_attr( $main_infos['pwa_path'] ) ?>" id="wpak_app_pwa_path" />
+				</div>
+			</fieldset>
+			<div class="field-group">
+				
+				<?php if ( WpakBuild::app_pwa_is_installed( $post->ID ) ): ?>
+					<a href="<?php echo $pwa_uri ?>" target="_blank"><?php _e( 'View Progressive Web App', WpAppKit::i18n_domain ) ?></a>
+				<?php endif ?>
+				
+				<div class="pwa-infos-install">
+					<?php
+						$pwa_installed = WpakBuild::app_pwa_is_installed( $post->ID );
+						$pwa_export_types = array( 
+							'pwa-install' => !$pwa_installed ? __( 'Install PWA', WpAppKit::i18n_domain ) : __( 'Update PWA', WpAppKit::i18n_domain ),
+							'pwa' => __( 'Download PWA sources', WpAppKit::i18n_domain ),
+						);
+					?>
+					<?php $default_export_type = 'pwa-install'; ?>
+					<select name="export_type" class="wpak_export_type_pwa" >
+						<?php foreach( $pwa_export_types as $export_type => $label ): ?>
+							<option value="<?php echo esc_attr( $export_type ) ?>" <?php selected( $export_type === $default_export_type )?>><?php echo esc_html( $label ) ?></option>
+						<?php endforeach ?>
+					</select>
+					<a class="wpak_export_link_pwa button" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => 'pwa' ) ), 'wpak_download_app_sources' ) ?>" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+
+					<div class="wpak_export_pwa_feedback"></div>
+				
+				</div>
+				
+				<div style="clear:both"></div>
+				
 			</div>
 			<?php wp_nonce_field( 'wpak-phonegap-infos-' . $post->ID, 'wpak-nonce-phonegap-infos' ) ?>
 		</div>
@@ -673,7 +738,11 @@ class WpakApps {
 		if ( isset( $_POST['wpak_app_url_scheme'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_url_scheme', sanitize_text_field( $_POST['wpak_app_url_scheme'] ) );
 		}
-
+		
+		if ( isset( $_POST['wpak_app_pwa_path'] ) ) {
+			update_post_meta( $post_id, '_wpak_app_pwa_path', sanitize_text_field( $_POST['wpak_app_pwa_path'] ) );
+		}
+		
 	}
 
 	/**
@@ -781,6 +850,8 @@ class WpakApps {
 		$author_email = get_post_meta( $post_id, '_wpak_app_author_email', true );
 		$icons = get_post_meta( $post_id, '_wpak_app_icons', true );
 		$url_scheme = get_post_meta( $post_id, '_wpak_app_url_scheme', true );
+		
+		$pwa_path = get_post_meta( $post_id, '_wpak_app_pwa_path', true );
 
 		$use_default_icons_and_splash = get_post_meta( $post_id, '_wpak_use_default_icons_and_splash', true );
 		$use_default_icons_and_splash = ( empty( $use_default_icons_and_splash ) && empty( $icons ) ) || $use_default_icons_and_splash === 'on';
@@ -793,7 +864,8 @@ class WpakApps {
 			$phonegap_plugins = get_post_meta( $post_id, '_wpak_app_phonegap_plugins', true );
 		}
 
-		return array( 'title' => $title,
+		return array( 
+			'title' => $title,
 			'name' => $name,
 			'app_phonegap_id' => $app_phonegap_id,
 			'desc' => $desc,
@@ -809,9 +881,10 @@ class WpakApps {
 			'icons' => $icons,
 			'use_default_icons_and_splash' => $use_default_icons_and_splash,
 			'url_scheme' => $url_scheme,
+			'pwa_path' => !empty( $pwa_path ) ? $pwa_path : WpakBuild::get_default_pwa_path( $post_id ) .'/'. self::get_app_slug( $post_id )
 		);
 	}
-
+	
 	public static function get_app_is_secured( $post_id ) {
 		return apply_filters( 'wpak_app_secured', true );
 	}
