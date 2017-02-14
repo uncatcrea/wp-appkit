@@ -1,13 +1,13 @@
 jQuery().ready( function () {
 	var $ = jQuery;
 
-	$( '#wpak_export_link_pwa' ).click( function ( e ) {
-		var pwa_export_type = $( '#wpak_export_type_pwa' ).val();
+	$( '.wpak_export_link_pwa' ).click( function ( e ) {
+		var pwa_export_type = $(this).siblings( '.wpak_export_type_pwa' ).val();
 		if ( pwa_export_type === 'pwa-install' ) {
 
 			e.preventDefault();
 			
-			var $feedback = $( '#wpak_export_pwa_feedback' );
+			var $feedback = $(this).siblings( '.wpak_export_pwa_feedback' );
 
 			var data = {
 				action: 'wpak_build_app_sources',
@@ -17,15 +17,14 @@ jQuery().ready( function () {
 			};
 
 			$.post( ajaxurl, data, function ( response ) {
-				console.log('RESPONSE',response);
 				if ( response.ok === 1 ) {
-					$feedback.removeClass().addClass( 'updated' ).html( 
+					$feedback.removeClass('updated,error').addClass( 'updated' ).html( 
 						wpak_pwa_export.messages['install_successfull'] 
 						+ '<br>' +
-						'<a href="'+ response.export_uri +'">See the Progressive Web App</a>'
+						'<a href="'+ response.export_uri +'">'+ wpak_pwa_export.messages['see_pwa'] +'</a>'
 					);
 				} else {
-					$feedback.removeClass().addClass( 'error' ).html( response.msg );
+					$feedback.removeClass('updated,error').addClass( 'error' ).html( response.msg );
 				}
 			} );
 		}

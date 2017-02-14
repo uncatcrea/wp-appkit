@@ -259,20 +259,31 @@ class WpakBuild {
 
 		self::exit_sending_json( $answer );
 	}
+	
+	public static function get_default_pwa_path( $app_id ) {
+		$default_pwa_path = 'pwa';
+		return apply_filters( 'wpak_default_pwa_path', $default_pwa_path, $app_id );
+	}
 
 	public static function get_pwa_directory_uri( $app_id ) {
-		return apply_filters( 'wpak_pwa_uri', get_option('siteurl') . '/' . 'pwa', $app_id );
+		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
+		return apply_filters( 'wpak_pwa_uri', get_option('siteurl') . '/' . $app_main_infos['pwa_path'], $app_id );
 	}
 	
-	private static function get_pwa_directory( $app_id ){
-		return apply_filters( 'wpak_pwa_path', ABSPATH .'/'. 'pwa', $app_id );
+	public static function get_pwa_directory( $app_id ){
+		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
+		return apply_filters( 'wpak_pwa_path', ABSPATH .'/'. $app_main_infos['pwa_path'], $app_id );
+	}
+	
+	public static function app_pwa_is_installed( $app_id ) {
+		return file_exists( self::get_pwa_directory( $app_id ) .'/index.html' );
 	}
 
 	private static function create_pwa_directory( $app_id ) {
 		$ok = true;
 		$app_pwa_directory = self::get_pwa_directory( $app_id );
 		if( !is_dir( $app_pwa_directory ) ) {
-			$ok = mkdir( $app_pwa_directory );
+			$ok = mkdir( $app_pwa_directory, 0777, true );
 		}
 		return $ok;
 	}
