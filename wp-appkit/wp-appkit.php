@@ -7,6 +7,7 @@ Version:     0.6.2
 Author:      Uncategorized Creations
 Author URI:  http://getwpappkit.com
 Text Domain: wp-appkit
+Domain Path: /lang
 License:     GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 Copyright:   2013-2016 Uncategorized Creations
