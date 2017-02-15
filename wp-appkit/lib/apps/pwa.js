@@ -21,7 +21,7 @@ jQuery().ready( function () {
 					$feedback.removeClass('updated,error').addClass( 'updated' ).html( 
 						wpak_pwa_export.messages['install_successfull'] 
 						+ '<br>' +
-						'<a href="'+ response.export_uri +'">'+ wpak_pwa_export.messages['see_pwa'] +'</a>'
+						'<a href="'+ response.export_uri +'" target="_blank">'+ wpak_pwa_export.messages['see_pwa'] +'</a>'
 					);
 				} else {
 					$feedback.removeClass('updated,error').addClass( 'error' ).html( response.msg );

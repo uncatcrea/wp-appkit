@@ -253,6 +253,10 @@ define( function ( require ) {
 				array( 'src' => 'icons/icon.png', 'qualifier' => '', 'width' => '57', 'height' => '57'  ),
 				array( 'src' => 'icons/icon-40.png', 'qualifier' => '', 'width' => '40', 'height' => '40'  ),
 				array( 'src' => 'icons/icon-small.png', 'qualifier' => '', 'width' => '29', 'height' => '29'  ),
+			),
+			'pwa' => array(
+				array( 'src' => 'icons/icon-wp-appkit-xxhdpi.png', 'qualifier' => 'xxhdpi', 'width' => '144', 'height' => '144', 'type' => 'image/png'  ),
+				array( 'src' => 'icons/icon-wp-appkit-xxxhdpi.png', 'qualifier' => 'xxxhdpi', 'width' => '192', 'height' => '192', 'type' => 'image/png'  ),
 			)
 		);
 
@@ -319,7 +323,9 @@ define( function ( require ) {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 
-		if ( $app_main_infos['use_default_icons_and_splash'] ) {
+		if ( ( $export_type !== 'pwa' && $app_main_infos['use_default_icons_and_splash'] )
+			 || ( $export_type === 'pwa' && $app_main_infos['pwa_use_default_icons_and_splash'] )
+			) {
 
 			$default_icons_and_splash = self::get_default_icons_and_splashscreens( $app_id, $export_type );
 			$default_icons = $default_icons_and_splash['icons'];
@@ -328,6 +334,10 @@ define( function ( require ) {
 			//Handle universal platform (case empty( $app_platform ) ):
 			$platforms = $app_platform === '' ? array( 'ios', 'android' ) : array( $app_platform );
 
+			if ( $export_type === 'pwa' ) {
+				$platforms = array( 'pwa' );
+			}
+			
 			$icons_splashscreens_dir = self::get_icons_splashscreens_dir( $app_id, $app_platform, $export_type );
 
 			foreach( $platforms as $platform ) {
