@@ -265,7 +265,7 @@ class WpakBuild {
 	
 	public static function get_pwa_directory( $app_id ){
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
-		return apply_filters( 'wpak_pwa_path', ABSPATH .'/'. $app_main_infos['pwa_path'], $app_id );
+		return apply_filters( 'wpak_pwa_path', ABSPATH . $app_main_infos['pwa_path'], $app_id );
 	}
 	
 	public static function app_pwa_is_installed( $app_id ) {
@@ -682,32 +682,62 @@ class WpakBuild {
 	private static function get_pwa_manifest( $app_id ) {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
-		$app_title = $app_main_infos['title'];
+		
+		$pwa_name = !empty( $app_main_infos['pwa_name'] ) ? $app_main_infos['pwa_name'] : $app_main_infos['title'];
+		$pwa_short_name = !empty( $app_main_infos['pwa_short_name'] ) ? $app_main_infos['pwa_short_name'] : $pwa_name;
+		
+		//"#282E34","#122E4F";
 		
 		$manifest = array(
-			"name" => $app_title,
-			"short_name" => $app_title,
-			"icons" => array(
-				array(
-					"src" => "icons/icon-wp-appkit-xxhdpi.png",
-					"sizes" => "144x144",
-					"type" => "image/png"
-				),
-				array(
-					"src" => "icons/icon-wp-appkit-xxxhdpi.png",
-					"sizes" => "192x192",
-					"type" => "image/png"
-				)
-			),
+			"name" => $pwa_name,
+			"short_name" => $pwa_short_name,
+			"description" => !empty( $app_main_infos['pwa_desc'] ) ? $app_main_infos['pwa_desc'] : '',
+			"icons" => self::get_pwa_manifest_icons( $app_id ),
 			"start_url" => "./",
 			"display" => "standalone",
-			"background_color" => "#282E34",
-			"theme_color" => "#122E4F"
+			"background_color" => !empty( $app_main_infos['pwa_background_color'] ) ? $app_main_infos['pwa_background_color'] : '',
+			"theme_color" => !empty( $app_main_infos['pwa_theme_color'] ) ? $app_main_infos['pwa_theme_color'] : '',
 		);
 		
 		$manifest = apply_filters( 'wpak_pwa_manifest', $manifest, $app_id );
 		
 		return json_encode( $manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+	}
+	
+	private static function get_pwa_manifest_icons( $app_id ) {
+		$manifest_icons = array();
+		
+		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
+		$app_icons_json = $app_main_infos['pwa_icons'];
+		$app_use_default_icons_and_splashscreens = $app_main_infos['pwa_use_default_icons_and_splash'];
+		if ( empty( $app_icons_json ) && $app_use_default_icons_and_splashscreens ) {
+
+			$icons_and_splash = WpakConfigFile::get_platform_icons_and_splashscreens_files( $app_id, $app_main_infos['platform'], 'pwa' );
+			$icons = $icons_and_splash['icons'];
+
+			if ( !empty( $icons ) ) {
+				foreach( $icons as $icon ) {
+					$manifest_icons[] = array(
+						'src' => $icon['src'],
+						'sizes' => $icon['width'] .'x'. $icon['height'],
+						'type' => $icon['type'],
+					);
+				}
+			}
+			
+		} else {
+			if ( $pwa_icons = self::pwa_icons_json_to_array( $app_icons_json ) ) {
+				$manifest_icons = $pwa_icons;
+			}
+		}
+		
+		return $manifest_icons;
+	}
+	
+	public static function pwa_icons_json_to_array( $app_icons_json ) {
+		$app_icons_json = stripslashes( $app_icons_json );
+		$app_icons_array = json_decode( $app_icons_json, false );
+		return !empty( $app_icons_array ) && is_array( $app_icons_array ) ? $app_icons_array : array();
 	}
 
 	private static function get_cache_manifest_content( $webapp_files ) {
