@@ -719,9 +719,15 @@ class WpakBuild {
 			"icons" => self::get_pwa_manifest_icons( $app_id ),
 			"start_url" => "./",
 			"display" => "standalone",
-			"background_color" => !empty( $app_main_infos['pwa_background_color'] ) ? $app_main_infos['pwa_background_color'] : '',
-			"theme_color" => !empty( $app_main_infos['pwa_theme_color'] ) ? $app_main_infos['pwa_theme_color'] : '',
 		);
+		
+		if ( !empty( $app_main_infos['pwa_background_color'] ) ) {
+			$manifest['background_color'] = $app_main_infos['pwa_background_color'];
+		}
+		
+		if ( !empty( $app_main_infos['pwa_theme_color'] ) ) {
+			$manifest['theme_color'] = $app_main_infos['pwa_theme_color'];
+		}
 		
 		$manifest = apply_filters( 'wpak_pwa_manifest', $manifest, $app_id );
 		
