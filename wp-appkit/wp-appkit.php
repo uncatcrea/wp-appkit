@@ -150,7 +150,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 				<div class="error">
 					<p>
 						<?php
-							_e( 'WP AppKit requires WordPress permalinks to be activated: '
+							_e( 'WP-AppKit requires WordPress permalinks to be activated: '
 								. 'see the <a href="http://codex.wordpress.org/Using_Permalinks#Choosing_your_permalink_structure">"Using permalink" Codex section</a> '
 								. 'for more info about how to activate permalinks.',
 								WpAppKit::i18n_domain
@@ -166,7 +166,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 	WpAppKit::hooks();
 
 	/**
-	 * WP AppKit WP CLI commands :
+	 * WP-AppKit WP CLI commands :
 	 */
 	if ( defined('WP_CLI') && WP_CLI ) {
 		require_once( dirname( __FILE__ ) .'/wp-cli-commands/wpak-commands.php' );

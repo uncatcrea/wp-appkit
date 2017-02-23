@@ -32,7 +32,7 @@ class WpakComponentsUtils {
 		/**
 		 * Filter post content. Use this to format app posts content your own way.
 		 *
-		 * To apply the default WP AppKit formating to the content and add only minor modifications to it,
+		 * To apply the default WP-AppKit formating to the content and add only minor modifications to it,
 		 * use the "wpak_post_content_format" filter instead.
 		 *
 		 * @see WpakComponentsUtils::get_formated_content()

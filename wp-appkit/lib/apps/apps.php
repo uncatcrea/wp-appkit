@@ -139,8 +139,8 @@ class WpakApps {
 	public static function add_settings_panels() {
 		$capability_required = current_user_can( 'wpak_edit_apps' ) ? 'wpak_edit_apps' : 'manage_options';
 		add_menu_page( 
-			__( 'WP AppKit', WpAppKit::i18n_domain ), 
-			__( 'WP AppKit', WpAppKit::i18n_domain ), 
+			__( 'WP-AppKit', WpAppKit::i18n_domain ), 
+			__( 'WP-AppKit', WpAppKit::i18n_domain ), 
 			$capability_required, 
 			self::menu_item, 
 			array( __CLASS__, 'settings_panel' ),
@@ -739,7 +739,7 @@ class WpakApps {
 	}
 
 	/**
-	 * Add/merge WP AppKit default Phonegap Build plugins to those set in BO and return
+	 * Add/merge WP-AppKit default Phonegap Build plugins to those set in BO and return
 	 * them as config.xml ready XML.
 	 *
 	 * @param int $app_id Application ID
@@ -806,7 +806,7 @@ class WpakApps {
 		}
 
 		/**
-		 * Filter the Phonegap Build plugins that are included by default by WP AppKit
+		 * Filter the Phonegap Build plugins that are included by default by WP-AppKit
 		 *
 		 * @param array		$default_plugins	Array of default Phonegap plugins.
 		 * @param string    $export_type        Export type : 'phonegap-build', 'phonegap-cli' or 'webapp'

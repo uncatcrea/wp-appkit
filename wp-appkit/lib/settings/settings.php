@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles the WP AppKit settings panel for general plugin settings.
+ * Handles the WP-AppKit settings panel for general plugin settings.
  * Default settings are defined in WpakSettings::get_settings();
  */
 class WpakSettings {
@@ -27,7 +27,7 @@ class WpakSettings {
 		
 		?>
 		<div class="wrap" id="wpak-settings">
-			<h2><?php _e( 'WP AppKit Settings', WpAppKit::i18n_domain ) ?></h2>
+			<h2><?php _e( 'WP-AppKit Settings', WpAppKit::i18n_domain ) ?></h2>
 
 			<?php if ( !empty( $result['message'] ) ): ?>
 				<div class="<?php echo $result['type'] ?>" ><p><?php echo $result['message'] ?></p></div>
@@ -39,15 +39,15 @@ class WpakSettings {
 					<tr>
 						<th><?php _e( 'Apps post lists', WpAppKit::i18n_domain ) ?></th>
 						<td>
-							<label for="posts_per_page"><?php _e('Number of posts per list in WP AppKit apps', WpAppKit::i18n_domain ) ?> : </label><br/>
+							<label for="posts_per_page"><?php _e('Number of posts per list in WP-AppKit apps', WpAppKit::i18n_domain ) ?> : </label><br/>
 							<input type="number" name="posts_per_page" id="posts_per_page" value="<?php echo $settings['posts_per_page'] ?>" />
 						</td>
 					</tr>
 					<tr>
-						<th><?php _e( 'WP AppKit user role', WpAppKit::i18n_domain ) ?></th>
+						<th><?php _e( 'WP-AppKit user role', WpAppKit::i18n_domain ) ?></th>
 						<td>
 							<input type="checkbox" name="activate_wp_appkit_editor_role" id="activate_wp_appkit_editor_role" <?php echo !empty($settings['activate_wp_appkit_editor_role']) ? 'checked' : ''?> />
-							<label for="activate_wp_appkit_editor_role"><?php _e('Activate a "WP AppKit App Editor" role that can only edit WP AppKit apps and no other WordPress contents', WpAppKit::i18n_domain ) ?></label>
+							<label for="activate_wp_appkit_editor_role"><?php _e('Activate a "WP-AppKit App Editor" role that can only edit WP-AppKit apps and no other WordPress contents', WpAppKit::i18n_domain ) ?></label>
 						</td>
 					</tr>
 					

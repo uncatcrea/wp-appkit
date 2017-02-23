@@ -1,6 +1,6 @@
 <?php
 /**
- * WP AppKit plugin commands
+ * WP-AppKit plugin commands
  */
 class Wpak_Commands extends WP_CLI_Command {
 

@@ -73,9 +73,9 @@ class WpakThemesBoSettings {
 			<p class="description"><?php echo sprintf( __( 'Choose a theme for your app. Theme defines how your app will look and behave. Themes can be uploaded in the Upload Themes panel. Themes are stored in the %s folder of your WordPress install.', WpAppKit::i18n_domain ), basename(WP_CONTENT_DIR) .'/'. WpakThemes::themes_directory ) ?></p>
 		<?php else: ?>
 			<div class="wpak_no_theme">
-				<strong><?php _e( 'No WP AppKit theme found!', WpAppKit::i18n_domain ) ?></strong>
+				<strong><?php _e( 'No WP-AppKit theme found!', WpAppKit::i18n_domain ) ?></strong>
 				<br/>
-				<?php echo  sprintf( __('Please upload a WP AppKit theme from the "<a href="%s" >Upload Themes</a>" panel or copy a theme directly to the %s directory.', WpAppKit::i18n_domain ),
+				<?php echo  sprintf( __('Please upload a WP-AppKit theme from the "<a href="%s" >Upload Themes</a>" panel or copy a theme directly to the %s directory.', WpAppKit::i18n_domain ),
 									admin_url('admin.php?page=wpak_bo_upload_themes'),
 									basename(WP_CONTENT_DIR) .'/'. WpakThemes::themes_directory
 							)

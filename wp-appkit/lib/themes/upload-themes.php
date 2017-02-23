@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles the WP AppKit BO panel for uploading themes
+ * Handles the WP-AppKit BO panel for uploading themes
  */
 class WpakUploadThemes {
 
@@ -32,7 +32,7 @@ class WpakUploadThemes {
 		switch( $action ) {
 			case 'upload-theme':
 				if ( ! current_user_can( 'upload_plugins' ) && ! current_user_can( 'wpak_edit_apps' ) ) {
-					wp_die( __( 'You do not have sufficient permissions to install WP AppKit themes on this site.', WpAppKit::i18n_domain ) );
+					wp_die( __( 'You do not have sufficient permissions to install WP-AppKit themes on this site.', WpAppKit::i18n_domain ) );
 				}
 
 				check_admin_referer( 'wpak-theme-upload' );
@@ -44,7 +44,7 @@ class WpakUploadThemes {
 				$file_type = wp_check_filetype( $file_upload->filename );
 				if( $file_type['ext'] == 'zip' && $file_type['type'] == 'application/zip') {
 
-					$title = sprintf( __('Installing WP AppKit from uploaded file: %s', WpAppKit::i18n_domain), esc_html( basename( $file_upload->filename ) ) );
+					$title = sprintf( __('Installing WP-AppKit from uploaded file: %s', WpAppKit::i18n_domain), esc_html( basename( $file_upload->filename ) ) );
 					$nonce = 'wpak-theme-upload';
 					$url = add_query_arg( array('package' => $file_upload->id) );
 
@@ -66,7 +66,7 @@ class WpakUploadThemes {
 					}
 
 					if( !is_wp_error($result) ){
-						echo sprintf( __("WP AppKit theme '%s' installed successfully!", WpAppKit::i18n_domain), $destination_folder_name );
+						echo sprintf( __("WP-AppKit theme '%s' installed successfully!", WpAppKit::i18n_domain), $destination_folder_name );
 					}else{
 						_e('An error occured', WpAppKit::i18n_domain);
 						echo ' : '. $result->get_error_message();
@@ -74,7 +74,7 @@ class WpakUploadThemes {
 
 					echo '<br/><br/><a href="'. esc_url ( remove_query_arg('wpak_action') ) .'">'. __('Back to theme upload form', WpAppKit::i18n_domain) .'</a>';
 
-					echo '<br/><br/><a href="'. admin_url() .'/edit.php?post_type=wpak_apps">'. __('Go to my WP AppKit app list', WpAppKit::i18n_domain) .'</a>';
+					echo '<br/><br/><a href="'. admin_url() .'/edit.php?post_type=wpak_apps">'. __('Go to my WP-AppKit app list', WpAppKit::i18n_domain) .'</a>';
 
 				}else{
 					_e("Uploaded file must be a valid zip file", WpAppKit::i18n_domain);
@@ -82,7 +82,7 @@ class WpakUploadThemes {
 				break;
 			case 'reinstall-default-themes':
 				if ( ! current_user_can( 'upload_plugins' ) && ! current_user_can( 'wpak_edit_apps' ) ) {
-					wp_die( __( 'You do not have sufficient permissions to install WP AppKit themes on this site.', WpAppKit::i18n_domain ) );
+					wp_die( __( 'You do not have sufficient permissions to install WP-AppKit themes on this site.', WpAppKit::i18n_domain ) );
 				}
 
 				check_admin_referer( 'wpak-reinstall-default-themes' );
@@ -146,7 +146,7 @@ class WpakUploadThemes {
 				<div class="wrap" id="wpak-settings">
 					<h2>
 						<?php
-						_e( 'WP AppKit Themes upload', WpAppKit::i18n_domain );
+						_e( 'WP-AppKit Themes upload', WpAppKit::i18n_domain );
 
 						if( !empty( $default_themes ) ):
 						?>
@@ -159,10 +159,10 @@ class WpakUploadThemes {
 					<?php endif ?>
 
 					<div class="upload-plugin">
-						<p class="install-help"><?php _e( 'If you have a WP AppKit theme in a .zip format, you may install it by uploading it here.', WpAppKit::i18n_domain ); ?></p>
+						<p class="install-help"><?php _e( 'If you have a WP-AppKit theme in a .zip format, you may install it by uploading it here.', WpAppKit::i18n_domain ); ?></p>
 						<form method="post" enctype="multipart/form-data" class="wp-upload-form" action="<?php echo esc_url( add_query_arg( array( 'wpak_action' => 'upload-theme' ) ) ) ?>">
 							<?php wp_nonce_field( 'wpak-theme-upload' ); ?>
-							<label class="screen-reader-text" for="themezip"><?php _e('WP AppKit Theme zip file', WpAppKit::i18n_domain); ?></label>
+							<label class="screen-reader-text" for="themezip"><?php _e('WP-AppKit Theme zip file', WpAppKit::i18n_domain); ?></label>
 							<input type="file" id="themezip" name="themezip" />
 							<?php submit_button( __( 'Install Now' ), 'button', 'install-theme-submit', false ); ?>
 						</form>

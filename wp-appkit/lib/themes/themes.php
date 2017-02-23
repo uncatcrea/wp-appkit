@@ -76,7 +76,7 @@ class WpakThemes {
 
 		// Try to create WP-AppKit themes directory if it doesn't exist
 		if( !is_dir( self::get_themes_directory() ) && !self::create_theme_directory() ) {
-			$error = sprintf( __( 'The WP AppKit themes directory %s can\'t be created. <br/>Please check that your WordPress install has the permissions to create this directory.', WpAppKit::i18n_domain ),
+			$error = sprintf( __( 'The WP-AppKit themes directory %s can\'t be created. <br/>Please check that your WordPress install has the permissions to create this directory.', WpAppKit::i18n_domain ),
 		  		self::get_themes_directory()
 			);
 		}
@@ -220,10 +220,10 @@ class WpakThemes {
 
 			//For assets files like fonts, images or css we can't
 			//be sure that the wpak_app_id GET arg is there, because they can
-			//be included directly in themes sources (CSS/HTML) where the WP AppKit API can't
+			//be included directly in themes sources (CSS/HTML) where the WP-AppKit API can't
 			//be used. So, we can't check that the file comes from the right app
 			//or theme > we just check that the theme the asset belongs to is a real
-			//WP AppKit theme and that at least one app uses this theme :
+			//WP-AppKit theme and that at least one app uses this theme :
 			if( self::is_asset_file( $file ) ) {
 				if ( preg_match( '/([^\/]+?)\/(.+)$/', $file, $matches ) ) {
 					$theme_slug = $matches[1];
@@ -440,7 +440,7 @@ class WpakThemes {
 
 		//Security note : before serving this file with readfile() we checked :
 		//- that its mime type is authorized
-		//- that it belongs to a valid WP AppKit Theme currently used by an app
+		//- that it belongs to a valid WP-AppKit Theme currently used by an app
 		readfile( $file );
 
 		exit();
