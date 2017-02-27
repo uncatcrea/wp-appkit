@@ -1,13 +1,13 @@
-=== WP-AppKit ===
-Contributors: uncategorized-creations
+=== WP-AppKit - build mobile apps with WordPress ===
+Contributors: Uncategorized Creations, Benjamin Lupu
 Tags: Mobile, App, PhoneGap
 Requires at least: 4.0
-Tested up to: 4.7
+Tested up to: 4.7.2
 Stable tag: 1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Create mobile apps connected to WordPress.
+A great way to build mobile apps for your WordPress site using your favorite technologies: JavaScript, HTML and CSS.
 
 == Description ==
 
