@@ -172,6 +172,10 @@ class WpakBuild {
 			return $answer;
 		}
 
+		//If the app current theme has some PHP (hooks!) to be executed before
+		//we build the export, include it here :
+		WpakThemes::include_app_theme_php( $app_id );
+		
 		$current_theme = WpakThemesStorage::get_current_theme( $app_id );
 
 		$plugin_dir = plugin_dir_path( dirname( dirname( __FILE__ ) ) );
