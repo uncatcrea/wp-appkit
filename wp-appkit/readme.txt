@@ -1,5 +1,5 @@
 === WP-AppKit - build mobile apps with WordPress ===
-Contributors: Uncategorized Creations, Benjamin Lupu
+Contributors: Uncategorized Creations
 Tags: Mobile, App, PhoneGap
 Requires at least: 4.0
 Tested up to: 4.7.2
@@ -11,9 +11,15 @@ A great way to build mobile apps for your WordPress site using your favorite tec
 
 == Description ==
 
-WP-AppKit is an open source WordPress plugin to build mobile applications connected to WordPress. 
-Applications are created with HTML, CSS and JavaScript (thanks to the Cordova/PhoneGap technology). 
-Developers, you can extend and customize applications using our API.
+Applications are a great way to offer an outstanding mobile experience for your users. Use push notifications, let users read offline, use saved accounts to let users share content are among many wonderful things you can do **only** with mobile applications.
+
+With WP-AppKit, we're committed to alleviate as much as we can the work necessary to build a mobile app. for that:
+* We offer a native support of WordPress (including custom post types, custom fields, custom taxonomies, comments, secured authentication and [many more features](https://uncategorized-creations.com/features/))
+* We use the PhoneGap/Cordova technology which allows to build apps using JavaScript, HTML and CSS
+* We support the PhoneGap Build online service for easy compilation
+* We provide a simple API to create app themes
+* Developers can hook into our API to add new great features
+
 
 == Installation ==
 
@@ -23,13 +29,19 @@ Developers, you can extend and customize applications using our API.
 
 == Frequently Asked Questions ==
 
-= A question that someone might have =
+You'll find [an always up to date FAQ](https://uncategorized-creations.com/frequently-asked-questions/) on our website.
 
-An answer to that question.
+- For how much time does WP-AppKit exist? =
 
-= What about foo bar? =
+WP-AppKit has been [available on GitHub](https://github.com/uncatcrea/wp-appkit) since 2013. It has been released on WordPress.org at the beginning of 2017.
 
-Answer to foo bar dilemma.
+= Is WP-AppKit an app builder? =
+
+**No** however.... As soon as WP-AppKit is installed, you'll be able to create an app's project: pick contents, create a menu, choose a theme (ie. an app theme)... Then you'll be able to preview your app in the browser (using the Chrome's mobile emulation mode). In that sense you may consider WP-AppKit as an app builder but it is not our goal to let users build the whole app in the WordPress admin. Instead we provide an API to let you extend and customize your app. So you will need technical skills (notably JavaScript skills) to get your app done.
+
+= Do I need to be a developer to use WP-AppKit? =
+
+**Yes**. Our goal is to provide as much as possible an easy way to get you into the business of building your Cordova based apps. For example, we provide a micro-framework to create app themes, the plugin is bundled with default themes, we create PhoneGap Build ready projects, we support by default WordPress authentication... However, as soon as you want to customize and add new features, you'll have to put your developper's hat. In that case, you'll need a good knowledge of PHP, WordPress, JavaScript, HTML and CSS.
 
 == Screenshots ==
 
