@@ -1,5 +1,5 @@
 === WP-AppKit - build mobile apps with WordPress ===
-Contributors: Uncategorized Creations
+Contributors: uncategorized-creations
 Tags: Mobile, App, PhoneGap
 Requires at least: 4.0
 Tested up to: 4.7.2
@@ -19,6 +19,7 @@ With WP-AppKit, we're committed to alleviate as much as we can the work necessar
 * We support the PhoneGap Build online service for easy compilation
 * We provide a simple API to create app themes
 * Developers can hook into our API to add new great features
+
 
 
 == Installation ==
