@@ -20,7 +20,7 @@ With WP-AppKit, we're committed to alleviate as much as we can the work necessar
 * We provide a simple API to **create app themes**
 * Developers can hook into our API to add new great features
 
-[See all WP-AppKit features](https://uncategorized-creations.com/features/))
+[See all WP-AppKit features](https://goo.gl/9aCPuk)
 
 = Getting Started =
 
@@ -28,17 +28,31 @@ Even if you are familiar with development, building your first mobile app can be
 
 For that, we have a tutorial that will guide through the process to have your first app connected to your WordPress site installed on your phone.
 
-[Get started with WP-AppKit](https://uncategorized-creations.com/wp-appkit/doc/getting-started/)
+[Get started with WP-AppKit](https://goo.gl/JzSX9O)
 
 You can also check this video that shows in 5 minutes what's inside the Get Started tutorial.
 
 [Video here]
+
+= App Themes =
+
+WP-AppKit supports JavaScript based app themes. It comes with 2 default themes named *Q for iOS* and *Q for Android*.
+
+Below quick video demos of each theme.
+
+** Q for Android **
+https://www.youtube.com/watch?v=fSQVx8-rqCY
+
+** Q for iOS
+https://www.youtube.com/watch?v=jkjtkH6wDys
 
 == Installation ==
 
 1. Upload the plugin files to the `/wp-content/plugins/wp-appkit` directory, or install the plugin through the WordPress 'Plugins' screen directly.
 1. Activate the plugin through the 'Plugins' screen in WordPress
 1. Click the "WP-AppKit" menu entry and start creating your App!
+
+**Good to know:** WP-AppKit installs default themes in a new folder called *themes-wp-appkit* located in *wp-content*.
 
 == Frequently Asked Questions ==
 
