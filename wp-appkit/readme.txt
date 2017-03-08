@@ -1,8 +1,8 @@
 === WP-AppKit - build mobile apps with WordPress ===
-Contributors: uncategorized-creations
+Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
 Tags: Mobile, App, PhoneGap
 Requires at least: 4.0
-Tested up to: 4.7.2
+Tested up to: 4.7.3
 Stable tag: 1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -11,16 +11,28 @@ A great way to build mobile apps for your WordPress site using your favorite tec
 
 == Description ==
 
-Applications are a great way to offer an outstanding mobile experience for your users. Use push notifications, let users read offline, use saved accounts to let users share content are among many wonderful things you can do **only** with mobile applications.
+Applications are a great way to offer an outstanding mobile experience for your users. Use push notifications, let users read offline, use saved accounts to share content are among many wonderful things you can do with mobile applications.
 
 With WP-AppKit, we're committed to alleviate as much as we can the work necessary to build a mobile app. for that:
-* We offer a native support of WordPress (including custom post types, custom fields, custom taxonomies, comments, secured authentication and [many more features](https://uncategorized-creations.com/features/))
-* We use the PhoneGap/Cordova technology which allows to build apps using JavaScript, HTML and CSS
-* We support the PhoneGap Build online service for easy compilation
-* We provide a simple API to create app themes
+* We offer a **native support of WordPress** (including custom post types, custom fields, custom taxonomies, comments, secured authentication and many more features)
+* We use the ***PhoneGap/Cordova** technology which allows to build apps using JavaScript, HTML and CSS
+* We support the **PhoneGap Build** online service for easy compilation
+* We provide a simple API to **create app themes**
 * Developers can hook into our API to add new great features
 
+[See all WP-AppKit features](https://uncategorized-creations.com/features/))
 
+= Getting Started =
+
+Even if you are familiar with development, building your first mobile app can be intimidating. We know that, we’ve been there before :-)
+
+For that, we have a tutorial that will guide through the process to have your first app connected to your WordPress site installed on your phone.
+
+[Get started with WP-AppKit](https://uncategorized-creations.com/wp-appkit/doc/getting-started/)
+
+You can also check this video that shows in 5 minutes what's inside the Get Started tutorial.
+
+[Video here]
 
 == Installation ==
 
