@@ -332,9 +332,19 @@ define(function (require) {
 	   * This queried screen is then pushed to history in app.addQueriedScreenToHistory().
 	   */
 	  app.setQueriedScreen = function( screen_data ){
-		  queried_screen_data = formatScreenData( _.extend( screen_data, {
+		  
+		  screen_data = _.extend( screen_data, {
 		  	fragment: Backbone.history.fragment
-	  	  }));
+	  	  });
+		  
+		  /**
+		   * 'queried-screen' filter
+		   * Allows to customize queried screen data before inserting it into history.
+		   * Useful for example to customize screen label.
+		   */
+		  screen_data = Hooks.applyFilters( 'queried-screen', screen_data, [] );
+		  
+		  queried_screen_data = formatScreenData( screen_data );
 	  };
 
 	  app.getQueriedScreen = function(){
