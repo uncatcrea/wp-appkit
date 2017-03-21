@@ -138,3 +138,21 @@ function wpak_is_app( $app_id_or_slug = 0 ) {
 function wpak_get_current_app() {
 	return WpakWebServiceContext::get_current_app();
 }
+
+/**
+ * If currently retrieving content for an app (web service), returns the corresponding app id.
+ * @return int App id, or 0 if not currently in a web service context.
+ */
+function wpak_get_current_app_id() {
+	$current_app = WpakWebServiceContext::get_current_app();
+	return !empty( $current_app ) ? $current_app->ID : 0;
+}
+
+/**
+ * If currently retrieving content for an app (web service), returns the corresponding app slug.
+ * @return string App slug, or empty string if not currently in a web service context.
+ */
+function wpak_get_current_app_slug() {
+	$current_app = WpakWebServiceContext::get_current_app();
+	return !empty( $current_app ) ? $current_app->post_name : '';
+}
