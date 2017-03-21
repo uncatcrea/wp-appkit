@@ -88,10 +88,11 @@ class WpakComponentsTypes {
 			 * 
 			 * @param array    $data                  Component data that can be customized
 			 * @param object   $component             Component we retrieved data for
+			 * @param int      $app_id                Id of the app the component belongs to
 			 * @param object   $component_globals     Global items passed to the component
 			 * @param array    $args                  Arguments comming from the request
 			 */
-			$data = apply_filters( 'wpak_component_data', $data, $component, $component_globals, $args );
+			$data = apply_filters( 'wpak_component_data', $data, $component, wpak_get_current_app_id(), $component_globals, $args );
 			
 		}
 		return $data;

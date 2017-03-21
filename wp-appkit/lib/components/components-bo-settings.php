@@ -77,6 +77,17 @@ class WpakComponentsBoSettings {
 					<?php endif ?>
 				</tbody>
 			</table>
+			
+			<?php 
+				/**
+				 * 'wpak_components_list_after' action.
+				 * Use this action to insert custom content after components list
+				 * 
+				 * @param    array    $components    List of components
+				 * @param    int      $app_id        Application id
+				 */
+				do_action( 'wpak_components_list_after', $components, $post->ID ); 
+			?>
 
 			<?php WpakComponentsTypes::echo_components_javascript() ?>
 
@@ -156,7 +167,20 @@ class WpakComponentsBoSettings {
 			<table class="form-table">
 				<tr valign="top">
 					<th scope="row"><?php _e( 'Component label', WpAppKit::i18n_domain ) ?></th>
-					<td><input class="can-reset" type="text" name="component_label" value="<?php echo $component->label ?>" /></td>
+					<td>
+						<input class="can-reset" type="text" name="component_label" value="<?php echo $component->label ?>" />
+						<?php 
+							/**
+							 * 'wpak_component_form_label' action
+							 * Use this action to display something after component's label field.
+							 * 
+							 * @param   int      $app_id      Application id
+							 * @param   bool     $edit        Whether editing or creating the component
+							 * @param   object   $component   Component object
+							 */
+							do_action( 'wpak_component_form_label', $post_id, $edit, $component ); 
+						?>
+					</td>
 				</tr>
 				<?php if ( $edit ): ?>
 					<tr valign="top">
@@ -253,6 +277,18 @@ class WpakComponentsBoSettings {
 
 			$component_label = trim( $data['component_label'] );
 			$component_type = $data['component_type'];
+			
+			/**
+			 * 'wpak_default_component_label' filter
+			 * Allows to customize posted component label. Useful to allow default label value
+			 * in case no label was entered by the user.
+			 * 
+			 * @param   string   $component_label   Component label sent by the user
+			 * @param   array    $data              Data submited by the user
+			 * @param   bool     $edit              Whether editing or creating the component
+			 * @param   int      $edit_id           Component id for edition
+			 */
+			$component_label = apply_filters( 'wpak_default_component_label', $component_label, $data, $edit, $edit_id );
 
 			if ( empty( $component_label ) ) {
 				$answer['message'] = __( 'You must provide a label for the component!', WpAppKit::i18n_domain );
@@ -291,6 +327,22 @@ class WpakComponentsBoSettings {
 
 			$component_options = WpakComponentsTypes::get_component_type_options_from_posted_form( $component_type, $data );
 
+			/**
+			 * 'wpak_component_save_options' filter
+			 * Use this filter to cusomize options saved for the component.
+			 * Allows to add any custom fields to component options.
+			 * 
+			 * @param   array   $component_options   Component options to be customized
+			 * @param   array   $data                All component data sent by the user
+			 * @param   in      $app_id              Application id
+			 * @param   string  $component_slug		 Component slug
+			 * @param   string  $component_label     Component label
+			 * @param   string  $component_type      Component type
+			 * @param   bool    $edit                Whether editing or creating the component
+			 * @param   int     $edit_id             Component id for edition
+			 */
+			$component_options = apply_filters( 'wpak_component_save_options', $component_options, $data, $post_id, $component_slug, $component_label, $component_type, $edit, $edit_id );
+			
 			$component = new WpakComponent( $component_slug, $component_label, $component_type, $component_options );
 			$component_id = WpakComponentsStorage::add_or_update_component( $post_id, $component, $edit_id );
 
