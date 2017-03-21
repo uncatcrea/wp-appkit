@@ -43,6 +43,9 @@ class WpakConfigFile {
 					//If the app current theme has some PHP (hooks!) to be executed before
 					//config files are generated, include it here :
 					WpakThemes::include_app_theme_php( $app_id );
+					
+					//Include PHP files required by addons activated for this app :
+					WpakAddons::require_app_addons_php_files( $app_id );
 
 					$file = $wp_query->query_vars['wpak_appli_file'];
 
