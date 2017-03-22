@@ -81,9 +81,9 @@ You can create an **unlimited** number of applications and an unlimited number o
 
 **Yes.** It is not implemented by default. We recommend that you use a service such as PushWoosh or OneSignal to implement push notifications for your app.
 
-= Do you support Custom Fields? =
+=Do you support Custom Fields? =
 
-Yes. By default, we don’t send Custom Fields to apps (to avoid performance issues). However, you can easily add the custom fields you need. By the way we have [a nice tutorial](https://uncategorized-creations.com/1712/display-wordpress-custom-fields-app/) about that. You can also use [Advanced Custom Fields](https://www.advancedcustomfields.com/).
+**Yes.** By default, we don’t send Custom Fields to apps (to avoid performance issues). However, you can easily add the custom fields you need. By the way we have [a nice tutorial](https://uncategorized-creations.com/1712/display-wordpress-custom-fields-app/) about that. You can also use [Advanced Custom Fields](https://www.advancedcustomfields.com/).
 
 = Do you support WordPress comments? =
 
