@@ -1,6 +1,6 @@
 === WP-AppKit - build mobile apps with WordPress ===
 Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
-Tags: Mobile, App, PhoneGap
+Tags: mobile, app, phonegap, cordova, android, convert to mobile app, ios, mobile app, native app, news app, wordPress mobile app, 
 Requires at least: 4.0
 Tested up to: 4.7.3
 Stable tag: 1.0
@@ -11,18 +11,21 @@ A great way to build mobile apps for your WordPress site using your favorite tec
 
 == Description ==
 
-Applications are a great way to offer an outstanding mobile experience for your users. Using push notifications, letting users read offline, using saved accounts to share content are among many wonderful things you can do with mobile applications.
+Mobile applications are a great way to offer an outstanding mobile experience for your users. Using push notifications, letting users read offline, using saved accounts to share content are among many wonderful things you can do with mobile applications.
 
-With WP-AppKit, we're committed to alleviate as much as we can the work necessary to build a mobile app. for that:
-* We offer a **native support of WordPress** (including custom post types, custom fields, custom taxonomies, comments, secured authentication and many more features)
-* We use the **PhoneGap/Cordova** technology which allows to build apps using JavaScript, HTML and CSS
-* We support the **PhoneGap Build** online service for easy compilation
-* We provide a simple API to **create app themes**
-* Developers can hook into our API to add the features they need
+= The Toolkit You Need to Build Your App =
 
-All available features are listed here: [https://uncategorized-creations.com/features/](https://uncategorized-creations.com/features/)
+With WP-AppKit, we're committed to alleviate as much as we can the work necessary to build a mobile app for your WordPress site.
 
-= Getting Started =
+* **Native support of WordPress**: custom post types, custom fields, custom taxonomies, comments, secured authentication
+* **PhoneGap/Cordova**: use JavaScript, HTML and CSS to build apps
+* **PhoneGap Build**: Easy online compilation
+* **Themes**: create app themes
+* **API**: developers can hook into our API to add the features they need
+
+Get a look at all available features: [https://uncategorized-creations.com/features/](https://uncategorized-creations.com/features/)
+
+= Getting Started: Test WP-AppKit in no time =
 
 Even if you are familiar with development, building your first mobile app can be intimidating. We know that, we’ve been there before :-)
 
@@ -34,48 +37,36 @@ You can also check this video that shows in 5 minutes what you will achieve than
 
 https://www.youtube.com/watch?v=t6KwLxuoZ2g
 
-= App Themes =
+= App Themes: a Flexible Way To Build Apps =
 
-WP-AppKit supports JavaScript based app themes. **You can develop your own themes and we provide 2 default sister themes** named *Q for iOS* and *Q for Android*. These themes are installed with the plugin. You will also find them on GitHub:
-* Q for iOS on GitHub: [https://github.com/uncatcrea/q-ios](https://github.com/uncatcrea/q-ios)
-* Q for Android on GitHub: [https://github.com/uncatcrea/q-android]()
+WP-AppKit supports JavaScript based app themes. We provide 2 default sister themes named *Q for iOS* and *Q for Android*. These themes are installed with the plugin. You can  also develop your own themes.
 
-Below video demos of each theme.
+**So, how do these themes look?**
 
-** Q for Android **
+*Q for Android*
 https://www.youtube.com/watch?v=fSQVx8-rqCY
 
-** Q for iOS
+*Q for iOS*
 https://www.youtube.com/watch?v=jkjtkH6wDys
 
-= Documentation, Customization And Development =
+= Customize: Documentation, API and Development =
 
-WP-AppKit is *open source* (GPLv2+) and available on GitHub: [https://github.com/uncatcrea/wp-appkit](https://github.com/uncatcrea/wp-appkit).
+* **Open source**: (GPLv2+) and available on GitHub: [https://github.com/uncatcrea/wp-appkit](https://github.com/uncatcrea/wp-appkit)
+* **Developer friendly**: use PHP and JavaScript hooks to customize the plugin and your themes
+* **Complete documentation**: [https://uncategorized-creations.com/wp-appkit/doc/](https://uncategorized-creations.com/wp-appkit/doc/).
+* **Tutorials**: [https://uncategorized-creations.com/tag/tutorials/](https://uncategorized-creations.com/tag/tutorials/).
 
-It is a developer friendly plugin as you will be able to use hooks (both PHP and JavaScript hooks) to customize the plugin itself and your themes.
+**For more information visit [getwpappkit.com](http://getwpappkit.com).**
 
-We maintain a complete documentation on our web site: [https://uncategorized-creations.com/wp-appkit/doc/](https://uncategorized-creations.com/wp-appkit/doc/).
-
-We also publish regularly tutorials based on frequent questions users ask us: [https://uncategorized-creations.com/tag/tutorials/](https://uncategorized-creations.com/tag/tutorials/).
-
-= How To Get Support? =
-
-We are committed to support our users and many of them gave us great feedback. However, when asking for support, **please remember that WP-AppKit is a project entirely done with passion by volunteers on their freetime**. As with any other projects of that type (ie. open source and maintained by volunteers), the only thing guaranteed is the free access to the source code. That said, **to get support**:
-* Read our guidelines about submitting great support questions: []()
-* Send an email to *support [at] uncategorized-creations.com*
-* All following exchanges will happen by emails
-* Response time depends on our availability
-* WordPress.org forums are not actively monitored. Please post all questions to our help desk
-
-> If you need a **professional support**, you may consider to try our [Pro Support](https://uncategorized-creations.com/downloads/1-year-pro-support/) offer
+> **You need more support for WP-AppKit?** [Pro Support](https://uncategorized-creations.com/downloads/1-year-pro-support/) is an exclusive service where specialists work with you to get the most of WP-AppKit.
 
 == Installation ==
 
 1. Upload the plugin files to the `/wp-content/plugins/wp-appkit` directory, or install the plugin through the WordPress 'Plugins' screen directly.
 1. Activate the plugin through the 'Plugins' screen in WordPress
-1. Click the "WP-AppKit" menu entry and start creating your App!
+1. Click the "WP-AppKit" menu entry and start creating your app!
 
-**Good to know:** WP-AppKit installs default themes in a new folder called *themes-wp-appkit* located in *wp-content*.
+**Note:** WP-AppKit uses a special folder called `theme-wp-appkit` to store the app themes. This folder is located in `/wp-content`.
 
 == Frequently Asked Questions ==
 
