@@ -11,16 +11,16 @@ A great way to build mobile apps for your WordPress site using your favorite tec
 
 == Description ==
 
-Applications are a great way to offer an outstanding mobile experience for your users. Use push notifications, let users read offline, use saved accounts to share content are among many wonderful things you can do with mobile applications.
+Applications are a great way to offer an outstanding mobile experience for your users. Using push notifications, letting users read offline, using saved accounts to share content are among many wonderful things you can do with mobile applications.
 
 With WP-AppKit, we're committed to alleviate as much as we can the work necessary to build a mobile app. for that:
 * We offer a **native support of WordPress** (including custom post types, custom fields, custom taxonomies, comments, secured authentication and many more features)
-* We use the ***PhoneGap/Cordova** technology which allows to build apps using JavaScript, HTML and CSS
+* We use the **PhoneGap/Cordova** technology which allows to build apps using JavaScript, HTML and CSS
 * We support the **PhoneGap Build** online service for easy compilation
 * We provide a simple API to **create app themes**
-* Developers can hook into our API to add new great features
+* Developers can hook into our API to add the features they need
 
-[See all WP-AppKit features](https://goo.gl/9aCPuk)
+All available features are listed here: [https://uncategorized-creations.com/features/](https://uncategorized-creations.com/features/)
 
 = Getting Started =
 
@@ -28,9 +28,9 @@ Even if you are familiar with development, building your first mobile app can be
 
 For that, we have a tutorial that will guide through the process to have your first app connected to your WordPress site installed on your phone.
 
-[Get started with WP-AppKit](https://goo.gl/JzSX9O)
+[Get started with WP-AppKit](https://uncategorized-creations.com/wp-appkit/doc/getting-started/)
 
-You can also check this video that shows in 5 minutes what's inside the Get Started tutorial.
+You can also check this video that shows in 5 minutes what you will achieve thanks to the *Getting Started* tutorial.
 
 https://www.youtube.com/watch?v=t6KwLxuoZ2g
 
@@ -38,7 +38,7 @@ https://www.youtube.com/watch?v=t6KwLxuoZ2g
 
 WP-AppKit supports JavaScript based app themes. It comes with 2 default themes named *Q for iOS* and *Q for Android*.
 
-Below quick video demos of each theme.
+Below video demos of each theme.
 
 ** Q for Android **
 https://www.youtube.com/watch?v=fSQVx8-rqCY
