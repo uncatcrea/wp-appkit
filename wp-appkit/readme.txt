@@ -67,7 +67,7 @@ https://www.youtube.com/watch?v=jkjtkH6wDys
 1. Activate the plugin through the 'Plugins' screen in WordPress
 1. Click the "WP-AppKit" menu entry and start creating your app!
 
-**Note:** WP-AppKit uses a special folder called `theme-wp-appkit` to store the app themes. This folder is located in `/wp-content`.
+**Note:** WP-AppKit uses a special folder called `themes-wp-appkit` to store the app themes. This folder is located in `/wp-content`.
 
 == Frequently Asked Questions ==
 
