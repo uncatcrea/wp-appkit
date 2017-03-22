@@ -36,7 +36,9 @@ https://www.youtube.com/watch?v=t6KwLxuoZ2g
 
 = App Themes =
 
-WP-AppKit supports JavaScript based app themes. It comes with 2 default themes named *Q for iOS* and *Q for Android*.
+WP-AppKit supports JavaScript based app themes. **You can develop your own themes and we provide 2 default sister themes** named *Q for iOS* and *Q for Android*. These themes are installed with the plugin. You will also find them on GitHub:
+* Q for iOS on GitHub: [https://github.com/uncatcrea/q-ios](https://github.com/uncatcrea/q-ios)
+* Q for Android on GitHub: [https://github.com/uncatcrea/q-android]()
 
 Below video demos of each theme.
 
