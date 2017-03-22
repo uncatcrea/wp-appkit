@@ -1,6 +1,6 @@
 === WP-AppKit - build mobile apps with WordPress ===
 Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
-Tags: mobile, app, phonegap, cordova, android, convert to mobile app, ios, mobile app, native app, news app, wordPress mobile app, 
+Tags: mobile, app, mobile app, pwa, progressive web app, webapp, phonegap, phonegap build, cordova, android, ios, notifications, offline, convert to mobile app
 Requires at least: 4.0
 Tested up to: 4.7.3
 Stable tag: 1.0
@@ -18,6 +18,7 @@ Mobile applications are a great way to offer an outstanding mobile experience fo
 With WP-AppKit, we're committed to alleviate as much as we can the work necessary to build a mobile app for your WordPress site.
 
 * **Native support of WordPress**: custom post types, custom fields, custom taxonomies, comments, secured authentication
+* **iOS and Android support**
 * **PhoneGap/Cordova**: use JavaScript, HTML and CSS to build apps
 * **PhoneGap Build**: Easy online compilation
 * **Themes**: create app themes
@@ -49,7 +50,7 @@ https://www.youtube.com/watch?v=fSQVx8-rqCY
 *Q for iOS*
 https://www.youtube.com/watch?v=jkjtkH6wDys
 
-= Customize: Documentation, API and Development =
+= Learn: Documentation and Tutorials =
 
 * **Open source**: (GPLv2+) and available on GitHub: [https://github.com/uncatcrea/wp-appkit](https://github.com/uncatcrea/wp-appkit)
 * **Developer friendly**: use PHP and JavaScript hooks to customize the plugin and your themes
@@ -72,17 +73,37 @@ https://www.youtube.com/watch?v=jkjtkH6wDys
 
 You'll find [an always up to date FAQ](https://uncategorized-creations.com/frequently-asked-questions/) on our website.
 
-- For how much time does WP-AppKit exist? =
+= How many applications can I create? =
 
-WP-AppKit has been [available on GitHub](https://github.com/uncatcrea/wp-appkit) since 2013. It has been released on WordPress.org at the beginning of 2017.
+You can create an **unlimited** number of applications and an unlimited number of versions of each application.
 
-= Is WP-AppKit an app builder? =
+= Can I send push notifications? =
 
-**No** however.... As soon as WP-AppKit is installed, you'll be able to create an app's project: pick contents, create a menu, choose a theme (ie. an app theme)... Then you'll be able to preview your app in the browser (using the Chrome's mobile emulation mode). In that sense you may consider WP-AppKit as an app builder but it is not our goal to let users build the whole app in the WordPress admin. Instead we provide an API to let you extend and customize your app. So you will need technical skills (notably JavaScript skills) to get your app done.
+**Yes.** It is not implemented by default. We recommend that you use a service such as PushWoosh or OneSignal to implement push notifications for your app.
 
-= Do I need to be a developer to use WP-AppKit? =
+= Do you support Custom Fields? =
 
-**Yes**. Our goal is to provide as much as possible an easy way to get you into the business of building your Cordova based apps. For example, we provide a micro-framework to create app themes, the plugin is bundled with default themes, we create PhoneGap Build ready projects, we support by default WordPress authentication... However, as soon as you want to customize and add new features, you'll have to put your developper's hat. In that case, you'll need a good knowledge of PHP, WordPress, JavaScript, HTML and CSS.
+Yes. By default, we don’t send Custom Fields to apps (to avoid performance issues). However, you can easily add the custom fields you need. By the way we have [a nice tutorial](https://uncategorized-creations.com/1712/display-wordpress-custom-fields-app/) about that. You can also use [Advanced Custom Fields](https://www.advancedcustomfields.com/).
+
+= Do you support WordPress comments? =
+
+**Yes.** You can display WordPress comments (including threaded comments). Posting comments requires development.
+
+= Do you use the WP REST API? =
+
+We use a homemade (extendable) REST API. As the WP REST API is now integrated to WordPress core, we’ll probably rely on it in the future.
+
+= Is WP-AppKit compatible with WooCommerce? = 
+
+You can display WooCommerce content (ie. products) in your themes as any other WordPress content. However, you’ll have to (re)develop functionalities such as cart or checkout.
+
+= Do you compile applications for me? =
+
+**No.** You can use PhoneGap Build, an easy to use Adobe’s cloud compilation service or the classic Cordova CLI.
+
+= Do you release applications in app stores for me?=
+
+**No.** This is something you’ll have to do when your application is ready and compiled.
 
 == Screenshots ==
 
