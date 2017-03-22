@@ -48,6 +48,27 @@ https://www.youtube.com/watch?v=fSQVx8-rqCY
 ** Q for iOS
 https://www.youtube.com/watch?v=jkjtkH6wDys
 
+= Documentation, Customization And Development =
+
+WP-AppKit is *open source* (GPLv2+) and available on GitHub: [https://github.com/uncatcrea/wp-appkit](https://github.com/uncatcrea/wp-appkit).
+
+It is a developer friendly plugin as you will be able to use hooks (both PHP and JavaScript hooks) to customize the plugin itself and your themes.
+
+We maintain a complete documentation on our web site: [https://uncategorized-creations.com/wp-appkit/doc/](https://uncategorized-creations.com/wp-appkit/doc/).
+
+We also publish regularly tutorials based on frequent questions users ask us: [https://uncategorized-creations.com/tag/tutorials/](https://uncategorized-creations.com/tag/tutorials/).
+
+= How To Get Support? =
+
+We are committed to support our users and many of them gave us great feedback. However, when asking for support, **please remember that WP-AppKit is a project entirely done with passion by volunteers on their freetime**. As with any other projects of that type (ie. open source and maintained by volunteers), the only thing guaranteed is the free access to the source code. That said, **to get support**:
+* Read our guidelines about submitting great support questions: []()
+* Send an email to *support [at] uncategorized-creations.com*
+* All following exchanges will happen by emails
+* Response time depends on our availability
+* WordPress.org forums are not actively monitored. Please post all questions to our help desk
+
+> If you need a **professional support**, you may consider to try our [Pro Support](https://uncategorized-creations.com/downloads/1-year-pro-support/) offer
+
 == Installation ==
 
 1. Upload the plugin files to the `/wp-content/plugins/wp-appkit` directory, or install the plugin through the WordPress 'Plugins' screen directly.
