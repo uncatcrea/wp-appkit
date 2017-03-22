@@ -32,7 +32,7 @@ For that, we have a tutorial that will guide through the process to have your fi
 
 You can also check this video that shows in 5 minutes what's inside the Get Started tutorial.
 
-[Video here]
+https://www.youtube.com/watch?v=t6KwLxuoZ2g
 
 = App Themes =
 
