@@ -107,11 +107,12 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 
 == Screenshots ==
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+1. Create and configure apps from the WordPress admin
+2. Choose which content should appear in app
+3. Manage app menu
+4. Create app themes. Two themes are pre-installed to get you started in no time
+5. Preview in the browser (using Chrome's emulation mode). Debug with the tools you know (Chrome's dev tools)
+6. Compile online (with PhoneGap build)
 
 == Changelog ==
 
