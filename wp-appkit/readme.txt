@@ -120,6 +120,31 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
 
+= 1.0 (2017-03-24) = 
+
+*Release on WordPress.org!*
+
+* Readme.txt for WordPress.org
+* Add Domain Path header to plugin's file headers
+* New WP-AppKit menu icon
+
+*Core evolutions*
+
+* Add new hooks to allow component customizations
+* Allow re-rendering menu from theme
+* Allow to customize current_screen data on app side
+* Create global functions to retrieve current app slug and id
+* Include addons php files where we include themes php files
+* Include theme's php files before export
+
+*Bugfixes*
+
+* Wrong Items Backbone Collections initializations
+
+*Backward compatibility*
+
+* No change in this version that affect backward compatibility with previous WP-AppKit version or already deployed apps.
+
 = 0.6.2 (2017-02-06) =
 
 *Bugfixes*
