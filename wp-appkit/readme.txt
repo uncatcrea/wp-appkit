@@ -1,4 +1,4 @@
-=== WP-AppKit - build mobile apps with WordPress ===
+=== WP-AppKit - Mobile apps for WordPress ===
 Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
 Tags: mobile, app, mobile app, pwa, progressive web app, webapp, phonegap, phonegap build, cordova, android, ios, notifications, offline, convert to mobile app
 Requires at least: 4.0
@@ -26,11 +26,13 @@ With WP-AppKit, we're committed to alleviate as much as we can the work necessar
 
 Get a look at all available features: [https://uncategorized-creations.com/features/](https://uncategorized-creations.com/features/)
 
+**NEW FEATURE - Progressive web apps**: We are currently adding support for Progressive web apps (PWA). You can follow our progress on [GitHub](https://github.com/mleroi/wp-appkit/tree/feature-pwa). PWA are a new way to deliver fast, reliable and great experience on the web notably for mobiles. They allow to create apps accessible as websites that you can install and access as traditionnal mobile apps. It's an initiative from Google, currently only available for Android but we think and hope that the support will grow rapidly.
+
 = Getting Started: Test WP-AppKit in no time =
 
 Even if you are familiar with development, building your first mobile app can be intimidating. We know that, we’ve been there before :-)
 
-For that, we have a tutorial that will guide through the process to have your first app connected to your WordPress site installed on your phone.
+For that, we have a tutorial that will guide you through the process to have your first app connected to your WordPress site installed on your phone.
 
 [Get started with WP-AppKit](https://uncategorized-creations.com/wp-appkit/doc/getting-started/)
 
@@ -81,13 +83,13 @@ You can create an **unlimited** number of applications and an unlimited number o
 
 **Yes.** It is not implemented by default. We recommend that you use a service such as PushWoosh or OneSignal to implement push notifications for your app.
 
-=Do you support Custom Fields? =
+= Do you support Custom Fields? =
 
 **Yes.** By default, we don’t send Custom Fields to apps (to avoid performance issues). However, you can easily add the custom fields you need. By the way we have [a nice tutorial](https://uncategorized-creations.com/1712/display-wordpress-custom-fields-app/) about that. You can also use [Advanced Custom Fields](https://www.advancedcustomfields.com/).
 
 = Do you support WordPress comments? =
 
-**Yes.** You can display WordPress comments (including threaded comments). Posting comments requires development.
+**Yes.** You can display WordPress comments (including threaded comments). However, posting comments requires development.
 
 = Do you use the WP REST API? =
 
@@ -101,9 +103,9 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 
 **No.** You can use PhoneGap Build, an easy to use Adobe’s cloud compilation service or the classic Cordova CLI.
 
-= Do you release applications in app stores for me?=
+= Do you release applications in app stores for me? =
 
-**No.** This is something you’ll have to do when your application is ready and compiled.
+**No.** This is something you’ll have to do by yourself when your application is ready and compiled.
 
 == Screenshots ==
 
