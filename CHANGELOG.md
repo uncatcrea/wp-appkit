@@ -5,6 +5,9 @@
 - **Add Domain Path header to plugin's file headers** ([#a733050](https://github.com/uncatcrea/wp-appkit/commit/a733050e607a1abbdd440ac5d27fa044cb151123), [@lpointet](https://github.com/lpointet))
 - **New WP-AppKit menu icon** ([#06c589b](https://github.com/uncatcrea/wp-appkit/commit/06c589b16bfffc5ac9b023fdda4c2545cefffc9c), [@mleroi](https://github.com/mleroi))
 
+### Default themes update
+- **Embed last version (1.0.4) of [Q for iOS](https://github.com/uncatcrea/q-ios/releases/tag/v1.0.4) and [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.0.4) default app themes**
+
 ### Core evolutions
 - **Add new hooks to allow component customizations** ([#288](https://github.com/uncatcrea/wp-appkit/issues/288), [@mleroi](https://github.com/mleroi))
 - **Allow re-rendering menu from theme** ([#290](https://github.com/uncatcrea/wp-appkit/issues/290), [@mleroi](https://github.com/mleroi))

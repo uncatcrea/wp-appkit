@@ -128,6 +128,10 @@ Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/maste
 * Add Domain Path header to plugin's file headers
 * New WP-AppKit menu icon
 
+*Default themes update*
+
+* Embed last version (1.0.4) of [Q for iOS](https://github.com/uncatcrea/q-ios/releases/tag/v1.0.4) and [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.0.4) default app themes
+
 *Core evolutions*
 
 * Add new hooks to allow component customizations
