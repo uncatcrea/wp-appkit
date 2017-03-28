@@ -1,5 +1,6 @@
 <?php
 require_once(dirname( __FILE__ ) . '/config-file.php');
+require_once(dirname( __FILE__ ) . '/wp-core-js-files.php');
 
 class WpakSimulator {
 
