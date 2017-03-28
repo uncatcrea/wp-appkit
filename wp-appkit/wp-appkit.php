@@ -109,6 +109,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			WpakWebServices::add_rewrite_tags_and_rules();
 			WpakConfigFile::rewrite_rules();
 			WpakThemes::rewrite_rules();
+			WpakWpCoreJsFiles::rewrite_rules();
 		}
 
 		/**
