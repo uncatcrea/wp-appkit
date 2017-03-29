@@ -21,12 +21,12 @@ class WpakThemes {
 			'name' => 'Q for iOS', // TODO: handle name change between versions?
 			'version' => '1.0.4',
 		),
-		
+
 		'q-android' => array(
 			'name' => 'Q for Android',
 			'version' => '1.0.4',
 		),
-		
+
 	);
 
 	public static function hooks() {
@@ -50,11 +50,6 @@ class WpakThemes {
 
 	public static function get_default_themes_directory_uri(){
 	 	return plugins_url( self::default_themes_directory, dirname( dirname( __FILE__ ) ) );
-	}
-
-	public static function get_default_theme_filename( $slug ) {
-		// This file might not exist if $slug doesn't exist into default themes, but if you call this method, you'd have to check if the file exists anyway
-		return $slug . '.zip';
 	}
 
 	public static function get_default_themes() {
@@ -155,27 +150,68 @@ class WpakThemes {
 			return false;
 		}
 
-		// WP_Filtesystem initialization ran OK, we can perform our copy
+		// WP_Filesystem initialization ran OK, we can perform our copy
 		global $wp_filesystem;
 		$result = true;
 
 		foreach( array_keys( self::get_default_themes() ) as $slug ) {
-			$filename = self::get_default_theme_filename( $slug );
-			if( !$wp_filesystem->is_file( self::get_default_themes_directory() . '/' . $filename ) ) {
+			if( !$wp_filesystem->is_dir( self::get_default_themes_directory() . '/' . $slug ) ) {
 				continue;
 			}
 
 			// Warning: this will erase existing files, it's intended since this method should be called after some checks and validation about that fact
 			// TODO: use WP_Upgrader API
-			$res = unzip_file( self::get_default_themes_directory() . '/' . $filename, self::get_themes_directory() );
-
-			if( is_wp_error( $res ) ) {
-				$result = false;
-			}
+            $destination = self::get_themes_directory() . '/' . $slug;
+            $wp_filesystem->mkdir( $destination );
+            $result = self::copy_dir( self::get_default_themes_directory() . '/' . $slug, $destination, true );
 		}
 
 		return $result;
 	}
+
+	/**
+     * Recursively copy a directory to another one.
+     * Both folders have to already exist.
+     *
+	 * @param $source
+	 * @param $dest
+	 * @param bool $overwrite
+	 *
+	 * @return bool
+	 */
+	public static function copy_dir( $source, $dest, $overwrite = false ) {
+	    global $wp_filesystem;
+
+	    if( !$wp_filesystem instanceof WP_Filesystem_Base ) {
+	        return false;
+        }
+
+	    if( !$wp_filesystem->is_dir( $source ) || !$wp_filesystem->is_dir( $dest ) ) {
+	        return false;
+        }
+
+        $source = trailingslashit( $source );
+	    $dest = trailingslashit( $dest );
+
+	    $files = glob( $source . '*' );
+	    foreach( $files as $file ) {
+	        if( $file == '.' || $file == '..' ) {
+	            continue;
+            }
+
+		    $filename = str_replace( $source, $dest, $file );
+
+	        if( $wp_filesystem->is_dir( $file ) ) {
+	            $wp_filesystem->mkdir( $filename );
+	            self::copy_dir( $file, $filename );
+            }
+            else {
+	            $wp_filesystem->copy( $file, $filename, $overwrite );
+            }
+        }
+
+        return true;
+    }
 
 	/**
 	 * Install default themes provided with this plugin into 'wp-content/themes-wp-appkit/' folder.
@@ -416,7 +452,7 @@ class WpakThemes {
 		if ( !empty( $content_already_echoed ) ) {
 			ob_end_clean();
 		}
-		
+
 		$mime_type = self::get_file_mime_type( $file );
 
 		if( !empty( $mime_type) ) {

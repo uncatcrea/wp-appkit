@@ -1,0 +1,266 @@
+/*
+ * common.css : general rules (applied to all templates)
+ * post-list.css : archive.html specific rules
+ * post-detail.css : single.html and page.html specific rules
+ */
+
+
+
+/*
+ * General rules
+ */
+
+.single-template {
+    padding-top: 0px;
+}
+
+.single-content {
+	text-align: left;
+	padding: 10px 20px 0px 20px;
+}
+
+
+
+/*
+ * Titles
+ */
+
+.single-template h1, .single-template h2, .single-template h3, .single-template h4, .single-template h5, .single-template h6 {
+	color: #333;
+	margin: 19px 0px 17px 0px;
+	font-size: 18px;
+    line-height: 24px;
+	font-family:'Roboto Bold',sans-serif;
+}
+
+
+
+/*
+ * Paragraph
+ */
+
+.single-content p {
+    font-family: 'PT Serif Regular', Georgia, serif;
+    color: #4c4c4c;
+	font-size: 17px;
+	line-height: 27px;
+	margin: 20px 0px 10px 0px;
+}
+
+
+
+/*
+ * Emphasis
+ */
+
+.single-content strong {
+	font-size: 17px;
+	line-height: 27px;
+	color: #4c4c4c;
+    font-weight:  bold;
+}
+
+.single-content em {
+	font-size: 17px;
+	line-height: 27px;
+	color: #4c4c4c;
+    font-style: italic;
+}
+
+.single-content em strong, .single-content strong em {
+	font-size: 17px;
+	line-height: 27px;
+	color: #4c4c4c;
+    font-style: italic;
+}
+
+
+
+/*
+ * Hyperlinks
+ */
+
+.single-content a {
+	-webkit-touch-callout: none;
+	font-size: 17px;
+	line-height: 27px;
+    text-decoration: none;
+}
+
+.single-content a:link {
+	color: #168dd9;
+}
+
+.single-content a:visited {
+	color: #168dd9;
+}
+
+
+
+/*
+ * Bullet lists
+ */
+
+.single-content ul, .single-content ol {
+    font-family: 'PT Serif Regular', Georgia, serif;
+	font-size: 17px;
+	line-height: 27px;
+	margin: -5px 0px 20px 0px;
+	padding: 0px 20px 0px 40px;
+    color: #4c4c4c;
+}
+
+.single-content ul li {
+	margin: 0px 0px 10px 0px;
+}
+
+.single-content ol li {
+	margin: 0px 0px 10px 0px;
+}
+
+
+
+/*
+ * Blockquotes
+ */
+
+.single-content blockquote {
+    margin: 20px 0px 10px 0px;
+    padding-left: 15px;
+    border-left: 5px solid #e2e2e2;
+	font-size: 17px;
+	line-height: 27px;
+	text-align: left;
+    font-family: 'PT Serif Regular', Georgia, serif;
+    color: #4c4c4c;
+	font-size: 17px;
+	line-height: 27px;
+}
+
+.single-content blockquote p {}
+
+
+
+/*
+ * Superscript and subscript
+ */
+
+.single-content sup, .single-content sub {
+	font-size: 10px;
+}
+
+
+
+/*
+ * Images (relies on JS formating - see functions.js)
+ */
+
+.single-content img {
+	width: 100%;
+	height: auto;
+	display: block; /* Done to avoid bottom margin bug */
+}
+
+.single-content .wp-caption-text {
+    font-size: 14px;
+    line-height: 21px;
+    padding: 0px 0px 0px 30px;
+    color: #a1a1a1;
+    background-image: url(../img/camera-icon.svg);
+    background-repeat: no-repeat;
+    background-size: 16px;
+    background-position: 5px 0px;
+    margin: 10px 0px 0px 0px;
+}
+
+.wp-caption {
+    margin: 0px;
+    width: 100%;
+	height: auto;    
+}
+
+
+
+/*
+ * Post meta
+ */
+
+.single-template .post-meta {
+    font-size: 14px;
+    color: #a1a1a1;
+    padding-top: 5px;
+}
+
+.single-template .post-author {
+    padding: 0px 10px 0px 0px;
+    border-right: 1px #e7e7e7 solid;
+}
+
+.single-template .post-publish-date {
+    padding: 0px 0px 0px 10px;
+}
+
+/* Post Excerpt */
+.single-content .post-excerpt {}
+
+
+
+/*
+ * Post title
+ */
+
+.single-template .post-title {
+	padding: 30px 20px 0px 20px;
+    margin-bottom: 15px;
+}
+
+.single-template .post-thumbnail {
+    width: 100%;
+    margin: 0;
+}
+
+.single-template .post-thumbnail-caption {
+    font-size: 14px;
+    padding: 10px 20px 0px 45px;
+    color: #a1a1a1;
+    background-image: url(../img/camera-icon.svg);
+    background-repeat: no-repeat;
+    background-size: 16px;
+    background-position: 20px 8px;
+}
+
+.single-template .post-title h1 {
+    font-size: 21px;
+	line-height: 24px;
+	color: #333;
+	margin: 10px 0px 0px 0px;
+    
+}
+
+.subhead {
+    color: #006aa4;
+    font-size: 13px;
+    text-transform: uppercase;
+    line-height: 13px;
+    margin-bottom: 9px;
+    font-family:'Roboto Bold',sans-serif;
+}
+
+
+
+/*
+ * Content unavailable in app
+ * Hidden with the [hide_from_apps notify="yes"] shortcode
+ */
+
+.wpak-content-not-available {
+    border: 1px #616161 solid;
+    border-radius: 4px;
+    padding: 5px 10px 5px 10px;
+    background-color: #fcfcfc;
+    font-family: 'PT Serif Regular', Georgia, serif;
+    color: #4c4c4c;
+	font-size: 17px;
+	line-height: 27px;
+	margin: 20px 0px 10px 0px;
+}

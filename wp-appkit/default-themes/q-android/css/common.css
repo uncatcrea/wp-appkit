@@ -1,0 +1,579 @@
+/*
+ * common.css : general rules (applied to all templates)
+ * post-list.css : archive.html specific rules
+ * post-detail.css : single.html and page.html specific rules
+ */
+
+
+
+/*
+ * Fonts
+ */
+
+@font-face {
+	font-family : "PT Serif Regular";
+	src : url('../fonts/PT-Serif-Regular.ttf');
+}
+
+
+
+/*
+ * General screen rules
+ */
+
+* {box-sizing: border-box;}
+
+html,body {
+	height: 100%;
+	margin: 0px;
+}
+
+body {
+	text-rendering: optimizelegibility;     /* Enables kerning and optional ligatures */
+	-webkit-text-size-adjust: 100%;         /* Blocks text auto-scaling (eg. when switching from portrait to landscape) */
+	-webkit-font-smoothing: antialiased;    /* Enhances font aliasing */
+	font-family: "Roboto",sans-serif;
+}
+
+a {
+    -webkit-tap-highlight-color: rgba(0,0,0,0); /* Disables touch highlight on hyperlinks */
+}
+
+
+
+/*
+ * App structure
+ */
+
+/* Encloses all app's elements (auto-added) */
+#app-layout {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    overflow: hidden;
+}
+
+/* Encloses app's menu (auto-added) */
+#app-menu {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    width: 85%;
+    z-index: 0; /* Positionned under the app's canvas / z-index relative to #app-layout */
+    overflow-y: scroll;
+    -webkit-overflow-scrolling:touch; /* Enables inertial scrolling */
+    background-color: #FCFCFC;
+}
+
+/* Encloses nav bar, content and toolbar  */
+#app-canvas {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    z-index: 10; /* Positionned above the app's menu / z-index relative to #app-layout */
+    overflow: hidden;
+    -webkit-backface-visibility: hidden;
+    box-shadow: -2px 0px 5px rgba(0,0,0,0.26);
+}
+
+/* Encloses content (auto-added) */
+#app-content-wrapper {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    z-index: 5; /* z-index relative to #app-canvas */
+}
+
+/* Encloses content (auto-added) */
+.app-screen {
+    overflow-y: scroll;
+    position: absolute;
+    top: 56px;
+    bottom: 0px;
+    left: 0px;
+	width: 100%;
+    background-color: #fff;
+    -webkit-overflow-scrolling:touch; /* Enables inertial scrolling */
+}
+
+/* When in slideup panel, no need to reserve place for app bar */
+.panel-content .app-screen {
+    top: 0px;
+}
+
+/* App Bar */
+#app-header, .panel-header {
+	position: absolute;
+	top: 0px;
+    left: 0px;
+	width: 100%;
+	height: 56px;
+	text-align: center;
+    overflow: hidden;
+    z-index: 10; /* z-index relative to #app-canvas */
+}
+
+/* Slideup panel */
+/* As we clone and change the ID, we have to use a class rather than an ID */
+
+.slideup-panel {
+    position: absolute;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    background-color: #fff;
+    z-index: 20; /* Positionned above the app's canvas / z-index relative to #app-layout */
+    opacity: 0;
+    top: 100px;
+    display: none;
+}
+
+.back-button {
+	position: absolute;
+	float: left;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-image:url('../img/back-icon.svg');
+    background-size: 24px 24px;
+	width:48px;
+	height:48px;
+    margin: 4px 0px 4px 0px;
+}
+
+
+
+/*
+ * Menu button
+ */
+
+.menu-button {
+	position: absolute;
+	/*float: left;*/
+    top: 0px;
+    left: 0px;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-image:url('../img/menu-icon.svg');	
+    background-size: 24px 24px;
+	width:48px;
+	height:48px;
+    margin: 4px 0px 4px 0px;
+}
+
+
+
+/*
+ * Refresh button
+ */
+
+.refresh-off {
+	position: absolute;
+	right: 0px;
+    top: 0px;
+	background-repeat: no-repeat;
+	background-position: center;	
+	width:48px;
+	height:48px;
+	background-image:url('../img/refresh-icon.svg');
+    background-size: 24px 24px;
+    margin: 4px 0px 4px 0px;
+}
+
+/* Animated on state for refresh button (spinning) */
+.refresh-on {
+	position: absolute;
+	right: 0px;
+    top: 0px;
+	background-repeat: no-repeat;
+	background-position: center;	
+	-webkit-animation: refresh-effect 1s infinite;
+	width:48px;
+	height:48px;
+	background-image:url('../img/refresh-icon.svg');
+    background-size: 24px 24px;
+    margin: 4px 0px 4px 0px;
+}
+
+/* Spinning effect for refresh button */
+@-webkit-keyframes refresh-effect {
+	100%	{-webkit-transform: rotate(360deg);}
+}
+
+/*
+ * App bar
+ */
+
+.app-header, .panel-header {
+	background-color: #424242;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.26);
+    color: #fff;
+}
+
+.app-header h1, .panel-header h1 {
+	margin: 0px;
+	padding: 0px 0px 20px 56px;
+	text-align: left;
+	line-height: 56px;
+	overflow: hidden;
+	height: 56px;
+	font-weight: 400;
+	-webkit-user-select: none; /* Block selection with a long touch */
+	font-size: 18px;
+	font-family: "Roboto",sans-serif;
+}
+
+
+
+/*
+ * Toast Message
+ */
+
+.app-message-bar {
+    position: absolute;
+    bottom: 48px;
+    left: 0;
+    width: 80%;
+    min-height: 48px;
+    max-height: 80px;
+    font-size: 14px;
+    line-height: 24px;
+    text-align: left;
+    padding: 14px 24px 14px 24px;
+    opacity: 0;
+    display: none;
+    overflow: visible;
+    z-index: 500;
+    background-color: #333;
+    color: #f9f9f9;
+    font-family: "Roboto Medium",sans-serif;
+    margin: 0 auto;
+    right: 0;
+    border-radius: 40px 40px 40px 40px;
+}
+
+.app-message-bar .spinner {
+    margin: 0px 10px 0px 0px;
+    width: 24px;
+    height: 24px;
+    float: left;
+}
+
+.app-message-bar .spinner .path {
+    stroke: #fff;
+}
+
+
+
+/*
+ * Content areas (post list|post detail|comments)
+ */
+
+.content {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    z-index: 1; /* z-index relative to .app-screen */
+    background-color: #fff;
+    -webkit-overflow-scrolling:touch; /* Enables inertial scrolling */
+}
+
+/* Slide up panel */
+.panel-content {
+    position: absolute;
+    top: 56px;
+    bottom: 0px;
+    left: 0px;
+	width: 100%;
+    z-index: 0; /* z-index relative to #slideup panel */
+    -webkit-overflow-scrolling:touch; /* Enables inertial scrolling */
+}
+
+
+
+/*
+ * Off-canvas menu
+ */
+
+/* Fixes the menu scrollbar bug */
+.off-canvas-menu {
+	overflow-y: auto;
+}
+
+.menu-items {
+    position: relative;
+	list-style: none;
+	margin: 56px 0px 0px 0px;
+	padding: 0px;
+	width: 100%;
+}
+
+.menu-items li {
+    position: relative;
+}
+
+.menu-items li a {
+	white-space: nowrap;
+	display: block;
+	text-decoration: none;
+	-webkit-user-select: none; /* Block user selection */
+	-webkit-touch-callout: none; /* Work on iOS to block hyperlink menu */
+    font-family: 'Roboto Medium', sans-serif;
+    color: rgba(0,0,0,.87);
+    font-size: 14px;
+    height: 48px;
+    line-height: 48px;
+    padding: 0px 16px 0px 16px;
+}
+
+.menu-items li.menu-active-item a {
+	background-color: #F2F2F2;
+	white-space: nowrap;
+	display: block;
+	text-decoration: none;
+	-webkit-user-select: none; /* Block user selection */
+	-webkit-touch-callout: none; /* Work on iOS to block hyperlink menu */
+    font-family: 'Roboto Medium', sans-serif;
+    color: #424242;
+    font-size: 14px;
+    height: 48px;
+    line-height: 48px;
+    padding: 0px 16px 0px 16px;
+}
+
+#app-menu .ripple-drop {
+    background-color: #F2F2F2;
+}
+
+
+/*
+ * Spinner structure and animation
+ */
+
+.spinner {
+  -webkit-animation: rotator 2s linear infinite;
+          animation: rotator 2s linear infinite;
+}
+
+@-webkit-keyframes rotator {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+@keyframes rotator {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+.path {
+  stroke-dasharray: 125;
+  stroke-dashoffset: 0;
+  -webkit-transform-origin: center;
+          transform-origin: center;
+  -webkit-animation: dash 4s ease-in-out infinite;
+          animation: dash 4s ease-in-out infinite;
+  stroke: #4285F4;
+}
+
+.path.colors {
+  -webkit-animation: dash 4s ease-in-out infinite, colors 4s ease-in infinite;
+          animation: dash 4s ease-in-out infinite, colors 4s ease-in infinite;
+}
+
+@-webkit-keyframes colors {
+  0% {
+    stroke: #4285F4;
+  }
+  20% {
+    stroke: #4285F4;
+  }
+  25% {
+    stroke: #DE3E35;
+  }
+  45% {
+    stroke: #DE3E35;
+  }
+  50% {
+    stroke: #F7C223;
+  }
+  70% {
+    stroke: #F7C223;
+  }
+  75% {
+    stroke: #1B9A59;
+  }
+  95% {
+    stroke: #1B9A59;
+  }
+  100% {
+    stroke: #4285F4;
+  }
+}
+
+@keyframes colors {
+  0% {
+    stroke: #4285F4;
+  }
+  20% {
+    stroke: #4285F4;
+  }
+  25% {
+    stroke: #DE3E35;
+  }
+  45% {
+    stroke: #DE3E35;
+  }
+  50% {
+    stroke: #F7C223;
+  }
+  70% {
+    stroke: #F7C223;
+  }
+  75% {
+    stroke: #1B9A59;
+  }
+  95% {
+    stroke: #1B9A59;
+  }
+  100% {
+    stroke: #4285F4;
+  }
+}
+@-webkit-keyframes dash {
+  0% {
+    stroke-dashoffset: 125;
+  }
+  12.5% {
+    stroke-dashoffset: 31.25;
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  25% {
+    stroke-dashoffset: 125;
+    -webkit-transform: rotate(270deg);
+            transform: rotate(270deg);
+  }
+  37.5% {
+    stroke-dashoffset: 31.25;
+    -webkit-transform: rotate(270deg);
+            transform: rotate(270deg);
+  }
+  50% {
+    stroke-dashoffset: 125;
+    -webkit-transform: rotate(540deg);
+            transform: rotate(540deg);
+  }
+  62.5% {
+    stroke-dashoffset: 31.25;
+    -webkit-transform: rotate(540deg);
+            transform: rotate(540deg);
+  }
+  75% {
+    stroke-dashoffset: 125;
+    -webkit-transform: rotate(810deg);
+            transform: rotate(810deg);
+  }
+  87.5% {
+    stroke-dashoffset: 31.25;
+    -webkit-transform: rotate(810deg);
+            transform: rotate(810deg);
+  }
+  100% {
+    stroke-dashoffset: 125;
+    -webkit-transform: rotate(1080deg);
+            transform: rotate(1080deg);
+  }
+}
+@keyframes dash {
+  0% {
+    stroke-dashoffset: 125;
+  }
+  12.5% {
+    stroke-dashoffset: 31.25;
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  25% {
+    stroke-dashoffset: 125;
+    -webkit-transform: rotate(270deg);
+            transform: rotate(270deg);
+  }
+  37.5% {
+    stroke-dashoffset: 31.25;
+    -webkit-transform: rotate(270deg);
+            transform: rotate(270deg);
+  }
+  50% {
+    stroke-dashoffset: 125;
+    -webkit-transform: rotate(540deg);
+            transform: rotate(540deg);
+  }
+  62.5% {
+    stroke-dashoffset: 31.25;
+    -webkit-transform: rotate(540deg);
+            transform: rotate(540deg);
+  }
+  75% {
+    stroke-dashoffset: 125;
+    -webkit-transform: rotate(810deg);
+            transform: rotate(810deg);
+  }
+  87.5% {
+    stroke-dashoffset: 31.25;
+    -webkit-transform: rotate(810deg);
+            transform: rotate(810deg);
+  }
+  100% {
+    stroke-dashoffset: 125;
+    -webkit-transform: rotate(1080deg);
+            transform: rotate(1080deg);
+  }
+}
+
+
+
+/*
+ * Ripple effect
+ */
+
+.ripple-drop {
+    position:absolute;
+    border-radius:100%;
+    background-color: #e1f5fe;
+    transform: scale(0);
+}
+
+.app-header .ripple-drop, .panel-header .ripple-drop {
+    background-color: #626262;
+}
+
+.ripple-drop.play-ripple-animation {
+    animation: ripple-animation 0.65s linear;
+}
+
+@keyframes ripple-animation {
+    100% {
+        opacity: 0;
+        transform: scale(2.5);
+    }
+}

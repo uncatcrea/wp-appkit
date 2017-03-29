@@ -1,0 +1,412 @@
+/*
+ * common.css : general rules (applied to all templates)
+ * post-list.css : archive.html specific rules
+ * post-detail.css : single.html and page.html specific rules
+ */
+
+
+
+/*
+ * Fonts
+ */
+
+@font-face {
+	font-family : "PT Serif Regular";
+	src : url('../fonts/PT-Serif-Regular.ttf');
+}
+
+
+
+/*
+ * General screen rules
+ */
+
+* {box-sizing: border-box;}
+
+html,body {
+	height: 100%;
+	margin: 0px;
+}
+
+body {
+	background-color:#182C36;
+	text-rendering: optimizelegibility;     /* Enables kerning and optional ligatures */
+	-webkit-text-size-adjust: 100%;         /* Blocks text auto-scaling (eg. when switching from portrait to landscape) */
+	-webkit-font-smoothing: antialiased;    /* Enhances font aliasing */
+	font-family:"HelveticaNeue", sans-serif;
+}
+
+a {
+    -webkit-tap-highlight-color: rgba(0,0,0,0); /* Disables touch highlight on hyperlinks */
+}
+
+/* Finger taps a button */
+.button-tap-on {
+	opacity:0.1;
+	-webkit-transition:opacity 0.1s linear;
+}
+
+/* Finger releases a button */
+.button-tap-off {
+	opacity:1;
+	-webkit-transition:opacity 0.1s linear;
+}
+
+
+
+/*
+ * App structure
+ */
+
+/* Encloses all app's elements (auto-added) */
+#app-layout {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    overflow: hidden;
+}
+
+/* Encloses app's menu (auto-added) */
+#app-menu {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    width: 85%;
+    z-index: 0; /* Positionned under the app's canvas / z-index relative to #app-layout */
+    overflow-y: scroll;
+    -webkit-overflow-scrolling:touch; /* Enables scrolling bounce effect when reaching top or bottom */
+}
+
+/* Encloses nav bar, content and toolbar  */
+#app-canvas {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    z-index: 10; /* Positionned above the app's menu / z-index relative to #app-layout */
+    overflow: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Encloses content (auto-added) */
+#app-content-wrapper {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    z-index: 5; /* z-index relative to #app-canvas */
+}
+
+/* Encloses content (auto-added) */
+.app-screen {
+    overflow-y: scroll;
+    position: absolute;
+    top: 44px;
+    bottom: 0px;
+    left: 0px;
+	width: 100%;
+    background-color: #fff;
+    -webkit-overflow-scrolling:touch; /* Enables scrolling bounce effect when reaching top or bottom */
+}
+
+/* When in slideup panel, no need to reserve place for toolbar */
+.panel-content .app-screen {
+    top: 0px;
+}
+
+/* Nav Bar */
+#app-header {
+	position: absolute;
+	top: 0px;
+    left: 0px;
+	width: 100%;
+	height: 44px;
+	text-align: center;
+    overflow: hidden;
+    z-index: 10; /* z-index relative to #app-canvas */
+}
+
+
+
+/*
+ * Menu button
+ */
+
+.menu-button {
+	position: absolute;
+	float: left;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-image:url('../img/menu-icon.svg');	
+	width:43px;
+	height:44px;
+}
+
+
+
+/*
+ * Back button
+ */
+
+.back-button {
+	position:absolute;
+	float: left;
+	background-repeat:no-repeat;
+	background-position:center;
+	background-image:url('../img/back-icon.svg');	
+	width:43px;
+	height:44px;
+}
+
+
+
+/*
+ * Refresh button
+ */
+
+.refresh-off {
+	position: absolute;
+	right: 0px;
+	background-repeat: no-repeat;
+	background-position: center;	
+	width:40px;
+	height:44px;
+	background-image:url('../img/refresh-off-icon.svg');
+}
+
+/* iOS Animated on state for refresh button (spinning) */
+.refresh-on {
+	position: absolute;
+	right: 0px;
+	background-repeat: no-repeat;
+	background-position: center;	
+	-webkit-animation: refresh-effect 1s infinite;
+	width:40px;
+	height:44px;
+	background-image:url('../img/refresh-on-icon.svg');
+}
+
+/* Spinning effect for refresh button */
+@-webkit-keyframes refresh-effect {
+	100%	{-webkit-transform: rotate(360deg);}
+}
+
+
+
+/*
+ * App's nav bar
+ */
+
+.app-header {
+	background-color: #F8F8F8;
+	border-bottom: 1px #B2B2B2 solid;
+}
+
+.app-header h1 {
+	margin: 0px;
+	padding: 1px 50px 0px 50px;
+	text-align: center;
+	line-height: 44px;
+	overflow: hidden;
+	height: 44px;
+	font-weight: normal;
+	-webkit-user-select: none; /* Block selection with a long touch */
+	font-size: 18px;
+	font-family:HelveticaNeue-Medium,sans-serif;
+}
+
+
+
+/*
+ * Message bar
+ */
+
+.app-message-bar {
+	position: absolute;
+	top: 44px;
+	left: 0px;
+	width: 100%;
+	height: 24px;
+	font-size: 14px;
+    line-height: 24px;
+	text-align: left;
+	padding: 0px 10px 0px 10px;
+	opacity: 0;
+    overflow: hidden;
+    z-index: 20; /* Relative to .app-canvas */
+	background-color:#333;
+	color:#f9f9f9;
+    font-family: HelveticaNeue-Medium, sans-serif;
+}
+
+/* Show message bar transition */
+.message-on {
+	opacity: 1;
+	-webkit-transition: opacity 0.2s linear;
+}
+
+/* Hide message bar transition */
+.message-off {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+}
+
+
+
+/*
+ * Content areas (post list|post detail)
+ */
+
+.content {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    z-index: 1; /* z-index relative to .app-screen */
+    background-color: #fff;
+    -webkit-overflow-scrolling:touch; /* Enables scrolling bounce effect when reaching top or bottom */
+}
+
+
+
+/*
+ * Off-canvas menu
+ */
+
+/* Fixes the menu scrollbar bug */
+.off-canvas-menu {
+	overflow-y: auto;
+}
+
+.menu-items {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+}
+
+.menu-items li {
+	padding: 0px 3px 0px 0px;
+}
+
+.menu-items li a {
+	padding: 8px 0px 8px 10px;
+	font-size: 18px;
+	color: #fff;
+	line-height: 18px;
+	white-space: nowrap;
+	border-bottom: 1px #0F1B21 solid;
+	display: block;
+	text-decoration: none;
+	-webkit-user-select: none; /* Block user selection */
+	-webkit-touch-callout: none; /* Work on iOS to block hyperlink menu */
+}
+
+.menu-items li.menu-active-item a {
+	padding: 8px 0px 8px 10px;
+	font-size: 18px;
+	color: #233F4D;
+	background-color: #fff;
+	line-height: 18px;
+	white-space: nowrap;
+	display: block;
+	text-decoration: none;
+	-webkit-user-select: none; /* Block user selection */
+	-webkit-touch-callout: none; /* Work on iOS to block hyperlink menu */
+}
+
+
+
+/*
+ * Spinner structure and animation
+ */
+
+div.spinner {
+    position: relative;
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+div.spinner div {
+    width: 6%;
+    height: 16%;
+    background-color: #fff;
+    position: absolute;
+    left: 49%;
+    top: 43%;
+    opacity: 0;
+    -webkit-border-radius: 50px;
+    -webkit-box-shadow: 0 0 3px rgba(0,0,0,0.2);
+    -webkit-animation: fade 1s linear infinite;
+}
+
+@-webkit-keyframes fade {
+  from {opacity: 1;}
+  to {opacity: 0.25;}
+}
+
+div.spinner div.bar1 {
+  -webkit-transform:rotate(0deg) translate(0, -130%);
+  -webkit-animation-delay: 0s;
+}    
+
+div.spinner div.bar2 {
+  -webkit-transform:rotate(30deg) translate(0, -130%); 
+  -webkit-animation-delay: -0.9167s;
+}
+
+div.spinner div.bar3 {
+  -webkit-transform:rotate(60deg) translate(0, -130%); 
+  -webkit-animation-delay: -0.833s;
+}
+
+div.spinner div.bar4 {
+  -webkit-transform:rotate(90deg) translate(0, -130%); 
+  -webkit-animation-delay: -0.7497s;
+}
+
+div.spinner div.bar5 {
+  -webkit-transform:rotate(120deg) translate(0, -130%); 
+  -webkit-animation-delay: -0.667s;
+}
+
+div.spinner div.bar6 {
+  -webkit-transform:rotate(150deg) translate(0, -130%); 
+  -webkit-animation-delay: -0.5837s;
+}
+
+div.spinner div.bar7 {
+  -webkit-transform:rotate(180deg) translate(0, -130%); 
+  -webkit-animation-delay: -0.5s;
+}
+
+div.spinner div.bar8 {
+  -webkit-transform:rotate(210deg) translate(0, -130%); 
+  -webkit-animation-delay: -0.4167s;
+}
+
+div.spinner div.bar9 {
+  -webkit-transform:rotate(240deg) translate(0, -130%); 
+  -webkit-animation-delay: -0.333s;
+}
+
+div.spinner div.bar10 {
+  -webkit-transform:rotate(270deg) translate(0, -130%); 
+  -webkit-animation-delay: -0.2497s;
+}
+
+div.spinner div.bar11 {
+  -webkit-transform:rotate(300deg) translate(0, -130%); 
+  -webkit-animation-delay: -0.167s;
+}
+
+div.spinner div.bar12 {
+  -webkit-transform:rotate(330deg) translate(0, -130%); 
+  -webkit-animation-delay: -0.0833s;
+}
