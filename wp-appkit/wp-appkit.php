@@ -170,6 +170,10 @@ if ( !class_exists( 'WpAppKit' ) ) {
 		protected static function upgrade_060() {
 			// Remove 'wpak_used_themes' transient since its value's structure changed with this version
 			delete_transient( 'wpak_used_themes' );
+			
+			//Memorize we've gone that far successfully, to not re-run this routine 
+			//in case something goes wrong in next upgrade routines:
+			update_option( 'wpak_version', '0.6' );
 		}
 		
 		/**
@@ -180,6 +184,10 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			//of jQuery, undercore and backbone:
 			self::add_rewrite_rules();
 			flush_rewrite_rules();
+			
+			//Memorize we've gone that far successfully, to not re-run this routine 
+			//in case something goes wrong in next upgrade routines:
+			update_option( 'wpak_version', '1.0' );
 		}
 
 		/**
