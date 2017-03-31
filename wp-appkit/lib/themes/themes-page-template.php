@@ -102,6 +102,7 @@ get_current_screen()->set_help_sidebar(
 
 
 $themes = WpakThemes::get_available_themes( true );
+$prepared_themes = array();
 
 foreach ( $themes as $slug => $theme ) {
     $screenshot = array();
