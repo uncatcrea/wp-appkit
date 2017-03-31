@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP AppKit\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-11 19:29+0200\n"
-"PO-Revision-Date: 2016-06-11 19:29+0200\n"
+"POT-Creation-Date: 2017-03-31 19:15+0200\n"
+"PO-Revision-Date: 2017-03-31 19:19+0200\n"
 "Last-Translator: Lionel Pointet <lionel.pointet@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n>1;\n"
-"X-Generator: Poedit 1.8.7\n"
+"X-Generator: Poedit 2.0\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;"
 "_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2;"
@@ -34,13 +34,13 @@ msgid "Wrong addon file"
 msgstr "Fichier d'addon incorrect"
 
 # @ wp-appkit
-#: ../lib/addons/addons.php:100 ../lib/simulator/config-file.php:63
-#: ../lib/themes/themes.php:292 ../lib/web-services/web-services.php:82
+#: ../lib/addons/addons.php:100 ../lib/simulator/config-file.php:66
+#: ../lib/themes/themes.php:427 ../lib/web-services/web-services.php:82
 msgid "App not found"
 msgstr "Application introuvable"
 
 # @ wp-appkit
-#: ../lib/addons/addons.php:105 ../lib/themes/themes.php:297
+#: ../lib/addons/addons.php:105 ../lib/themes/themes.php:432
 msgid "App id not found in _GET parmeters"
 msgstr "Id de l'application introuvable dans les paramètres _GET"
 
@@ -52,7 +52,7 @@ msgstr "Addons"
 msgid "Addons activated for this App"
 msgstr "Addons activés pour cette application"
 
-#: ../lib/apps/apps.php:32 ../lib/apps/apps.php:373 ../lib/apps/apps.php:387
+#: ../lib/apps/apps.php:32 ../lib/apps/apps.php:380 ../lib/apps/apps.php:394
 #: ../lib/apps/build.php:30 ../lib/components/components-bo-settings.php:46
 #: ../lib/themes/themes-bo-settings.php:63
 #: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:46
@@ -70,7 +70,7 @@ msgid "Applications"
 msgstr "Applications"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:70 ../lib/apps/apps.php:391
+#: ../lib/apps/apps.php:70 ../lib/apps/apps.php:398
 msgid "Application"
 msgstr "Application"
 
@@ -84,7 +84,7 @@ msgid "Add an application"
 msgstr "Ajouter une application"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:74 ../lib/components/components-bo-settings.php:118
+#: ../lib/apps/apps.php:74 ../lib/components/components-bo-settings.php:129
 msgid "Edit"
 msgstr "Modifier"
 
@@ -111,89 +111,88 @@ msgid "Application project saved."
 msgstr "Projet d'application enregistré."
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:120 ../lib/apps/apps.php:167
+#: ../lib/apps/apps.php:120 ../lib/apps/apps.php:174
 msgid "Platform"
 msgstr "Plateforme"
 
-# @ wp-appkit
-#: ../lib/apps/apps.php:141
-msgid "WP AppKit"
-msgstr "WP AppKit"
+#: ../lib/apps/apps.php:142 ../lib/apps/apps.php:143
+msgid "WP-AppKit"
+msgstr "WP-AppKit"
 
-#: ../lib/apps/apps.php:149
+#: ../lib/apps/apps.php:156
 msgid "Save & Preview"
 msgstr "Enregistrer et prévisualiser"
 
-#: ../lib/apps/apps.php:158
+#: ../lib/apps/apps.php:165
 msgid "My Project"
 msgstr "Mon projet"
 
-#: ../lib/apps/apps.php:176
+#: ../lib/apps/apps.php:183
 msgid "Deep Linking"
 msgstr "Liens profonds"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:189 ../lib/apps/apps.php:330 ../lib/apps/build.php:91
+#: ../lib/apps/apps.php:196 ../lib/apps/apps.php:337 ../lib/apps/build.php:91
 msgid "PhoneGap Build"
 msgstr "PhoneGap Build"
 
-#: ../lib/apps/apps.php:215 ../lib/apps/apps.php:267 ../lib/apps/apps.php:270
+#: ../lib/apps/apps.php:222 ../lib/apps/apps.php:274 ../lib/apps/apps.php:277
 msgid "Save"
 msgstr "Enregistrer"
 
-#: ../lib/apps/apps.php:221
+#: ../lib/apps/apps.php:228
 msgid "Preview"
 msgstr "Prévisualiser"
 
 #. translators: Publish box date format, see http://php.net/date
-#: ../lib/apps/apps.php:230
+#: ../lib/apps/apps.php:237
 msgid "M j, Y @ H:i"
 msgstr "j F Y \\à G \\h i \\m\\i\\n "
 
-#: ../lib/apps/apps.php:233
+#: ../lib/apps/apps.php:240
 #, php-format
 msgid "Last saved on: <b>%1$s</b>"
 msgstr "Dernière sauvegarde : <b>%1$s</b>"
 
-#: ../lib/apps/apps.php:235 ../lib/apps/apps.php:239
+#: ../lib/apps/apps.php:242 ../lib/apps/apps.php:246
 msgid "Not saved yet"
 msgstr "Pas encore enregistré"
 
-#: ../lib/apps/apps.php:254
+#: ../lib/apps/apps.php:261
 msgid "Delete Permanently"
 msgstr "Supprimer définitivement"
 
-#: ../lib/apps/apps.php:256
+#: ../lib/apps/apps.php:263
 msgid "Move to Trash"
 msgstr "Déplacer dans la corbeille"
 
-#: ../lib/apps/apps.php:307
+#: ../lib/apps/apps.php:314
 msgid "Define a title"
 msgstr "Définir un titre"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:311
+#: ../lib/apps/apps.php:318
 msgid "Add components"
 msgstr "Ajouter des composants"
 
-#: ../lib/apps/apps.php:315
+#: ../lib/apps/apps.php:322
 msgid "Setup appearance and navigation"
 msgstr "Configurer l'apparence et la navigation"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:319
+#: ../lib/apps/apps.php:326
 msgid "Setup PhoneGap config"
 msgstr "Configurer PhoneGap"
 
-#: ../lib/apps/apps.php:323
+#: ../lib/apps/apps.php:330
 msgid "Save your app"
 msgstr "Enregistrer votre application"
 
-#: ../lib/apps/apps.php:330 ../lib/apps/apps.php:458
+#: ../lib/apps/apps.php:337 ../lib/apps/apps.php:465
 msgid "Export"
 msgstr "Exporter"
 
-#: ../lib/apps/apps.php:375
+#: ../lib/apps/apps.php:382
 msgid ""
 "Deep Linking allows you to create links to open the app. Enter here the "
 "custom scheme you want to use (e.g. \"urlscheme\" lets you create links like "
@@ -203,17 +202,17 @@ msgstr ""
 "Entrez ici le protocole spécifique que vous voulez utiliser (ex : \"urlscheme"
 "\" permet de créer des liens sous la forme urlscheme://monlien)"
 
-#: ../lib/apps/apps.php:376
+#: ../lib/apps/apps.php:383
 msgid "Custom URL Scheme"
 msgstr "Protocole spécifique"
 
-#: ../lib/apps/apps.php:378
+#: ../lib/apps/apps.php:385
 msgid "If empty, deep linking feature won't be available for this app"
 msgstr ""
 "Si ce champ est laissé vide, la fonctionnalité des liens profonds ne sera "
 "pas disponible pour cette application"
 
-#: ../lib/apps/apps.php:389
+#: ../lib/apps/apps.php:396
 msgid ""
 "Information will be used when compiling your app and may be displayed in app "
 "stores. It will be stored in the config.xml file of your project."
@@ -223,46 +222,46 @@ msgstr ""
 "stockées dans le fichier config.xml de votre projet."
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:393 ../lib/apps/apps.php:432
+#: ../lib/apps/apps.php:400 ../lib/apps/apps.php:439
 #: ../lib/components/components-bo-settings.php:63
 msgid "Name"
 msgstr "Nom"
 
-#: ../lib/apps/apps.php:397
+#: ../lib/apps/apps.php:404
 msgid "Description"
 msgstr "Description"
 
-#: ../lib/apps/apps.php:401
+#: ../lib/apps/apps.php:408
 msgid "ID"
 msgstr "ID"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:405 ../lib/apps/apps.php:447
+#: ../lib/apps/apps.php:412 ../lib/apps/apps.php:454
 msgid "Version"
 msgstr "Version"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:409
+#: ../lib/apps/apps.php:416
 msgid "VersionCode (Android only)"
 msgstr "\"versionCode\" de l'application (Android seulement)"
 
-#: ../lib/apps/apps.php:413
+#: ../lib/apps/apps.php:420
 msgid "Build Tool (Android only)"
 msgstr "Outil de compilation (Android seulement)"
 
-#: ../lib/apps/apps.php:415
+#: ../lib/apps/apps.php:422
 msgid "Gradle"
 msgstr "Gradle"
 
-#: ../lib/apps/apps.php:416
+#: ../lib/apps/apps.php:423
 msgid "Ant"
 msgstr "Ant"
 
-#: ../lib/apps/apps.php:420
+#: ../lib/apps/apps.php:427
 msgid "Icons and Splashscreens"
 msgstr "Icônes et splashscreens"
 
-#: ../lib/apps/apps.php:422
+#: ../lib/apps/apps.php:429
 #, php-format
 msgid ""
 "Add here the tags defining where are the app icons and splashscreens.<br/"
@@ -271,11 +270,11 @@ msgstr ""
 "Entrez ici les balises définissant où sont les icônes et splashscreens de "
 "l'application.<br/>Exemple : %s"
 
-#: ../lib/apps/apps.php:425
+#: ../lib/apps/apps.php:432
 msgid "Use default WP-AppKit Icons and Splashscreens"
 msgstr "Utiliser les icônes et splashscreens par défaut de WP-AppKit"
 
-#: ../lib/apps/apps.php:426
+#: ../lib/apps/apps.php:433
 msgid ""
 "If checked and \"Icons and Splashscreens\" is empty, the app export will "
 "embed the default WP-AppKit Icons and Splashscreens."
@@ -283,28 +282,28 @@ msgstr ""
 "Si sélectionné et \"Icônes et splashscreens\" est vide, l'export de l'app "
 "embarquera les icônes et splashscreens par défaut de WP-AppKit."
 
-#: ../lib/apps/apps.php:430
+#: ../lib/apps/apps.php:437
 msgid "Author"
 msgstr "Auteur"
 
-#: ../lib/apps/apps.php:436
+#: ../lib/apps/apps.php:443
 msgid "Website"
 msgstr "Site web"
 
-#: ../lib/apps/apps.php:440
+#: ../lib/apps/apps.php:447
 msgid "Email"
 msgstr "Email"
 
-#: ../lib/apps/apps.php:445
+#: ../lib/apps/apps.php:452
 msgid "PhoneGap"
 msgstr "PhoneGap"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:451
+#: ../lib/apps/apps.php:458
 msgid "Plugins"
 msgstr "Plugins"
 
-#: ../lib/apps/apps.php:453
+#: ../lib/apps/apps.php:460
 msgid ""
 "Add here the tags defining the plugins you want to include in your app. "
 "Before adding a plugin, check which one is included by default."
@@ -314,26 +313,26 @@ msgstr ""
 "sont incluses par défaut."
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:457
+#: ../lib/apps/apps.php:464
 msgid "View config.xml"
 msgstr "Voir le fichier config.xml"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:470
+#: ../lib/apps/apps.php:477
 msgid "App Simulation Visibility"
 msgstr "Visibilité de la simulation de l'application"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:474
+#: ../lib/apps/apps.php:481
 msgid "Private"
 msgstr "Privée"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:475
+#: ../lib/apps/apps.php:482
 msgid "Public"
 msgstr "Publique"
 
-#: ../lib/apps/apps.php:477
+#: ../lib/apps/apps.php:484
 msgid ""
 "Private means that only logged in users with the right permissions can "
 "access the browser simulation. When public, anyone can access browser "
@@ -346,12 +345,12 @@ msgstr ""
 "config.js et config.xml qui peuvent contenir des données sensibles."
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:609
+#: ../lib/apps/apps.php:616
 msgid "iOS"
 msgstr "iOS"
 
 # @ wp-appkit
-#: ../lib/apps/apps.php:610
+#: ../lib/apps/apps.php:617
 msgid "Android"
 msgstr "Android"
 
@@ -431,12 +430,12 @@ msgstr ""
 "avez les permissions nécessaire pour créer ce répertoire."
 
 # @ wp-appkit
-#: ../lib/apps/build.php:207
+#: ../lib/apps/build.php:214
 msgid "Wrong application ID"
 msgstr "Mauvais identifiant d'application"
 
 # @ wp-appkit
-#: ../lib/apps/build.php:260
+#: ../lib/apps/build.php:267
 #, php-format
 msgid ""
 "The Zip archive file [%s] could not be created. Please check that you have "
@@ -445,53 +444,53 @@ msgstr ""
 "Impossible de créer le fichier Zip [%s]. Veuillez vérifier que vous avez les "
 "permissions en écriture sur ce répertoire."
 
-#: ../lib/apps/build.php:277
+#: ../lib/apps/build.php:284
 msgctxt "ZipArchive::ER_EXISTS error"
 msgid "File already exists"
 msgstr "Le fichier existe déjà"
 
-#: ../lib/apps/build.php:280
+#: ../lib/apps/build.php:287
 msgctxt "ZipArchive::ER_INCONS error"
 msgid "Zip archive inconsistent"
 msgstr "Fichier zip corrompu"
 
-#: ../lib/apps/build.php:283
+#: ../lib/apps/build.php:290
 msgctxt "ZipArchive::ER_INVAL error"
 msgid "Invalid argument"
 msgstr "Argument invalide"
 
-#: ../lib/apps/build.php:286
+#: ../lib/apps/build.php:293
 msgctxt "ZipArchive::ER_MEMORY error"
 msgid "Malloc failure"
 msgstr "Erreur mémoire"
 
-#: ../lib/apps/build.php:289
+#: ../lib/apps/build.php:296
 msgctxt "ZipArchive::ER_NOENT error"
 msgid "No such file"
 msgstr "Fichier introuvable"
 
-#: ../lib/apps/build.php:292
+#: ../lib/apps/build.php:299
 msgctxt "ZipArchive::ER_NOZIP error"
 msgid "Not a zip archive"
 msgstr "Le fichier indiqué n'est pas un zip"
 
-#: ../lib/apps/build.php:295
+#: ../lib/apps/build.php:302
 msgctxt "ZipArchive::ER_OPEN error"
 msgid "Can't open file"
 msgstr "Impossible d'ouvrir le fichier"
 
-#: ../lib/apps/build.php:298
+#: ../lib/apps/build.php:305
 msgctxt "ZipArchive::ER_READ error"
 msgid "Read error"
 msgstr "Erreur de lecture"
 
-#: ../lib/apps/build.php:301
+#: ../lib/apps/build.php:308
 msgctxt "ZipArchive::ER_SEEK error"
 msgid "Seek error"
 msgstr "Erreur de déplacement"
 
 # @ wp-appkit
-#: ../lib/apps/build.php:306
+#: ../lib/apps/build.php:313
 #, php-format
 msgid ""
 "The Zip archive file [%s] could not be opened (%s). Please check that you "
@@ -501,27 +500,27 @@ msgstr ""
 "avez les permissions en écriture sur ce répertoire."
 
 # @ wp-appkit
-#: ../lib/apps/build.php:322 ../lib/apps/build.php:349
-#: ../lib/apps/build.php:416
+#: ../lib/apps/build.php:329 ../lib/apps/build.php:356
+#: ../lib/apps/build.php:423
 #, php-format
 msgid "Could not add directory [%s] to zip archive"
 msgstr "Impossible d'ajouter le répertoire [%s] à l'archive Zip"
 
 # @ wp-appkit
-#: ../lib/apps/build.php:361 ../lib/apps/build.php:369
-#: ../lib/apps/build.php:423
+#: ../lib/apps/build.php:368 ../lib/apps/build.php:376
+#: ../lib/apps/build.php:430
 #, php-format
 msgid "Could not add file [%s] to zip archive"
 msgstr "Impossible d'ajouter le fichier [%s] à l'archive Zip"
 
 # @ wp-appkit
-#: ../lib/apps/build.php:483
+#: ../lib/apps/build.php:490
 #, php-format
 msgid "Zip archive source directory [%s] could not be found."
 msgstr "Impossible de trouver le répertoire source du fichier Zip [%s]."
 
 # @ wp-appkit
-#: ../lib/apps/build.php:489
+#: ../lib/apps/build.php:496
 msgid "Error during archive creation"
 msgstr "Erreur lors de la création de l'archive"
 
@@ -601,7 +600,7 @@ msgstr "Options"
 msgid "No Component yet!"
 msgstr "Aucun composant pour l'instant!"
 
-#: ../lib/components/components-bo-settings.php:109
+#: ../lib/components/components-bo-settings.php:120
 #: ../lib/navigation/navigation-bo-settings.php:95
 msgid ""
 "Component type doesn't exist, this component won't be included into the app"
@@ -609,81 +608,81 @@ msgstr ""
 "Type de composant inexistant, ce composant ne sera pas inclus dans l'app"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:119
+#: ../lib/components/components-bo-settings.php:130
 #: ../lib/navigation/navigation-bo-settings.php:107
-#: ../lib/themes/themes-page-template.php:266
+#: ../lib/themes/themes-page-template.php:267
 msgid "Delete"
 msgstr "Supprimer"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:158
+#: ../lib/components/components-bo-settings.php:169
 msgid "Component label"
 msgstr "Libellé du composant"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:163
+#: ../lib/components/components-bo-settings.php:187
 msgid "Component slug"
 msgstr "Slug du composant"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:168
+#: ../lib/components/components-bo-settings.php:192
 msgid "Component type"
 msgstr "Type de composant"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:179
+#: ../lib/components/components-bo-settings.php:203
 msgid "Component options"
 msgstr "Options du composant"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:189
+#: ../lib/components/components-bo-settings.php:213
 #: ../lib/navigation/navigation-bo-settings.php:192
 msgid "Cancel"
 msgstr "Annuler"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:190
+#: ../lib/components/components-bo-settings.php:214
 msgid "Save Changes"
 msgstr "Enregistrer"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:247
+#: ../lib/components/components-bo-settings.php:271
 msgid "Application not found."
 msgstr "Application non trouvée."
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:258
+#: ../lib/components/components-bo-settings.php:294
 msgid "You must provide a label for the component!"
 msgstr "Le champ libellé est requis"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:263
+#: ../lib/components/components-bo-settings.php:299
 msgid "The component label can't be numeric."
 msgstr "Le libellé du composant ne peut pas être numérique."
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:271
+#: ../lib/components/components-bo-settings.php:307
 msgid "You must provide a slug for the component."
 msgstr "Le champ slug est requis."
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:276
+#: ../lib/components/components-bo-settings.php:312
 msgid "The component slug can't be numeric."
 msgstr "Le slug ne peut pas être numérique."
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:307
+#: ../lib/components/components-bo-settings.php:359
 #, php-format
 msgid "Component \"%s\" updated successfuly"
 msgstr "Composant \"%s\" enregistré"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:311
+#: ../lib/components/components-bo-settings.php:363
 #, php-format
 msgid "Component \"%s\" created successfuly"
 msgstr "Composant \"%s\" créé"
 
-#: ../lib/components/components-bo-settings.php:321
+#: ../lib/components/components-bo-settings.php:373
 msgid ""
 "The component to delete is in the app navigation. Please remove the "
 "component from app navigation before deleting it."
@@ -692,17 +691,17 @@ msgstr ""
 "Supprimez le composant de la navigation pour pouvoir l'effacer."
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:324
+#: ../lib/components/components-bo-settings.php:376
 msgid "Could not delete component"
 msgstr "Impossible d'effacer le composant"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:328
+#: ../lib/components/components-bo-settings.php:380
 msgid "Component deleted successfuly"
 msgstr "Composant effacé"
 
 # @ wp-appkit
-#: ../lib/components/components-bo-settings.php:332
+#: ../lib/components/components-bo-settings.php:384
 msgid "Component to delete not found"
 msgstr "Le composant à effacer est introuvable"
 
@@ -961,10 +960,9 @@ msgstr ""
 msgid "Settings"
 msgstr "Paramètres"
 
-# @ wp-appkit
 #: ../lib/settings/settings.php:30
-msgid "WP AppKit Settings"
-msgstr "Paramètres WP AppKit"
+msgid "WP-AppKit Settings"
+msgstr "Paramètres WP-AppKit"
 
 # @ wp-appkit
 #: ../lib/settings/settings.php:40
@@ -972,21 +970,20 @@ msgid "Apps post lists"
 msgstr "Listes d'articles des applications"
 
 #: ../lib/settings/settings.php:42
-msgid "Number of posts per list in WP AppKit apps"
-msgstr "Nombre d'articles présents dans les listes des applications WP AppKit"
+msgid "Number of posts per list in WP-AppKit apps"
+msgstr "Nombre d'articles présents dans les listes des applications WP-AppKit"
 
-# @ wp-appkit
 #: ../lib/settings/settings.php:47
-msgid "WP AppKit user role"
-msgstr "Rôle utilisateur WP AppKit"
+msgid "WP-AppKit user role"
+msgstr "Rôle utilisateur WP-AppKit"
 
 #: ../lib/settings/settings.php:50
 msgid ""
-"Activate a \"WP AppKit App Editor\" role that can only edit WP AppKit apps "
+"Activate a \"WP-AppKit App Editor\" role that can only edit WP-AppKit apps "
 "and no other WordPress contents"
 msgstr ""
-"Activer le rôle \"Editeur d'applications WP AppKit\" qui permet de créer des "
-"utilisateurs n'ayant accès qu'aux applications WP AppKit et à aucun autre "
+"Activer le rôle \"Editeur d'applications WP-AppKit\" qui permet de créer des "
+"utilisateurs n'ayant accès qu'aux applications WP-AppKit et à aucun autre "
 "contenu du site."
 
 # @ wp-appkit
@@ -999,7 +996,7 @@ msgid "Settings saved"
 msgstr "Paramètres enregistrés"
 
 # @ wp-appkit
-#: ../lib/simulator/config-file.php:67
+#: ../lib/simulator/config-file.php:70
 msgid "App id not found in _GET parameters"
 msgstr "Id de l'application non trouvé dans les paramètres _GET"
 
@@ -1038,16 +1035,16 @@ msgstr ""
 "de votre installation WordPress."
 
 #: ../lib/themes/themes-bo-settings.php:76
-msgid "No WP AppKit theme found!"
-msgstr "Aucun thème WP AppKit trouvé !"
+msgid "No WP-AppKit theme found!"
+msgstr "Aucun thème WP-AppKit trouvé !"
 
 #: ../lib/themes/themes-bo-settings.php:78
 #, php-format
 msgid ""
-"Please upload a WP AppKit theme from the \"<a href=\"%s\" >Upload Themes</a>"
+"Please upload a WP-AppKit theme from the \"<a href=\"%s\" >Upload Themes</a>"
 "\" panel or copy a theme directly to the %s directory."
 msgstr ""
-"Téléchargez un thème WP AppKit depuis le panneau de \"<a href=\"%s\" "
+"Téléchargez un thème WP-AppKit depuis le panneau de \"<a href=\"%s\" "
 ">chargement de thèmes</a>\" ou copiez un thème directement dans le dossier "
 "%s."
 
@@ -1058,9 +1055,9 @@ msgid "Version %s"
 msgstr "Version %s"
 
 #: ../lib/themes/themes-bo-settings.php:101
-#: ../lib/themes/themes-page-template.php:188
-#: ../lib/themes/themes-page-template.php:219
-#: ../lib/themes/themes-page-template.php:246
+#: ../lib/themes/themes-page-template.php:189
+#: ../lib/themes/themes-page-template.php:220
+#: ../lib/themes/themes-page-template.php:247
 #, php-format
 msgid "By %s"
 msgstr "Par %s"
@@ -1079,7 +1076,7 @@ msgstr "Nécessite WP-AppKit version %s"
 msgid "Application Title (displayed in app top bar)"
 msgstr "Titre de l'application (affiché dans la top bar)"
 
-#: ../lib/themes/themes-page-template.php:145
+#: ../lib/themes/themes-page-template.php:146
 msgid ""
 "Are you sure you want to delete this theme?\n"
 "\n"
@@ -1089,74 +1086,73 @@ msgstr ""
 "\n"
 "Cliquez sur 'Annuler' pour revenir, 'OK' pour confirmer la suppression."
 
-#: ../lib/themes/themes-page-template.php:150
+#: ../lib/themes/themes-page-template.php:151
 msgid "Add New Theme"
 msgstr "Ajouter un thème"
 
-#: ../lib/themes/themes-page-template.php:151
+#: ../lib/themes/themes-page-template.php:152
 msgid "Search Installed Themes"
 msgstr "Chercher parmi les thèmes installés"
 
-#: ../lib/themes/themes-page-template.php:152
+#: ../lib/themes/themes-page-template.php:153
 msgid "Search installed themes..."
 msgstr "Chercher parmi les thèmes installés..."
 
-#: ../lib/themes/themes-page-template.php:153
+#: ../lib/themes/themes-page-template.php:154
 #, php-format
 msgid "Number of Themes found: %d"
 msgstr "Nombre de thèmes trouvés : %d"
 
-#: ../lib/themes/themes-page-template.php:154
-#: ../lib/themes/themes-page-template.php:201
+#: ../lib/themes/themes-page-template.php:155
+#: ../lib/themes/themes-page-template.php:202
 msgid "No themes found. Try a different search."
 msgstr "Aucun thème trouvé. Essayez une autre recherche."
 
-#: ../lib/themes/themes-page-template.php:165
+#: ../lib/themes/themes-page-template.php:166
 msgctxt "Add new theme"
 msgid "Add New"
 msgstr "Ajouter"
 
-#: ../lib/themes/themes-page-template.php:187
-#: ../lib/themes/themes-page-template.php:218
+#: ../lib/themes/themes-page-template.php:188
+#: ../lib/themes/themes-page-template.php:219
 msgid "Theme Details"
 msgstr "Détails du thème"
 
-#: ../lib/themes/themes-page-template.php:231
+#: ../lib/themes/themes-page-template.php:232
 msgid "Show previous theme"
 msgstr "Afficher le thème précédent"
 
-#: ../lib/themes/themes-page-template.php:232
+#: ../lib/themes/themes-page-template.php:233
 msgid "Show next theme"
 msgstr "Afficher le thème suivant"
 
-#: ../lib/themes/themes-page-template.php:233
+#: ../lib/themes/themes-page-template.php:234
 msgid "Close details dialog"
 msgstr "Fermer la fenêtre des détails"
 
-#: ../lib/themes/themes-page-template.php:245
+#: ../lib/themes/themes-page-template.php:246
 #, php-format
 msgid "Version: %s"
 msgstr "Version : %s"
 
-#: ../lib/themes/themes-page-template.php:251
+#: ../lib/themes/themes-page-template.php:252
 msgid "Tags:"
 msgstr "Étiquettes :"
 
-#: ../lib/themes/themes-page-template.php:255
+#: ../lib/themes/themes-page-template.php:256
 msgid "Applications using this theme:"
 msgstr "Applications utilisant ce thème :"
 
-# @ wp-appkit
-#: ../lib/themes/themes.php:79
+#: ../lib/themes/themes.php:87
 #, php-format
 msgid ""
-"The WP AppKit themes directory %s can't be created. <br/>Please check that "
+"The WP-AppKit themes directory %s can't be created. <br/>Please check that "
 "your WordPress install has the permissions to create this directory."
 msgstr ""
 "Impossible de créer le répertoire de thèmes [%s]. <br/>Veuillez vérifier que "
 "vous avez les permissions nécessaire pour créer ce répertoire."
 
-#: ../lib/themes/themes.php:86
+#: ../lib/themes/themes.php:94
 #, php-format
 msgid ""
 "We tried copying default themes into %s directory, and it seems it didn't "
@@ -1168,74 +1164,74 @@ msgstr ""
 "<a href=\"%s\">téléchargeant ces thèmes par défaut et en les chargeant via "
 "la page dédiée</a>."
 
-#: ../lib/themes/themes.php:238
+#: ../lib/themes/themes.php:373
 msgid "Not a valid theme file"
 msgstr "Le fichier de thème est invalide"
 
-#: ../lib/themes/themes.php:244
+#: ../lib/themes/themes.php:379
 msgid "Not a valid theme file path"
 msgstr "Le chemin vers le fichier de thème est invalide"
 
 # @ wp-appkit
-#: ../lib/themes/themes.php:277
+#: ../lib/themes/themes.php:412
 msgid "Theme file not found"
 msgstr "Fichier de thème introuvable"
 
-#: ../lib/themes/themes.php:282
+#: ../lib/themes/themes.php:417
 msgid "Asked theme is not activated for the given app"
 msgstr "Le thème demandé n'est pas activé pour cette application"
 
-#: ../lib/themes/themes.php:287
+#: ../lib/themes/themes.php:422
 msgid "Wrong theme file"
 msgstr "Fichier de thème incorrect"
 
-#: ../lib/themes/themes.php:431
+#: ../lib/themes/themes.php:572
 msgid "Theme file mime type not authorized"
 msgstr "Type mime du fichier de thème non autorisé"
 
-#: ../lib/themes/upload-themes.php:18
+#: ../lib/themes/upload-themes.php:19
 msgid "Upload Themes"
 msgstr "Télécharger des thèmes"
 
-#: ../lib/themes/upload-themes.php:27 ../lib/themes/upload-themes.php:77
+#: ../lib/themes/upload-themes.php:35 ../lib/themes/upload-themes.php:85
 msgid ""
-"You do not have sufficient permissions to install WP AppKit themes on this "
+"You do not have sufficient permissions to install WP-AppKit themes on this "
 "site."
 msgstr ""
-"Vous n'avez pas les permissions suffisantes pour installer des thèmes WP "
+"Vous n'avez pas les permissions suffisantes pour installer des thèmes WP-"
 "AppKit sur ce site"
 
-#: ../lib/themes/upload-themes.php:39
+#: ../lib/themes/upload-themes.php:47
 #, php-format
-msgid "Installing WP AppKit from uploaded file: %s"
-msgstr "Installer WP AppKit depuis un fichier téléchargé : %s"
+msgid "Installing WP-AppKit from uploaded file: %s"
+msgstr "Installer WP-AppKit depuis un fichier téléchargé : %s"
 
-#: ../lib/themes/upload-themes.php:61
+#: ../lib/themes/upload-themes.php:69
 #, php-format
-msgid "WP AppKit theme '%s' installed successfully!"
-msgstr "Thème WP AppKit '%s' installé !"
+msgid "WP-AppKit theme '%s' installed successfully!"
+msgstr "Thème WP-AppKit '%s' installé !"
 
-#: ../lib/themes/upload-themes.php:63
+#: ../lib/themes/upload-themes.php:71
 msgid "An error occured"
 msgstr "Une erreur s'est produite"
 
-#: ../lib/themes/upload-themes.php:67 ../lib/themes/upload-themes.php:129
+#: ../lib/themes/upload-themes.php:75 ../lib/themes/upload-themes.php:137
 msgid "Back to theme upload form"
 msgstr "Retour à la page de téléchargement de thèmes"
 
-#: ../lib/themes/upload-themes.php:69
-msgid "Go to my WP AppKit app list"
-msgstr "Aller à la liste d'applications WP AppKit"
+#: ../lib/themes/upload-themes.php:77
+msgid "Go to my WP-AppKit app list"
+msgstr "Aller à la liste d'applications WP-AppKit"
 
-#: ../lib/themes/upload-themes.php:72
+#: ../lib/themes/upload-themes.php:80
 msgid "Uploaded file must be a valid zip file"
 msgstr "Le fichier téléchargé doit être un fichier zip valide"
 
-#: ../lib/themes/upload-themes.php:105
+#: ../lib/themes/upload-themes.php:113
 msgid "Default themes have correctly been reinstalled."
 msgstr "Les thèmes par défaut ont correctement été réinstallés."
 
-#: ../lib/themes/upload-themes.php:111
+#: ../lib/themes/upload-themes.php:119
 msgid ""
 "An error occured while reinstalling default themes. Please do it manually by "
 "downloading the packages below."
@@ -1243,11 +1239,11 @@ msgstr ""
 "Une erreur est survenue pendant la réinstallation des thèmes par défaut. "
 "Veuillez le faire manuellement en téléchargeant les archives ci-dessous."
 
-#: ../lib/themes/upload-themes.php:119 ../lib/themes/upload-themes.php:145
+#: ../lib/themes/upload-themes.php:127 ../lib/themes/upload-themes.php:153
 msgid "Reinstall Default Themes"
 msgstr "Réinstaller les thèmes par défaut"
 
-#: ../lib/themes/upload-themes.php:123
+#: ../lib/themes/upload-themes.php:131
 msgid ""
 "We found at least one theme that is already installed. This process will "
 "override all existing files. Are you sure you want to continue?"
@@ -1255,33 +1251,42 @@ msgstr ""
 "Nous avons trouvé au moins un thème déjà installé. Ce processus écrasera "
 "tous les fichiers existants. Êtes-vous sûr de vouloir continuer ?"
 
-#: ../lib/themes/upload-themes.php:128
+#: ../lib/themes/upload-themes.php:136
 msgid "I understand and want to continue"
 msgstr "Je comprends et souhaite continuer"
 
-#: ../lib/themes/upload-themes.php:141
-msgid "WP AppKit Themes upload"
-msgstr "Téléchargement de Thèmes WP AppKit"
+#: ../lib/themes/upload-themes.php:149
+msgid "WP-AppKit Themes upload"
+msgstr "Téléchargement de Thèmes WP-AppKit"
 
-#: ../lib/themes/upload-themes.php:154
+#: ../lib/themes/upload-themes.php:162
 msgid ""
-"If you have a WP AppKit theme in a .zip format, you may install it by "
+"If you have a WP-AppKit theme in a .zip format, you may install it by "
 "uploading it here."
 msgstr ""
-"Si vous avez un thème WP AppKit au format zip, vous pouvez l'installer en le "
+"Si vous avez un thème WP-AppKit au format zip, vous pouvez l'installer en le "
 "téléchargeant ici."
 
-#: ../lib/themes/upload-themes.php:157
-msgid "WP AppKit Theme zip file"
-msgstr "Fichier zip du Theme WP AppKit"
+#: ../lib/themes/upload-themes.php:165
+msgid "WP-AppKit Theme zip file"
+msgstr "Fichier zip du thème WP-AppKit"
 
-#: ../lib/themes/upload-themes.php:159
+#: ../lib/themes/upload-themes.php:167
 msgid "Install Now"
 msgstr "Installer maintenant"
 
-#: ../lib/themes/upload-themes.php:164
+#: ../lib/themes/upload-themes.php:172
 msgid "Download Default Themes Packages"
 msgstr "Télécharger les archives des thèmes par défaut"
+
+#: ../lib/themes/upload-themes.php:188
+#, php-format
+msgid ""
+"No packages available, you can find default themes under %s and copy them "
+"directly."
+msgstr ""
+"Aucune archive trouvée, vous trouverez les thèmes par défaut sous %s et vous "
+"pouvez les copier directement."
 
 #: ../lib/user-permissions/auth-engines/rsa-public-private-auth.php:18
 msgid ""
@@ -1314,10 +1319,9 @@ msgstr ""
 msgid "Authentication"
 msgstr "Authentification"
 
-# @ wp-appkit
 #: ../lib/user-permissions/user-permissions.php:36
-msgid "WP AppKit App Editor"
-msgstr "Editeur WP AppKit"
+msgid "WP-AppKit App Editor"
+msgstr "Editeur d'applications WP-AppKit"
 
 # @ wp-appkit
 #: ../lib/web-services/web-services-bo-settings.php:14
@@ -1338,18 +1342,111 @@ msgstr "Mauvais jeton de sécurité"
 msgid "Error : Web service not recognised"
 msgstr "Erreur : Service Web non reconnu"
 
-#: ../wp-appkit.php:143
+#: ../wp-appkit.php:153
 msgid ""
-"WP AppKit requires WordPress permalinks to be activated: see the <a href="
+"WP-AppKit requires WordPress permalinks to be activated: see the <a href="
 "\"http://codex.wordpress.org/"
 "Using_Permalinks#Choosing_your_permalink_structure\">\"Using permalink\" "
 "Codex section</a> for more info about how to activate permalinks."
 msgstr ""
-"WP AppKit requiert d'avoir activé les permaliens : voir la <a href=\"http://"
+"WP-AppKit requiert d'avoir activé les permaliens : voir la <a href=\"http://"
 "codex.wordpress.org/fr:"
 "Utilisation_des_permaliens#Choisir_votre_structure_de_permaliens\">section "
 "du codex \"Choisir votre structure de permaliens\"</a> pour plus "
 "d'informations sur comment activer les permaliens."
+
+#: ../default-themes/q-android/js/moment.min.js:6
+#: ../default-themes/q-ios/js/moment.min.js:6
+msgid "\n"
+msgstr ""
+
+# @ wp-appkit
+#~ msgid "WP AppKit"
+#~ msgstr "WP AppKit"
+
+# @ wp-appkit
+#~ msgid "WP AppKit Settings"
+#~ msgstr "Paramètres WP AppKit"
+
+#~ msgid "Number of posts per list in WP AppKit apps"
+#~ msgstr ""
+#~ "Nombre d'articles présents dans les listes des applications WP AppKit"
+
+# @ wp-appkit
+#~ msgid "WP AppKit user role"
+#~ msgstr "Rôle utilisateur WP AppKit"
+
+#~ msgid ""
+#~ "Activate a \"WP AppKit App Editor\" role that can only edit WP AppKit "
+#~ "apps and no other WordPress contents"
+#~ msgstr ""
+#~ "Activer le rôle \"Editeur d'applications WP AppKit\" qui permet de créer "
+#~ "des utilisateurs n'ayant accès qu'aux applications WP AppKit et à aucun "
+#~ "autre contenu du site."
+
+#~ msgid "No WP AppKit theme found!"
+#~ msgstr "Aucun thème WP AppKit trouvé !"
+
+#~ msgid ""
+#~ "Please upload a WP AppKit theme from the \"<a href=\"%s\" >Upload Themes</"
+#~ "a>\" panel or copy a theme directly to the %s directory."
+#~ msgstr ""
+#~ "Téléchargez un thème WP AppKit depuis le panneau de \"<a href=\"%s\" "
+#~ ">chargement de thèmes</a>\" ou copiez un thème directement dans le "
+#~ "dossier %s."
+
+# @ wp-appkit
+#~ msgid ""
+#~ "The WP AppKit themes directory %s can't be created. <br/>Please check "
+#~ "that your WordPress install has the permissions to create this directory."
+#~ msgstr ""
+#~ "Impossible de créer le répertoire de thèmes [%s]. <br/>Veuillez vérifier "
+#~ "que vous avez les permissions nécessaire pour créer ce répertoire."
+
+#~ msgid ""
+#~ "You do not have sufficient permissions to install WP AppKit themes on "
+#~ "this site."
+#~ msgstr ""
+#~ "Vous n'avez pas les permissions suffisantes pour installer des thèmes WP "
+#~ "AppKit sur ce site"
+
+#~ msgid "Installing WP AppKit from uploaded file: %s"
+#~ msgstr "Installer WP AppKit depuis un fichier téléchargé : %s"
+
+#~ msgid "WP AppKit theme '%s' installed successfully!"
+#~ msgstr "Thème WP AppKit '%s' installé !"
+
+#~ msgid "Go to my WP AppKit app list"
+#~ msgstr "Aller à la liste d'applications WP AppKit"
+
+#~ msgid "WP AppKit Themes upload"
+#~ msgstr "Téléchargement de Thèmes WP AppKit"
+
+#~ msgid ""
+#~ "If you have a WP AppKit theme in a .zip format, you may install it by "
+#~ "uploading it here."
+#~ msgstr ""
+#~ "Si vous avez un thème WP AppKit au format zip, vous pouvez l'installer en "
+#~ "le téléchargeant ici."
+
+#~ msgid "WP AppKit Theme zip file"
+#~ msgstr "Fichier zip du Theme WP AppKit"
+
+# @ wp-appkit
+#~ msgid "WP AppKit App Editor"
+#~ msgstr "Editeur WP AppKit"
+
+#~ msgid ""
+#~ "WP AppKit requires WordPress permalinks to be activated: see the <a href="
+#~ "\"http://codex.wordpress.org/"
+#~ "Using_Permalinks#Choosing_your_permalink_structure\">\"Using permalink\" "
+#~ "Codex section</a> for more info about how to activate permalinks."
+#~ msgstr ""
+#~ "WP AppKit requiert d'avoir activé les permaliens : voir la <a href="
+#~ "\"http://codex.wordpress.org/fr:"
+#~ "Utilisation_des_permaliens#Choisir_votre_structure_de_permaliens"
+#~ "\">section du codex \"Choisir votre structure de permaliens\"</a> pour "
+#~ "plus d'informations sur comment activer les permaliens."
 
 #~ msgid ""
 #~ "Choose a theme for your app. Theme defines how your app will look and "
