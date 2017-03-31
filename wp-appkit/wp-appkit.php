@@ -185,6 +185,12 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			self::add_rewrite_rules();
 			flush_rewrite_rules();
 			
+			//If WordPress Network, add WP-AppKit custom rewrite rules to htacces,
+			//required for apps' preview to work.
+			if( is_multisite() ) {
+				WpakServerRewrite::prepend_wp_network_wpak_rules_to_htaccess();
+			}
+			
 			//Memorize we've gone that far successfully, to not re-run this routine 
 			//in case something goes wrong in next upgrade routines:
 			update_option( 'wpak_version', '1.0' );
