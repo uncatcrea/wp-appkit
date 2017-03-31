@@ -46,7 +46,10 @@ class WpakApps {
 
 	public static function apps_custom_post_type() {
 
-		$capability = current_user_can('wpak_edit_apps') ? 'wpak_app' : 'post';
+		//Handle specific capabilities for the custom "WP AppKit App Editor" role only.
+		//With special case for multisite admin who has all caps by default, so has the 
+		//'wpak_edit_apps' capability (See WP_User::has_cap()).
+		$capability = current_user_can('wpak_edit_apps') && !( is_multisite() && is_super_admin() ) ? 'wpak_app' : 'post';
 
 		register_post_type(
 			'wpak_apps',
