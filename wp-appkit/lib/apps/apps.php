@@ -337,7 +337,7 @@ class WpakApps {
 
 			<div id="export-action">
 
-				<?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ); ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+				<?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ); ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
 
 				<?php
 				/*
