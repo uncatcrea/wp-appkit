@@ -168,13 +168,16 @@ class WpakThemes {
 
 		// WP_Filesystem initialization ran OK, we can perform our copy
 		global $wp_filesystem;
-		$result = true;
+		$default_themes = self::get_default_themes();
+		$result = empty( $default_themes );
 
-		foreach( self::get_default_themes() as $slug => $theme ) {
+		foreach( $default_themes as $slug => $theme ) {
 			$filename = self::get_default_theme_filename( $slug, $theme );
 			if( !$wp_filesystem->is_file( self::get_default_themes_directory() . '/' . $filename ) ) {
 				continue;
 			}
+
+			$result = true;
 
 			// Warning: this will erase existing files, it's intended since this method should be called after some checks and validation about that fact
 			// TODO: use WP_Upgrader API

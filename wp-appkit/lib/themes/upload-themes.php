@@ -168,7 +168,7 @@ class WpakUploadThemes {
 						</form>
 					</div>
 
-					<?php if( !empty( $default_themes ) ): ?>
+					<?php if( !empty( $default_themes ) ): $default_themes_exist = false; ?>
 						<h2><?php _e( 'Download Default Themes Packages', WpAppKit::i18n_domain ); ?></h2>
 						<div>
 							<ul>
@@ -177,11 +177,17 @@ class WpakUploadThemes {
 									if( !is_file( WpakThemes::get_default_themes_directory() . '/' . $filename ) ) {
 										continue;
 									}
+									$default_themes_exist = true;
 									?>
 									<li>
 										<a href="<?php echo WpakThemes::get_default_themes_directory_uri() . '/' . $filename; ?>"><?php echo $theme['name'] . ' (' . $theme['version'] . ')'; ?></a>
 									</li>
 								<?php endforeach; ?>
+                                <?php if( !$default_themes_exist ): ?>
+                                    <li>
+                                        <?php echo sprintf( __( 'No packages available, you can find default themes under %s and copy them directly.', WpAppKit::i18n_domain ), WpakThemes::get_default_themes_directory() ); ?>
+                                    </li>
+                                <?php endif; ?>
 							</ul>
 						</div>
 					<?php endif; ?>
