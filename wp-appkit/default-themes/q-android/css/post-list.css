@@ -1,0 +1,84 @@
+/*
+ * common.css : general rules (applied to all templates)
+ * post-list.css : archive.html specific rules
+ * post-detail.css : single.html and page.html specific rules
+ */
+
+
+
+/*
+ * List item
+ */
+
+.list-template .content-item {
+    position:relative;
+}
+
+.list-template .content-item a {
+	color: #4c4c4c;
+	margin: 0px;
+    padding: 25px 20px 25px 20px;
+    border-bottom: 1px #e2e2e2 solid;
+	display: block;
+	text-decoration: none;
+	-webkit-user-select: none;
+	-webkit-touch-callout: none;
+    position: relative;
+}
+
+.list-template h2 {
+	margin: 0px 0px 5px 0px;
+    font-size: 21px;
+	line-height: 24px;
+	color: #333;
+	font-family:'Roboto Bold',sans-serif;    
+}
+
+.list-template .content-thumbnail {
+    width: 100%;
+    height: auto;
+    margin: 10px 0px 0px 0px;
+    display: block; /* Done to avoid bottom margin bug */
+}
+
+
+
+/*
+ * Get more button
+ */
+
+.get-more-button-wrapper {
+    padding: 0px 20px 0px 20px;
+}
+
+.get-more-button {
+    position: relative;
+    height: 46px;
+    overflow: hidden;
+    background-color: #168dd9;
+    border-radius: 2px;
+    font-size: 14px;
+    border: none;
+    color: #fff;
+    width: 100%;
+    padding: 11px 14px 11px 14px;
+    margin: 20px 0px 20px 0px;
+    line-height: 24px;
+    font-family:HelveticaNeue-Bold,sans-serif;
+}
+
+.get-more-button .ripple-drop {
+    background-color: #1897E8;
+}
+
+/* Get more button spinner */
+.get-more-button .spinner {
+    width: 24px;
+    height: 24px;
+    vertical-align: bottom;
+    margin-left: 5px;
+}
+
+.get-more-button .spinner .path {
+    stroke: #fff;
+}

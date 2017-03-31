@@ -1,0 +1,17 @@
+<!--
+ * Menu is enclosed in <div id="app-menu"></div>
+-->
+
+<ul id="menu-items" class="menu-items" style="display:none;">
+
+    <% if(menu_items.length){ %>
+
+        <% _.each( menu_items, function( menu_item ){ %>
+
+            <li class="has-ripple-feedback"><a href="<%= menu_item.link %>"><%= menu_item.label %></a></li>
+
+        <% }) %>
+
+    <% } %>
+
+</ul>

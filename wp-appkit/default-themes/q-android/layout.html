@@ -1,0 +1,34 @@
+<!--
+ * Layout is enclosed in <div id="app-layout"></div>
+-->
+
+<!--
+ * Menu is enclosed in <div id="app-menu"></div>
+-->
+<%= menu %>
+
+<div id="app-canvas">
+
+    <div id="app-header" class="app-header has-ripple-feedback ripple-small">
+        <div id="menu-button" class="menu-button"></div>
+        <div id="refresh-button" class="refresh-off"></div>
+        <h1></h1>
+    </div>
+
+    <div id="app-message-bar" class="app-message-bar">message</div>
+
+    <!--
+     * Content is enclosed in <div id="app-content-wrapper"><div class="app-screen"></div></div>
+    -->
+    <%= content %>
+            
+    <div id="slideup-panel" class="slideup-panel">
+        <div id="panel-header" class="panel-header has-ripple-feedback ripple-small">
+            <div id="back-button" class="back-button"></div>
+            <h1></h1>
+        </div>
+
+        <div id="panel-content" class="panel-content"></div>
+    </div>
+    
+</div>
