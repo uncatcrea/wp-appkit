@@ -99,12 +99,12 @@ class WpakNavigationBoSettings{
 
 		?>
 		<?php if( !empty($component) ): ?>
-			<tr class="ui-state-default <?php echo $alternate_class . $error_class  ?> navigation-item navigation-item-component-<?php echo $nav_item->component_id; ?>" data-id="<?php echo $nav_item_id ?>" id="navigation-item-row-<?php echo $nav_item_id ?>">
+			<tr class="ui-state-default <?php echo $alternate_class . $error_class  ?> navigation-item navigation-item-component-<?php echo esc_attr( $nav_item->component_id ); ?>" data-id="<?php echo esc_attr( $nav_item_id ) ?>" id="navigation-item-row-<?php echo esc_attr( $nav_item_id ) ?>">
 				<td>
-					<span class="label"><?php echo $component->label ?></span> (<span class="slug"><?php echo $component->slug ?></span>)
-					<input type="hidden" id="position-<?php echo $nav_item_id ?>" name="positions[<?php echo $nav_item_id ?>]" value="<?php echo $nav_item->position ?>" />
+					<span class="label"><?php echo esc_html( $component->label ) ?></span> (<span class="slug"><?php echo esc_html( $component->slug ) ?></span>)
+					<input type="hidden" id="position-<?php echo esc_attr( $nav_item_id ) ?>" name="positions[<?php echo esc_attr( $nav_item_id ) ?>]" value="<?php echo esc_attr( $nav_item->position ) ?>" />
 					<div class="row-actions">
-						<span class="trash"><a class="submitdelete delete_navigation_item" href="#" data-post-id="<?php echo $post_id ?>" data-id="<?php echo $nav_item_id ?>"><?php _e('Delete',WpAppKit::i18n_domain)?></a></span>
+						<span class="trash"><a class="submitdelete delete_navigation_item" href="#" data-post-id="<?php echo esc_attr( $post_id ) ?>" data-id="<?php echo esc_attr( $nav_item_id ) ?>"><?php _e('Delete',WpAppKit::i18n_domain)?></a></span>
 					</div>
 				</td>
 				<td>
@@ -115,26 +115,26 @@ class WpakNavigationBoSettings{
 
 						<?php $icon_value = $nav_item->options['icon_slug'] ?>
 
-						<div id="nav-item-value-<?php echo $nav_item_id ?>">
-							<span id="span-<?php echo $nav_item_id ?>"><?php echo !empty($icon_value) ? $icon_value : __('none', WpAppKit::i18n_domain) ?></span>
+						<div id="nav-item-value-<?php echo esc_attr( $nav_item_id ) ?>">
+							<span id="span-<?php echo esc_attr( $nav_item_id ) ?>"><?php echo !empty($icon_value) ? esc_html( $icon_value ) : __('none', WpAppKit::i18n_domain) ?></span>
 							<div class="row-actions">
-								<a href="#" class="change-icon-slug" data-id="<?php echo $nav_item_id ?>"><?php _e('Edit icon', WpAppKit::i18n_domain) ?></a>
+								<a href="#" class="change-icon-slug" data-id="<?php echo esc_attr( $nav_item_id ) ?>"><?php _e('Edit icon', WpAppKit::i18n_domain) ?></a>
 							</div>
 						</div>
 
 
-						<div id="nav-item-input-<?php echo $nav_item_id ?>" style="display:none" >
-							<input type="text" id="icon-<?php echo $nav_item_id ?>" class="menu-item-icon-input" data-id="<?php echo $nav_item_id ?>" value="<?php echo $nav_item->options['icon_slug'] ?>"/>
-							&nbsp;<a href="#" id="change-icon-slug-ok-<?php echo $nav_item_id ?>" class="change-icon-slug-ok" data-id="<?php echo $nav_item_id ?>" data-post-id="<?php echo $post_id ?>" ><?php _e('Ok', WpAppKit::i18n_domain) ?></a>
-							&nbsp;&nbsp;<a href="#" class="change-icon-slug-cancel" data-id="<?php echo $nav_item_id ?>"><?php _e('Cancel', WpAppKit::i18n_domain) ?></a>
+						<div id="nav-item-input-<?php echo esc_attr( $nav_item_id ) ?>" style="display:none" >
+							<input type="text" id="icon-<?php echo esc_attr( $nav_item_id ) ?>" class="menu-item-icon-input" data-id="<?php echo esc_attr( $nav_item_id ) ?>" value="<?php echo esc_attr( $nav_item->options['icon_slug'] ) ?>"/>
+							&nbsp;<a href="#" id="change-icon-slug-ok-<?php echo esc_attr( $nav_item_id ) ?>" class="change-icon-slug-ok" data-id="<?php echo esc_attr( $nav_item_id ) ?>" data-post-id="<?php echo esc_attr( $post_id ) ?>" ><?php _e('Ok', WpAppKit::i18n_domain) ?></a>
+							&nbsp;&nbsp;<a href="#" class="change-icon-slug-cancel" data-id="<?php echo esc_attr( $nav_item_id ) ?>"><?php _e('Cancel', WpAppKit::i18n_domain) ?></a>
 						</div>
 
 						*/ ?>
 
 					<?php else: ?>
 
-						<div id="nav-item-value-<?php echo $nav_item_id ?>">
-							<span id="span-<?php echo $nav_item_id ?>"><?php echo $error_message ?></span>
+						<div id="nav-item-value-<?php echo esc_attr( $nav_item_id ) ?>">
+							<span id="span-<?php echo esc_attr( $nav_item_id ) ?>"><?php echo $error_message ?></span>
 						</div>
 
 					<?php endif ?>
@@ -166,7 +166,7 @@ class WpakNavigationBoSettings{
 
 		?>
 		<?php if( !$no_components ): ?>
-			<div id="navigation-item-form-<?php echo $navigation_item_id ?>" class="navigation-item-form">
+			<div id="navigation-item-form-<?php echo esc_attr( $navigation_item_id ) ?>" class="navigation-item-form">
 				<table class="form-table">
 					<tr valign="top">
 						<?php if( !empty($components) ): ?>
@@ -174,7 +174,7 @@ class WpakNavigationBoSettings{
 					        <td>
 					        	<select name="component_id">
 					        		<?php foreach($components as $component_id => $component): ?>
-					        			<option value="<?php echo $component_id ?>"><?php echo $component->label ?></option>
+					        			<option value="<?php echo esc_attr( $component_id ) ?>"><?php echo esc_html( $component->label ) ?></option>
 					        		<?php endforeach ?>
 					        	</select>
 					        </td>
@@ -186,12 +186,12 @@ class WpakNavigationBoSettings{
 				    </tr>
 				</table>
 				<input type="hidden" name="position" value="0" />
-				<input type="hidden" name="navigation_post_id" value="<?php echo $post_id ?>" />
+				<input type="hidden" name="navigation_post_id" value="<?php echo esc_attr( $post_id ) ?>" />
 				<p class="submit">
 					<span class="spinner"></span>
 					<a class="button-secondary alignleft cancel" title="<?php _e('Cancel',WpAppKit::i18n_domain) ?>" href="#" id="cancel-new-item"><?php _e('Cancel',WpAppKit::i18n_domain) ?></a>&nbsp;
 					<?php if( !empty($components) ): ?>
-						<a class="button button-primary navigation-form-submit" data-id="<?php echo $navigation_item_id ?>"><?php _e('Add component to navigation',WpAppKit::i18n_domain) ?></a>
+						<a class="button button-primary navigation-form-submit" data-id="<?php echo esc_attr( $navigation_item_id ) ?>"><?php _e('Add component to navigation',WpAppKit::i18n_domain) ?></a>
 					<?php endif ?>
 				</p>
 			</div>
@@ -214,18 +214,18 @@ class WpakNavigationBoSettings{
 			exit();
 		}
 
-		$post_id = $_POST['post_id'];
-		$action = $_POST['wpak_action'];
-		$data = $_POST['data'];
+		$post_id = intval( $_POST['post_id'] );
+		$action = sanitize_key( $_POST['wpak_action'] );
+		$data = is_array( $_POST['data'] ) ? $_POST['data'] : array(); //Each data value is sanitized hereunder before being used
 
 		if( $action == 'add_or_update' ){
 
-			$post_id = $data['navigation_post_id'];
+			$post_id = intval( $data['navigation_post_id'] );
 
-			$nav_item_component_id = $data['component_id'];
+			$nav_item_component_id = intval( $data['component_id'] );
 
 			$new_item_position = WpakNavigationItemsStorage::get_nb_navigation_items($post_id) + 1;
-			$nav_item_position = !empty($data['position']) && is_numeric($data['position']) ? $data['position'] : $new_item_position;
+			$nav_item_position = !empty($data['position']) && is_numeric($data['position']) ? intval( $data['position'] ) : $new_item_position;
 
 			if( empty($nav_item_component_id) ){
 				$answer['message'] = __('You must choose a component!',WpAppKit::i18n_domain);
@@ -255,8 +255,8 @@ class WpakNavigationBoSettings{
 
 		}elseif( $action == 'delete' ){
 
-			$nav_item_id = $data['navigation_item_id'];
-			$post_id = $data['post_id'];
+			$nav_item_id = intval( $data['navigation_item_id'] );
+			$post_id = intval( $data['post_id'] );
 			if( WpakNavigationItemsStorage::navigation_item_exists($post_id,$nav_item_id) ){
 				if( !WpakNavigationItemsStorage::delete_navigation_item($post_id,$nav_item_id) ){
 					$answer['message'] = __('Could not delete navigation item',WpAppKit::i18n_domain);
@@ -282,13 +282,13 @@ class WpakNavigationBoSettings{
 		}elseif( $action == 'edit_option' ) {
 
 			if( !empty($data['navigation_item_id']) && !empty($data['option']) ) {
-				$value = $data['value'];
+				$value = sanitize_text_field( $data['value'] );
 
 				if( $data['option'] == 'icon_slug' ){
 					$value = sanitize_file_name( remove_accents( $value ) );
 				}
 
-				WpakNavigationItemsStorage::update_item_option($post_id,$data['navigation_item_id'],$data['option'],$value);
+				WpakNavigationItemsStorage::update_item_option($post_id, intval( $data['navigation_item_id'] ), sanitize_key( $data['option'] ),$value);
 
 				$answer['message'] = __('Navigation item updated successfuly',WpAppKit::i18n_domain);
 				$answer['ok'] = 1;

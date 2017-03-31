@@ -155,7 +155,7 @@ class WpakUploadThemes {
 					</h2>
 
 					<?php if ( !empty( $result['message'] ) ): ?>
-						<div class="<?php echo $result['type'] ?>" ><p><?php echo $result['message'] ?></p></div>
+						<div class="<?php echo esc_attr( $result['type'] ) ?>" ><p><?php echo $result['message'] ?></p></div>
 					<?php endif ?>
 
 					<div class="upload-plugin">
@@ -179,7 +179,7 @@ class WpakUploadThemes {
 									}
 									?>
 									<li>
-										<a href="<?php echo WpakThemes::get_default_themes_directory_uri() . '/' . $filename; ?>"><?php echo $theme['name'] . ' (' . $theme['version'] . ')'; ?></a>
+										<a href="<?php echo esc_url( WpakThemes::get_default_themes_directory_uri() . '/' . $filename ); ?>"><?php echo esc_html( $theme['name'] . ' (' . $theme['version'] . ')' ); ?></a>
 									</li>
 								<?php endforeach; ?>
 							</ul>

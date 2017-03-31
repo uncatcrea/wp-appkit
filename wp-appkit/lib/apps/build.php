@@ -38,7 +38,7 @@ class WpakBuild {
 			<span class="description"><?php _e( 'If activated, echoes debug information in the browser JavasSript console while simulating the app.', WpAppKit::i18n_domain ) ?></span>
 		</div>
 		<div class="field-group">
-			<a href="<?php echo self::get_appli_dir_url() . '/config.js?wpak_app_id=' . WpakApps::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a>
+			<a href="<?php echo esc_url( self::get_appli_dir_url() . '/config.js?wpak_app_id=' . WpakApps::get_app_slug( $post->ID ) ) ?>" target="_blank"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a>
 		</div>
 		<?php wp_nonce_field( 'wpak-simulation-data-' . $post->ID, 'wpak-nonce-simulation-data' ) ?>
 		<?php
@@ -121,7 +121,7 @@ class WpakBuild {
 			$filename_full = self::get_export_files_path() . "/" . $filename;
 		}
 		else {
-			echo $answer['msg'];
+			echo esc_html( $answer['msg'] );
 			exit;
 		}
 

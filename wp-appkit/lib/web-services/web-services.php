@@ -123,7 +123,7 @@ class WpakWebServices {
 							$json = stripslashes( $_POST['model'] );
 							$sent = json_decode( $json );
 						} else {
-							$sent = $_POST;
+							$sent = wp_unslash( $_POST ); //Same as in core's WP_REST_Server::serve_request()
 						}
 						
 					} else {
@@ -183,7 +183,7 @@ class WpakWebServices {
 									$json = stripslashes( $_POST['model'] );
 									$sent = json_decode( $json );
 								} else {
-									$sent = $_POST;
+									$sent = wp_unslash( $_POST ); //Same as in core's WP_REST_Server::serve_request()
 								}
 								
 								self::log( 'PUT one (X-HTTP-Method-Override + emulateJSON) : ' . $id . ' - json :' . $json . ' - _POST : ' . print_r( $_POST, true ) );
@@ -339,7 +339,7 @@ class WpakWebServices {
 		if ( $token_type == 'url' && !empty( $wp_query->query_vars['wpak_token'] ) ) {
 			$token = $wp_query->query_vars['wpak_token'];
 		} elseif ( $token_type == 'get' && !empty( $_GET['token'] ) ) {
-			$token = $_GET['token'];
+			$token = sanitize_text_field( $_GET['token'] );
 		}
 
 		$token_ok = !empty( $token ) ? WpakToken::check_token( $token, $app_id, $service_slug ) : false;

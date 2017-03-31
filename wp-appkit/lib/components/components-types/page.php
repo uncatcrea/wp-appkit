@@ -228,7 +228,7 @@ class WpakComponentTypePage extends WpakComponentType {
 			<select id="post_type" name="post_type" class="post-type-list">
 				<?php foreach ( $all_post_types as $post_type ): ?>
 					<?php $selected = $post_type->name == $current_post_type ? 'selected="selected"' : '' ?>
-					<option value="<?php echo $post_type->name ?>" <?php echo $selected ?>><?php echo $post_type->labels->name ?></option>
+					<option value="<?php echo esc_attr( $post_type->name ) ?>" <?php echo $selected ?>><?php echo esc_html( $post_type->labels->name ) ?></option>
 				<?php endforeach ?>
 			</select>
 		</div>
@@ -256,7 +256,7 @@ class WpakComponentTypePage extends WpakComponentType {
 		<select id="page_id" name="page_id" class="page-pages">
 			<?php foreach ( $pages as $page ): ?>
 				<?php $selected = $page->ID == $current_page_id ? 'selected="selected"' : '' ?>
-				<option value="<?php echo $page->ID ?>" <?php echo $selected ?>><?php echo $page->post_title ?></option>
+				<option value="<?php echo esc_attr( $page->ID ) ?>" <?php echo $selected ?>><?php echo esc_html( $page->post_title ) ?></option>
 			<?php endforeach ?>
 		</select>
 		<br/><br/>

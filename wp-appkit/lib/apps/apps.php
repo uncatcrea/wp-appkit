@@ -228,7 +228,7 @@ class WpakApps {
 			<div id="minor-publishing">
 				<div id="minor-publishing-actions">
 					<div id="preview-action">
-						<a href="<?php echo WpakBuild::get_appli_index_url( $post->ID ); ?>" class="preview button" target="_blank"><?php _e( 'Preview', WpAppKit::i18n_domain ) ?></a>
+						<a href="<?php echo esc_url( WpakBuild::get_appli_index_url( $post->ID ) ); ?>" class="preview button" target="_blank"><?php _e( 'Preview', WpAppKit::i18n_domain ) ?></a>
 					</div>
 					<div class="clear"></div>
 				</div>
@@ -265,7 +265,7 @@ class WpakApps {
 						else
 							$delete_text = __( 'Move to Trash' );
 						?>
-					<a class="submitdelete deletion" href="<?php echo get_delete_post_link( $post->ID ); ?>"><?php echo $delete_text; ?></a><?php
+					<a class="submitdelete deletion" href="<?php echo esc_url( get_delete_post_link( $post->ID ) ); ?>"><?php echo esc_html( $delete_text ); ?></a><?php
 					} ?>
 				</div>
 
@@ -337,7 +337,7 @@ class WpakApps {
 
 			<div id="export-action">
 
-				<?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+				<?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ); ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
 
 				<?php
 				/*
@@ -352,7 +352,7 @@ class WpakApps {
 					<option value="<?php echo esc_attr( $export_type ) ?>" <?php selected( $export_type === $default_export_type )?>><?php echo esc_html( $label ) ?></option>
 					<?php endforeach ?>
 				</select>
-				<a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => $default_export_type ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+				<a id="wpak_export_link" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => $default_export_type ) ), 'wpak_download_app_sources' ) ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
 				*/
 				?>
 
@@ -369,7 +369,7 @@ class WpakApps {
 			<select id="wpak_app_platform" name="wpak_app_platform">
 				<?php foreach ( self::get_platforms() as $value => $label ): ?>
 					<?php $selected = $value == $main_infos['platform'] ? 'selected="selected"' : '' ?>
-					<option value="<?php echo $value ?>" <?php echo $selected ?>><?php echo $label ?></option>
+					<option value="<?php echo esc_attr( $value ) ?>" <?php echo $selected ?>><?php echo esc_html( $label ) ?></option>
 				<?php endforeach ?>
 			</select>
 			<?php wp_nonce_field( 'wpak-main-infos-' . $post->ID, 'wpak-nonce-main-infos' ) ?>
@@ -464,7 +464,7 @@ class WpakApps {
 				</div>
 			</fieldset>
 			<div class="field-group wpak_phonegap_links">
-				<a href="<?php echo WpakBuild::get_appli_dir_url() . '/config.xml?wpak_app_id=' . self::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.xml', WpAppKit::i18n_domain ) ?></a>
+				<a href="<?php echo esc_url( WpakBuild::get_appli_dir_url() . '/config.xml?wpak_app_id=' . self::get_app_slug( $post->ID ) ) ?>" target="_blank"><?php _e( 'View config.xml', WpAppKit::i18n_domain ) ?></a>
 				<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ) ?>" class="button wpak_phonegap_export" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
 			</div>
 			<?php wp_nonce_field( 'wpak-phonegap-infos-' . $post->ID, 'wpak-nonce-phonegap-infos' ) ?>

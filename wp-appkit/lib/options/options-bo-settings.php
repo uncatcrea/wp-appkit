@@ -26,7 +26,7 @@ class WpakOptionsBoSettings {
 		?>
 		<div class="wpak_settings field-group">
 			<label for="wpak_app_options_refresh_interval"><?php _e( 'Refresh Interval (in seconds)', WpAppKit::i18n_domain ) ?></label>
-			<input id="wpak_app_options_refresh_interval" type="text" name="wpak_app_options[refresh_interval]" value="<?php echo $options['refresh_interval'] ?>" />
+			<input id="wpak_app_options_refresh_interval" type="text" name="wpak_app_options[refresh_interval]" value="<?php echo esc_attr( $options['refresh_interval'] ) ?>" />
 			<span class="description"><?php _e( 'Interval in seconds between attempts to refresh app\'s content. 0 means that content will be refreshed at each app\'s launch.', WpAppKit::i18n_domain ) ?></span>
 			<?php wp_nonce_field( 'wpak-options-' . $post->ID, 'wpak-nonce-options' ) ?>
 		</div>

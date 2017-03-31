@@ -30,7 +30,7 @@ class WpakSettings {
 			<h2><?php _e( 'WP-AppKit Settings', WpAppKit::i18n_domain ) ?></h2>
 
 			<?php if ( !empty( $result['message'] ) ): ?>
-				<div class="<?php echo $result['type'] ?>" ><p><?php echo $result['message'] ?></p></div>
+				<div class="<?php echo esc_attr( $result['type'] ) ?>" ><p><?php echo $result['message'] ?></p></div>
 			<?php endif ?>
 			
 			<form method="post" action="<?php echo esc_url( add_query_arg( array() ) ) ?>">
@@ -40,7 +40,7 @@ class WpakSettings {
 						<th><?php _e( 'Apps post lists', WpAppKit::i18n_domain ) ?></th>
 						<td>
 							<label for="posts_per_page"><?php _e('Number of posts per list in WP-AppKit apps', WpAppKit::i18n_domain ) ?> : </label><br/>
-							<input type="number" name="posts_per_page" id="posts_per_page" value="<?php echo $settings['posts_per_page'] ?>" />
+							<input type="number" name="posts_per_page" id="posts_per_page" value="<?php echo esc_attr( $settings['posts_per_page'] ) ?>" />
 						</td>
 					</tr>
 					<tr>
