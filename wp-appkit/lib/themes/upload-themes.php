@@ -174,13 +174,13 @@ class WpakUploadThemes {
 							<ul>
 								<?php foreach( $default_themes as $slug => $theme ):
 									$filename = WpakThemes::get_default_theme_filename( $slug, $theme );
-									if( !is_file( WpakThemes::get_default_themes_directory() . '/' . $filename ) ) {
+									if( !is_file( WpakThemes::get_zip_files_path() . '/' . $filename ) ) {
 										continue;
 									}
 									$default_themes_exist = true;
 									?>
 									<li>
-										<a href="<?php echo WpakThemes::get_default_themes_directory_uri() . '/' . $filename; ?>"><?php echo $theme['name'] . ' (' . $theme['version'] . ')'; ?></a>
+										<a href="<?php echo esc_url( WpakThemes::get_zip_files_uri() . '/' . $filename ); ?>"><?php echo esc_html( $theme['name'] . ' (' . $theme['version'] . ')' ); ?></a>
 									</li>
 								<?php endforeach; ?>
                                 <?php if( !$default_themes_exist ): ?>

@@ -8,6 +8,7 @@ class WpakThemes {
 
 	const themes_directory = 'themes-wp-appkit';
 	const default_themes_directory = 'default-themes';
+	const zip_files_directory = 'wpak-themes-packages';
 	protected static $default_themes = array(
 		/**
 		 * Key is used for:
@@ -47,8 +48,38 @@ class WpakThemes {
 	 	return plugin_dir_path( dirname( dirname( __FILE__ ) ) ) . self::default_themes_directory;
 	}
 
-	public static function get_default_themes_directory_uri(){
-	 	return plugins_url( self::default_themes_directory, dirname( dirname( __FILE__ ) ) );
+	/**
+     * Return the server path to the folder where zip packages for default themes will be created.
+     *
+	 * @return string
+	 */
+	public static function get_zip_files_path() {
+		$upload_dir = wp_upload_dir();
+		return empty( $upload_dir['error'] ) ? $upload_dir['basedir'] . '/' . self::zip_files_directory : '';
+	}
+
+	/**
+     * Return the URL to the folder where zip packages for default themes will be created.
+     *
+	 * @return string
+	 */
+	public static function get_zip_files_uri() {
+		$upload_dir = wp_upload_dir();
+		return empty( $upload_dir['error'] ) ? $upload_dir['baseurl'] . '/' . self::zip_files_directory : '';
+	}
+
+	/**
+     * Create the folder where zip packages for default themes will be created.
+     *
+	 * @return bool
+	 */
+	private static function _create_zip_directory_if_doesnt_exist() {
+		$zip_directory = self::get_zip_files_path();
+		$ok = true;
+		if ( !file_exists( $zip_directory ) ) {
+			$ok = mkdir( $zip_directory, 0777, true );
+		}
+		return $ok;
 	}
 
 	/**
@@ -173,7 +204,7 @@ class WpakThemes {
 
 		foreach( $default_themes as $slug => $theme ) {
 			$filename = self::get_default_theme_filename( $slug, $theme );
-			if( !$wp_filesystem->is_file( self::get_default_themes_directory() . '/' . $filename ) ) {
+			if( !$wp_filesystem->is_file( self::get_zip_files_path() . '/' . $filename ) ) {
 				continue;
 			}
 
@@ -181,7 +212,7 @@ class WpakThemes {
 
 			// Warning: this will erase existing files, it's intended since this method should be called after some checks and validation about that fact
 			// TODO: use WP_Upgrader API
-			$res = unzip_file( self::get_default_themes_directory() . '/' . $filename, self::get_themes_directory() );
+			$res = unzip_file( self::get_zip_files_path() . '/' . $filename, self::get_themes_directory() );
 
 			if( is_wp_error( $res ) ) {
 				$result = false;
@@ -196,7 +227,7 @@ class WpakThemes {
      *
 	 * @return bool
 	 */
-	protected static function _clean_default_themes_directory() {
+	protected static function _clean_zip_directory() {
 	    global $wp_filesystem;
 
 		$possible_names = array();
@@ -205,7 +236,7 @@ class WpakThemes {
 		    $possible_names[] = self::get_default_theme_filename( $slug, $theme );
         }
 
-	    $files = glob( self::get_default_themes_directory() . '/*.zip' );
+	    $files = glob( self::get_zip_files_path() . '/*.zip' );
 
 		foreach( $files as $file ) {
 		    $filename = basename( $file );
@@ -289,24 +320,26 @@ class WpakThemes {
 	public static function create_themes_zip() {
 		global $wp_filesystem;
 
-		$access_type = get_filesystem_method( array(), self::get_default_themes_directory() );
+		self::_create_zip_directory_if_doesnt_exist();
 
-		if( $access_type != 'direct' || !WP_Filesystem( array(), self::get_default_themes_directory() ) ) {
+		$access_type = get_filesystem_method( array(), self::get_zip_files_path() );
+
+		if( $access_type != 'direct' || !WP_Filesystem( array(), self::get_zip_files_path() ) ) {
 			return false;
 		}
 
-		self::_clean_default_themes_directory();
+		self::_clean_zip_directory();
 
 	    foreach( self::get_default_themes() as $slug => $theme ) {
 	        $filename = self::get_default_theme_filename( $slug, $theme );
 		    if(
-			    $wp_filesystem->is_file( self::get_default_themes_directory() . '/' . $filename ) ||
+			    $wp_filesystem->is_file( self::get_zip_files_path() . '/' . $filename ) ||
 			    !$wp_filesystem->is_dir( self::get_default_themes_directory() . '/' . $slug )
 		    ) {
 			    continue;
 		    }
 
-            self::_build_zip( self::get_default_themes_directory() . '/' . $slug, self::get_default_themes_directory() . '/' . $filename );
+            self::_build_zip( self::get_default_themes_directory() . '/' . $slug, self::get_zip_files_path() . '/' . $filename );
         }
 
         return true;
