@@ -63,17 +63,20 @@ https://www.youtube.com/watch?v=jkjtkH6wDys
 
 > **You need more support for WP-AppKit?** [Pro Support](https://uncategorized-creations.com/downloads/1-year-pro-support/) is an exclusive service where specialists work with you to get the most of WP-AppKit.
 
-== Installation ==
-
-1. Upload the plugin files to the `/wp-content/plugins/wp-appkit` directory, or install the plugin through the WordPress 'Plugins' screen directly.
-1. Activate the plugin through the 'Plugins' screen in WordPress
-1. Click the "WP-AppKit" menu entry and start creating your app!
-
-**Note:** WP-AppKit uses a special folder called `themes-wp-appkit` to store the app themes. This folder is located in `/wp-content`.
-
 == Frequently Asked Questions ==
 
 You'll find [an always up to date FAQ](https://uncategorized-creations.com/frequently-asked-questions/) on our website.
+
+= How do I install WP-AppKit? =
+
+Like any other WordPress plugin, install the plugin through the WordPress 'Plugins' screen directly (or upload plugin files to the `/wp-content/plugins/wp-appkit` directory),
+then activate it through the 'Plugins' screen in WordPress and click the "WP-AppKit" menu entry to start creating your app!
+
+**Note:** WP-AppKit uses a special folder called `themes-wp-appkit` to store the app themes. This folder is automatically created in `/wp-content` at plugin installation.
+
+**Github version:** If you have the [github version of WP-AppKit](https://github.com/uncatcrea/wp-appkit) already installed on your WordPress, 
+please **unsintall** it and **delete** the */plugins/wp-appkit* folder before installing the version from WordPress.org's plugin repository.
+Your current WP-AppKit apps and themes (in *wp-content/themes-wp-appkit*) won't be affected by this operation.
 
 = How many applications can I create? =
 
