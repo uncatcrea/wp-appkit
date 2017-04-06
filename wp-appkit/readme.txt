@@ -127,6 +127,7 @@ Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/maste
 * Readme.txt for WordPress.org
 * Add Domain Path header to plugin's file headers
 * New WP-AppKit menu icon
+* Comply to WordPress.org repository requirements
 
 *Default themes update*
 
@@ -144,6 +145,7 @@ Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/maste
 *Bugfixes*
 
 * Wrong Items Backbone Collections initializations
+* Malformed config.xml in PhoneGap Build
 
 *Backward compatibility*
 

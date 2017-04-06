@@ -4,6 +4,7 @@
 - **Readme.txt for WordPress.org** ([@blupu](https://github.com/blupu))
 - **Add Domain Path header to plugin's file headers** ([#a733050](https://github.com/uncatcrea/wp-appkit/commit/a733050e607a1abbdd440ac5d27fa044cb151123), [@lpointet](https://github.com/lpointet))
 - **New WP-AppKit menu icon** ([#06c589b](https://github.com/uncatcrea/wp-appkit/commit/06c589b16bfffc5ac9b023fdda4c2545cefffc9c), [@mleroi](https://github.com/mleroi))
+- **Comply to WordPress.org repository requirements** ([Pull Request #297](https://github.com/uncatcrea/wp-appkit/pull/297))
 
 ### Default themes update
 - **Embed last version (1.0.4) of [Q for iOS](https://github.com/uncatcrea/q-ios/releases/tag/v1.0.4) and [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.0.4) default app themes**
@@ -18,6 +19,7 @@
 
 ### Bugfixes
 - **Wrong Items Backbone Collections initializations** ([#282](https://github.com/uncatcrea/wp-appkit/issues/282), [@mleroi](https://github.com/mleroi))
+- **Malformed config.xml in PhoneGap Build** ([#248](https://github.com/uncatcrea/wp-appkit/issues/248), [@lpointet](https://github.com/lpointet))
 
 ### Backward compatibility
 - No change in this version that affect backward compatibility with previous WP-AppKit version or already deployed apps.
