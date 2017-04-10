@@ -5,18 +5,8 @@ WP-AppKit is an open source WordPress plugin to **build mobile applications conn
 
 ## Latest News
 
-### 06/20/2016: Version 0.6
-* **WP-AppKit now provides pre-installed starter themes.** You don't need to download and install them anymore :-)
-* **New starter themes.** _Wpak themes_ are deprecated. Discover the new shiny _Q themes_ for [iOS](https://github.com/uncatcrea/q-ios) and [Android](https://github.com/uncatcrea/q-android).
-* Along with the new starter themes, we've added a **theme management panel** to the plugin's UI.
-* **Deep links**. WP-AppKit now provides an easy way to support deeplinks for your app.
-* As usual, we've fixed bugs and included a bunch of small evolutions (including a lot of user requests).
-
-**Please note this version breaks backward compatibilities on minor features. Be sure to check the [changelog](https://github.com/uncatcrea/wp-app-kit/blob/master/CHANGELOG.md).**
-
-> Please keep in mind that WP-AppKit is currently in beta. Test it, break it! But be careful if you use it for professional purposes.
-
-> All versions under 1.0 are beta versions
+### 04/10/2017 ###
+* WP-AppKit is officially out of beta and can be installed from [WordPress.org](https://wordpress.org/plugins/wp-appkit/)
 
 ## Getting Started
 Creating apps with WP-AppKit means creating JavaScript based app themes. (More on that [here](https://github.com/uncatcrea/wp-appkit/blob/master/README.md#app-themes)).
