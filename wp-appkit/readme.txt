@@ -1,6 +1,6 @@
 === WP-AppKit - Mobile apps for WordPress ===
 Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
-Tags: mobile, app, mobile app, pwa, progressive web app, webapp, phonegap, phonegap build, cordova, android, ios, notifications, offline, convert to mobile app
+Tags: mobile app, android, ios, progressive web app, phonegap build
 Requires at least: 4.0
 Tested up to: 4.7.3
 Stable tag: 1.0
@@ -22,11 +22,11 @@ With WP-AppKit, we're committed to alleviate as much as we can the work necessar
 * **PhoneGap/Cordova**: use JavaScript, HTML and CSS to build apps
 * **PhoneGap Build**: Easy online compilation
 * **Themes**: create app themes
-* **API**: developers can hook into our API to add the features they need
+* **Customizable**: hook into our API to add the features they need
 
 Get a look at all available features: [https://uncategorized-creations.com/features/](https://uncategorized-creations.com/features/)
 
-**NEW FEATURE - Progressive web apps**: We are currently adding support for Progressive web apps (PWA). You can follow our progress on [GitHub](https://github.com/mleroi/wp-appkit/tree/feature-pwa). PWA are a new way to deliver fast, reliable and great experience on the web notably for mobiles. They allow to create apps accessible as websites that you can install and access as traditionnal mobile apps. It's an initiative from Google, currently only available for Android but we think and hope that the support will grow rapidly.
+**NEW FEATURE - Progressive web apps**: We are currently adding support for Progressive web apps (PWA). You can follow our progress on [GitHub](https://github.com/mleroi/wp-appkit/tree/feature-pwa). PWA are a new way to deliver fast, reliable and great experience on the web notably for mobiles. They allow to create apps accessible as websites that you can install and access as traditionnal mobile apps.
 
 = Getting Started: Test WP-AppKit in no time =
 
@@ -74,9 +74,9 @@ then activate it through the 'Plugins' screen in WordPress and click the "WP-App
 
 **Note:** WP-AppKit uses a special folder called `themes-wp-appkit` to store the app themes. This folder is automatically created in `/wp-content` at plugin installation.
 
-**Github version:** If you have the [github version of WP-AppKit](https://github.com/uncatcrea/wp-appkit) already installed on your WordPress, 
-please **unsintall** it and **delete** the */plugins/wp-appkit* folder before installing the version from WordPress.org's plugin repository.
-Your current WP-AppKit apps and themes (in *wp-content/themes-wp-appkit*) won't be affected by this operation.
+**Github version:** if you have the [github version of WP-AppKit](https://github.com/uncatcrea/wp-appkit) already installed on your WordPress, 
+please **unsintall** it and **delete** the `/plugins/wp-appkit` folder before installing the version from WordPress.org's plugin repository.
+Your current WP-AppKit apps and themes (in `wp-content/themes-wp-appkit`) won't be affected by this operation.
 
 = How many applications can I create? =
 
