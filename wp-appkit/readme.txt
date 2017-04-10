@@ -22,7 +22,7 @@ With WP-AppKit, we're committed to alleviate as much as we can the work necessar
 * **PhoneGap/Cordova**: use JavaScript, HTML and CSS to build apps
 * **PhoneGap Build**: Easy online compilation
 * **Themes**: create app themes
-* **Customizable**: hook into our API to add the features they need
+* **Customizable**: hook into our API to add the features you need
 
 Get a look at all available features: [https://uncategorized-creations.com/features/](https://uncategorized-creations.com/features/)
 
