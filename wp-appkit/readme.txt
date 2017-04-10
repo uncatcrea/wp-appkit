@@ -7,15 +7,13 @@ Stable tag: 1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-A great way to build mobile apps for your WordPress site using your favorite technologies: JavaScript, HTML and CSS.
-
 == Description ==
+
+A great way to build mobile apps for your WordPress site using your favorite technologies: JavaScript, HTML and CSS.
 
 Mobile applications are a great way to offer an outstanding mobile experience for your users. Using push notifications, letting users read offline, using saved accounts to share content are among many wonderful things you can do with mobile applications.
 
 = The Toolkit You Need to Build Your App =
-
-With WP-AppKit, we're committed to alleviate as much as we can the work necessary to build a mobile app for your WordPress site.
 
 * **Native support of WordPress**: custom post types, custom fields, custom taxonomies, comments, secured authentication
 * **iOS and Android support**
@@ -24,11 +22,11 @@ With WP-AppKit, we're committed to alleviate as much as we can the work necessar
 * **Themes**: create app themes
 * **Customizable**: hook into our API to add the features you need
 
-Get a look at all available features: [https://uncategorized-creations.com/features/](https://uncategorized-creations.com/features/)
+Get a look at all [available features](https://uncategorized-creations.com/features/)
 
-**NEW FEATURE - Progressive web apps**: We are currently adding support for Progressive web apps (PWA). You can follow our progress on [GitHub](https://github.com/mleroi/wp-appkit/tree/feature-pwa). PWA are a new way to deliver fast, reliable and great experience on the web notably for mobiles. They allow to create apps accessible as websites that you can install and access as traditionnal mobile apps.
+**NEW FEATURE - Progressive web apps**: We are currently adding support for progressive web applications (PWA). You can follow our progress on [GitHub](https://github.com/mleroi/wp-appkit/tree/feature-pwa). PWA are a new way to deliver fast, reliable and great experience on the web notably for mobiles. They allow to create apps accessible as websites that you can install and access as traditionnal mobile apps.
 
-= Getting Started: Test WP-AppKit in no time =
+= Getting Started =
 
 Even if you are familiar with development, building your first mobile app can be intimidating. We know that, we’ve been there before :-)
 
@@ -44,24 +42,18 @@ https://www.youtube.com/watch?v=t6KwLxuoZ2g
 
 WP-AppKit supports JavaScript based app themes. We provide 2 default sister themes named *Q for iOS* and *Q for Android*. These themes are installed with the plugin. You can  also develop your own themes.
 
-**So, how do these themes look?**
+* [Q for Android](https://www.youtube.com/watch?v=fSQVx8-rqCY) (video)
+* [Q for iOS](https://www.youtube.com/watch?v=jkjtkH6wDys) (video)
 
-*Q for Android*
-https://www.youtube.com/watch?v=fSQVx8-rqCY
+= Documentation and Tutorials =
 
-*Q for iOS*
-https://www.youtube.com/watch?v=jkjtkH6wDys
-
-= Learn: Documentation and Tutorials =
-
-* **Open source**: (GPLv2+) and available on GitHub: [https://github.com/uncatcrea/wp-appkit](https://github.com/uncatcrea/wp-appkit)
-* **Developer friendly**: use PHP and JavaScript hooks to customize the plugin and your themes
-* **Complete documentation**: [https://uncategorized-creations.com/wp-appkit/doc/](https://uncategorized-creations.com/wp-appkit/doc/).
-* **Tutorials**: [https://uncategorized-creations.com/tag/tutorials/](https://uncategorized-creations.com/tag/tutorials/).
-
-**For more information visit [getwpappkit.com](http://getwpappkit.com).**
+* [Complete documentation](https://uncategorized-creations.com/wp-appkit/doc/).
+* [Tutorials](https://uncategorized-creations.com/tag/tutorials/).
+* [GitHub repository](https://github.com/uncatcrea/wp-appkit)
 
 > **You need more support for WP-AppKit?** [Pro Support](https://uncategorized-creations.com/downloads/1-year-pro-support/) is an exclusive service where specialists work with you to get the most of WP-AppKit.
+
+**More information at [getwpappkit.com](http://getwpappkit.com).**
 
 == Frequently Asked Questions ==
 
@@ -69,13 +61,11 @@ You'll find [an always up to date FAQ](https://uncategorized-creations.com/frequ
 
 = How do I install WP-AppKit? =
 
-Like any other WordPress plugin, install the plugin through the WordPress 'Plugins' screen directly (or upload plugin files to the `/wp-content/plugins/wp-appkit` directory),
-then activate it through the 'Plugins' screen in WordPress and click the "WP-AppKit" menu entry to start creating your app!
+Like any other WordPress plugin, install the plugin through the WordPress `Plugins` screen directly (or upload plugin files to the `/wp-content/plugins/wp-appkit` directory), then activate it through the `Plugins` screen in WordPress and click the `WP-AppKit` menu entry to start creating your app!
 
 **Note:** WP-AppKit uses a special folder called `themes-wp-appkit` to store the app themes. This folder is automatically created in `/wp-content` at plugin installation.
 
-**Github version:** if you have the [github version of WP-AppKit](https://github.com/uncatcrea/wp-appkit) already installed on your WordPress, 
-please **unsintall** it and **delete** the `/plugins/wp-appkit` folder before installing the version from WordPress.org's plugin repository.
+**Github version:** if you have the [github version of WP-AppKit](https://github.com/uncatcrea/wp-appkit) already installed on your WordPress, please **unsintall** it and **delete** the `/plugins/wp-appkit` folder before installing the version from WordPress.org's plugin repository.
 Your current WP-AppKit apps and themes (in `wp-content/themes-wp-appkit`) won't be affected by this operation.
 
 = How many applications can I create? =
@@ -393,10 +383,3 @@ Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/maste
 * Secure PhoneGap meta box
 * Remove default mobile image size
 * Woff2 files not accepted in themes
-
-
-== Arbitrary section ==
-
-You may provide arbitrary sections, in the same format as the ones above.  This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation."  Arbitrary sections will be shown below the built-in sections outlined above (between FAQ and Changelog).
