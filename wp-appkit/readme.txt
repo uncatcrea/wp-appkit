@@ -3,7 +3,7 @@ Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
 Tags: mobile app, android, ios, progressive web app, phonegap build
 Requires at least: 4.0
 Tested up to: 4.7.3
-Stable tag: 1.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -112,6 +112,10 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 == Changelog ==
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
+
+= 1.0.1 (2017-04-11) = 
+
+* Update readme file
 
 = 1.0 (2017-03-24) = 
 

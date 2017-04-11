@@ -1,3 +1,7 @@
+## 1.0.1 (2017-04-11)
+
+- Update WordPress.org's readme file
+
 ## 1.0 (2017-03-24)
 
 ### Release on WordPress.org!
