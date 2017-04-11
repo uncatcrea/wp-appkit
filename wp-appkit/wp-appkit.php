@@ -3,7 +3,7 @@
 Plugin Name: WP-AppKit
 Plugin URI:  https://github.com/uncatcrea/wp-appkit
 Description: Build Phonegap Mobile apps based on your WordPress content.
-Version:     1.0
+Version:     1.0.1
 Author:      Uncategorized Creations
 Author URI:  http://getwpappkit.com
 Text Domain: wp-appkit
@@ -109,6 +109,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			WpakWebServices::add_rewrite_tags_and_rules();
 			WpakConfigFile::rewrite_rules();
 			WpakThemes::rewrite_rules();
+			WpakWpCoreJsFiles::rewrite_rules();
 		}
 
 		/**
@@ -118,27 +119,81 @@ if ( !class_exists( 'WpAppKit' ) ) {
 		 * based on database version and WP-AppKit version being updated-to.
 		 */
 		public static function upgrade() {
-			$current_version = get_option( 'wpak_version', null );
+			$db_version = get_option( 'wpak_version', null );
 			$data = get_file_data( __FILE__, array( 'version' => 'Version' ) );
+			$plugin_file_version = $data['version'];
 
-			// We are up-to-date. Nothing to do.
-			if ( $data['version'] == $current_version )
+			// /!\ NOTE
+			//version_compare() considers 1 != 1.0 != 1.0.0
+			//-> it considers: 1 < 1.0 < 1.0.0
+			//So for example if we have 1.0 in plugin file we should compare it to 1.0, not 1.0.0
+			
+			if ( $db_version === null ) {
+				//This is a first install, no need for upgrade routine.
+				//Just set db version:
+				update_option( 'wpak_version', $plugin_file_version );
+				
+				//And, if network install, save rewrite rules because on_activation hook
+				//is not executed when network activating a plugin. (See notes here: 
+				//https://codex.wordpress.org/Function_Reference/register_activation_hook )
+				if ( is_multisite() ) {
+					self::add_rewrite_rules();
+					flush_rewrite_rules();
+				}
 				return;
+			}
+			
+			if ( version_compare( $plugin_file_version, $db_version, '=' ) ) {
+				// We are up-to-date. Nothing to do.
+				return;
+			}
 
-			if( version_compare( $current_version, '0.6.0', '<' ) ) {
+			if( version_compare( $db_version, '0.6', '<' ) ) {
 				self::upgrade_060();
 			}
+			
+			if( version_compare( $db_version, '1.0', '<' ) ) {
+				self::upgrade_100();
+			}
+			
+			if ( !version_compare( $plugin_file_version, $db_version, '=' ) ) {
+				//Update db version not to run update scripts again and so that
+				//db version is up to date:
+				update_option( 'wpak_version', $plugin_file_version );
+			}
+			
 		}
 
 		/**
-		 * Execute changes made in WP-AppKit 0.6.0.
+		 * Execute changes made in WP-AppKit 0.6.0
 		 */
 		protected static function upgrade_060() {
 			// Remove 'wpak_used_themes' transient since its value's structure changed with this version
 			delete_transient( 'wpak_used_themes' );
-
-			// Everything went fine, update DB version not to run this script once again
-			update_option( 'wpak_version', '0.6.0' );
+			
+			//Memorize we've gone that far successfully, to not re-run this routine 
+			//in case something goes wrong in next upgrade routines:
+			update_option( 'wpak_version', '0.6' );
+		}
+		
+		/**
+		 * Execute changes made in WP-AppKit 1.0
+		 */
+		protected static function upgrade_100() {
+			//We have to flush rewrite rules to take into account new rules to use WP core's versions
+			//of jQuery, undercore and backbone:
+			self::add_rewrite_rules();
+			flush_rewrite_rules();
+			
+			//If WordPress Network, add WP-AppKit custom rewrite rules to htacces,
+			//required for apps' preview to work.
+			if( is_multisite() ) {
+				WpakServerRewrite::prepend_wp_network_wpak_rules_to_htaccess();
+			}
+			
+			//Memorize we've gone that far successfully, to not re-run this routine 
+			//in case something goes wrong in next upgrade routines:
+			update_option( 'wpak_version', '1.0' );
 		}
 
 		/**

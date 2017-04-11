@@ -18,7 +18,7 @@ class WpakUploadThemes {
 		$capability_required = current_user_can( 'wpak_edit_apps' ) ? 'wpak_edit_apps' : 'manage_options';
 		add_submenu_page( WpakApps::menu_item, __( 'Upload Themes', WpAppKit::i18n_domain ), __( 'Upload Themes', WpAppKit::i18n_domain ), $capability_required, self::menu_item, array( __CLASS__, 'settings_panel' ) );
 	}
-	
+
 	public static function add_theme_upload_styles() {
 		global $pagenow, $plugin_page;
 		if ( ($pagenow === 'admin.php' ) && $plugin_page === 'wpak_bo_upload_themes' ) {
@@ -155,7 +155,7 @@ class WpakUploadThemes {
 					</h2>
 
 					<?php if ( !empty( $result['message'] ) ): ?>
-						<div class="<?php echo $result['type'] ?>" ><p><?php echo $result['message'] ?></p></div>
+						<div class="<?php echo esc_attr( $result['type'] ) ?>" ><p><?php echo $result['message'] ?></p></div>
 					<?php endif ?>
 
 					<div class="upload-plugin">
@@ -167,21 +167,27 @@ class WpakUploadThemes {
 							<?php submit_button( __( 'Install Now' ), 'button', 'install-theme-submit', false ); ?>
 						</form>
 					</div>
-						
-					<?php if( !empty( $default_themes ) ): ?>
+
+					<?php if( !empty( $default_themes ) ): $default_themes_exist = false; ?>
 						<h2><?php _e( 'Download Default Themes Packages', WpAppKit::i18n_domain ); ?></h2>
 						<div>
 							<ul>
 								<?php foreach( $default_themes as $slug => $theme ):
-									$filename = WpakThemes::get_default_theme_filename( $slug );
+									$filename = WpakThemes::get_default_theme_filename( $slug, $theme );
 									if( !is_file( WpakThemes::get_default_themes_directory() . '/' . $filename ) ) {
 										continue;
 									}
+									$default_themes_exist = true;
 									?>
 									<li>
-										<a href="<?php echo WpakThemes::get_default_themes_directory_uri() . '/' . $filename; ?>"><?php echo $theme['name'] . ' (' . $theme['version'] . ')'; ?></a>
+										<a href="<?php echo esc_url( WpakThemes::get_default_themes_directory_uri() . '/' . $filename ); ?>"><?php echo esc_html( $theme['name'] . ' (' . $theme['version'] . ')' ); ?></a>
 									</li>
 								<?php endforeach; ?>
+                                <?php if( !$default_themes_exist ): ?>
+                                    <li>
+                                        <?php echo sprintf( __( 'No packages available, you can find default themes under %s and copy them directly.', WpAppKit::i18n_domain ), WpakThemes::get_default_themes_directory() ); ?>
+                                    </li>
+                                <?php endif; ?>
 							</ul>
 						</div>
 					<?php endif; ?>

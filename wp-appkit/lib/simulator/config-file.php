@@ -43,7 +43,7 @@ class WpakConfigFile {
 					//If the app current theme has some PHP (hooks!) to be executed before
 					//config files are generated, include it here :
 					WpakThemes::include_app_theme_php( $app_id );
-					
+
 					//Include PHP files required by addons activated for this app :
 					WpakAddons::require_app_addons_php_files( $app_id );
 
@@ -439,25 +439,25 @@ define( function ( require ) {
 		echo '<?xml version="1.0" encoding="UTF-8" ?>';
 ?>
 
-<widget xmlns       = "<?php echo $xmlns ?>"
-        xmlns:gap   = "<?php echo $xmlns_gap ?>"
-        id          = "<?php echo $app_phonegap_id ?>"
-        versionCode = "<?php echo $app_version_code ?>"
-        version     = "<?php echo $app_version ?>" >
+<widget xmlns       = "<?php echo esc_url( $xmlns ); ?>"
+        xmlns:gap   = "<?php echo esc_url( $xmlns_gap ); ?>"
+        id          = "<?php echo esc_attr( $app_phonegap_id ); ?>"
+        versionCode = "<?php echo esc_attr( $app_version_code ); ?>"
+        version     = "<?php echo esc_attr( $app_version ); ?>" >
 
-	<name><?php echo $app_name ?></name>
+	<name><?php echo ent2ncr( htmlentities( $app_name, ENT_QUOTES, 'UTF-8', false ) ); ?></name>
 
-	<description><?php echo $app_description ?></description>
+	<description><?php echo ent2ncr( htmlentities( $app_description, ENT_QUOTES, 'UTF-8', false ) ); ?></description>
 
-	<author href="<?php echo $app_author_website ?>" email="<?php echo $app_author_email ?>"><?php echo $app_author ?></author>
+	<author href="<?php echo esc_url( $app_author_website ) ?>" email="<?php echo esc_attr( $app_author_email ) ?>"><?php echo ent2ncr( htmlentities( $app_author, ENT_QUOTES, 'UTF-8', false ) ); ?></author>
 
-	<gap:platform name="<?php echo $app_platform ?>" />
+	<gap:platform name="<?php echo esc_attr( $app_platform ); ?>" />
 <?php if( !empty( $app_build_tool ) && $app_platform == 'android' ): ?>
-	<preference name="android-build-tool" value="<?php echo $app_build_tool ?>" />
+	<preference name="android-build-tool" value="<?php echo esc_attr( $app_build_tool ); ?>" />
 <?php endif ?>
 <?php if( !empty( $app_phonegap_version ) ): ?>
 
-	<preference name="phonegap-version" value="<?php echo $app_phonegap_version ?>" />
+	<preference name="phonegap-version" value="<?php echo esc_attr( $app_phonegap_version ); ?>" />
 <?php endif ?>
 	<preference name="permissions" value="none"/>
 <?php
@@ -501,12 +501,12 @@ define( function ( require ) {
 	<!-- SplashScreen configuration -->
 <?php if( !empty( $splashscreen_settings['preferences'] ) ) : ?>
 <?php foreach( $splashscreen_settings['preferences'] as $splashscreen_setting => $value ): ?>
-	<preference name="<?php echo $splashscreen_setting ?>" value="<?php echo $value ?>" />
+	<preference name="<?php echo esc_attr( $splashscreen_setting ); ?>" value="<?php echo esc_attr( $value ); ?>" />
 <?php endforeach ?>
 <?php endif ?>
 <?php if( !empty( $splashscreen_settings['gap:config-file'] ) ) : ?>
 <?php foreach( $splashscreen_settings['gap:config-file'] as $splashscreen_setting => $value ): ?>
-	<gap:config-file platform="<?php echo $app_platform ?>" parent="<?php echo $splashscreen_setting ?>"><<?php echo $value ?>/></gap:config-file>
+	<gap:config-file platform="<?php echo esc_attr( $app_platform ); ?>" parent="<?php echo esc_attr( $splashscreen_setting ); ?>"><<?php echo $value ?>/></gap:config-file>
 <?php endforeach ?>
 <?php endif ?>
 <?php endif ?>

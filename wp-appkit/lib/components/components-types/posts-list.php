@@ -331,7 +331,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			<select name="post-type" class="posts-list-post-type">
 				<?php foreach ( $post_types as $post_type => $post_type_object ): ?>
 					<?php $selected = $post_type == $current_post_type ? 'selected="selected"' : '' ?>
-					<option value="<?php echo $post_type ?>" <?php echo $selected ?>><?php echo $post_type_object->labels->name ?></option>
+					<option value="<?php echo esc_attr( $post_type ) ?>" <?php echo $selected ?>><?php echo esc_html( $post_type_object->labels->name ) ?></option>
 				<?php endforeach ?>
 				<option value="last-posts" <?php echo 'last-posts' == $current_post_type ? 'selected="selected"' : '' ?>><?php _e( 'Latest posts', WpAppKit::i18n_domain ) ?></option>
 				<option value="custom" <?php echo 'custom' == $current_post_type ? 'selected="selected"' : '' ?>><?php _e( 'Custom, using hooks', WpAppKit::i18n_domain ) ?></option>
@@ -379,7 +379,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		<?php if( $current_post_type == 'last-posts' ) : //Custom posts list ?>
 			<?php //no sub option for now ?>
 		<?php elseif( $current_post_type == 'custom' ): //Custom posts list ?>
-			<label><?php _e( 'Hook name', WpAppKit::i18n_domain ) ?></label> : <input type="text" name="hook" value="<?php echo $current_hook ?>" />
+			<label><?php _e( 'Hook name', WpAppKit::i18n_domain ) ?></label> : <input type="text" name="hook" value="<?php echo esc_attr( $current_hook ) ?>" />
 		<?php else: //Post type ?>
 
 			<?php
@@ -403,7 +403,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 					<?php foreach ( $taxonomies as $taxonomy_slug ): ?>
 						<?php $taxonomy = get_taxonomy( $taxonomy_slug ) ?>
 						<?php $selected = $taxonomy_slug == $current_taxonomy ? 'selected="selected"' : '' ?>
-						<option value="<?php echo $taxonomy_slug ?>" <?php echo $selected ?>><?php echo $taxonomy->labels->name ?></option>
+						<option value="<?php echo esc_attr( $taxonomy_slug ) ?>" <?php echo $selected ?>><?php echo esc_html( $taxonomy->labels->name ) ?></option>
 					<?php endforeach ?>
 				</select>
 				<br/>
@@ -412,12 +412,12 @@ class WpakComponentTypePostsList extends WpakComponentType {
 						$taxonomy_obj = get_taxonomy( $current_taxonomy );
 						$terms = get_terms( $current_taxonomy );
 					?>
-					<label><?php echo $taxonomy_obj->labels->name ?> : </label>
+					<label><?php echo esc_html( $taxonomy_obj->labels->name ) ?> : </label>
 					<?php if ( !empty( $terms ) ): ?>
 						<select name="term">
 							<?php foreach ( $terms as $term ): ?>
 								<?php $selected = $term->slug == $current_term ? 'selected="selected"' : '' ?>
-								<option value="<?php echo $term->slug ?>" <?php echo $selected ?>><?php echo $term->name ?></option>
+								<option value="<?php echo esc_attr( $term->slug ) ?>" <?php echo $selected ?>><?php echo esc_html( $term->name ) ?></option>
 							<?php endforeach ?>
 						</select>
 					<?php else: ?>
@@ -432,10 +432,10 @@ class WpakComponentTypePostsList extends WpakComponentType {
 	}
 
 	public function get_options_from_posted_form( $data ) {
-		$post_type = !empty( $data['post-type'] ) ? $data['post-type'] : '';
-		$taxonomy = !empty( $data['taxonomy'] ) ? $data['taxonomy'] : '';
-		$term = !empty( $data['term'] ) ? $data['term'] : '';
-		$hook = !empty( $data['hook'] ) ? $data['hook'] : '';
+		$post_type = !empty( $data['post-type'] ) ? sanitize_key( $data['post-type'] ) : '';
+		$taxonomy = !empty( $data['taxonomy'] ) ? sanitize_key( $data['taxonomy'] ) : '';
+		$term = !empty( $data['term'] ) ? sanitize_key( $data['term'] ) : '';
+		$hook = !empty( $data['hook'] ) ? sanitize_key( $data['hook'] ) : '';
 		$options = array( 'post-type' => $post_type, 'taxonomy' => $taxonomy, 'term' => $term, 'hook' => $hook );
 		return $options;
 	}

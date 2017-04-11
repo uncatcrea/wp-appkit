@@ -1,0 +1,47 @@
+<!--
+ * Content is enclosed in <div id="app-content-wrapper"><div id="app-screen"></div></div>
+ * Subhead: is added by add-custom-data.php in the theme's php folder / It expects that the post has a subhead custom field
+ * Thumbnail caption: is added by add-custom-data.php in the theme's php folder
+ * Custom post date: getCustomDate() added in functions.js as a template's parameter
+ * Handler for image loading error: displayDefaultImage() added in functions.js as a template's parameter
+-->
+
+<div id="content" class="content single-template">
+
+    <div class="post-title">
+
+        <% if ( post.subhead ) { %>
+
+            <div class="subhead"><%= post.subhead %></div>
+
+        <% } %>
+        
+        <h1>
+            <%= post.title %>
+        </h1>
+
+<!--
+        <div class="post-meta">
+            By <span class="post-author"><%= post.author %></span><span class="post-publish-date"><%= getCustomDate(post.date) %></span>
+        </div>
+-->
+
+    </div>
+
+    <% if(  post.thumbnail && post.thumbnail.src && post.thumbnail.src.length ){ %>
+
+        <img class="post-thumbnail" src="<%= post.thumbnail.src %>" onerror="displayDefaultImage(this);" />
+        
+        <% if (post.thumbnail.caption) { %>
+            <div class="post-thumbnail-caption"><%= post.thumbnail.caption %></div>
+        <% } %>
+
+    <% } %>	
+            
+    <div id="single-content" class="single-content">
+
+            <%= post.content %>
+
+	</div>
+        
+</div>

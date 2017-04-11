@@ -1,0 +1,48 @@
+<!--
+ * Content is enclosed in <div id="app-content-wrapper"><div id="app-screen"></div></div>
+ * Subhead: is added by add-custom-data.php in the theme's php folder / It expects that the post has a subhead custom field
+ * Handler for image loading error: displayDefaultImage() added in functions.js as a template's parameter
+-->
+
+<div id="content" class="content list-template">
+    
+	<% if(posts.length){ %>
+
+		<% _.each( posts, function( post ){ %>
+
+			<div class="content-item has-ripple-feedback">
+
+                <a href="<%= TemplateTags.getPostLink(post.id) %>">
+
+                    <% if ( post.subhead ) { %>
+
+                        <div class="subhead"><%= post.subhead %></div>
+
+                    <% } %>
+
+					<h2><span><%= post.title %></span></h2>
+                        
+                    <% if(  post.thumbnail && post.thumbnail.src && post.thumbnail.src.length ){ %>
+
+                        <img class="content-thumbnail" src="<%= post.thumbnail.src %>" onerror="displayDefaultImage(this);" />
+
+                    <% } %>	
+                    
+                        
+				</a>
+			</div>
+
+		<% }); %>
+
+        <% if( TemplateTags.displayGetMoreLink() ){ %>
+			<div class="get-more-button-wrapper">
+                <button type="button" id="get-more-button" class="get-more-button has-ripple-feedback ripple-small">More (<%= TemplateTags.getMoreLinkNbLeft() %>)</button>
+            
+            </div>
+		<% } %>
+            
+	<% }else{ %>
+		<div class='content-message'>No post found</div>
+	<% } %>
+        
+</div>
