@@ -126,8 +126,8 @@ class WpakAddons {
 			<span><?php _e( 'Addons activated for this App', WpAppKit::i18n_domain ) ?></span><br/>
 			<?php foreach ( self::get_addons() as $addon ): ?>
 				<?php $checked = array_key_exists( $addon->slug, $app_addons ) ? 'checked' : '' ?>
-					<input type="checkbox" name="wpak-addons[]" id="<?php echo $addon->slug ?>" value="<?php echo $addon->slug ?>" <?php echo $checked ?> />
-					<label for="<?php echo $addon->slug ?>"><?php echo $addon->name ?></label>
+					<input type="checkbox" name="wpak-addons[]" id="<?php echo esc_attr( $addon->slug ) ?>" value="<?php echo esc_attr( $addon->slug ) ?>" <?php echo $checked ?> />
+					<label for="<?php echo esc_attr( $addon->slug ) ?>"><?php echo esc_html( $addon->name ) ?></label>
 			<?php endforeach ?>
 			<?php wp_nonce_field( 'wpak-addons-' . $post->ID, 'wpak-nonce-addons' ) ?>
 		</div>

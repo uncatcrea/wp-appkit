@@ -74,7 +74,7 @@ class WpakComponentTypeHooks extends WpakComponentType {
 		?>
 		<div class="component-params">
 			<label><?php _e( 'Hook name', WpAppKit::i18n_domain ) ?> : </label>
-			<input type="text" name="hook" value="<?php echo $current_hook ?>" />
+			<input type="text" name="hook" value="<?php echo esc_attr( $current_hook ) ?>" />
 		</div>
 		<?php
 	}
@@ -88,7 +88,7 @@ class WpakComponentTypeHooks extends WpakComponentType {
 	}
 
 	public function get_options_from_posted_form( $data ) {
-		$hook = !empty( $data['hook'] ) ? $data['hook'] : '';
+		$hook = !empty( $data['hook'] ) ? sanitize_key( $data['hook'] ) : '';
 		$options = array( 'hook' => $hook );
 		return $options;
 	}

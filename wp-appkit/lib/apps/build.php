@@ -38,7 +38,7 @@ class WpakBuild {
 			<span class="description"><?php _e( 'If activated, echoes debug information in the browser JavasSript console while simulating the app.', WpAppKit::i18n_domain ) ?></span>
 		</div>
 		<div class="field-group">
-			<a href="<?php echo self::get_appli_dir_url() . '/config.js?wpak_app_id=' . WpakApps::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a>
+			<a href="<?php echo esc_url( self::get_appli_dir_url() . '/config.js?wpak_app_id=' . WpakApps::get_app_slug( $post->ID ) ) ?>" target="_blank"><?php _e( 'View config.js', WpAppKit::i18n_domain ) ?></a>
 		</div>
 		<?php wp_nonce_field( 'wpak-simulation-data-' . $post->ID, 'wpak-nonce-simulation-data' ) ?>
 		<?php
@@ -121,7 +121,7 @@ class WpakBuild {
 			$filename_full = self::get_export_files_path() . "/" . $filename;
 		}
 		else {
-			echo $answer['msg'];
+			echo esc_html( $answer['msg'] );
 			exit;
 		}
 
@@ -135,7 +135,7 @@ class WpakBuild {
 			header( "Content-Disposition: attachment; filename=\"" . $filename . "\"" );
 			header( "Content-Transfer-Encoding: binary" );
 			header( "Content-Length: " . filesize( $filename_full ) );
-			ob_end_flush();
+			ob_end_clean();
 			@readfile( $filename_full );
 			exit;
 		} else {
@@ -172,6 +172,13 @@ class WpakBuild {
 			return $answer;
 		}
 
+		//If the app current theme has some PHP (hooks!) to be executed before
+		//we build the export, include it here :
+		WpakThemes::include_app_theme_php( $app_id );
+		
+		//Include PHP files required by addons activated for this app :
+		WpakAddons::require_app_addons_php_files( $app_id );
+		
 		$current_theme = WpakThemesStorage::get_current_theme( $app_id );
 
 		$plugin_dir = plugin_dir_path( dirname( dirname( __FILE__ ) ) );
@@ -328,7 +335,7 @@ class WpakBuild {
 			if ( !empty( $source_root ) ) {
 				$source_root .= '/';
 			}
-
+			
 			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $source ), RecursiveIteratorIterator::SELF_FIRST );
 
 			foreach ( $files as $file ) {
@@ -375,6 +382,23 @@ class WpakBuild {
 
 					$webapp_files[] = $zip_filename;
 				}
+			}
+			
+			//Add JS Files that must be copied from WordPress core:
+			$core_js_files = array(
+				'vendor/jquery.js' => ABSPATH . WPINC .'/js/jquery/jquery.js',
+				'vendor/underscore.js' => ABSPATH . WPINC .'/js/underscore.min.js',
+				'vendor/backbone.js' => ABSPATH . WPINC .'/js/backbone.min.js',
+			);
+			
+			foreach( $core_js_files as $app_file => $real_file ) {
+				$zip_filename = $source_root . $app_file;
+				if ( !$zip->addFile( $real_file, $zip_filename ) ) {
+					$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
+					$answer['ok'] = 0;
+					return $answer;
+				}
+				$webapp_files[] = $zip_filename;
 			}
 
 			//Add themes files :

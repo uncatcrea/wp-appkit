@@ -999,6 +999,16 @@ define( function( require, exports ) {
 
         return screen_object;
     };
+	
+	/**
+	 * Re-render Menu view
+	 */
+	themeApp.renderMenu = function() {
+		var menu_view = RegionManager.getMenuView();
+		if ( menu_view ) {
+			menu_view.render();
+		}
+	};
 
 	//Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
 	//a circular dependency for requirejs) can both be required at the same time

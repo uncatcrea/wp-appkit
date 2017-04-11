@@ -67,15 +67,15 @@ class WpakThemesBoSettings {
 			<select name="wpak_app_theme_choice" id="wpak_app_theme_choice">
 				<?php foreach ( $available_themes as $theme_slug => $theme_data ): ?>
 					<?php $selected = $theme_slug == $current_theme ? 'selected="selected"' : '' ?>
-					<option value="<?php echo $theme_slug ?>" <?php echo $selected ?>><?php echo $theme_data['Name'] ?> </option>
+					<option value="<?php echo esc_attr( $theme_slug ) ?>" <?php echo $selected ?>><?php echo esc_html( $theme_data['Name'] ) ?> </option>
 				<?php endforeach ?>
 			</select>
-			<p class="description"><?php echo sprintf( __( 'Choose a theme for your app. Theme defines how your app will look and behave. Themes can be uploaded in the Upload Themes panel. Themes are stored in the %s folder of your WordPress install.', WpAppKit::i18n_domain ), basename(WP_CONTENT_DIR) .'/'. WpakThemes::themes_directory ) ?></p>
+			<p class="description"><?php echo esc_html( sprintf( __( 'Choose a theme for your app. Theme defines how your app will look and behave. Themes can be uploaded in the Upload Themes panel. Themes are stored in the %s folder of your WordPress install.', WpAppKit::i18n_domain ), basename(WP_CONTENT_DIR) .'/'. WpakThemes::themes_directory ) ) ?></p>
 		<?php else: ?>
 			<div class="wpak_no_theme">
-				<strong><?php _e( 'No WP AppKit theme found!', WpAppKit::i18n_domain ) ?></strong>
+				<strong><?php _e( 'No WP-AppKit theme found!', WpAppKit::i18n_domain ) ?></strong>
 				<br/>
-				<?php echo  sprintf( __('Please upload a WP AppKit theme from the "<a href="%s" >Upload Themes</a>" panel or copy a theme directly to the %s directory.', WpAppKit::i18n_domain ),
+				<?php echo sprintf( __('Please upload a WP-AppKit theme from the "<a href="%s" >Upload Themes</a>" panel or copy a theme directly to the %s directory.', WpAppKit::i18n_domain ),
 									admin_url('admin.php?page=wpak_bo_upload_themes'),
 									basename(WP_CONTENT_DIR) .'/'. WpakThemes::themes_directory
 							)
@@ -84,9 +84,9 @@ class WpakThemesBoSettings {
 		<?php endif ?>
 
 		<?php foreach ( $available_themes as $theme => $theme_data ): ?>
-			<div class="wpak-theme-data" id="wpak-theme-data-<?php echo $theme ?>" style="display:none">
+			<div class="wpak-theme-data" id="wpak-theme-data-<?php echo esc_attr( $theme ) ?>" style="display:none">
 				<div class="theme-data-content">
-					<?php echo $theme_data['Description'] ?>
+					<?php echo esc_html( $theme_data['Description'] ) ?>
 
 					<?php
 						$theme_meta = array();
@@ -120,7 +120,7 @@ class WpakThemesBoSettings {
 
 		<div class="wpak-app-title wpak_settings">
 			<label><?php _e( 'Application Title (displayed in app top bar)', WpAppKit::i18n_domain ) ?></label><br/>
-			<input id="wpak_app_title" type="text" name="wpak_app_title" value="<?php echo $main_infos['title'] ?>" />
+			<input id="wpak_app_title" type="text" name="wpak_app_title" value="<?php echo esc_attr( $main_infos['title'] ) ?>" />
 		</div>
 
 		<?php wp_nonce_field( 'wpak-theme-data-' . $post->ID, 'wpak-nonce-theme-data' ) ?>

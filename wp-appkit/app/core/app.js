@@ -332,9 +332,19 @@ define(function (require) {
 	   * This queried screen is then pushed to history in app.addQueriedScreenToHistory().
 	   */
 	  app.setQueriedScreen = function( screen_data ){
-		  queried_screen_data = formatScreenData( _.extend( screen_data, {
+		  
+		  screen_data = _.extend( screen_data, {
 		  	fragment: Backbone.history.fragment
-	  	  }));
+	  	  });
+		  
+		  /**
+		   * 'queried-screen' filter
+		   * Allows to customize queried screen data before inserting it into history.
+		   * Useful for example to customize screen label.
+		   */
+		  screen_data = Hooks.applyFilters( 'queried-screen', screen_data, [] );
+		  
+		  queried_screen_data = formatScreenData( screen_data );
 	  };
 
 	  app.getQueriedScreen = function(){
@@ -561,7 +571,7 @@ define(function (require) {
 		if( undefined === globals_keys.get( type ) ) {
 			Utils.log( 'app.addGlobalType info: adding a type to globals', { type: type } );
 			globals_keys.add( { id: type } );
-            app.globals[type] = new Items.Items( { global: type } );
+            app.globals[type] = new Items.Items( [], { global: type } );
 		}
 	};
 
@@ -651,7 +661,7 @@ define(function (require) {
 	    	    	    			 var fetches = [];
 	    	    	    			 global_keys.each(function(value, key, list){
 	    	    	    				 var global_id = value.get('id');
-	    	    	    				 var items = new Items.Items({global:global_id});
+	    	    	    				 var items = new Items.Items( [], {global:global_id} );
 	    	    	    				 fetches.push(fetch(items,global_id));
 	    	    	    			 });
 
@@ -735,7 +745,7 @@ define(function (require) {
 							//Delete all existing items from local storage :
 							globals_keys.each(function(value, key, list){
 								var global_id = value.get('id');
-								var items = new Items.Items({global:global_id});
+								var items = new Items.Items( [], {global:global_id} );
 								items.resetAll();
 							});
 
@@ -744,7 +754,7 @@ define(function (require) {
 							//Then reload new items from web service :
 							globals_keys.resetAll();
 							_.each( data.globals, function( global, key, list ) {
-								var items = new Items.Items( { global: key } );
+								var items = new Items.Items( [], { global: key } );
 								items.resetAll();
 								_.each( global, function( item, id ) {
 									items.add( _.extend( { id: id }, item ) );
@@ -1586,10 +1596,13 @@ define(function (require) {
 	        				  };
 		    			  }
     		  		  }else{
+						  //No component.data, which should not happen, unless something went wrong on server side
+						  //when building the component data. This can happen for example when a custom component 
+						  //is added to an app without providing the correct hook name or not setting correct data 
+						  //in hook.
     		  			  app.triggerError(
   			    			  'getcomponentdata:hooks:no-data',
-  			    			  {type:'wrong-data',where:'app::getComponentData',message: 'Custom component has no data attribute',data:{component:component}},
-  			    			  cb_error
+  			    			  {type:'wrong-data',where:'app::getComponentData',message: 'Custom component ['+ component_id +'] has no data attribute: please check that the component\'s hook is set correctly.',data:{component:component}}
   			    		  );
     		  		  }
 	    			  break;

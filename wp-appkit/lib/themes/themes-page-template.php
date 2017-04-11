@@ -102,6 +102,7 @@ get_current_screen()->set_help_sidebar(
 
 
 $themes = WpakThemes::get_available_themes( true );
+$prepared_themes = array();
 
 foreach ( $themes as $slug => $theme ) {
     $screenshot = array();
@@ -159,8 +160,8 @@ add_thickbox();
 ?>
 
 <div class="wrap">
-    <h1><?php echo get_admin_page_title(); ?>
-        <span class="title-count theme-count"><?php echo count( $themes ); ?></span>
+    <h1><?php echo esc_html( get_admin_page_title() ); ?>
+        <span class="title-count theme-count"><?php echo esc_html( count( $themes ) ); ?></span>
     <?php if ( current_user_can( 'wpak_edit_apps' ) || current_user_can( 'manage_options' ) ) : ?>
         <a href="<?php menu_page_url( WpakUploadThemes::menu_item ); ?>" class="hide-if-no-js page-title-action"><?php echo esc_html_x( 'Add New', 'Add new theme', WpAppKit::i18n_domain ); ?></a>
     <?php endif; ?>
@@ -179,7 +180,7 @@ foreach ( $themes as $theme ) :
 <div class="theme" tabindex="0" aria-describedby="<?php echo $aria_action . ' ' . $aria_name; ?>">
     <?php if ( ! empty( $theme['screenshot'][0] ) ) { ?>
         <div class="theme-screenshot">
-            <img src="<?php echo $theme['screenshot'][0]; ?>" alt="" />
+            <img src="<?php echo esc_url( $theme['screenshot'][0] ); ?>" alt="" />
         </div>
     <?php } else { ?>
         <div class="theme-screenshot blank"></div>
@@ -187,7 +188,7 @@ foreach ( $themes as $theme ) :
     <span class="more-details" id="<?php echo $aria_action; ?>"><?php _e( 'Theme Details', WpAppKit::i18n_domain ); ?></span>
     <div class="theme-author"><?php printf( __( 'By %s', WpAppKit::i18n_domain ), $theme['author'] ); ?></div>
 
-    <h2 class="theme-name" id="<?php echo $aria_name; ?>"><?php echo $theme['name']; ?></h2>
+    <h2 class="theme-name" id="<?php echo $aria_name; ?>"><?php echo esc_html( $theme['name'] ); ?></h2>
 
     <div class="theme-actions">
     </div>

@@ -46,7 +46,10 @@ class WpakApps {
 
 	public static function apps_custom_post_type() {
 
-		$capability = current_user_can('wpak_edit_apps') ? 'wpak_app' : 'post';
+		//Handle specific capabilities for the custom "WP AppKit App Editor" role only.
+		//With special case for multisite admin who has all caps by default, so has the 
+		//'wpak_edit_apps' capability (See WP_User::has_cap()).
+		$capability = current_user_can('wpak_edit_apps') && !( is_multisite() && is_super_admin() ) ? 'wpak_app' : 'post';
 
 		register_post_type(
 			'wpak_apps',
@@ -138,7 +141,14 @@ class WpakApps {
 
 	public static function add_settings_panels() {
 		$capability_required = current_user_can( 'wpak_edit_apps' ) ? 'wpak_edit_apps' : 'manage_options';
-		add_menu_page( __( 'WP AppKit', WpAppKit::i18n_domain ), __( 'WP AppKit', WpAppKit::i18n_domain ), $capability_required, self::menu_item, array( __CLASS__, 'settings_panel' ) );
+		add_menu_page( 
+			__( 'WP-AppKit', WpAppKit::i18n_domain ), 
+			__( 'WP-AppKit', WpAppKit::i18n_domain ), 
+			$capability_required, 
+			self::menu_item, 
+			array( __CLASS__, 'settings_panel' ),
+			'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyAgIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIiAgIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyIgICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiICAgdmVyc2lvbj0iMS4xIiAgIGlkPSJMYXllcl8xIiAgIHg9IjBweCIgICB5PSIwcHgiICAgdmlld0JveD0iMCAwIDE4IDE4IiAgIHhtbDpzcGFjZT0icHJlc2VydmUiICAgaW5rc2NhcGU6dmVyc2lvbj0iMC45MSByMTM3MjUiICAgc29kaXBvZGk6ZG9jbmFtZT0iaWNvbi1taW5pLTIuc3ZnIiAgIHdpZHRoPSIxOCIgICBoZWlnaHQ9IjE4Ij48bWV0YWRhdGEgICAgIGlkPSJtZXRhZGF0YTE1Ij48cmRmOlJERj48Y2M6V29yayAgICAgICAgIHJkZjphYm91dD0iIj48ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD48ZGM6dHlwZSAgICAgICAgICAgcmRmOnJlc291cmNlPSJodHRwOi8vcHVybC5vcmcvZGMvZGNtaXR5cGUvU3RpbGxJbWFnZSIgLz48ZGM6dGl0bGU+PC9kYzp0aXRsZT48L2NjOldvcms+PC9yZGY6UkRGPjwvbWV0YWRhdGE+PGRlZnMgICAgIGlkPSJkZWZzMTMiIC8+PHNvZGlwb2RpOm5hbWVkdmlldyAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIiAgICAgYm9yZGVyY29sb3I9IiM2NjY2NjYiICAgICBib3JkZXJvcGFjaXR5PSIxIiAgICAgb2JqZWN0dG9sZXJhbmNlPSIxMCIgICAgIGdyaWR0b2xlcmFuY2U9IjEwIiAgICAgZ3VpZGV0b2xlcmFuY2U9IjEwIiAgICAgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAiICAgICBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIiAgICAgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIxNjgwIiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTAyOCIgICAgIGlkPSJuYW1lZHZpZXcxMSIgICAgIHNob3dncmlkPSJmYWxzZSIgICAgIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSJmYWxzZSIgICAgIGlua3NjYXBlOnpvb209IjIuOTUiICAgICBpbmtzY2FwZTpjeD0iNDAiICAgICBpbmtzY2FwZTpjeT0iNDAiICAgICBpbmtzY2FwZTp3aW5kb3cteD0iLTgiICAgICBpbmtzY2FwZTp3aW5kb3cteT0iLTgiICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0iTGF5ZXJfMSIgLz48c3R5bGUgICAgIHR5cGU9InRleHQvY3NzIiAgICAgaWQ9InN0eWxlMyI+LnN0MHtmaWxsOiMxRTIzMkQ7fTwvc3R5bGU+PGcgICAgIGlkPSJnNSIgICAgIHN0eWxlPSJmaWxsOiNhMGE1YWE7ZmlsbC1vcGFjaXR5OjEiICAgICB0cmFuc2Zvcm09Im1hdHJpeCgwLjIwNTEyODIxLDAsMCwwLjIwNTEyODIxLDEuNzk0ODcxNCwwLjc5NDg3MTYpIj48cGF0aCAgICAgICBjbGFzcz0ic3QwIiAgICAgICBkPSJNIDQxLjUsMSA1LjUsMSBDIDMsMSAxLDMgMSw1LjUgbCAwLDY5IEMgMSw3NyAzLDc5IDUuNSw3OSBsIDM2LDAgQyA0NCw3OSA0Niw3NyA0Niw3NC41IGwgMCwtNjkgQyA0NiwzIDQ0LDEgNDEuNSwxIFogTSAyOSw3NCAxOCw3NCBjIC0xLjEsMCAtMiwtMC45IC0yLC0yIDAsLTEuMSAwLjksLTIgMiwtMiBsIDExLDAgYyAxLjEsMCAyLDAuOSAyLDIgMCwxLjEgLTAuOSwyIC0yLDIgeiBNIDQwLDY0IGMgMCwwLjYgLTAuNCwxIC0xLDEgTCA4LDY1IEMgNy40LDY1IDcsNjQuNSA3LDY0IEwgNyw4IEMgNyw3LjQgNy40LDcgOCw3IGwgMzEsMCBjIDAuNiwwIDEsMC41IDEsMSBsIDAsNTYgeiIgICAgICAgaWQ9InBhdGg3IiAgICAgICBzdHlsZT0iZmlsbDojYTBhNWFhO2ZpbGwtb3BhY2l0eToxIiAgICAgICBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIiAvPjxwYXRoICAgICAgIGNsYXNzPSJzdDAiICAgICAgIGQ9Ik0gNzQuNywzNSBDIDcyLjYsMzQuNSA3MSwzMyA3MC4yLDMxIDY5LjUsMjkgNjkuOCwyNi44IDcxLDI1LjEgbCAyLjYsLTMuNiAtNS4xLC02LjEgLTQsMS45IGMgLTEuOSwwLjkgLTQuMiwwLjkgLTYsLTAuMiAtMS44LC0xLjEgLTMsLTMgLTMuMiwtNS4xIEwgNTUsNy42IGwgLTYuMiwtMSAwLDE4LjUgYyA2LjcsMS43IDEyLDcuNyAxMiwxNC45IDAsNy4yIC01LjEsMTMuMiAtMTEuOCwxNSBsIDAsMTguNSA2LjIsLTEgMC4zLC00LjQgYyAwLjEsLTIuMSAxLjMsLTQgMy4yLC01LjEgMS44LC0xLjEgNC4xLC0xLjEgNiwtMC4yIGwgNCwxLjkgNS4xLC02LjEgLTIuNywtMy42IGMgLTEuMywtMS43IC0xLjYsLTMuOSAtMC44LC01LjkgMC43LC0yIDIuNCwtMy41IDQuNSwtNCBMIDc5LDQ0IDc5LDM2IDc0LjcsMzUgWiIgICAgICAgaWQ9InBhdGg5IiAgICAgICBzdHlsZT0iZmlsbDojYTBhNWFhO2ZpbGwtb3BhY2l0eToxIiAgICAgICBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIiAvPjwvZz48L3N2Zz4='
+		);
 	}
 
 	public static function add_main_meta_box() {
@@ -218,7 +228,7 @@ class WpakApps {
 			<div id="minor-publishing">
 				<div id="minor-publishing-actions">
 					<div id="preview-action">
-						<a href="<?php echo WpakBuild::get_appli_index_url( $post->ID ); ?>" class="preview button" target="_blank"><?php _e( 'Preview', WpAppKit::i18n_domain ) ?></a>
+						<a href="<?php echo esc_url( WpakBuild::get_appli_index_url( $post->ID ) ); ?>" class="preview button" target="_blank"><?php _e( 'Preview', WpAppKit::i18n_domain ) ?></a>
 					</div>
 					<div class="clear"></div>
 				</div>
@@ -255,7 +265,7 @@ class WpakApps {
 						else
 							$delete_text = __( 'Move to Trash' );
 						?>
-					<a class="submitdelete deletion" href="<?php echo get_delete_post_link( $post->ID ); ?>"><?php echo $delete_text; ?></a><?php
+					<a class="submitdelete deletion" href="<?php echo esc_url( get_delete_post_link( $post->ID ) ); ?>"><?php echo esc_html( $delete_text ); ?></a><?php
 					} ?>
 				</div>
 
@@ -327,7 +337,7 @@ class WpakApps {
 
 			<div id="export-action">
 
-				<?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+				<?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ); ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
 
 				<?php
 				/*
@@ -342,7 +352,7 @@ class WpakApps {
 					<option value="<?php echo esc_attr( $export_type ) ?>" <?php selected( $export_type === $default_export_type )?>><?php echo esc_html( $label ) ?></option>
 					<?php endforeach ?>
 				</select>
-				<a id="wpak_export_link" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => $default_export_type ) ), 'wpak_download_app_sources' ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+				<a id="wpak_export_link" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => $default_export_type ) ), 'wpak_download_app_sources' ) ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
 				*/
 				?>
 
@@ -359,7 +369,7 @@ class WpakApps {
 			<select id="wpak_app_platform" name="wpak_app_platform">
 				<?php foreach ( self::get_platforms() as $value => $label ): ?>
 					<?php $selected = $value == $main_infos['platform'] ? 'selected="selected"' : '' ?>
-					<option value="<?php echo $value ?>" <?php echo $selected ?>><?php echo $label ?></option>
+					<option value="<?php echo esc_attr( $value ) ?>" <?php echo $selected ?>><?php echo esc_html( $label ) ?></option>
 				<?php endforeach ?>
 			</select>
 			<?php wp_nonce_field( 'wpak-main-infos-' . $post->ID, 'wpak-nonce-main-infos' ) ?>
@@ -454,7 +464,7 @@ class WpakApps {
 				</div>
 			</fieldset>
 			<div class="field-group wpak_phonegap_links">
-				<a href="<?php echo WpakBuild::get_appli_dir_url() . '/config.xml?wpak_app_id=' . self::get_app_slug( $post->ID ) ?>" target="_blank"><?php _e( 'View config.xml', WpAppKit::i18n_domain ) ?></a>
+				<a href="<?php echo esc_url( WpakBuild::get_appli_dir_url() . '/config.xml?wpak_app_id=' . self::get_app_slug( $post->ID ) ) ?>" target="_blank"><?php _e( 'View config.xml', WpAppKit::i18n_domain ) ?></a>
 				<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ) ?>" class="button wpak_phonegap_export" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
 			</div>
 			<?php wp_nonce_field( 'wpak-phonegap-infos-' . $post->ID, 'wpak-nonce-phonegap-infos' ) ?>
@@ -732,7 +742,7 @@ class WpakApps {
 	}
 
 	/**
-	 * Add/merge WP AppKit default Phonegap Build plugins to those set in BO and return
+	 * Add/merge WP-AppKit default Phonegap Build plugins to those set in BO and return
 	 * them as config.xml ready XML.
 	 *
 	 * @param int $app_id Application ID
@@ -799,7 +809,7 @@ class WpakApps {
 		}
 
 		/**
-		 * Filter the Phonegap Build plugins that are included by default by WP AppKit
+		 * Filter the Phonegap Build plugins that are included by default by WP-AppKit
 		 *
 		 * @param array		$default_plugins	Array of default Phonegap plugins.
 		 * @param string    $export_type        Export type : 'phonegap-build', 'phonegap-cli' or 'webapp'

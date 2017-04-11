@@ -12,21 +12,20 @@ class WpakThemes {
 		/**
 		 * Key is used for:
 		 *  - theme slug (to check if an installed theme is this one)
-		 *  - filename into default themes folder (key.zip)
-		 * Key should be the same as the theme's folder name (once unzipped)
+		 *  - filename into default themes folder (key-version.zip)
+		 * Key should be the same as the theme's folder name
 		 */
 
-		// Structure example:
 		'q-ios' => array(
-			'name' => 'Q for iOS', // TODO: handle name change between versions?
-			'version' => '1.0.2',
+			'name' => 'Q for iOS',
+			'version' => '1.0.4',
 		),
-		
+
 		'q-android' => array(
 			'name' => 'Q for Android',
-			'version' => '1.0.2',
+			'version' => '1.0.4',
 		),
-		
+
 	);
 
 	public static function hooks() {
@@ -52,9 +51,18 @@ class WpakThemes {
 	 	return plugins_url( self::default_themes_directory, dirname( dirname( __FILE__ ) ) );
 	}
 
-	public static function get_default_theme_filename( $slug ) {
+	/**
+     * Return the name of the default theme's file.
+     * This file should be located under the default themes directory, see WpakThemes::get_default_themes_directory
+     *
+	 * @param string $slug
+	 * @param array  $theme
+	 *
+	 * @return string
+	 */
+	public static function get_default_theme_filename( $slug, $theme ) {
 		// This file might not exist if $slug doesn't exist into default themes, but if you call this method, you'd have to check if the file exists anyway
-		return $slug . '.zip';
+		return $slug . '-' . $theme['version'] . '.zip';
 	}
 
 	public static function get_default_themes() {
@@ -76,7 +84,7 @@ class WpakThemes {
 
 		// Try to create WP-AppKit themes directory if it doesn't exist
 		if( !is_dir( self::get_themes_directory() ) && !self::create_theme_directory() ) {
-			$error = sprintf( __( 'The WP AppKit themes directory %s can\'t be created. <br/>Please check that your WordPress install has the permissions to create this directory.', WpAppKit::i18n_domain ),
+			$error = sprintf( __( 'The WP-AppKit themes directory %s can\'t be created. <br/>Please check that your WordPress install has the permissions to create this directory.', WpAppKit::i18n_domain ),
 		  		self::get_themes_directory()
 			);
 		}
@@ -149,21 +157,27 @@ class WpakThemes {
 	 * @return 	bool 	$result 	Whether the copy is complete or not. It's considered OK when *all* themes have been copied.
 	 */
 	public static function copy_default_themes() {
+	    // Make sure we have something to copy
+		self::create_themes_zip();
+
 		$access_type = get_filesystem_method( array(), self::get_themes_directory() );
 
 		if( $access_type != 'direct' || !WP_Filesystem( array(), self::get_themes_directory() ) ) {
 			return false;
 		}
 
-		// WP_Filtesystem initialization ran OK, we can perform our copy
+		// WP_Filesystem initialization ran OK, we can perform our copy
 		global $wp_filesystem;
-		$result = true;
+		$default_themes = self::get_default_themes();
+		$result = empty( $default_themes );
 
-		foreach( array_keys( self::get_default_themes() ) as $slug ) {
-			$filename = self::get_default_theme_filename( $slug );
+		foreach( $default_themes as $slug => $theme ) {
+			$filename = self::get_default_theme_filename( $slug, $theme );
 			if( !$wp_filesystem->is_file( self::get_default_themes_directory() . '/' . $filename ) ) {
 				continue;
 			}
+
+			$result = true;
 
 			// Warning: this will erase existing files, it's intended since this method should be called after some checks and validation about that fact
 			// TODO: use WP_Upgrader API
@@ -176,6 +190,127 @@ class WpakThemes {
 
 		return $result;
 	}
+
+	/**
+     * Remove useless files from the default themes directory.
+     *
+	 * @return bool
+	 */
+	protected static function _clean_default_themes_directory() {
+	    global $wp_filesystem;
+
+		$possible_names = array();
+		$default_themes = self::get_default_themes();
+		foreach( $default_themes as $slug => $theme ) {
+		    $possible_names[] = self::get_default_theme_filename( $slug, $theme );
+        }
+
+	    $files = glob( self::get_default_themes_directory() . '/*.zip' );
+
+		foreach( $files as $file ) {
+		    $filename = basename( $file );
+		    if( in_array( $filename, $possible_names ) ) {
+		        continue;
+            }
+
+			$wp_filesystem->delete( $file, false, 'f' );
+        }
+
+        return true;
+    }
+
+	/**
+     * Build a zip file from a directory into a given filename.
+     *
+	 * @param string $source
+	 * @param string $destination
+	 *
+	 * @return bool
+	 */
+    protected static function _build_zip( $source, $destination ) {
+        if( !extension_loaded( 'zip' ) ) {
+	        return false;
+        }
+
+	    $zip = new ZipArchive();
+
+	    //
+	    // ZipArchive::open() returns TRUE on success and an error code on failure, not FALSE
+	    // All other used ZipArchive methods return FALSE on failure
+	    //
+	    // Apparently ZipArchive::OVERWRITE is not sufficient for recent PHP versions (>= 5.2.8, cf. comments here: http://fr.php.net/manual/en/ziparchive.open.php)
+	    //
+
+	    if( true !== $zip->open( $destination, ZipArchive::CREATE | ZipArchive::OVERWRITE ) ) {
+		    return false;
+	    }
+
+	    try {
+		    $files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $source ), RecursiveIteratorIterator::SELF_FIRST );
+	    }
+	    catch( Exception $e ) {
+	        return false;
+        }
+
+        $dirname = basename( $source );
+	    if( !$zip->addEmptyDir( $dirname ) ) {
+	        return false;
+        }
+
+	    foreach( $files as $file ) {
+	        if( $file->getFilename() == '.' || $file->getFilename() == '..' ) {
+		        continue;
+	        }
+
+	        $filename = str_replace( $source, $dirname . '/', $file->getPathname() );
+		    $filename = wp_normalize_path( $filename );
+		    $filename = ltrim( $filename, '/\\' );
+
+            if( $file->isDir() ) {
+	            if( !$zip->addEmptyDir( $filename ) ) {
+                    return false;
+                }
+            }
+            else if( $file->isFile() ) {
+	            if( !$zip->addFile( $file, $filename ) ) {
+	                return false;
+                }
+            }
+        }
+
+	    return $zip->close();
+    }
+
+	/**
+     * Create zip files from default themes included as folders into default themes directory.
+     *
+	 * @return bool
+	 */
+	public static function create_themes_zip() {
+		global $wp_filesystem;
+
+		$access_type = get_filesystem_method( array(), self::get_default_themes_directory() );
+
+		if( $access_type != 'direct' || !WP_Filesystem( array(), self::get_default_themes_directory() ) ) {
+			return false;
+		}
+
+		self::_clean_default_themes_directory();
+
+	    foreach( self::get_default_themes() as $slug => $theme ) {
+	        $filename = self::get_default_theme_filename( $slug, $theme );
+		    if(
+			    $wp_filesystem->is_file( self::get_default_themes_directory() . '/' . $filename ) ||
+			    !$wp_filesystem->is_dir( self::get_default_themes_directory() . '/' . $slug )
+		    ) {
+			    continue;
+		    }
+
+            self::_build_zip( self::get_default_themes_directory() . '/' . $slug, self::get_default_themes_directory() . '/' . $filename );
+        }
+
+        return true;
+    }
 
 	/**
 	 * Install default themes provided with this plugin into 'wp-content/themes-wp-appkit/' folder.
@@ -220,10 +355,10 @@ class WpakThemes {
 
 			//For assets files like fonts, images or css we can't
 			//be sure that the wpak_app_id GET arg is there, because they can
-			//be included directly in themes sources (CSS/HTML) where the WP AppKit API can't
+			//be included directly in themes sources (CSS/HTML) where the WP-AppKit API can't
 			//be used. So, we can't check that the file comes from the right app
 			//or theme > we just check that the theme the asset belongs to is a real
-			//WP AppKit theme and that at least one app uses this theme :
+			//WP-AppKit theme and that at least one app uses this theme :
 			if( self::is_asset_file( $file ) ) {
 				if ( preg_match( '/([^\/]+?)\/(.+)$/', $file, $matches ) ) {
 					$theme_slug = $matches[1];
@@ -411,6 +546,12 @@ class WpakThemes {
 	 */
 	protected static function exit_send_theme_file( $file ) {
 
+		//Remove any previous output before serving file:
+		$content_already_echoed = ob_get_contents();
+		if ( !empty( $content_already_echoed ) ) {
+			ob_end_clean();
+		}
+
 		$mime_type = self::get_file_mime_type( $file );
 
 		if( !empty( $mime_type) ) {
@@ -434,7 +575,7 @@ class WpakThemes {
 
 		//Security note : before serving this file with readfile() we checked :
 		//- that its mime type is authorized
-		//- that it belongs to a valid WP AppKit Theme currently used by an app
+		//- that it belongs to a valid WP-AppKit Theme currently used by an app
 		readfile( $file );
 
 		exit();

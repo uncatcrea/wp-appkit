@@ -944,10 +944,7 @@ themes.view.Themes = wp.Backbone.View.extend({
 
         // Generate the themes
         // Using page instance
-        // While checking the collection has items
-        if ( this.options.collection.size() > 0 ) {
-            this.renderThemes( this.parent.page );
-        }
+        this.renderThemes( this.parent.page );
 
         // Display a live theme count for the collection
         this.liveThemeCount = this.collection.count ? this.collection.count : this.collection.length;
@@ -965,6 +962,9 @@ themes.view.Themes = wp.Backbone.View.extend({
 
         // If we have no more themes bail
         if ( self.instance.size() === 0 ) {
+            if ( ! themes.isInstall && themes.data.settings.canInstall && ! $( '.add-new-theme' ).length ) {
+                this.$el.append( '<div class="theme add-new-theme"><a href="' + themes.data.settings.installURI + '"><div class="theme-screenshot"><span></span></div><h2 class="theme-name">' + l10n.addNew + '</h2></a></div>' );
+            }
             // Fire a no-more-themes event.
             this.parent.trigger( 'theme:end' );
             return;

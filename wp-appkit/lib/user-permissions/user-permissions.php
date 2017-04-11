@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Allows to create a "WP AppKit App Editor" user role so that we can create
- * users that can only edit WP AppKit apps and no other contents.
+ * Allows to create a "WP-AppKit App Editor" user role so that we can create
+ * users that can only edit WP-AppKit apps and no other contents.
  * 
  * Used in WpakSettings.
  */
@@ -33,7 +33,7 @@ class WpakUserPermissions {
 		
 		$wpak_role = add_role(
 			self::wpak_editor_role, 
-			__( 'WP AppKit App Editor', WpAppKit::i18n_domain ), 
+			__( 'WP-AppKit App Editor', WpAppKit::i18n_domain ), 
 			$capabilities
 		);
 		

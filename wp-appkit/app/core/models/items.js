@@ -13,8 +13,9 @@ define(function (require) {
     var Items = Backbone.Collection.extend({
     	model : Item,
     	localStorage: null,
-    	initialize : function(args,options){
-			var global = args.global ? args.global : options.global; //TODO : Fix this definitely by removing args.global for all new Items.Items!!
+    	initialize : function(models,options){
+			options = options || {};
+			var global = options.global ? options.global : 'no-global';
     		this.localStorage = new Backbone.LocalStorage("Items-"+global);
     	},
     	saveAll : function(){

@@ -5,14 +5,14 @@ class WpakComponentsUtils {
 	/**
 	 * Default function to retrieve web service formated data for a post
 	 */
-	public static function get_post_data( $_post, $component = null ) {
+	public static function get_post_data( $wp_post, $component = null ) {
 		
 		if ( $component === null ) {
 			$component = new WpakComponent( 'wpak-internal', 'Internal', 'wpak-internal' );
 		}
 		
 		global $post;
-		$post = $_post;
+		$post = $wp_post;
 		setup_postdata( $post );
 
 		$post_data = array(
@@ -32,7 +32,7 @@ class WpakComponentsUtils {
 		/**
 		 * Filter post content. Use this to format app posts content your own way.
 		 *
-		 * To apply the default WP AppKit formating to the content and add only minor modifications to it,
+		 * To apply the default WP-AppKit formating to the content and add only minor modifications to it,
 		 * use the "wpak_post_content_format" filter instead.
 		 *
 		 * @see WpakComponentsUtils::get_formated_content()
