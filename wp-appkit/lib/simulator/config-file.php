@@ -148,6 +148,7 @@ define( function ( require ) {
 	 * (see https://github.com/apache/cordova-plugin-whitelist).
 	 *
 	 * @param int $app_id Application ID
+	 * @param string $app_platform Platform (see WpakApps::get_platforms to get the list)
 	 * @param string $export_type 'phonegap-build' (default), 'phonegap-cli' or 'webapp'
 	 */
 	protected static function get_whitelist_settings( $app_id, $app_platform, $export_type = 'phonegap-build' ) {
@@ -185,6 +186,16 @@ define( function ( require ) {
 		return $whitelist_settings;
 	}
 
+	/**
+	 * Return settings useful to configure splashscreen in a PhoneGap Build config.xml file.
+	 * This shouldn't be used for a platform that won't need PhoneGap Build (ex: pwa).
+	 *
+	 * @param int       $app_id         Application ID.
+	 * @param string    $app_platform   App platform (see WpakApps::get_platforms to get the list).
+	 * @param string    $export_type    Export type.
+	 *
+	 * @return array $splashcreen_settings
+	 */
 	protected static function get_splashscreen_settings( $app_id, $app_platform, $export_type ) {
 		$splashcreen_settings = array( 'preferences' => array(), 'gap:config-file' => array() );
 
@@ -372,7 +383,14 @@ define( function ( require ) {
 	}
 
 	/**
-	 * Retrieves icons and splashscreens for build export.
+	 * Retrieves icons and splashscreens for build export. This returns XML string to be used inside PhoneGap Build config.xml file.
+	 * This shouldn't be called for a platform that doesn't need PhoneGap Build (ex: pwa).
+	 *
+	 * @param int       $app_id         Application ID.
+	 * @param string    $app_platform   App platform (see WpakApps::get_platforms to get the list).
+	 * @param string    $export_type    Export type.
+	 *
+	 * @return string $app_icons_and_splashscreens_files
 	 */
 	protected static function get_icons_and_splashscreens_xml( $app_id, $app_platform, $export_type ) {
 
