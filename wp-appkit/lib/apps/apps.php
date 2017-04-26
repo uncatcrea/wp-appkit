@@ -12,6 +12,19 @@ class WpakApps {
 			add_action( 'admin_print_styles', array( __CLASS__, 'admin_print_styles' ) );
 			add_action( 'add_meta_boxes', array( __CLASS__, 'add_main_meta_box' ), 29 );
 			add_action( 'add_meta_boxes', array( __CLASS__, 'add_secondary_meta_boxes' ), 30 ); //30 to pass after the "Simulation" and "Export" boxes (see WpakBuild)
+			add_action( 'postbox_classes_wpak_apps_wpak_app_export_phonegap_build', array( __CLASS__, 'add_platform_specific_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_export_phonegap_build', array( __CLASS__, 'add_ios_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_export_phonegap_build', array( __CLASS__, 'add_android_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_phonegap_data', array( __CLASS__, 'add_platform_specific_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_phonegap_data', array( __CLASS__, 'add_ios_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_phonegap_data', array( __CLASS__, 'add_android_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_deep_linking', array( __CLASS__, 'add_platform_specific_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_deep_linking', array( __CLASS__, 'add_ios_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_deep_linking', array( __CLASS__, 'add_android_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_export_pwa', array( __CLASS__, 'add_platform_specific_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_export_pwa', array( __CLASS__, 'add_pwa_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_pwa_data', array( __CLASS__, 'add_platform_specific_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_pwa_data', array( __CLASS__, 'add_pwa_class' ) );
 			add_action( 'wpak_inner_simulation_box', array( __CLASS__, 'inner_security_box' ), 10, 2 );
 			add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 			add_filter( 'post_row_actions', array( __CLASS__, 'remove_quick_edit' ), 10, 2 );
@@ -20,6 +33,30 @@ class WpakApps {
 			add_filter( 'manage_wpak_apps_posts_columns' , array( __CLASS__, 'add_platform_column' ) );
 			add_action( 'manage_wpak_apps_posts_custom_column' , array( __CLASS__, 'platform_column_content' ), 10, 2 );
 		}
+	}
+
+	public static function add_platform_specific_class( $classes ) {
+		$classes[] = 'platform-specific';
+
+		return $classes;
+	}
+
+	public static function add_ios_class( $classes ) {
+		$classes[] = 'ios';
+
+		return $classes;
+	}
+
+	public static function add_android_class( $classes ) {
+		$classes[] = 'android';
+
+		return $classes;
+	}
+
+	public static function add_pwa_class( $classes ) {
+		$classes[] = 'pwa';
+
+		return $classes;
 	}
 
 	public static function admin_enqueue_scripts() {
