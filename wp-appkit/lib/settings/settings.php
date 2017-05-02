@@ -12,6 +12,14 @@ class WpakSettings {
 	public static function hooks() {
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array( __CLASS__, 'add_settings_panels' ), 20 ); //20 to pass after Simulator
+			add_action( 'admin_print_styles', array( __CLASS__, 'admin_print_styles' ) );
+		}
+	}
+	
+	public static function admin_print_styles() {
+		global $pagenow;
+		if ( $pagenow == 'admin.php'  && !empty( $_GET['page'] ) && $_GET['page'] === 'wpak_bo_settings_page' ) {
+			wp_enqueue_style( 'wpak_settings_css', plugins_url( 'lib/settings/settings.css', dirname( dirname( __FILE__ ) ) ), array(), WpAppKit::resources_version );
 		}
 	}
 
@@ -39,21 +47,17 @@ class WpakSettings {
 				<a href="<?php echo esc_url( add_query_arg( array( 'wpak_settings_page' => 'licenses' ), $settings_base_url ) ); ?>" class="nav-tab <?php echo $active_tab == 'licenses' ? 'nav-tab-active' : ''; ?>"><?php _e( 'Licenses', WpAppKit::i18n_domain ); ?></a>
 			</h2>
 			
-			<?php 
-				$content_function = 'tab_' . $active_tab;
-				if( method_exists( __CLASS__, $content_function ) ) {
-					self::$content_function();
-				}
-			?>
+			<div class="wrap-<?php echo $active_tab; ?>">
+				<?php 
+					$content_function = 'tab_' . $active_tab;
+					if( method_exists( __CLASS__, $content_function ) ) {
+						self::$content_function();
+					}
+				?>
+			</div>
 
 		</div>
 
-		<style>
-			#wpak-settings table{ margin:2em 0 }
-			#wpak-settings table td{ padding: 1em 2em }
-			#wpak-settings table th, #wpak-settings table td{ text-align: left }
-		</style>
-		
 		<?php
 	}
 	
@@ -95,32 +99,7 @@ class WpakSettings {
 	}
 	
 	protected static function tab_licenses() {
-		$result = self::handle_posted_settings();
-		$settings = self::get_settings();
-		?>
-		
-		<?php if ( !empty( $result['message'] ) ): ?>
-			<div class="<?php echo $result['type'] ?>" ><p><?php echo $result['message'] ?></p></div>
-		<?php endif ?>
-			
-		<form method="post" action="<?php echo esc_url( add_query_arg( array() ) ) ?>">
-				
-			<table>
-				<tr>
-					<th><?php _e( 'Apps post lists', WpAppKit::i18n_domain ) ?></th>
-					<td>
-						<label for="posts_per_page"><?php _e('Number of posts per list in WP-AppKit apps', WpAppKit::i18n_domain ) ?> : </label><br/>
-						<input type="number" name="posts_per_page" id="posts_per_page" value="<?php echo $settings['posts_per_page'] ?>" />
-					</td>
-				</tr>
-			</table>
-
-			<?php wp_nonce_field( 'wpak_save_license' ) ?>
-
-			<input type="submit" class="button button-primary" value="<?php _e( 'Save settings', WpAppKit::i18n_domain ) ?>" />
-
-		</form>
-		<?php
+		WpakLicenses::tab_licenses();
 	}
 
 	public static function get_settings() {
@@ -176,20 +155,6 @@ class WpakSettings {
 		}
 	}
 	
-	protected static function get_licenses() {
-		
-		/**
-		 * Use this from premium addons and premium themes to add EDD licenses management
-		 * Each added licence should be formated like so:
-		 * $licence = array( 
-		 *     'addon-slug' => 'a-unique-addon-slug-identifier'
-		 * )
-		 */
-		$licenses = apply_filters( 'wpak_licenses', array() );
-		
-		return $licenses;
-	}
-
 }
 
 WpakSettings::hooks();
