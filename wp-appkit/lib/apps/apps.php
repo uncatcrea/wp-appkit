@@ -704,11 +704,13 @@ class WpakApps {
 					<input type="text" name="wpak_app_pwa_theme_color" value="<?php echo esc_attr( $main_infos['pwa_theme_color'] ) ?>" id="wpak_pwa_theme_color" />
 				</div>
 			</fieldset>
-			<div class="field-group">
-				
-				<a href="<?php echo $pwa_uri . '/manifest.json' ?>" target="_blank"><?php _e( 'View manifest.json', WpAppKit::i18n_domain ) ?></a>
-				
-			</div>
+			<?php if( $pwa_installed ): ?>
+				<div class="field-group">
+
+					<a href="<?php echo $pwa_uri . '/manifest.json' ?>" target="_blank"><?php _e( 'View manifest.json', WpAppKit::i18n_domain ) ?></a>
+
+				</div>
+			<?php endif; ?>
 			<?php wp_nonce_field( 'wpak-phonegap-infos-' . $post->ID, 'wpak-nonce-phonegap-infos' ) ?>
 		</div>
 		<?php
