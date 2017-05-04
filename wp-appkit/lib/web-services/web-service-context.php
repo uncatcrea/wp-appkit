@@ -96,11 +96,10 @@ class WpakWebServiceContext {
 			if ( isset( $_GET[$key] ) ) {
 				if ( is_numeric( $_GET[$key] ) ) {
 					$client_app_param_value = intval( $_GET[$key] );
-				} else if ( !is_array( $_GET[$key] ) ) {
-					$client_app_param_value = sanitize_text_field( $_GET[$key] );
 				} else {
 					$client_app_param_value = $_GET[$key];
-					//For values that are arrays, more sanitization can and should be made in functions that use getClientAppParam(),
+					//Sanitizing $_GET[$key] here makes authentication fail, because secret key must not be sanitized.
+                    //More sanitization can and should be made in functions that use getClientAppParam(),
 					//as getClientAppParam() is designed to allow the app theme developer to retrieve on server side (via hooks)
 					//the data (int/string/array) he sent from the app.
 				}
