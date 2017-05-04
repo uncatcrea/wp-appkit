@@ -615,11 +615,12 @@ class WpakApps {
 		</div>
 		<?php
 	}
-	
+
 	public static function inner_pwa_infos_box( $post, $current_box ) {
 		$main_infos = self::get_app_main_infos( $post->ID );
 		$pwa_uri = WpakBuild::get_pwa_directory_uri( $post->ID );
 		$pwa_dir = WpakBuild::get_pwa_directory( $post->ID );
+		$pwa_installed = WpakBuild::app_pwa_is_installed( $post->ID );
 		?>
 		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
 		<div class="wpak_settings">
@@ -627,24 +628,23 @@ class WpakApps {
 			<fieldset>
 				<legend><?php _e( 'Install', WpAppKit::i18n_domain ); ?></legend>
 				<div class="field-group">
-					
+
 					<div class="pwa_installed">
-						<?php if ( WpakBuild::app_pwa_is_installed( $post->ID ) ): ?>
+						<?php if ( $pwa_installed ): ?>
 								Progressive Web App <strong>installed</strong> in:<br><?php echo $pwa_dir ?>
 						<?php else: ?>
 								Progressive Web App not installed.
 						<?php endif ?>
 					</div>
-					
-					<?php if ( WpakBuild::app_pwa_is_installed( $post->ID ) ): ?>
+
+					<?php if ( $pwa_installed ): ?>
 						<a href="<?php echo $pwa_uri ?>" class="button" target="_blank"><?php _e( 'View Progressive Web App', WpAppKit::i18n_domain ) ?></a>
 					<?php endif ?>
-						
+
 					<div class="pwa-infos-install">
 
 						<?php
-							$pwa_installed = WpakBuild::app_pwa_is_installed( $post->ID );
-							$pwa_export_types = array( 
+							$pwa_export_types = array(
 								'pwa-install' => !$pwa_installed ? __( 'Install PWA', WpAppKit::i18n_domain ) : __( 'Update PWA sources', WpAppKit::i18n_domain ),
 								'pwa' => __( 'Download PWA sources', WpAppKit::i18n_domain ),
 							);
