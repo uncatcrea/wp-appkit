@@ -22,7 +22,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 
 		const resources_version = '1.0';
 		const i18n_domain = 'wp-appkit';
-
+        
 		public static function hooks() {
 			add_action( 'plugins_loaded', array( __CLASS__, 'plugins_loaded' ) );
 
@@ -37,6 +37,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 		}
 
 		protected static function lib_require() {
+            require_once(dirname( __FILE__ ) . '/lib/config.php');
 			require_once(dirname( __FILE__ ) . '/lib/addons/addons.php');
 			require_once(dirname( __FILE__ ) . '/lib/user-permissions/user-login.php');
 			require_once(dirname( __FILE__ ) . '/lib/web-services/web-services.php');
