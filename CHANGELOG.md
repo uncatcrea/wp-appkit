@@ -1,3 +1,7 @@
+## 1.0.2 (2017-05-05)
+
+- Bugfix: User authentication fails randomly ([#303](https://github.com/uncatcrea/wp-appkit/issues/303), [@mleroi](https://github.com/mleroi))
+
 ## 1.0.1 (2017-04-11)
 
 - Update WordPress.org's readme file
