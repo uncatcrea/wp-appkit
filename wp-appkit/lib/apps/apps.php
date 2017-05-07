@@ -32,6 +32,8 @@ class WpakApps {
 			add_filter( 'post_updated_messages', array( __CLASS__, 'updated_messages' ) );
 			add_filter( 'manage_wpak_apps_posts_columns' , array( __CLASS__, 'add_platform_column' ) );
 			add_action( 'manage_wpak_apps_posts_custom_column' , array( __CLASS__, 'platform_column_content' ), 10, 2 );
+
+			add_filter( 'sanitize_post_meta__wpak_app_pwa_path', array( __CLASS__, 'sanitize_pwa_path' ) );
 		}
 	}
 
@@ -1205,6 +1207,23 @@ class WpakApps {
 		}
 
 		return $plugins_array;
+	}
+
+	/**
+	 * @param string $path
+	 *
+	 * @return string
+	 */
+	public static function sanitize_pwa_path( $path ) {
+	    // Remove unwanted characters from the beginning of the path, to avoid values like '../../whatever'
+	    $path = ltrim( $path, './\\' );
+
+	    // WordPress core directories are forbidden
+	    if( strpos( $path, 'wp-admin' ) === 0 || strpos( $path, 'wp-includes' ) === 0 ) {
+	        return ''; // An empty value will lead to a default one
+	    }
+
+	    return $path;
 	}
 
 }
