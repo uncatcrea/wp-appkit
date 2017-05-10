@@ -1215,15 +1215,63 @@ class WpakApps {
 	 * @return string
 	 */
 	public static function sanitize_pwa_path( $path ) {
-	    // Remove unwanted characters from the beginning of the path, to avoid values like '../../whatever'
-	    $path = ltrim( $path, './\\' );
+		// Remove unwanted characters from the beginning of the path, to avoid values like '../../whatever'
+		$path = ltrim( $path, './\\' );
 
-	    // WordPress core directories are forbidden
-	    if( strpos( $path, 'wp-admin' ) === 0 || strpos( $path, 'wp-includes' ) === 0 ) {
-	        return ''; // An empty value will lead to a default one
-	    }
+		$realpath = self::realpath( ABSPATH . '/' . $path );
 
-	    return $path;
+		if(
+			strpos( $realpath, untrailingslashit( ABSPATH ) ) === false || // Avoid paths like 'folder/../../../whatever' by ensuring the value is under ABSPATH
+			strpos( $path, 'wp-admin' ) === 0 || // WordPress core directories are forbidden
+			strpos( $path, 'wp-includes' ) === 0
+		) {
+			return ''; // An empty value will lead to a default one
+		}
+
+		return $path;
+	}
+
+	/**
+	 * A replacement to PHP's realpath to handle non-existent paths as well.
+	 *
+	 * @param string $value
+	 *
+	 * @return bool|string
+	 */
+	public static function realpath( $value ) {
+		$path     = (string) $value;
+		$realpath = @realpath( $path );
+		if( $realpath ) {
+			return $realpath;
+		}
+		$drive = '';
+		if( substr( PHP_OS, 0, 3 ) == 'WIN' ) {
+			$path = preg_replace( '/[\\\\\/]/', DIRECTORY_SEPARATOR, $path );
+			if( preg_match( '/([a-zA-Z]\:)(.*)/', $path, $matches ) ) {
+				list( $fullMatch, $drive, $path ) = $matches;
+			} else {
+				$cwd   = getcwd();
+				$drive = substr( $cwd, 0, 2 );
+				if( substr( $path, 0, 1 ) != DIRECTORY_SEPARATOR ) {
+					$path = substr( $cwd, 3 ) . DIRECTORY_SEPARATOR . $path;
+				}
+			}
+		} elseif( substr( $path, 0, 1 ) != DIRECTORY_SEPARATOR ) {
+			$path = getcwd() . DIRECTORY_SEPARATOR . $path;
+		}
+		$stack = array();
+		$parts = explode( DIRECTORY_SEPARATOR, $path );
+		foreach( $parts as $dir ) {
+			if( strlen( $dir ) && $dir !== '.' ) {
+				if( $dir == '..' ) {
+					array_pop( $stack );
+				} else {
+					array_push( $stack, $dir );
+				}
+			}
+		}
+
+		return $drive . DIRECTORY_SEPARATOR . implode( DIRECTORY_SEPARATOR, $stack );
 	}
 
 }
