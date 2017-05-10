@@ -716,6 +716,58 @@ class WpakThemes {
 
 		return $return;
 	}
+
+	/**
+	 * Return PWA icons available in a theme, if any.
+	 * These icons must be provided as PNG images into the 'icons/' theme's directory.
+	 *
+	 * @param string $theme_slug
+	 *
+	 * @return array
+	 */
+	public static function get_pwa_icons( $theme_slug ) {
+	    if( !self::is_theme( $theme_slug ) ) {
+	        return array();
+	    }
+
+	    $icons_dir = self::get_themes_directory() . '/' . $theme_slug . '/icons/';
+	    $files = glob( $icons_dir . '*.png' );
+	    $icons = array();
+	    foreach( $files as $file ) {
+	        $filename = basename( $file );
+	        $size = self::get_pwa_icon_size( $filename );
+
+	        if( empty( $size ) ) {
+	            continue;
+	        }
+
+	        $icons[] = array(
+	            'name' => $filename,
+	            'path' => $file,
+	            'size' => $size,
+	        );
+	    }
+
+	    return $icons;
+	}
+
+	/**
+	 * Get the size of a PWA icon given its file name.
+	 * Size must be provided in the filename as follow: icon-name-width-height.png
+	 *
+	 * @param string $filename
+	 *
+	 * @return array
+	 */
+	public static function get_pwa_icon_size( $filename ) {
+	    preg_match( '/-([0-9]+)x([0-9]+)\.png/U', $filename, $matches );
+
+	    if( empty( $matches[2] ) || empty( $matches[1] ) ) {
+	        return array();
+	    }
+
+	    return array( $matches[1], $matches[2] );
+	}
 }
 
 WpakThemes::hooks();
