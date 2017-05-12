@@ -12,11 +12,47 @@ class WpakLicenses {
    
     public static function hooks() {
         add_action( 'admin_init', array( __CLASS__, 'edd_plugin_updater' ), 0 );
+        
+        //Set the weekly license check:
+        add_filter( 'cron_schedules', array( __CLASS__, 'add_weekly_schedule' ) );
+		add_action( 'wp', array( __CLASS__, 'add_weekly_license_check' ) );
+        add_action( 'wpak_weekly_license_check', array( __CLASS__, 'check_licenses' ) );
     }
     
+    public static function add_weekly_schedule( $schedules = array() ) {
+        
+		// Adds "Once weekly" to the existing core schedules ('hourly', 'twicedaily', 'daily').
+		$schedules['weekly'] = array(
+			'interval' => 604800,
+			'display'  => __( 'Once Weekly', WpAppKit::i18n_domain )
+		);
+
+		return $schedules;
+	}
+    
+    public static function add_weekly_license_check() {
+		if ( ! wp_next_scheduled( 'wpak_weekly_license_check' ) ) {
+			wp_schedule_event( current_time( 'timestamp', true ), 'weekly', 'wpak_weekly_license_check' );
+		}
+	}
+    
     public static function tab_licenses() {
-        $result = self::handle_posted_licenses();
+        
+        $result = array();
+        if ( isset( $_GET['force_licenses_check'] ) && $_GET['force_licenses_check'] == 1 ) {
+            $result = self::check_licenses();
+        } else {
+            $result = self::handle_posted_licenses();
+        }
+        
         $licenses_registered = self::get_registered_licenses();
+        
+        if ( isset( $_GET['force_versions_check'] ) && $_GET['force_versions_check'] == 1 ) {
+            //To force check of addons versions (EDD_SL_Plugin_Updater::check_update()):
+            //(plus there's a 3 hours cache on addons version check)
+            set_site_transient( 'update_plugins', null );
+        }
+        
         ?>
        
         <?php if ( !empty( $result['message'] ) ): ?>
@@ -25,20 +61,20 @@ class WpakLicenses {
            
         <?php if ( !empty( $licenses_registered ) ): ?>
            
-            <form method="post" action="<?php echo esc_url( add_query_arg( array() ) ) ?>">
+            <form method="post" action="<?php echo esc_url( remove_query_arg( array('force_licenses_check') ) ) ?>">
                
                 <p>
                     <?php
                         echo sprintf(
-                            __( 'Enter your addon or theme license keys here to receive support and updates for purchased items. If your license key has expired, please <a href="%s" target="_blank">renew your license</a>.', WpAppKit::i18n_domain ),
-                            '//TODO' //TODO
+                            __( 'Enter your addon or theme license keys here to receive support and updates for purchased items. If your license key has expired, please <a href="%s" target="_blank">renew your license (TODO)</a>.', WpAppKit::i18n_domain ),
+                            'http://docs.easydigitaldownloads.com/article/1000-license-renewal' //TODO
                         );
                     ?>
                 </p>
 
                 <table class="form-table">
                     <tbody>
-                        <?php foreach( $licenses_registered as $license ): var_dump($license);?>
+                        <?php foreach( $licenses_registered as $license ): ?>
 
                             <?php $license_form_id = 'license_key_'. $license->item_shortname; ?>
 
@@ -79,7 +115,13 @@ class WpakLicenses {
             <p><?php _e( 'No WP-AppKit Theme or Addon requiring a license found.', WpAppKit::i18n_domain ); ?></p>
            
         <?php endif; ?>
-           
+            
+        <?php $next_check_timestamp = wp_next_scheduled( 'wpak_weekly_license_check' ); ?>
+        <!-- 
+            WP-AppKit Licenses debug infos:
+            Next weekly license check: <?php echo $next_check_timestamp ? date( 'Y-m-d H:i:s', $next_check_timestamp ) : 'never'; ?>
+        -->
+        
         <?php
     }
    
@@ -135,7 +177,7 @@ class WpakLicenses {
             $result['message'] = __( 'An error occurred: wrong permissions', WpAppKit::i18n_domain );
 			return $result;
 		}
-
+        
         $current_licenses = self::get_registered_licenses();
         
         foreach ( $_POST as $key => $value ) {
@@ -201,6 +243,27 @@ class WpakLicenses {
         //(License errors are handle independently in each license_active data)
         $result['ok'] = true;
         $result['message'] = __( 'Licenses saved', WpAppKit::i18n_domain );
+        
+        return $result;
+    }
+    
+    public static function check_licenses() {
+        $result = array( 'ok' => true, 'message' => '' );
+        
+        $current_licenses = self::get_registered_licenses();
+        $messages = array();
+        foreach( $current_licenses as $license ) {
+            $license_key = $license->license_key;
+            if( !empty( $license_key ) ) {
+                $check_result = $license->check();
+                $result['ok'] = $result['ok'] && $check_result['ok'];
+                $messages[] = $license->item_name .': '. $check_result['message'];
+            }
+        }
+        
+        if ( !empty( $messages ) ) {
+            $result['message'] = implode( '<br>', $messages );
+        }
         
         return $result;
     }

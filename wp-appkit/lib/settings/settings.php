@@ -36,7 +36,7 @@ class WpakSettings {
 			$active_tab = 'general';
 		}
 		
-		$settings_base_url = remove_query_arg( array('wpak_settings_page') );
+		$settings_base_url = remove_query_arg( array( 'wpak_settings_page', 'force_licenses_check' ) );
 		
 		?>
 		<div class="wrap" id="wpak-settings">

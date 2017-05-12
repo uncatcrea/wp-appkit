@@ -76,7 +76,7 @@ class WpakLicense {
             
             $license_data = json_decode( wp_remote_retrieve_body( $response ) );
 
-            // Tell WordPress to look for updates
+            // Tell WordPress to look for updates, so that edd plugin update check is triggered (triggers EDD_SL_Plugin_Updater::check_update())
             set_site_transient( 'update_plugins', null );
 
             //Memorize license key
@@ -135,6 +135,58 @@ class WpakLicense {
         
         return $result;
     }
+    
+    public function check() {
+
+        $result = array( 'ok' => false, 'message' => '' );
+
+		if( empty( $this->license_key ) ) {
+            $result['message'] = __( 'No license key to check', WpAppKit::i18n_domain );
+			return $result;
+		}
+
+		// data to send in our API request
+		$api_params = array(
+			'edd_action'=> 'check_license',
+			'license' 	=> $this->license_key,
+			'item_name' => urlencode( $this->item_name ),
+			'url'       => home_url()
+		);
+
+		// Call the API
+		$response = wp_remote_post(
+			$this->api_url,
+			array(
+				'timeout'   => 15,
+				'sslverify' => false,
+				'body'      => $api_params
+			)
+		);
+
+		// make sure the response came back okay
+		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+            
+			//Network error: return error message:
+            if ( is_wp_error( $response ) ) {
+                $result['message'] = $response->get_error_message();
+            } else {
+                $result['message'] = __( 'An error occurred, please try again.', WpAppKit::i18n_domain );
+            }
+            
+		} else {
+
+            $license_data = json_decode( wp_remote_retrieve_body( $response ) );
+
+            //Memorize returned license data
+            $this->set_local_data( 'license_active', $license_data );
+            
+            $result['ok'] = true;
+        }
+        
+        var_dump($response);
+
+        return $result;
+	}
     
     /*protected static function check_licence( $product_id, $licence_key ) {
         $result = array( 'ok' => false, 'answer' => array(), 'message' => '' );
@@ -207,7 +259,6 @@ class WpakLicense {
                 switch( $this->license_active->license ) {
 
 					case 'valid' :
-					default:
 
 						$type = 'valid';
 
@@ -241,6 +292,18 @@ class WpakLicense {
 
 						}
 						break;
+                        
+                    default:
+                        //We have a $this->license_active->success === true, but no valid $this->license_active->license
+                        //A re-sync is welcome.
+                        
+                        $type = 'error';
+                        
+                        $message = __( 'Your license state is not synchronized with UncatCrea server. Please re-save your licenses to synchronize it.', WpAppKit::i18n_domain );
+
+                        $status = 'license-error-notice';
+                        
+                        break;
 
 				}
             }

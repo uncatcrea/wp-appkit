@@ -83,7 +83,7 @@ class EDD_SL_Plugin_Updater {
 	public function check_update( $_transient_data ) {
 
 		global $pagenow;
-
+        
 		if ( ! is_object( $_transient_data ) ) {
 			$_transient_data = new stdClass;
 		}
@@ -95,12 +95,12 @@ class EDD_SL_Plugin_Updater {
 		if ( ! empty( $_transient_data->response ) && ! empty( $_transient_data->response[ $this->name ] ) && false === $this->wp_override ) {
 			return $_transient_data;
 		}
-
+        
 		$version_info = $this->get_cached_version_info();
 
 		if ( false === $version_info ) {
+            
 			$version_info = $this->api_request( 'plugin_latest_version', array( 'slug' => $this->slug, 'beta' => $this->beta ) );
-
 			$this->set_version_info_cache( $version_info );
 
 		}
@@ -225,6 +225,7 @@ class EDD_SL_Plugin_Updater {
 
 	/**
 	 * Updates information on the "View version x.x details" page with custom data.
+     * Expires every 3 hours
 	 *
 	 * @uses api_request()
 	 *
@@ -258,9 +259,9 @@ class EDD_SL_Plugin_Updater {
 
 		$cache_key = 'edd_api_request_' . md5( serialize( $this->slug . $this->api_data['license'] . $this->beta ) );
 
-		// Get the transient where we store the api request for this plugin for 24 hours
+		// Get the transient where we store the api request for this plugin for 24 hours (No! 3 hours)
 		$edd_api_request_transient = $this->get_cached_version_info( $cache_key );
-
+ 
 		//If we have no transient-saved value, run the API, set a fresh transient with the API value, and return that value too right now.
 		if ( empty( $edd_api_request_transient ) ) {
 
@@ -329,7 +330,7 @@ class EDD_SL_Plugin_Updater {
 	private function api_request( $_action, $_data ) {
 
 		global $wp_version;
-
+        
 		$data = array_merge( $this->api_data, $_data );
 
 		if ( $data['slug'] != $this->slug ) {
@@ -451,7 +452,6 @@ class EDD_SL_Plugin_Updater {
 		}
 
 		$cache = get_option( $cache_key );
-
 		if( empty( $cache['timeout'] ) || current_time( 'timestamp' ) > $cache['timeout'] ) {
 			return false; // Cache is expired
 		}
@@ -460,6 +460,9 @@ class EDD_SL_Plugin_Updater {
 
 	}
 
+    /**
+     * Cache version info for 3 hours
+     */
 	public function set_version_info_cache( $value = '', $cache_key = '' ) {
 
 		if( empty( $cache_key ) ) {
