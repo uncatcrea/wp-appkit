@@ -1118,3 +1118,14 @@ a.list-group-item-danger.active:focus {
 .pwa-infos-install{
 	float:right;
 }
+
+.wpak-pwa-icons {
+    padding:5px 0 0 5px;
+}
+.wpak-pwa-icons-list {
+    padding-top:5px;
+}
+.wpak-pwa-icon {
+    max-width:150px;
+    max-height:150px;
+}

@@ -688,14 +688,19 @@ class WpakApps {
 					<textarea name="wpak_app_pwa_desc" id="wpak_app_pwa_desc"><?php echo esc_textarea( $main_infos['pwa_desc'] ) ?></textarea>
 				</div>
 				<div class="field-group">
-					<?php $pwa_icons_ref_link = 'https://developer.mozilla.org/fr/docs/Web/Manifest#icons' ?>
 					<label><?php _e( 'Icons', WpAppKit::i18n_domain ) ?></label>
-					<textarea name="wpak_app_pwa_icons" id="wpak_app_pwa_icons"><?php echo esc_textarea( $main_infos['pwa_icons'] ) ?></textarea>
-					<span class="description"><?php sprintf( __( 'Add here the Progressive Web App icons, directly in JSON format, as defined here:<br/>%s', WpAppKit::i18n_domain ), '<a href="'. $pwa_icons_ref_link .'">'. $pwa_icons_ref_link .'</a>' ) ?><br><br></span>
-					<br>
-					<input type="checkbox" id="wpak_use_default_icons_and_splash_pwa" name="wpak_use_default_icons_and_splash_pwa" <?php checked( $main_infos['pwa_use_default_icons_and_splash'] ) ?> />
-					<label for="wpak_use_default_icons_and_splash_pwa"><?php _e( 'Use default WP-AppKit Icons', WpAppKit::i18n_domain ) ?></label>
-					<span class="description"><?php _e( 'If checked and "Icons" field is empty, the Progressive Web App export will embed the default WP-AppKit Icons.', WpAppKit::i18n_domain )?></span>
+					<div class="wpak-pwa-icons">
+						<?php if( !empty( $main_infos['pwa_icons'] ) ): ?>
+							<div class="wpak-pwa-icons-text"><?php _e( 'We detected the following icons in your theme. They will be automatically used by the PWA:', WpAppKit::i18n_domain ) ?></div>
+							<div class="wpak-pwa-icons-list">
+								<?php foreach( $main_infos['pwa_icons'] as $icon ): ?>
+									<img class="wpak-pwa-icon" src="<?php echo $icon['url']; ?>" width="<?php echo $icon['size'][0]; ?>" height="<?php echo $icon['size'][1]; ?>" />
+								<?php endforeach; ?>
+							</div>
+						<?php else: ?>
+							<div class="wpak-pwa-no-icons"><?php _e( 'We didn\'t detect any icons in your theme. You can add them in following <a href="#">our tutorial</a>. If you don\'t provide icons, default ones will be used.', WpAppKit::i18n_domain ) ?></div>
+						<?php endif; ?>
+					</div>
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Background Color', WpAppKit::i18n_domain ) ?></label>
@@ -838,46 +843,27 @@ class WpakApps {
 		if ( isset( $_POST['wpak_app_url_scheme'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_url_scheme', sanitize_text_field( $_POST['wpak_app_url_scheme'] ) );
 		}
-		
+
 		if ( isset( $_POST['wpak_app_pwa_path'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_pwa_path', sanitize_text_field( $_POST['wpak_app_pwa_path'] ) );
 		}
-		
+
 		if ( isset( $_POST['wpak_app_pwa_name'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_pwa_name', sanitize_text_field( $_POST['wpak_app_pwa_name'] ) );
 		}
-		
+
 		if ( isset( $_POST['wpak_app_pwa_short_name'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_pwa_short_name', sanitize_text_field( $_POST['wpak_app_pwa_short_name'] ) );
 		}
-		
+
 		if ( isset( $_POST['wpak_app_pwa_desc'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_pwa_desc', sanitize_text_field( $_POST['wpak_app_pwa_desc'] ) );
 		}
-		
-		if ( isset( $_POST['wpak_app_pwa_icons'] ) ) {
-			$app_icons_json = $_POST['wpak_app_pwa_icons'];
-			$app_icons_json = trim( $app_icons_json );
-			
-			update_post_meta( $post_id, '_wpak_app_pwa_icons', $app_icons_json );
 
-			//Use default app icons and spash only if none is provided manually:
-			if ( empty( $app_icons_json ) ) {
-				//App that have no existent '_wpak_use_default_icons_and_splash_pwa' meta must
-				//be considered as using the default icons and splash. So it is important
-				//that we set it to 'off' and not delete the meta.
-				$use_default = !empty( $_POST['wpak_use_default_icons_and_splash_pwa'] ) ? 'on' : 'off';
-				update_post_meta( $post_id, '_wpak_use_default_icons_and_splash_pwa', $use_default );
-			} else {
-				update_post_meta( $post_id, '_wpak_use_default_icons_and_splash_pwa', 'off' );
-			}
-
-		}
-		
 		if ( isset( $_POST['wpak_app_pwa_backgound_color'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_pwa_background_color', sanitize_text_field( $_POST['wpak_app_pwa_backgound_color'] ) );
 		}
-		
+
 		if ( isset( $_POST['wpak_app_pwa_theme_color'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_pwa_theme_color', sanitize_text_field( $_POST['wpak_app_pwa_theme_color'] ) );
 		}
@@ -989,26 +975,24 @@ class WpakApps {
 		$author_email = get_post_meta( $post_id, '_wpak_app_author_email', true );
 		$icons = get_post_meta( $post_id, '_wpak_app_icons', true );
 		$url_scheme = get_post_meta( $post_id, '_wpak_app_url_scheme', true );
-		
+
 		$use_default_icons_and_splash = get_post_meta( $post_id, '_wpak_use_default_icons_and_splash', true );
 		$use_default_icons_and_splash = ( empty( $use_default_icons_and_splash ) && empty( $icons ) ) || $use_default_icons_and_splash === 'on';
-		
+
 		$pwa_path = get_post_meta( $post_id, '_wpak_app_pwa_path', true );
-		
+
 		$pwa_name = get_post_meta( $post_id, '_wpak_app_pwa_name', true );
 		$pwa_name = empty( $pwa_name ) ? empty( $title ) ? '' : $title : $pwa_name;
 		$pwa_short_name = get_post_meta( $post_id, '_wpak_app_pwa_short_name', true );
 		$pwa_short_name = empty( $pwa_short_name ) ? $pwa_name : $pwa_short_name;
-		
+
 		$pwa_description = get_post_meta( $post_id, '_wpak_app_pwa_desc', true );
-		
-		$pwa_icons = get_post_meta( $post_id, '_wpak_app_pwa_icons', true );
-		$pwa_use_default_icons_and_splash = get_post_meta( $post_id, '_wpak_use_default_icons_and_splash_pwa', true );
-		$pwa_use_default_icons_and_splash = ( empty( $pwa_use_default_icons_and_splash ) && empty( $pwa_icons ) ) || $pwa_use_default_icons_and_splash === 'on';
+
+		$pwa_icons = WpakThemes::get_pwa_icons( WpakThemesStorage::get_current_theme( $post_id ) );
 
 		$pwa_backgound_color = get_post_meta( $post_id, '_wpak_app_pwa_background_color', true );
 		$pwa_theme_color = get_post_meta( $post_id, '_wpak_app_pwa_theme_color', true );
-		
+
 		$build_tool = get_post_meta( $post_id, '_wpak_app_build_tool', true );
 		$build_tool = empty( $build_tool ) ? 'gradle' : $build_tool; //Set gradle as default Android build tool
 
@@ -1039,12 +1023,12 @@ class WpakApps {
 			'pwa_name' => $pwa_name,
 			'pwa_short_name' => $pwa_short_name,
 			'pwa_desc' => !empty( $pwa_description ) ? $pwa_description : '',
-			'pwa_use_default_icons_and_splash' => $pwa_use_default_icons_and_splash,
+			'pwa_use_default_icons_and_splash' => empty( $pwa_icons ),
 			'pwa_backgound_color' => $pwa_backgound_color,
 			'pwa_theme_color' => $pwa_theme_color,
 		);
 	}
-	
+
 	public static function get_app_is_secured( $post_id ) {
 		return apply_filters( 'wpak_app_secured', true );
 	}

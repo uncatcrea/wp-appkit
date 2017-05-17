@@ -744,6 +744,7 @@ class WpakThemes {
 	        $icons[] = array(
 	            'name' => $filename,
 	            'path' => $file,
+	            'url' => self::get_themes_directory_uri() . '/' . $theme_slug . '/icons/' . $filename,
 	            'size' => $size,
 	        );
 	    }
