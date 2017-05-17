@@ -183,8 +183,6 @@ class WpakLicense {
             $result['ok'] = true;
         }
         
-        var_dump($response);
-
         return $result;
 	}
     

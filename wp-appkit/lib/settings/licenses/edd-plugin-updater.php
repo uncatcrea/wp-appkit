@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 /**
  * Allows plugins to use their own update API.
  *
- * @author Easy Digital Downloads
+ * @author Easy Digital Downloads, updated by Uncatcrea for WP-AppKit needs
  * @version 1.6.12
  */
 class EDD_SL_Plugin_Updater {
@@ -450,7 +450,7 @@ class EDD_SL_Plugin_Updater {
 		if( empty( $cache_key ) ) {
 			$cache_key = $this->cache_key;
 		}
-
+        
 		$cache = get_option( $cache_key );
 		if( empty( $cache['timeout'] ) || current_time( 'timestamp' ) > $cache['timeout'] ) {
 			return false; // Cache is expired
@@ -477,5 +477,19 @@ class EDD_SL_Plugin_Updater {
 		update_option( $cache_key, $data );
 
 	}
+    
+    /**
+     * Added by Uncatcrea for WP-AppKit needs:
+     * Flush auto update cached data so that it is refreshed from Uncatcrea server.
+     */
+    public function flush_caches() {
+ 
+        $version_info_cache_key = $this->cache_key;
+        $api_request_cache_key = 'edd_api_request_' . md5( serialize( $this->slug . $this->api_data['license'] . $this->beta ) );
+        
+        delete_option( $version_info_cache_key );
+        delete_option( $api_request_cache_key );
+        
+    }
 
 }

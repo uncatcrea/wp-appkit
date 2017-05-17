@@ -9,9 +9,11 @@ if( !class_exists( 'EDD_SL_Plugin_Updater' ) ) {
 class WpakLicenses {
    
     protected static $registered_licences = null;
+    protected static $auto_updaters = array();
    
     public static function hooks() {
         add_action( 'admin_init', array( __CLASS__, 'edd_plugin_updater' ), 0 );
+        add_action( 'admin_init', array( __CLASS__, 'handle_forced_updates' ), 10 );
         
         //Set the weekly license check:
         add_filter( 'cron_schedules', array( __CLASS__, 'add_weekly_schedule' ) );
@@ -39,19 +41,10 @@ class WpakLicenses {
     public static function tab_licenses() {
         
         $result = array();
-        if ( isset( $_GET['force_licenses_check'] ) && $_GET['force_licenses_check'] == 1 ) {
-            $result = self::check_licenses();
-        } else {
-            $result = self::handle_posted_licenses();
-        }
+        
+        $result = self::handle_posted_licenses();
         
         $licenses_registered = self::get_registered_licenses();
-        
-        if ( isset( $_GET['force_versions_check'] ) && $_GET['force_versions_check'] == 1 ) {
-            //To force check of addons versions (EDD_SL_Plugin_Updater::check_update()):
-            //(plus there's a 3 hours cache on addons version check)
-            set_site_transient( 'update_plugins', null );
-        }
         
         ?>
        
@@ -61,13 +54,22 @@ class WpakLicenses {
            
         <?php if ( !empty( $licenses_registered ) ): ?>
            
-            <form method="post" action="<?php echo esc_url( remove_query_arg( array('force_licenses_check') ) ) ?>">
+            <form method="post" action="<?php echo esc_url( remove_query_arg( array('wpak_force_licenses_check','wpak_force_updates_check') ) ) ?>">
                
                 <p>
                     <?php
                         echo sprintf(
                             __( 'Enter your addon or theme license keys here to receive support and updates for purchased items. If your license key has expired, please <a href="%s" target="_blank">renew your license (TODO)</a>.', WpAppKit::i18n_domain ),
                             'http://docs.easydigitaldownloads.com/article/1000-license-renewal' //TODO
+                        );
+                    ?>
+                </p>
+                
+                <p>
+                    <?php
+                        echo sprintf(
+                            __( 'Themes, addons and licenses updates are checked automatically every day. To check for last versions and last license state now, <a href="%s">click here</a>.', WpAppKit::i18n_domain ),
+                            add_query_arg( array( 'wpak_force_licenses_check' => 1, 'wpak_force_updates_check' => 1 ) )
                         );
                     ?>
                 </p>
@@ -285,7 +287,7 @@ class WpakLicenses {
         
         foreach( $licenses_registered as $license ) {
 
-            $edd_updater = new EDD_SL_Plugin_Updater( WpakConfig::uncatcrea_website_url, $license->file, array(
+            self::$auto_updaters[] = new EDD_SL_Plugin_Updater( WpakConfig::uncatcrea_website_url, $license->file, array(
                     'version' 	=> $license->version,
                     'license' 	=> $license->license_key,
                     'item_name' => $license->item_name,
@@ -297,14 +299,42 @@ class WpakLicenses {
         }
 
     }
+    
+    public static function handle_forced_updates() {
+        
+        global $pagenow;
+       
+        if ( $pagenow === 'admin.php' 
+             && !empty( $_GET['page'] ) && $_GET['page'] === 'wpak_bo_settings_page'
+             && !empty( $_GET['wpak_settings_page'] ) && $_GET['wpak_settings_page'] === 'licenses'
+            ) {
+
+            $redirect = false;
+
+            if ( isset( $_GET['wpak_force_licenses_check'] ) && $_GET['wpak_force_licenses_check'] == 1 ) {
+                $result = self::check_licenses();
+                $redirect = true;
+            }
+
+            if ( isset( $_GET['wpak_force_updates_check'] ) && $_GET['wpak_force_updates_check'] == 1 ) {
+                //To force check of addons versions (EDD_SL_Plugin_Updater::check_update()):
+                set_site_transient( 'update_plugins', null );
+                //Plus, there's a 3 hours cache on addons version check. Flush it:
+                foreach( self::$auto_updaters as $auto_updater ) {
+                    $auto_updater->flush_caches();
+                }
+                $redirect = true;
+            }
+
+            if ( $redirect ) {
+                wp_safe_redirect( remove_query_arg( array( 'wpak_force_licenses_check', 'wpak_force_updates_check' ) ) );
+                exit();
+            }
+            
+        }
+        
+    }
    
 }
 
 WpakLicenses::hooks();
-
-add_filter( 'http_request_host_is_external', 'allow_my_custom_host', 10, 3 );
-function allow_my_custom_host( $allow, $host, $url ) {
-  if ( $host === 'local.uncategorized-creations.com' )
-    $allow = true;
-  return $allow;
-}
