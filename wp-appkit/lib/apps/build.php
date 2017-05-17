@@ -720,27 +720,26 @@ class WpakBuild {
 			"start_url" => "./",
 			"display" => "standalone",
 		);
-		
+
 		if ( !empty( $app_main_infos['pwa_background_color'] ) ) {
 			$manifest['background_color'] = $app_main_infos['pwa_background_color'];
 		}
-		
+
 		if ( !empty( $app_main_infos['pwa_theme_color'] ) ) {
 			$manifest['theme_color'] = $app_main_infos['pwa_theme_color'];
 		}
-		
+
 		$manifest = apply_filters( 'wpak_pwa_manifest', $manifest, $app_id );
-		
+
 		return json_encode( $manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
 	}
-	
+
 	private static function get_pwa_manifest_icons( $app_id ) {
 		$manifest_icons = array();
-		
+
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
-		$app_icons_json = $app_main_infos['pwa_icons'];
-		$app_use_default_icons_and_splashscreens = $app_main_infos['pwa_use_default_icons_and_splash'];
-		if ( empty( $app_icons_json ) && $app_use_default_icons_and_splashscreens ) {
+		$app_icons = $app_main_infos['pwa_icons'];
+		if ( empty( $app_icons ) ) {
 
 			$icons_and_splash = WpakConfigFile::get_platform_icons_and_splashscreens_files( $app_id, $app_main_infos['platform'], 'pwa' );
 			$icons = $icons_and_splash['icons'];
@@ -754,16 +753,21 @@ class WpakBuild {
 					);
 				}
 			}
-			
+
 		} else {
-			if ( $pwa_icons = self::pwa_icons_json_to_array( $app_icons_json ) ) {
-				$manifest_icons = $pwa_icons;
-			}
+		    foreach( $app_icons as $icon ) {
+		        $src = str_replace( WpakThemes::get_themes_directory(), 'themes', $icon['path'] );
+		        $manifest_icons[] = array(
+		            'src' => $src,
+		            'sizes' => $icon['size'][0] . 'x' . $icon['size'][1],
+		            'type' => 'image/png',
+		        );
+		    }
 		}
-		
+
 		return $manifest_icons;
 	}
-	
+
 	public static function pwa_icons_json_to_array( $app_icons_json ) {
 		$app_icons_json = stripslashes( $app_icons_json );
 		$app_icons_array = json_decode( $app_icons_json, false );
