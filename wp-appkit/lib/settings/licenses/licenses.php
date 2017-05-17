@@ -59,7 +59,7 @@ class WpakLicenses {
                 <p>
                     <?php
                         echo sprintf(
-                            __( 'Enter your addon or theme license keys here to receive support and updates for purchased items. If your license key has expired, please <a href="%s" target="_blank">renew your license (TODO)</a>.', WpAppKit::i18n_domain ),
+                            __( 'Enter your support, addon or theme license keys here to receive support and updates for purchased items. If your license key has expired, please <a href="%s" target="_blank">renew your license (TODO)</a>.', WpAppKit::i18n_domain ),
                             'http://docs.easydigitaldownloads.com/article/1000-license-renewal' //TODO
                         );
                     ?>
@@ -132,6 +132,16 @@ class WpakLicenses {
         if ( self::$registered_licences === null ) {
             
             self::$registered_licences = array();
+
+            //One default license for pro support:
+            $default_licenses = array(
+                array( 
+                    'file' => '', //Empty because this is not an addon or theme, just support
+                    'item_name' => '1 year Pro Support',
+                    'version' => '',
+                    'author' => 'Uncategorized Creations',
+                )
+            );
             
             /**
              * Use this from premium addons and premium themes to add EDD licenses management
@@ -145,7 +155,7 @@ class WpakLicenses {
              *        'item_id' = null
              * )
              */
-            $licenses_raw = apply_filters( 'wpak_licenses', array() );
+            $licenses_raw = apply_filters( 'wpak_licenses', $default_licenses );
            
             foreach( $licenses_raw as $license_raw ) {
                 
@@ -270,14 +280,6 @@ class WpakLicenses {
         return $result;
     }
     
-    /*protected static function check_licence_zombies() {
-        //foreach licence check if in $_POST and delete it if not
-        if ( empty( $_POST['wpak_licences'][ $this->item_shortname . '_license_key'] ) ) {
-			delete_option( $this->item_shortname . '_license_active' );
-			return;
-		}
-    }*/
-    
     /**
      * Activate EDD auto check for items updates
      */
@@ -287,14 +289,20 @@ class WpakLicenses {
         
         foreach( $licenses_registered as $license ) {
 
-            self::$auto_updaters[] = new EDD_SL_Plugin_Updater( WpakConfig::uncatcrea_website_url, $license->file, array(
-                    'version' 	=> $license->version,
-                    'license' 	=> $license->license_key,
-                    'item_name' => $license->item_name,
-                    'author' 	=> $license->author,
-                    'beta'		=> false
-                )
-            );
+            $license_file = $license->file;
+            
+            if ( !empty( $license_file ) ) { //To exclude support licenses
+                
+                self::$auto_updaters[] = new EDD_SL_Plugin_Updater( WpakConfig::uncatcrea_website_url, $license_file, array(
+                        'version' 	=> $license->version,
+                        'license' 	=> $license->license_key,
+                        'item_name' => $license->item_name,
+                        'author' 	=> $license->author,
+                        'beta'		=> false
+                    )
+                );
+                
+            }
             
         }
 
