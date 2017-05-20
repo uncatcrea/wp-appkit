@@ -73,17 +73,20 @@ class WpakApps {
 				),
 			);
 			wp_localize_script( 'wpak_apps_js', 'Apps', $localize );
-			
+
 			global $post;
 			wp_enqueue_script( 'wpak_apps_pwa_js', plugins_url( 'lib/apps/pwa.js', dirname( dirname( __FILE__ ) ) ), array( 'jquery' ), WpAppKit::resources_version );
 			wp_localize_script( 'wpak_apps_pwa_js', 'wpak_pwa_export', array(
 				'app_id' => $post->ID,
 				'nonce' => wp_create_nonce( 'wpak_build_app_sources_' . $post->ID ),
+				'icons_nonce' => wp_create_nonce( 'wpak_get_pwa_icons_' . $post->ID ),
 				'messages' => array(
 					'install_successfull' => __( 'Progressive Web App installed successfully', WpAppKit::i18n_domain ),
-					'see_pwa' => __( 'View Progressive Web App', WpAppKit::i18n_domain )
+					'see_pwa' => __( 'View Progressive Web App', WpAppKit::i18n_domain ),
+					'pwa_icons_detected' => __( 'We detected the following icons in your theme. They will be automatically used by the PWA:', WpAppKit::i18n_domain ),
+					'pwa_no_icons' => __( 'We didn\'t detect any icons in your theme. You can add them in following <a href="#">our tutorial</a>. If you don\'t provide icons, default ones will be used.', WpAppKit::i18n_domain ),
 				)
-			) );
+			));
 		}
 	}
 
@@ -690,16 +693,7 @@ class WpakApps {
 				<div class="field-group">
 					<label><?php _e( 'Icons', WpAppKit::i18n_domain ) ?></label>
 					<div class="wpak-pwa-icons">
-						<?php if( !empty( $main_infos['pwa_icons'] ) ): ?>
-							<div class="wpak-pwa-icons-text"><?php _e( 'We detected the following icons in your theme. They will be automatically used by the PWA:', WpAppKit::i18n_domain ) ?></div>
-							<div class="wpak-pwa-icons-list">
-								<?php foreach( $main_infos['pwa_icons'] as $icon ): ?>
-									<img class="wpak-pwa-icon" src="<?php echo $icon['url']; ?>" width="<?php echo $icon['size'][0]; ?>" height="<?php echo $icon['size'][1]; ?>" />
-								<?php endforeach; ?>
-							</div>
-						<?php else: ?>
-							<div class="wpak-pwa-no-icons"><?php _e( 'We didn\'t detect any icons in your theme. You can add them in following <a href="#">our tutorial</a>. If you don\'t provide icons, default ones will be used.', WpAppKit::i18n_domain ) ?></div>
-						<?php endif; ?>
+						<div class="hide-if-js"><?php _e( 'If your theme already embeds icons, we will automatically take them for your PWA. If not, we will take WP-AppKit default icons.' ) ?></div>
 					</div>
 				</div>
 				<div class="field-group">

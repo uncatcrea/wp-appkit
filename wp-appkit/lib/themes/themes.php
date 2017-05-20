@@ -32,6 +32,10 @@ class WpakThemes {
 		add_action( 'init', array( __CLASS__, 'rewrite_rules' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'template_redirect' ), 5 );
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
+
+		if( is_admin() ) {
+		    add_action( 'wp_ajax_wpak_get_pwa_icons', array( __CLASS__, 'ajax_get_pwa_icons' ) );
+		}
 	}
 
 
@@ -753,6 +757,37 @@ class WpakThemes {
 	}
 
 	/**
+	 * Handle AJAX request to get PWA icons for a given theme/app.
+	 */
+	public static function ajax_get_pwa_icons() {
+	    $answer = array( 'icons' => array() );
+
+	    if ( empty( $_GET ) || empty( $_GET['app_id'] ) || !is_numeric( $_GET['app_id'] ) ) {
+		    self::exit_sending_json( $answer );
+	    }
+
+	    $app_id = addslashes( $_GET['app_id'] );
+
+	    if ( !check_admin_referer( 'wpak_get_pwa_icons_' . $app_id, 'nonce' ) ) {
+		    return;
+	    }
+
+	    $theme = !empty( $_GET['theme'] ) ? addslashes( $_GET['theme'] ) : WpakThemesStorage::get_current_theme( $app_id );
+
+	    $icons = self::get_pwa_icons( $theme );
+
+	    foreach( $icons as $icon ) {
+	        $answer['icons'][] = array(
+	            'url' => $icon['url'],
+	            'width' => $icon['size'][0],
+	            'height' => $icon['size'][1],
+	        );
+	    }
+
+	    self::exit_sending_json( $answer );
+	}
+
+	/**
 	 * Get the size of a PWA icon given its file name.
 	 * Size must be provided in the filename as follow: icon-name-width-height.png
 	 *
@@ -768,6 +803,26 @@ class WpakThemes {
 	    }
 
 	    return array( $matches[1], $matches[2] );
+	}
+
+	/**
+	 * @todo: maybe refactor this method and all similar ones around the plugin (e.g. into a WpakAjax class)?
+	 *
+	 * @param $answer
+	 */
+	private static function exit_sending_json( $answer ) {
+	    //If something was displayed before, clean it so that our answer can
+	    //be valid json (and store it in an "echoed_before_json" answer key
+	    //so that we can warn the user about it) :
+	    $content_already_echoed = ob_get_contents();
+	    if ( !empty( $content_already_echoed ) ) {
+		    $answer['echoed_before_json'] = $content_already_echoed;
+		    ob_end_clean();
+	    }
+
+	    header( 'Content-type: application/json' );
+	    echo json_encode( $answer );
+	    exit();
 	}
 }
 

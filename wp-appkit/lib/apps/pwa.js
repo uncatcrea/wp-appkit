@@ -31,5 +31,34 @@ jQuery().ready( function () {
 
 	} );
 
+	var $icons_container = $( '.wpak-pwa-icons' );
+
+	$('#wpak_app_theme_choice').change(function(){
+		var data = {
+			action: 'wpak_get_pwa_icons',
+			app_id: wpak_pwa_export.app_id,
+			theme: $(this).val(),
+			nonce: wpak_pwa_export.icons_nonce
+		};
+
+		$.get( ajaxurl, data, function( response ) {
+			var html = '';
+			if( typeof response.icons !== "undefined" && response.icons.length ) {
+				html = $( '<div>' ).addClass( 'wpak-pwa-icons-text' ).html( wpak_pwa_export.messages.pwa_icons_detected );
+				$.each( response.icons, function( i, icon ) {
+					html = html.add( $( '<img />' )
+						.addClass( 'wpak-pwa-icon' )
+						.attr( 'width', icon.width )
+						.attr( 'height', icon.height )
+						.attr( 'src', icon.url ));
+				});
+			}
+			else {
+				html = $( '<div>' ).addClass( 'wpak-pwa-no-icons' ).html( wpak_pwa_export.messages.pwa_no_icons );
+			}
+			$icons_container.html( html );
+		});
+	}).change();
+
 } );
 
