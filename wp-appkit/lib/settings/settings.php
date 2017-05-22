@@ -36,7 +36,7 @@ class WpakSettings {
 			$active_tab = 'general';
 		}
 		
-		$settings_base_url = remove_query_arg( array( 'wpak_settings_page', 'wpak_force_licenses_check','wpak_force_updates_check' ) );
+		$settings_base_url = self::get_settings_base_url();
 		
 		?>
 		<div class="wrap" id="wpak-settings">
@@ -155,6 +155,9 @@ class WpakSettings {
 		}
 	}
 	
+    protected static function get_settings_base_url() {
+        return admin_url( 'admin.php?page=wpak_bo_settings_page' );
+    }
 }
 
 WpakSettings::hooks();

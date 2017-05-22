@@ -54,7 +54,7 @@ class WpakLicenses {
            
         <?php if ( !empty( $licenses_registered ) ): ?>
            
-            <form method="post" action="<?php echo esc_url( remove_query_arg( array('wpak_force_licenses_check','wpak_force_updates_check') ) ) ?>">
+            <form method="post" action="<?php echo esc_url( self::get_licenses_base_url() ) ?>">
                
                 <p>
                     <?php
@@ -69,7 +69,7 @@ class WpakLicenses {
                     <?php
                         echo sprintf(
                             __( 'Themes, addons and licenses updates are checked automatically every day. To check for last versions and last license state now, <a href="%s">click here</a>.', WpAppKit::i18n_domain ),
-                            add_query_arg( array( 'wpak_force_licenses_check' => 1, 'wpak_force_updates_check' => 1 ) )
+                            self::get_force_refresh_link( array( 'licenses', 'updates' ) )
                         );
                     ?>
                 </p>
@@ -335,12 +335,34 @@ class WpakLicenses {
             }
 
             if ( $redirect ) {
-                wp_safe_redirect( remove_query_arg( array( 'wpak_force_licenses_check', 'wpak_force_updates_check' ) ) );
+                wp_safe_redirect( self::get_licenses_base_url() );
                 exit();
             }
             
         }
         
+    }
+    
+    public static function get_force_refresh_link( $refresh_types ) {
+        
+        if ( is_string( $refresh_types ) ) {
+            $refresh_types = array( $refresh_types );
+        }
+        
+        $query_args = array();
+        if ( in_array( 'licenses', $refresh_types ) ) { //To refresh license validity state
+            $query_args['wpak_force_licenses_check'] = 1;
+        }
+        if ( in_array( 'updates', $refresh_types ) ) { //To force addons/themes update check
+            $query_args['wpak_force_updates_check'] = 1;
+        }
+        
+        return add_query_arg( $query_args, self::get_licenses_base_url() );
+    }
+    
+    public static function get_licenses_base_url() {
+        $base_url = admin_url( 'admin.php?page=wpak_bo_settings_page&wpak_settings_page=licenses' );
+        return remove_query_arg( array('wpak_force_licenses_check','wpak_force_updates_check'), $base_url );
     }
    
 }
