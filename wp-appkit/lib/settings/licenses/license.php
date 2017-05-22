@@ -272,9 +272,10 @@ class WpakLicense {
 						} elseif( $expiration > $now && $expiration - $now < ( DAY_IN_SECONDS * 30 ) ) {
 
 							$message = sprintf(
-								__( 'Your license key expires soon! It expires on %s. <a href="%s" target="_blank">Renew your license key</a>.', WpAppKit::i18n_domain ),
+								__( 'Your license key expires soon! It expires on %s. <a href="%s" target="_blank">Renew your license key</a>, then <a href="%s">re-check your license validity</a>.', WpAppKit::i18n_domain ),
 								date_i18n( get_option( 'date_format' ), strtotime( $this->license_active->expires, current_time( 'timestamp' ) ) ),
-								WpakConfig::checkout_url .'?edd_license_key='. $this->license_key
+								WpakConfig::checkout_url .'?edd_license_key='. $this->license_key,
+                                WpakLicenses::get_force_refresh_link( array( 'licenses' ) )
 							);
 
 							$status = 'license-expires-soon-notice';
