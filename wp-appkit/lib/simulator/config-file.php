@@ -84,6 +84,9 @@ class WpakConfigFile {
 
 		$app_platform = $app_main_infos['platform'];
 		$app_platform = empty( $app_platform ) ? 'all' : $app_platform;
+        
+        $pwa_path = !empty( $app_main_infos['pwa_path'] ) ? trailingslashit( $app_main_infos['pwa_path'] ) : '';
+        $app_path = $app_platform === 'pwa' ? '/'. $pwa_path : '';
 
 		$app_version = WpakApps::sanitize_app_version( $app_main_infos['version'] );
 
@@ -118,6 +121,7 @@ define( function ( require ) {
 		app_type : '<?php echo !empty( $export_type ) ? $export_type : 'preview' ?>',
 		app_title : '<?php echo addslashes($app_title) ?>',
 		app_platform : '<?php echo addslashes($app_platform) ?>',
+		app_path: '<?php echo addslashes($app_path) ?>',
 		gmt_offset : <?php echo addslashes($gmt_offset) ?>,
 		debug_mode : '<?php echo $debug_mode ?>'<?php
 		if( !empty( $auth_key ) ):

@@ -133,6 +133,7 @@ define(function (require) {
 		  'refresh-at-app-launch' : true,
 		  'go-to-default-route-after-refresh' : true,
 		  'custom-screen-rendering' : false,
+          'use-html5-pushstate': false //Automatically set to true only for PWA
 	  };
 
 	  app.getParam = function(param){
@@ -194,25 +195,40 @@ define(function (require) {
 		var default_route = app.resetDefaultRoute(true);
 		var launch_route = default_route;
 		var deep_link_route = DeepLink.getLaunchRoute();
-        var url_route = window.location.hash; //Retrieve asked route from url's fragment
+        var url_fragment = window.location.hash; //Retrieve asked route from url's fragment
+        var url_pathname = window.location.pathname; //Retrieve asked route from url's relative path
         
+		/**
+         * Set default route to the one passed via deeplink or via url fragment or via url slug.
+         * + Disable refresh at app launch because:
+         * 1. it will cause going to default route right after, so our launch route won't be useful
+         * 2. if we're here, it's because we're in launching process, after having retrieved some data
+         * 3. if we disable 'go-to-default-route-after-refresh', we'd have to enable it again after the next refresh
+         */
+        var asked_route = '';
 		if( deep_link_route.length > 0 ) {
-            launch_route = deep_link_route;
-
-            //
-            // Disable refresh at app launch because:
-            //  1. it will cause going to default route right after, so our launch route won't be useful
-            //  2. if we're here, it's because we're in launching process, after having retrieved some data
-            //  3. if we disable 'go-to-default-route-after-refresh', we'd have to enable it again after the next refresh
-            //
+            
+            asked_route = deep_link_route;
 
             app.setParam( 'refresh-at-app-launch', false );
             
-		} else if ( url_route.length > 0 ) {
+		} else if ( url_fragment.length > 0 ) {
             
-            launch_route = url_route;
+            asked_route = url_fragment;
             
             app.setParam( 'refresh-at-app-launch', false );
+        
+        } else if ( app.getParam( 'use-html5-pushstate' ) && url_pathname.length > 0 && url_pathname.indexOf( Config.app_path ) === 0 ) {
+            
+            asked_route = '/'+ url_pathname.replace( Config.app_path, '' );
+            asked_route = Utils.addTrailingSlash( asked_route );
+            
+            app.setParam( 'refresh-at-app-launch', false );
+        }
+        
+        if ( asked_route.length > 0 && asked_route !== launch_route ) {
+            launch_route = asked_route;
+            Utils.log( 'Launch route set to asked route: ', asked_route );
         }
 
 		/**
@@ -232,12 +248,20 @@ define(function (require) {
 			// Reset DeepLink launch route after hooks are fired to let scripts retrieve this route if needed
 			DeepLink.reset();
 
+            var history_start_args = {};
+            
+            if( app.getParam( 'use-html5-pushstate' ) ) {
+                history_start_args.pushState = true;
+                history_start_args.root = Config.app_path;
+            }
+
 			if( launch_route.length > 0 ){
-				Backbone.history.start();
+				Backbone.history.start( history_start_args );
 				//Navigate to the launch_route :
 				app.router.navigate(launch_route, {trigger: true});
 			}else{
-				Backbone.history.start({silent:true});
+                history_start_args.silent = true;
+				Backbone.history.start( history_start_args );
 				//Hack : Trigger a non existent route so that no view is loaded :
 				app.router.navigate('#wpak-none', {trigger: true});
 			}
@@ -283,27 +307,30 @@ define(function (require) {
 	app.getScreenFragment = function ( link_type, data ) {
 		
 		var screen_link = '';
+        
+        var prefix = app.getParam('use-html5-pushstate') ? '/' : '#';
+        var suffix = app.getParam('use-html5-pushstate') ? '/' : '';
 		
 		switch( link_type ) {
 			case 'single':
-				screen_link = '#single/' + data.global + '/' + data.item_id;
+				screen_link = prefix + 'single/' + data.global + '/' + data.item_id + suffix;
 				break;
 			case 'page':
-				screen_link = '#page/' + data.component_id + '/' + data.item_id;
+				screen_link = prefix + 'page/' + data.component_id + '/' + data.item_id + suffix;
 				break;
 			case 'comments':
-				screen_link = '#comments-' + data.item_id;
+				screen_link = prefix + 'comments-' + data.item_id + suffix;
 				break;
 			case 'component':
 				var component = app.getComponentData( data.component_id );
 				if ( component ) {
 					//If page component, return directly page's screen fragment to avoid
 					//redirection in router, which leads to back button not working.
-					screen_link = component.type !== 'page' ? '#component-'+ component.id : '#page/'+ component.id +'/'+ component.data.root_id;
+					screen_link = component.type !== 'page' ? prefix + 'component-'+ component.id + suffix : prefix + 'page/'+ component.id +'/'+ component.data.root_id + suffix;
 				}
 				break;
 			case 'custom-page':
-				screen_link = '#custom-page';
+				screen_link = prefix + 'custom-page' + suffix;
 				break;
 		}
 		
@@ -1732,6 +1759,14 @@ define(function (require) {
 	   *  - initialize addons
        */
       app.initialize = function ( callback ) {
+
+        //Activate pretty slugs via html5 pushstate for PWA:
+        //(this can be deactivated in theme by setting the param
+        //'use-html5-pushstate' to false)
+        if( Config.app_platform === 'pwa' && Config.app_type !== 'preview' ) {
+            app.setParam( 'use-html5-pushstate', true );
+            Utils.log( 'HTML5 pushstate mode activated.' );
+        }
 
       	document.addEventListener( 'resume', app.onResume, false );
 

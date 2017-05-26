@@ -23,11 +23,21 @@ define(function (require) {
 
         routes: {
             "": "default_route",
+            
+            //Screen routes:
             "single/:global/:id" : "single",
             "page/:component_id/:page_id" : "page",
             "comments-:post_id" : "comments",
             "component-:id" : "component",
             "custom-page" : "custom_page",
+            
+            //Same screen routes with trailing slashes (used when HTML5 pushstate is activated):
+            "single/:global/:id/" : "single",
+            "page/:component_id/:page_id/" : "page",
+            "comments-:post_id/" : "comments",
+            "component-:id/" : "component",
+            "custom-page/" : "custom_page",
+            
 			'*notFound': "not_found"
         },
 

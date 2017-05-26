@@ -61,6 +61,12 @@ require(['root/config'],function(Config){
 									require(Addons.getJs('theme','before'),function(){
 										require(['theme/js/functions'],function(){
 											
+                                            /**
+                                             * Intercept navigation inside the app to trigger Backbone router navigation
+                                             * instead of browser page refresh. 
+                                             */
+                                            RegionManager.handleNavigationInterception();
+                                            
 											/**
 											 * Templates that are preloaded by default for before perf.
 											 * Note: we can't require 'page' template here as it is not required in themes.

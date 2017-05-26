@@ -24,6 +24,13 @@ define( function( require ) {
 		return new_url;
 	};
 	
+    utils.addTrailingSlash = function( url ) {
+        if ( url.substr(-1) !== '/') {
+            url += '/';
+        }
+        return url;
+    };
+    
 	utils.getAjaxErrorType = function( jqXHR, textStatus, errorThrown ) {
 		var error_type = 'unknown-error';
 		

@@ -47,6 +47,49 @@ define(function (require) {
 	    	vent.off(event,callback);
 	    };
 
+        /**
+        * Intercept internal navigation in the app to trigger Backbone router navigation
+        * instead of browser page refresh. Mandatory for pretty slugs with HTML5 pushstate.
+        */
+        region.handleNavigationInterception = function() {
+            if ( App.getParam( 'use-html5-pushstate' ) ) {
+                var auto_prevent_page_reload = true;
+                
+                /**
+                 * When using HTML5 pushstate pretty urls, clicking on an internal link in the app
+                 * leads to the browser refreshing the page. To avoid that we have to 
+                 * intercept clicks on links and do a Backbone router.navigate() instead
+                 * of letting the browser handling the navigation. By default we do that
+                 * by intercepting all click events on body element.
+                 * To handle this in your own way directly in theme, use this 'auto-prevent-page-reload'
+                 * filter and return false.
+                 */
+                auto_prevent_page_reload = Hooks.applyFilters( 'auto-prevent-page-reload', auto_prevent_page_reload );
+                
+                if ( auto_prevent_page_reload ) {
+                    $( 'body' ).on( 'click', 'a', preventPageReloadForInternalLinks );
+                }
+            }
+        };
+        
+        /**
+         * When clicking on internal links, cancel click event and do a manual
+         * Backbone router navigation. This is to avoid the browser refreshing
+         * the page when clicking internal links and using HTML5 pushstate.
+         */
+        var preventPageReloadForInternalLinks = function( e ) {
+			var $link_el = $( e.currentTarget );
+            
+			var href = $link_el.attr( 'href' ).trim();
+			var is_internal_url = href.indexOf( '/' ) === 0;
+
+			if ( is_internal_url ) {
+				e.preventDefault();
+				App.router.navigate( href, { trigger: true } );
+			}
+
+		};
+
 	    region.buildHead = function(cb){
 	    	if( headView === null ){
 	    		require(['core/views/head'],function(HeadView){
