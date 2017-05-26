@@ -194,7 +194,8 @@ define(function (require) {
 		var default_route = app.resetDefaultRoute(true);
 		var launch_route = default_route;
 		var deep_link_route = DeepLink.getLaunchRoute();
-
+        var url_route = window.location.hash; //Retrieve asked route from url's fragment
+        
 		if( deep_link_route.length > 0 ) {
             launch_route = deep_link_route;
 
@@ -206,7 +207,13 @@ define(function (require) {
             //
 
             app.setParam( 'refresh-at-app-launch', false );
-		}
+            
+		} else if ( url_route.length > 0 ) {
+            
+            launch_route = url_route;
+            
+            app.setParam( 'refresh-at-app-launch', false );
+        }
 
 		/**
 		 * Use the 'launch-route' filter to display a specific screen at app launch
