@@ -308,7 +308,7 @@ define(function (require) {
 		
 		var screen_link = '';
         
-        var prefix = app.getParam('use-html5-pushstate') ? '/' : '#';
+        var prefix = app.getParam('use-html5-pushstate') ? '' : '#';
         var suffix = app.getParam('use-html5-pushstate') ? '/' : '';
 		
 		switch( link_type ) {

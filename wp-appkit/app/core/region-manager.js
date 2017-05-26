@@ -64,7 +64,7 @@ define(function (require) {
                  * To handle this in your own way directly in theme, use this 'auto-prevent-page-reload'
                  * filter and return false.
                  */
-                auto_prevent_page_reload = Hooks.applyFilters( 'auto-prevent-page-reload', auto_prevent_page_reload );
+                auto_prevent_page_reload = Hooks.applyFilters( 'auto-prevent-page-reload', auto_prevent_page_reload, [] );
                 
                 if ( auto_prevent_page_reload ) {
                     $( 'body' ).on( 'click', 'a', preventPageReloadForInternalLinks );
@@ -81,10 +81,10 @@ define(function (require) {
 			var $link_el = $( e.currentTarget );
             
 			var href = $link_el.attr( 'href' ).trim();
-			var is_internal_url = href.indexOf( '/' ) === 0;
 
-			if ( is_internal_url ) {
+			if ( Utils.isInternalUrl( href ) ) {
 				e.preventDefault();
+                route = Utils.extractRootFromUrlPath( href );
 				App.router.navigate( href, { trigger: true } );
 			}
 
