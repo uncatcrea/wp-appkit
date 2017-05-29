@@ -1,4 +1,4 @@
-define(function (require) {
+define(function (require,exports) {
 
       "use strict";
 
@@ -18,7 +18,8 @@ define(function (require) {
 		  Stats               = require('core/stats'),
 		  Addons              = require('core/addons-internal'),
 		  WsToken             = require('core/lib/encryption/token'),
-          DeepLink			  = require( 'core/modules/deep-link' );
+          DeepLink			  = require( 'core/modules/deep-link' ),
+          Router              = require( 'core/router' );
 
 	  var app = {};
 
@@ -152,8 +153,22 @@ define(function (require) {
 
 	  //--------------------------------------------------------------------------
 	  //App Backbone router :
-	  app.router = null;
+	  app.router = Router.router;
 
+      /**
+       * Add a screen to history manually from its route, without triggering 
+       * the route, nor the corresponding screen rendering. 
+       */
+      app.silentlyAddRouteToAppHistory = function( route ) {
+        var route_info = app.router.getRouteTypeAndParameters( route );
+        if ( route_info ) {
+            var route_rendering_data = app.router.getRouteData( route_info.type, route_info.parameters );
+            app.setQueriedScreen( route_rendering_data.screen_data );
+            app.addQueriedScreenToHistory();
+            Utils.log( 'Silently added route to history: '+ route );
+        }
+      };
+      
 	  /**
 	   * Sets the route corresponding to the app homepage : fragment empty or = "#".
 	   * Use the 'default-route' filter to change the default route from functions.js.
@@ -220,15 +235,24 @@ define(function (require) {
         
         } else if ( app.getParam( 'use-html5-pushstate' ) && url_pathname.length > 0 && url_pathname.indexOf( Config.app_path ) === 0 ) {
             
-            asked_route = '/'+ url_pathname.replace( Config.app_path, '' );
+            asked_route = url_pathname.replace( Config.app_path, '' );
             asked_route = Utils.addTrailingSlash( asked_route );
             
             app.setParam( 'refresh-at-app-launch', false );
         }
         
+        //A route was asked by url, that is different from launch route.
+        //Set launch_route to this asked route and manually add the default screen
+        //to history, so that we can go back to it with back button.
         if ( asked_route.length > 0 && asked_route !== launch_route ) {
+           
+            var add_default_route_before_asked_route = Hooks.applyFilters( 'add-default-route-before-asked-route', true, [ asked_route, default_route, launch_route ] );
+           
+            if ( add_default_route_before_asked_route ) {
+                app.silentlyAddRouteToAppHistory( default_route );
+            }
+            
             launch_route = asked_route;
-            Utils.log( 'Launch route set to asked route: ', asked_route );
         }
 
 		/**
@@ -238,13 +262,13 @@ define(function (require) {
 		 * to a choosen page in the "info:app-ready" event for example.
 		 */
 		launch_route = Hooks.applyFilters('launch-route',launch_route,[Stats.getStats()]);
-
+        
 		/**
 		 * 'pre-start-router' action: use this if you need to do some treatment
 		 * before Backbone routing starts.
 		 */
 		Hooks.doActions( 'pre-start-router', [ launch_route, Stats.getStats() ] ).done( function() {
-
+            
 			// Reset DeepLink launch route after hooks are fired to let scripts retrieve this route if needed
 			DeepLink.reset();
 
@@ -411,18 +435,13 @@ define(function (require) {
 			  if( queried_screen_data.screen_type == 'list' ){
 				  history_action = 'empty-then-push';
 			  }else if( queried_screen_data.screen_type == 'single' ){
-				  if( current_screen.screen_type == 'list' ){
-					  history_action = 'push';
-				  }else if( current_screen.screen_type == 'custom-component' ){
-					  history_action = 'push';
-				  }else if( current_screen.screen_type == 'comments' ){
+				  history_action = 'push';
+				  if( current_screen.screen_type == 'comments' ){
 					  if( previous_screen.screen_type == 'single' && previous_screen.item_id == queried_screen_data.item_id ){
 						  history_action = 'pop';
 					  }else{
 						  history_action = 'empty-then-push';
 					  }
-				  }else{
-					  history_action = 'empty-then-push';
 				  }
 			  }else if( queried_screen_data.screen_type == 'page' ){
 				  if( current_screen.screen_type == 'page'
@@ -1820,6 +1839,9 @@ define(function (require) {
 		Utils.log('Network event : offline');
 	};
 
-	return app;
+    /**
+     * Use exports so that Router and App can be required at the same time.
+     */
+	_.extend( exports, app );
 
 });

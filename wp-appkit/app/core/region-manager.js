@@ -82,10 +82,10 @@ define(function (require) {
             
 			var href = $link_el.attr( 'href' ).trim();
 
-			if ( Utils.isInternalUrl( href ) ) {
+			if ( Utils.isInternalUrl( href ) && href !== '#' ) {
 				e.preventDefault();
-                route = Utils.extractRootFromUrlPath( href );
-				App.router.navigate( href, { trigger: true } );
+                var route = Utils.extractRootFromUrlPath( href );
+				App.router.navigate( route, { trigger: true } );
 			}
 
 		};

@@ -3,6 +3,7 @@ define( function( require ) {
 	"use strict";
 
 	var Config = require( 'root/config' );
+    var Hooks = require( 'core/lib/hooks' );
 
 	var utils = { };
 
@@ -54,7 +55,9 @@ define( function( require ) {
             } 
             
             if ( url_path.indexOf( Config.app_path ) === 0 ) { 
-                fragment = fragment.replace( Config.app_path, '' );
+                fragment = url_path.replace( Config.app_path, '' );
+            } else {
+                fragment = url_path;
             }
             
         } else {

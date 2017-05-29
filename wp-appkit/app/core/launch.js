@@ -31,6 +31,7 @@ require(['root/config'],function(Config){
 				.then( function () {
 					console.log( '[WP-AppKit Service Worker] Registered' );
 				} );
+        
 	}
 
 	var dynamic_paths = {
@@ -41,8 +42,8 @@ require(['root/config'],function(Config){
 	    paths: dynamic_paths
 	});
 
-	require(['jquery', 'underscore', 'core/addons-internal', 'core/app-utils', 'core/app', 'core/router', 'core/region-manager', 'core/stats', 'core/phonegap/utils','core/lib/hooks'],
-			function ($, _, Addons, Utils, App, Router, RegionManager, Stats, PhoneGap, Hooks) {
+	require(['jquery', 'underscore', 'core/addons-internal', 'core/app-utils', 'core/app', 'core/region-manager', 'core/stats', 'core/phonegap/utils','core/lib/hooks'],
+			function ($, _, Addons, Utils, App, RegionManager, Stats, PhoneGap, Hooks) {
 
 			var launch = function() {
 				
@@ -55,8 +56,6 @@ require(['root/config'],function(Config){
 							RegionManager.buildLayout(function(){
 
 								RegionManager.buildHeader(function(){
-
-									App.router = new Router();
 
 									require(Addons.getJs('theme','before'),function(){
 										require(['theme/js/functions'],function(){
