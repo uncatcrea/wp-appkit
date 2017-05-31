@@ -676,7 +676,11 @@ class WpakBuild {
             
             if ( self::pwa_pretty_slugs_on( $app_id ) ) {
                 //Add "base" (required to handle pretty slugs with HTML5 pushstate):
-                $base_html = "<base href=\"/". ( !empty(  $app_main_infos['pwa_path'] ) ? trailingslashit( $app_main_infos['pwa_path'] ) :  $app_main_infos['pwa_path'] ) ."\" />\n";
+                $pwa_base_suburl = !empty(  $app_main_infos['pwa_path'] ) ? $app_main_infos['pwa_path'] : '';
+                
+                $pwa_base_suburl = self::add_subdir_prefix( $pwa_base_suburl );
+                
+                $base_html = "<base href=\"/". trailingslashit( ltrim( $pwa_base_suburl, '/' ) )  ."\" />\n";
             }
 		
 			//Add manifest link:
@@ -700,6 +704,19 @@ class WpakBuild {
 
 		return $index_content;
 	}
+    
+    public static function add_subdir_prefix( $slug ) {
+        //Prefix slug with subdirectory if WP is installed in subdirectory:
+        $subdir = parse_url( get_option( 'siteurl' ), PHP_URL_PATH );
+        if ( $subdir && $subdir !== '/' ) {
+            $left_slash = strpos( $slug, '/' ) === 0;
+            $slug = trailingslashit( ltrim( $subdir, '/' ) ) . ltrim( $slug, '/' );
+            if ( $left_slash ) {
+                $slug = '/'. $slug;
+            }
+        }
+        return $slug;
+    }
 	
 	private static function build_pwa_service_worker_cache( $app_id, $content, $webapp_files, $export_type ) {
 		

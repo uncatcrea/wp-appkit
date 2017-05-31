@@ -86,7 +86,8 @@ class WpakConfigFile {
 		$app_platform = empty( $app_platform ) ? 'all' : $app_platform;
         
         $pwa_path = !empty( $app_main_infos['pwa_path'] ) ? trailingslashit( $app_main_infos['pwa_path'] ) : '';
-        $app_path = $app_platform === 'pwa' ? '/'. $pwa_path : '';
+        $pwa_path = WpakBuild::add_subdir_prefix( $pwa_path );
+        $app_path = $app_platform === 'pwa' ? '/'. trailingslashit( ltrim( $pwa_path, '/' ) ) : '';
 
 		$app_version = WpakApps::sanitize_app_version( $app_main_infos['version'] );
 
