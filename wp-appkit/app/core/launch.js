@@ -96,7 +96,7 @@ require(['root/config'],function(Config){
 												require(Addons.getJs('theme','after'),
 													function(){
 														App.sync(
-															function(){
+															function( deferred ){
 																RegionManager.buildMenu(function(){ //Menu items are loaded by App.sync
 
 																	Stats.updateVersion();
@@ -110,6 +110,10 @@ require(['root/config'],function(Config){
 																	}
 
 																	App.launchRouting();
+
+                                                                    if ( deferred ) {
+                                                                        deferred.resolve( { ok: true, message: '', data: {} } );
+                                                                    }
 
 																	App.triggerInfo('app-launched'); //triggers info:app-ready, info:app-first-launch and info:app-version-changed
 
@@ -131,7 +135,7 @@ require(['root/config'],function(Config){
 																	PhoneGap.hideSplashScreen();
 																});
 															},
-															function( error ){
+															function( error, deferred ){
 																Backbone.history.start();
 
 																var error_message = "Error : App could not synchronize with website";
@@ -142,9 +146,13 @@ require(['root/config'],function(Config){
 
 																Utils.log( error_message );
 
-																PhoneGap.hideSplashScreen();
+                                                                if ( deferred ) {
+                                                                    deferred.reject( { ok: false, message: error_message, data: error } );
+                                                                }
 
 																App.triggerInfo('no-content');
+                                                                
+                                                                PhoneGap.hideSplashScreen();
 															},
 															false //true to force refresh local storage at each app launch.
 														);

@@ -684,24 +684,24 @@ define(function (require,exports) {
 	  //--------------------------------------------------------------------------
 	  //App synchronization :
 
-	  app.sync = function(cb_ok,cb_error,force_reload){
+	  app.sync = function( cb_ok, cb_error, force_reload ){
 
 		  var force = force_reload != undefined && force_reload;
-
+          
 		  app.components.fetch({'success': function(components, response, options){
 			  Hooks.doActions( 'components-fetched', [components, response, options] ).done( function() {
 	    		 if( components.length == 0 || force ){
-	    			 syncWebService(cb_ok,cb_error);
+	    			 syncWebService( cb_ok, cb_error );
 	    		 }else{
 	    			 Utils.log('Components retrieved from local storage.',{components:components});
 	    			 app.navigation.fetch({'success': function(navigation, response_nav, options_nav){
 	    	    		 if( navigation.length == 0 ){
-	    	    			 syncWebService(cb_ok,cb_error);
+	    	    			 syncWebService( cb_ok, cb_error );
 	    	    		 }else{
 	    	    			 Utils.log('Menu items retrieved from local storage.',{navigation:navigation});
 	    	    			 globals_keys.fetch({'success': function(global_keys, response_global_keys, options_global_keys){
 	    	    	    		 if( global_keys.length == 0 ){
-	    	    	    			 syncWebService(cb_ok,cb_error);
+	    	    	    			 syncWebService( cb_ok, cb_error );
 	    	    	    		 }else{
 	    	    	    			 var fetch = function(_items,_key){
 	    	    	    				 return _items.fetch({'success': function(fetched_items, response_items, options_items){
@@ -719,7 +719,7 @@ define(function (require,exports) {
 
 	    	    	    			 $.when.apply($, fetches).done(function () {
 	    	    	    				 if( app.globals.length == 0 ){
-		    	    	    				 syncWebService(cb_ok,cb_error);
+		    	    	    				 syncWebService( cb_ok, cb_error );
 		    	    	    			 }else{
 		    	    	    				 Utils.log('Global items retrieved from local storage.',{globals:app.globals});
 		    	    	    				 cb_ok();
@@ -736,8 +736,36 @@ define(function (require,exports) {
 
       };
 
-	  var syncWebService = function(cb_ok,cb_error,force_reload){
-			var token = WsToken.getWebServiceUrlToken( 'synchronization' );
+      /**
+       * Calls synchronization webservice.
+       * Note: cb_ok and cb_error callbacks are given a deferred that they must
+       * resolve so that the refresh:end event is triggered.
+       */
+	  var syncWebService = function( cb_ok, cb_error ){
+			
+            //Set refresh events:
+            
+            //Trigger 'refresh:start' event.
+            //For legacy, this is not an "info" event for now.
+            vent.trigger( 'refresh:start' );
+
+            var sync_deferred = $.Deferred();
+
+            var sync_cb_ok = function() {
+                cb_ok( sync_deferred );
+            };
+
+            var sync_cb_error = function( error_data ) {
+                cb_error( error_data, sync_deferred );
+            };
+
+            //Trigger 'refresh:end' when sync ends
+            sync_deferred.always( function( data ){
+                vent.trigger( 'refresh:end', data );
+            } );
+          
+            //Setup synchronization webservice call:
+            var token = WsToken.getWebServiceUrlToken( 'synchronization' );
 			var ws_url = token + '/synchronization/';
 
 			/**
@@ -829,13 +857,13 @@ define(function (require,exports) {
 								app.triggerError(
 									'synchro:no-component',
 									{ type: 'web-service', where: 'app::syncWebService', message: 'No component found for this App. Please add components to the App on WordPress side.', data: data },
-									cb_error
+									sync_cb_error
 								);
 
 							} else {
 
 								Utils.log( 'Components, menu items and globals retrieved from online.', { components: app.components, navigation: app.navigation, globals: app.globals } );
-								cb_ok();
+								sync_cb_ok();
 
 							}
 
@@ -843,7 +871,7 @@ define(function (require,exports) {
 							app.triggerError(
 								'synchro:wrong-answer',
 								{ type: 'web-service', where: 'app::syncWebService', message: 'Wrong "synchronization" web service answer', data: data },
-								cb_error
+								sync_cb_error
 							);
 						}
 
@@ -851,13 +879,13 @@ define(function (require,exports) {
 						app.triggerError(
 							'synchro:ws-return-error',
 							{ type: 'web-service', where: 'app::syncWebService', message: 'Web service "synchronization" returned an error : [' + data.result.message + ']', data: data },
-							cb_error
+							sync_cb_error
 						);
 					} else {
 						app.triggerError(
 							'synchro:wrong-status',
 							{ type: 'web-service', where: 'app::syncWebService', message: 'Wrong web service answer status', data: data },
-							cb_error
+							sync_cb_error
 						);
 					}
 
@@ -865,7 +893,7 @@ define(function (require,exports) {
 					app.triggerError(
 						'synchro:wrong-format',
 						{ type: 'web-service', where: 'app::syncWebService', message: 'Wrong web service answer format', data: data },
-						cb_error
+						sync_cb_error
 					);
 				}
 
@@ -875,7 +903,7 @@ define(function (require,exports) {
 				app.triggerError(
 					'synchro:ajax',
 					{ type: 'ajax', where: 'app::syncWebService', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } },
-					cb_error
+					sync_cb_error
 				);
 			};
 
