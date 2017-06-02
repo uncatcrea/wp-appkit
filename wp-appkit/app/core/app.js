@@ -18,8 +18,7 @@ define(function (require,exports) {
 		  Stats               = require('core/stats'),
 		  Addons              = require('core/addons-internal'),
 		  WsToken             = require('core/lib/encryption/token'),
-          DeepLink			  = require( 'core/modules/deep-link' ),
-          Router              = require( 'core/router' );
+          DeepLink			  = require( 'core/modules/deep-link' );
 
 	  var app = {};
 
@@ -153,7 +152,7 @@ define(function (require,exports) {
 
 	  //--------------------------------------------------------------------------
 	  //App Backbone router :
-	  app.router = Router.router;
+	  app.router = null; //Set in launch.js for now, to avoid circular dependency
 
       /**
        * Add a screen to history manually from its route, without triggering 
@@ -1839,9 +1838,6 @@ define(function (require,exports) {
 		Utils.log('Network event : offline');
 	};
 
-    /**
-     * Use exports so that Router and App can be required at the same time.
-     */
-	_.extend( exports, app );
+    return app;
 
 });

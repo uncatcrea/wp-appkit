@@ -48,7 +48,7 @@ define(function (require, exports) {
         return route_type;
     };
 
-    var router = Backbone.Router.extend({
+    return Backbone.Router.extend({
 
         routes: {
             "": "default_route",
@@ -420,8 +420,4 @@ define(function (require, exports) {
 
     });
 
-    /**
-     * Use exports so that Router and App can be required at the same time.
-     */
-    exports.router = new router;
 });
