@@ -235,9 +235,13 @@ define(function (require,exports) {
         } else if ( app.getParam( 'use-html5-pushstate' ) && url_pathname.length > 0 && url_pathname.indexOf( Config.app_path ) === 0 ) {
             
             asked_route = url_pathname.replace( Config.app_path, '' );
-            asked_route = Utils.addTrailingSlash( asked_route );
             
-            app.setParam( 'refresh-at-app-launch', false );
+            if ( asked_route.length > 0 ) {
+                asked_route = Utils.addTrailingSlash( asked_route );
+                if ( asked_route !== default_route ) {
+                    app.setParam( 'refresh-at-app-launch', false );
+                }
+            }
         }
         
         //A route was asked by url, that is different from launch route.
