@@ -480,22 +480,26 @@ class WpakApps {
 					</li>
 				</ul>
 			</div>
-			
+
 			<?php $pwa_uri = WpakBuild::get_pwa_directory_uri( $post->ID ); ?>
 			<?php $pwa_installed = WpakBuild::app_pwa_is_installed( $post->ID ); ?>
 			<?php if ( $pwa_installed ): ?>
 				<a href="<?php echo $pwa_uri ?>" target="_blank" class="view-app-pwa button"><?php _e( 'View Progressive Web App', WpAppKit::i18n_domain ) ?></a>
 			<?php endif ?>
-				
+
 			<div id="export-action">
-				
+
 				<?php
-					$pwa_export_types = array( 
+					$pwa_export_types = array(
 						'pwa-install' => !$pwa_installed ? __( 'Install PWA', WpAppKit::i18n_domain ) : __( 'Update PWA sources', WpAppKit::i18n_domain ),
 						'pwa' => __( 'Download PWA sources', WpAppKit::i18n_domain ),
 					);
+
+					if( !self::isSaved( $post ) ) {
+					    unset( $pwa_export_types['pwa-install'] );
+					}
 				?>
-				
+
 				<?php $default_export_type = 'pwa-install'; ?>
 				<select name="export_type" class="wpak_export_type_pwa" >
 					<?php foreach( $pwa_export_types as $export_type => $label ): ?>
@@ -653,6 +657,10 @@ class WpakApps {
 								'pwa-install' => !$pwa_installed ? __( 'Install PWA', WpAppKit::i18n_domain ) : __( 'Update PWA sources', WpAppKit::i18n_domain ),
 								'pwa' => __( 'Download PWA sources', WpAppKit::i18n_domain ),
 							);
+
+							if( !self::isSaved( $post ) ) {
+								unset( $pwa_export_types['pwa-install'] );
+							}
 						?>
 						<?php $default_export_type = 'pwa-install'; ?>
 						<select name="export_type" class="wpak_export_type_pwa" >
@@ -665,17 +673,19 @@ class WpakApps {
 						<div class="wpak_export_pwa_feedback"></div>
 
 					</div>
-					
+
 				</div>
 			</fieldset>
-			<fieldset>
-				<legend><?php _e( 'Paths', WpAppKit::i18n_domain ); ?></legend>
-				<div class="field-group">
-					<label><?php _e( 'Install Progressive Web App to:', WpAppKit::i18n_domain ) ?></label>
-					<br><span><?php echo get_option( 'siteurl' ) .'/'; ?></span>
-					<input type="text" name="wpak_app_pwa_path" value="<?php echo esc_attr( $main_infos['pwa_path'] ) ?>" id="wpak_app_pwa_path" />
-				</div>
-			</fieldset>
+			<?php if( self::isSaved( $post ) ): ?>
+				<fieldset>
+					<legend><?php _e( 'Paths', WpAppKit::i18n_domain ); ?></legend>
+						<div class="field-group">
+						<label><?php _e( 'Install Progressive Web App to:', WpAppKit::i18n_domain ) ?></label>
+						<br><span><?php echo get_option( 'siteurl' ) .'/'; ?></span>
+						<input type="text" name="wpak_app_pwa_path" value="<?php echo esc_attr( $main_infos['pwa_path'] ) ?>" id="wpak_app_pwa_path" />
+					</div>
+				</fieldset>
+			<?php endif; ?>
 			<fieldset>
 				<legend><?php _e( 'Manifest', WpAppKit::i18n_domain ); ?></legend>
 				<div class="field-group">
@@ -1250,6 +1260,17 @@ class WpakApps {
 		}
 
 		return $drive . DIRECTORY_SEPARATOR . implode( DIRECTORY_SEPARATOR, $stack );
+	}
+
+	/**
+	 * @param int|WP_Post $post
+	 *
+	 * @return bool
+	 */
+	public static function isSaved( $post ) {
+		$post = get_post( $post );
+
+		return in_array( $post->post_status, array( 'publish', 'future', 'private' ) ) && 0 != $post->ID;
 	}
 
 }

@@ -227,19 +227,25 @@ class WpakBuild {
 		if ( !check_admin_referer( 'wpak_build_app_sources_' . $app_id, 'nonce' ) ) {
 			return;
 		}
-		
+
 		$export_type = isset( $_POST['export_type'] ) ? addslashes( $_POST['export_type'] ) : 'phonegap-build';
-		
+
 		$answer = self::build_app_sources( $app_id, $export_type );
-		
+
 		if ( $answer['ok'] === 1 && $export_type === 'pwa-install' ) {
-			
+
+			if( !WpakApps::isSaved( $app_id ) ) {
+				$answer['ok'] = 0;
+				$answer['msg'] = __( 'Please save the application project before installing PWA.', WpAppKit::i18n_domain );
+				self::exit_sending_json( $answer );
+			}
+
 			$answer['export_uri'] = self::get_pwa_directory_uri( $app_id );
 
 			//Extract sources to Progressive Web App folder:
-			
+
 			$zip_file = $answer['export_full_name'];
-			
+
 			$target_directory = self::get_pwa_directory( $app_id );
 			$check = self::check_pwa_directory( $target_directory );
 			if ( ! $check['ok'] ) {
