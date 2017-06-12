@@ -298,7 +298,6 @@ class WpakApps {
 	}
 
 	public static function inner_publish_box( $post, $current_box ) {
-		$first_save = !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID;
 		?>
 		<div class="submitbox" id="submitpost">
 			<div style="display:none;">
@@ -352,7 +351,7 @@ class WpakApps {
 				<div id="publishing-action">
 					<span class="spinner"></span>
 					<?php
-					if ( $first_save ) { ?>
+					if ( !self::isSaved( $post ) ) { ?>
 						<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( 'Publish' ) ?>" />
 						<?php submit_button( __( 'Save' ), 'primary button-large', 'publish', false, array( 'accesskey' => 'p' ) );
 					} else { ?>
@@ -368,15 +367,13 @@ class WpakApps {
 	}
 
 	public static function inner_project_box( $post, $current_box ) {
-		$first_save = !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID;
-		$main_infos = self::get_app_main_infos( $post->ID );
 		$components = WpakComponents::get_app_components( $post->ID );
 		$navigation = WpakNavigation::get_app_navigation( $post->ID );
 		$checked = array(
 			'title' => !empty( $post->post_title ),
 			'components' => !empty( $components ),
 			'navigation' => !empty( $navigation ),
-			'save' => !$first_save,
+			'save' => self::isSaved( $post ),
 		);
 		?>
 
