@@ -26,10 +26,14 @@ define( function( require ) {
 	};
 	
     utils.addTrailingSlash = function( url ) {
-        if ( url.substr(-1) !== '/') {
+        if ( url.substr(-1) !== '/' ) {
             url += '/';
         }
         return url;
+    };
+	
+	utils.removeTrailingSlash = function( url ) {
+        return url.replace( /\/$/, "" );
     };
     
     utils.isInternalUrl = function( url ) {
@@ -41,23 +45,25 @@ define( function( require ) {
     };
     
     /**
-     * Extracts route (ie single/posts/123) from full url path (ie my/app-/path/single/posts/123)
+     * Extracts route (ie single/posts/123/) from full url path (ie my/app-/path/single/posts/123/)
      */
-    utils.extractRootFromUrlPath = function( url_path ) {
-        var fragment = '';
+    utils.extractRouteFromUrlPath = function( url_path ) {
+        var route = '';
         
         if ( Config.app_path.length > 0 ) {
-            
+            //App installed in sub directory:
+			
             if ( url_path.indexOf( '/' ) === 0 ) { 
                 //url_path starts with slash: remove it because fragments and 
                 //app_path have no starting slash:
                 url_path = url_path.replace( /^\/+/, '' );
             } 
             
+			//Strip Config.app_path from url:
             if ( url_path.indexOf( Config.app_path ) === 0 ) { 
-                fragment = url_path.replace( Config.app_path, '' );
+                route = url_path.replace( Config.app_path, '' );
             } else {
-                fragment = url_path;
+                route = url_path;
             }
             
         } else {
@@ -65,14 +71,14 @@ define( function( require ) {
             //App installed at domain's root
             if ( url_path.indexOf( '/' ) === 0 ) { 
                 //url_path starts with slash: simply remove it
-                fragment = url_path.replace( /^\/+/, '' );
+                route = url_path.replace( /^\/+/, '' );
             } else {
-                fragment = url_path;
+                route = url_path;
             }
             
         }
         
-        return fragment;
+        return route;
     }
     
 	utils.getAjaxErrorType = function( jqXHR, textStatus, errorThrown ) {

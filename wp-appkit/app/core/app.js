@@ -103,10 +103,12 @@ define(function (require,exports) {
 	  };
 
 	  app.addCustomRoute = function( fragment, template, data ) {
+		  fragment = Utils.removeTrailingSlash( fragment );
 		  custom_routes[fragment] = { template: template, data: data };
 	  };
 
 	  app.removeCustomRoute = function( fragment ) {
+		  fragment = Utils.removeTrailingSlash( fragment );
 		  if( custom_routes.hasOwnProperty(fragment) ) {
 			  delete custom_routes[fragment];
 		  }
@@ -114,6 +116,7 @@ define(function (require,exports) {
 
 	  app.getCustomRoute = function( fragment ) {
 		  var route = {};
+		  fragment = Utils.removeTrailingSlash( fragment );
 		  if( custom_routes.hasOwnProperty(fragment) ) {
 			  route = custom_routes[fragment];
 		  }

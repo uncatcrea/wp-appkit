@@ -84,7 +84,7 @@ define(function (require) {
 
 			if ( Utils.isInternalUrl( href ) && href !== '#' ) {
 				e.preventDefault();
-                var route = Utils.extractRootFromUrlPath( href );
+                var route = Utils.extractRouteFromUrlPath( href );
 				App.router.navigate( route, { trigger: true } );
 			}
 
