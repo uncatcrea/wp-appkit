@@ -224,24 +224,6 @@ class WpakApps {
 			'side',
 			'high'
 		);
-		
-		add_meta_box(
-			'wpak_app_export_phonegap_build',
-			__( 'Export - PhoneGap Build', WpAppKit::i18n_domain ),
-			array( __CLASS__, 'inner_export_phonegap_build' ),
-			'wpak_apps',
-			'side',
-			'high'
-		);
-		
-		add_meta_box(
-			'wpak_app_export_pwa',
-			__( 'Export - Progressive Web App', WpAppKit::i18n_domain ),
-			array( __CLASS__, 'inner_export_pwa' ),
-			'wpak_apps',
-			'side',
-			'high'
-		);
 
 		add_meta_box(
 			'wpak_app_main_infos',
@@ -374,7 +356,35 @@ class WpakApps {
 			'components' => !empty( $components ),
 			'navigation' => !empty( $navigation ),
 			'save' => self::isSaved( $post ),
+			'phonegap' => true,
+			'pwa' => true,
 		);
+
+		// Update phonegap checked value thanks to mandatory fields
+		$main_infos = self::get_app_main_infos( $post->ID );
+		$mandatory = self::get_phonegap_mandatory_fields();
+
+		foreach( $mandatory as $key ) {
+			if( '' === $main_infos[$key] ) {
+				$checked['phonegap'] = false;
+				break;
+			}
+		}
+
+		// PWA related things
+		$pwa_uri = WpakBuild::get_pwa_directory_uri( $post->ID );
+		$pwa_installed = WpakBuild::app_pwa_is_installed( $post->ID );
+
+		$pwa_export_types = array(
+			'pwa-install' => !$pwa_installed ? __( 'Install PWA', WpAppKit::i18n_domain ) : __( 'Update PWA sources', WpAppKit::i18n_domain ),
+			'pwa' => __( 'Download PWA sources', WpAppKit::i18n_domain ),
+		);
+
+		if( !self::isSaved( $post ) ) {
+			unset( $pwa_export_types['pwa-install'] );
+		}
+
+		$default_export_type = 'pwa-install';
 		?>
 
 		<div class="submitbox">
@@ -396,119 +406,56 @@ class WpakApps {
 						<span class="glyphicon glyphicon-<?php echo $checked['save'] ? 'check' : 'unchecked'; ?>"></span>
 						<?php _e( 'Save your app', WpAppKit::i18n_domain ); ?>
 					</li>
+                    <li id="wpak_app_wizard_phonegap" class="list-group-item platform-specific android ios <?php echo $checked['phonegap'] ? 'list-group-item-success' : ''; ?>">
+                        <span class="glyphicon glyphicon-<?php echo $checked['phonegap'] ? 'check' : 'unchecked'; ?>"></span>
+			    <?php _e( 'Setup PhoneGap config', WpAppKit::i18n_domain ); ?>
+                    </li>
+                    <li id="wpak_app_wizard_pwa" class="list-group-item platform-specific pwa <?php echo $checked['pwa'] ? 'list-group-item-success' : ''; ?>">
+                        <span class="glyphicon glyphicon-<?php echo $checked['pwa'] ? 'check' : 'unchecked'; ?>"></span>
+			    <?php _e( 'Setup Progressive Web App config', WpAppKit::i18n_domain ); ?>
+                    </li>
 				</ul>
 			</div>
+
+            <div class="export-action platform-specific android ios">
+                <?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ); ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+
+                <?php
+                /*
+                     * 2016-03-05: Export type select commented for now as we have to stabilize export features other
+                     * than PhoneGap Build before releasing it.
+                     * Was added in https://github.com/uncatcrea/wp-appkit/commit/ac4af270f8ea6273f4d653878c69fceec85a9dd8 along with
+                     * the corresponding JS in apps.js.
+                     *
+                    <?php $default_export_type = 'phonegap-build'; ?>
+                    <select name="export_type" id="wpak_export_type" >
+                        <?php foreach( WpakBuild::get_allowed_export_types() as $export_type => $label ): ?>
+                        <option value="<?php echo esc_attr( $export_type ) ?>" <?php selected( $export_type === $default_export_type )?>><?php echo esc_html( $label ) ?></option>
+                        <?php endforeach ?>
+                    </select>
+                    <a id="wpak_export_link" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => $default_export_type ) ), 'wpak_download_app_sources' ) ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+                    */
+                ?>
+            </div>
+
+            <?php if ( $pwa_installed ): ?>
+                <a href="<?php echo $pwa_uri ?>" target="_blank" class="view-app-pwa button platform-specific pwa"><?php _e( 'View Progressive Web App', WpAppKit::i18n_domain ) ?></a>
+            <?php endif ?>
+
+            <div class="export-action platform-specific pwa">
+                <select name="export_type" class="wpak_export_type_pwa" >
+                <?php foreach( $pwa_export_types as $export_type => $label ): ?>
+                    <option value="<?php echo esc_attr( $export_type ) ?>" <?php selected( $export_type === $default_export_type )?>><?php echo esc_html( $label ) ?></option>
+                <?php endforeach ?>
+                </select>
+                <a class="wpak_export_link_pwa button" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => 'pwa' ) ), 'wpak_download_app_sources' ) ?>" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+
+                <div class="wpak_export_pwa_feedback"></div>
+
+            </div>
 
 		</div>
 
-		<?php
-	}
-	
-	public static function inner_export_phonegap_build( $post, $current_box ) {
-		
-		$main_infos = self::get_app_main_infos( $post->ID );
-		$mandatory = self::get_phonegap_mandatory_fields();
-		$checked = array(
-			'phonegap' => true,
-		);
-
-		foreach( $mandatory as $key ) {
-			if( '' === $main_infos[$key] ) {
-				$checked['phonegap'] = false;
-				break;
-			}
-		}
-		
-		?>
-			
-		<div class="submitbox">
-			
-			<div>
-				<ul class="list-group">
-					<li id="wpak_app_wizard_phonegap" class="list-group-item <?php echo $checked['phonegap'] ? 'list-group-item-success' : ''; ?>">
-						<span class="glyphicon glyphicon-<?php echo $checked['phonegap'] ? 'check' : 'unchecked'; ?>"></span>
-						<?php _e( 'Setup PhoneGap config', WpAppKit::i18n_domain ); ?>
-					</li>
-				</ul>
-			</div>
-
-			<div id="export-action">
-
-				<?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ); ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
-
-				<?php
-				/*
-				 * 2016-03-05: Export type select commented for now as we have to stabilize export features other
-				 * than PhoneGap Build before releasing it.
-				 * Was added in https://github.com/uncatcrea/wp-appkit/commit/ac4af270f8ea6273f4d653878c69fceec85a9dd8 along with
-				 * the corresponding JS in apps.js.
-				 *
-				<?php $default_export_type = 'phonegap-build'; ?>
-				<select name="export_type" id="wpak_export_type" >
-					<?php foreach( WpakBuild::get_allowed_export_types() as $export_type => $label ): ?>
-					<option value="<?php echo esc_attr( $export_type ) ?>" <?php selected( $export_type === $default_export_type )?>><?php echo esc_html( $label ) ?></option>
-					<?php endforeach ?>
-				</select>
-				<a id="wpak_export_link" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => $default_export_type ) ), 'wpak_download_app_sources' ) ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
-				*/
-				?>
-
-			</div>
-			
-		</div>
-			
-		<?php
-	}
-	
-	public static function inner_export_pwa( $post, $current_box ) {
-		
-		$main_infos = self::get_app_main_infos( $post->ID );
-		$checked = array(
-			'pwa' => true,
-		);
-		
-		?>
-			
-			<div>
-				<ul class="list-group">
-					<li id="wpak_app_wizard_phonegap" class="list-group-item <?php echo $checked['pwa'] ? 'list-group-item-success' : ''; ?>">
-						<span class="glyphicon glyphicon-<?php echo $checked['pwa'] ? 'check' : 'unchecked'; ?>"></span>
-						<?php _e( 'Setup Progressive Web App config', WpAppKit::i18n_domain ); ?>
-					</li>
-				</ul>
-			</div>
-
-			<?php $pwa_uri = WpakBuild::get_pwa_directory_uri( $post->ID ); ?>
-			<?php $pwa_installed = WpakBuild::app_pwa_is_installed( $post->ID ); ?>
-			<?php if ( $pwa_installed ): ?>
-				<a href="<?php echo $pwa_uri ?>" target="_blank" class="view-app-pwa button"><?php _e( 'View Progressive Web App', WpAppKit::i18n_domain ) ?></a>
-			<?php endif ?>
-
-			<div id="export-action">
-
-				<?php
-					$pwa_export_types = array(
-						'pwa-install' => !$pwa_installed ? __( 'Install PWA', WpAppKit::i18n_domain ) : __( 'Update PWA sources', WpAppKit::i18n_domain ),
-						'pwa' => __( 'Download PWA sources', WpAppKit::i18n_domain ),
-					);
-
-					if( !self::isSaved( $post ) ) {
-					    unset( $pwa_export_types['pwa-install'] );
-					}
-				?>
-
-				<?php $default_export_type = 'pwa-install'; ?>
-				<select name="export_type" class="wpak_export_type_pwa" >
-					<?php foreach( $pwa_export_types as $export_type => $label ): ?>
-						<option value="<?php echo esc_attr( $export_type ) ?>" <?php selected( $export_type === $default_export_type )?>><?php echo esc_html( $label ) ?></option>
-					<?php endforeach ?>
-				</select>
-				<a class="wpak_export_link_pwa button" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => 'pwa' ) ), 'wpak_download_app_sources' ) ?>" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
-
-				<div class="wpak_export_pwa_feedback"></div>
-				
-			</div>
-			
 		<?php
 	}
 

@@ -14,7 +14,7 @@
     border-top: 1px solid #ddd;
 }
 
-#export-action {
+.export-action {
     text-align:right;
     padding:0 12px 12px 0;
     line-height:28px;
@@ -29,7 +29,7 @@
     vertical-align:middle;
 }
 
-#wpak_app_export_pwa .inside .view-app-pwa {
+#wpak_app_project .inside .view-app-pwa {
 	text-align: center;
     padding: 0;
     margin: 0 15px 15px;
