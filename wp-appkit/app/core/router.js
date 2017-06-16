@@ -79,7 +79,16 @@ define(function (require, exports) {
 		},
 
         default_route: function(){
-        	this.navigate(default_route, {trigger: true});
+        	//this.navigate(default_route, {trigger: true});
+            
+            var fragment = Backbone.history.getFragment( default_route );
+            var route_handler = _.find( Backbone.history.handlers, function( handler ) {
+                return handler.route.test( fragment );
+            });
+            
+            this.execute( route_handler.callback, [fragment], '' );
+            
+            this.navigate( '/', { trigger: false } );
         },
         
         component: function ( component_id ) {
