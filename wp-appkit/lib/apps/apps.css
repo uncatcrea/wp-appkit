@@ -1122,8 +1122,13 @@ a.list-group-item-danger.active:focus {
 .wpak-pwa-icons {
     padding:5px 0 0 5px;
 }
-.wpak-pwa-icons-list {
-    padding-top:5px;
+.wpak-pwa-icons span {
+    min-width:40px;
+    display:inline-block;
+    margin:auto;
+    text-align:center;
+    font-style:italic;
+    font-size:0.85em;
 }
 .wpak-pwa-icons-text {
     margin-bottom:3px;

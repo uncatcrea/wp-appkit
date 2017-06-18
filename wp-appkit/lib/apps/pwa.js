@@ -42,11 +42,15 @@ jQuery().ready( function () {
 			if( typeof response.icons !== "undefined" && response.icons.length ) {
 				html = $( '<div>' ).addClass( 'wpak-pwa-icons-text' ).html( wpak_pwa_export.messages.pwa_icons_detected );
 				$.each( response.icons, function( i, icon ) {
-					html = html.add( $( '<img />' )
+					var $img = $( '<img />' )
 						.addClass( 'wpak-pwa-icon' )
 						.attr( 'width', icon.width )
 						.attr( 'height', icon.height )
-						.attr( 'src', icon.url ));
+						.attr( 'src', icon.url );
+					html = html.add( $( '<span></span>' )
+						.append( $img )
+						.append( '<br/>' + icon.width + 'x' + icon.height )
+					);
 				});
 			}
 			else {
