@@ -737,6 +737,8 @@ class WpakThemes {
 	    $icons_dir = self::get_themes_directory() . '/' . $theme_slug . '/icons/';
 	    $files = glob( $icons_dir . '*.png' );
 	    $icons = array();
+	    $widths = array(); // Used for sorting
+	    $heights = array(); // Used for sorting
 	    foreach( $files as $file ) {
 	        $filename = basename( $file );
 	        $size = self::get_pwa_icon_size( $filename );
@@ -751,7 +753,11 @@ class WpakThemes {
 	            'url' => self::get_themes_directory_uri() . '/' . $theme_slug . '/icons/' . $filename,
 	            'size' => $size,
 	        );
+	        $widths[] = $size[0];
+	        $heights[] = $size[1];
 	    }
+
+	    array_multisort( $heights, SORT_ASC, $widths, SORT_ASC, $icons );
 
 	    return $icons;
 	}
