@@ -81,16 +81,9 @@ define(function (require, exports) {
         default_route: function(){
         	//this.navigate(default_route, {trigger: true});
             
-            var fragment = Backbone.history.getFragment( default_route );
-            var route_handler = _.find( Backbone.history.handlers, function( handler ) {
-                return handler.route.test( fragment );
-            });
-            
-            this.execute( route_handler.callback, [fragment], '' );
-            
-            this.navigate( '/', { trigger: false } );
+            this.execute_route_silently( default_route );
         },
-        
+		
         component: function ( component_id ) {
         	var _this = this;
 			route_asked = 'component-'+ component_id;
@@ -260,7 +253,7 @@ define(function (require, exports) {
             var custom_route = App.getCustomRoute(fragment);
             if( !_.isEmpty(custom_route) ){
                 fragment_not_found = '';
-                App.showCustomPage(custom_route.template,custom_route.data,fragment);
+                App.showCustomPage(custom_route.template,custom_route.data,fragment,true);
             }
 
             if( fragment_not_found.length ){
@@ -425,7 +418,28 @@ define(function (require, exports) {
             }
             
             return route_data;
-        }
+        },
+		
+		/**
+		 * Execute router's method corresponding to the given route without 
+		 * changing current url or fragment.
+		 * Used for default route and custom routes.
+		 */
+		execute_route_silently: function( route ) {
+			
+			var fragment = Backbone.history.getFragment( route );
+            var route_handler = _.find( Backbone.history.handlers, function( handler ) {
+                return handler.route.test( fragment );
+            });
+            
+			if ( route_handler !== undefined ) {
+				this.execute( route_handler.callback, [fragment], '' );
+				this.navigate( '/', { trigger: false } );
+			} else {
+				Utils.log( 'Router.js error: execute_route_silently: route not found.' );
+			}
+			
+		}
 
     });
 
