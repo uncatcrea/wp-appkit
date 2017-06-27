@@ -75,6 +75,13 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			if( is_multisite() ) {
 				WpakServerRewrite::prepend_wp_network_wpak_rules_to_htaccess();
 			}
+			
+			//If WP-AppKit custom user role was activated before deactivating 
+			//the plugin, reactivate it:
+			$settings = WpakSettings::get_settings();
+			if ( $settings['activate_wp_appkit_editor_role'] ) {
+				WpakUserPermissions::create_wp_appkit_user_role();
+			}
 		}
 
 		public static function on_deactivation( $network_wide ) {
@@ -94,6 +101,9 @@ if ( !class_exists( 'WpAppKit' ) ) {
 				WpakServerRewrite::delete_wp_network_wpak_rules_from_htaccess();
 			}
 
+			//Remove WP-AppKit custom user role on deactivation (if it was 
+			//activated in settings panel):
+			WpakUserPermissions::remove_wp_appkit_user_role();
 		}
 
 		public static function init() {
