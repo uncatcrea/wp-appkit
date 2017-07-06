@@ -420,6 +420,13 @@ class WpakApps {
 					<input type="text" name="wpak_app_version_code" value="<?php echo esc_attr( $main_infos['version_code'] ) ?>" id="wpak_app_version_code" />
 				</div>
 				<div class="field-group platform-specific android">
+					<label><?php _e( 'Target Architecture (Android only)', WpAppKit::i18n_domain ) ?></label><br>
+					<select name="wpak_app_target_architecture">
+						<option value="arm" <?php selected( $main_infos['target_architecture'], 'gradle' ) ?>><?php echo esc_html( __( 'ARM' ), WpAppKit::i18n_domain ) ?></option>
+						<option value="x86" <?php selected( $main_infos['target_architecture'], 'x86' ) ?>><?php echo esc_html( __( 'x86' ), WpAppKit::i18n_domain ) ?></option>
+					</select>
+				</div>
+				<div class="field-group platform-specific android">
 					<label><?php _e( 'Build Tool (Android only)', WpAppKit::i18n_domain ) ?></label><br>
 					<select name="wpak_app_build_tool">
 						<option value="gradle" <?php selected( $main_infos['build_tool'], 'gradle' ) ?>><?php echo esc_html( __( 'Gradle' ), WpAppKit::i18n_domain ) ?></option>
@@ -536,6 +543,10 @@ class WpakApps {
 
 		if ( isset( $_POST['wpak_app_version_code'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_version_code', sanitize_text_field( $_POST['wpak_app_version_code'] ) );
+		}
+		
+		if ( isset( $_POST['wpak_app_target_architecture'] ) ) {
+			update_post_meta( $post_id, '_wpak_app_target_architecture', sanitize_text_field( $_POST['wpak_app_target_architecture'] ) );
 		}
 
 		if ( isset( $_POST['wpak_app_build_tool'] ) ) {
@@ -704,9 +715,12 @@ class WpakApps {
 		$use_default_icons_and_splash = get_post_meta( $post_id, '_wpak_use_default_icons_and_splash', true );
 		$use_default_icons_and_splash = ( empty( $use_default_icons_and_splash ) && empty( $icons ) ) || $use_default_icons_and_splash === 'on';
 
+		$target_architecture = get_post_meta( $post_id, '_wpak_app_target_architecture', true );
+		$target_architecture = empty( $target_architecture ) ? 'arm' : $target_architecture; //Set amd as default Android build type
+
 		$build_tool = get_post_meta( $post_id, '_wpak_app_build_tool', true );
 		$build_tool = empty( $build_tool ) ? 'gradle' : $build_tool; //Set gradle as default Android build tool
-
+		
 		$phonegap_plugins = '';
 		if ( metadata_exists( 'post', $post_id, '_wpak_app_phonegap_plugins' ) ) {
 			$phonegap_plugins = get_post_meta( $post_id, '_wpak_app_phonegap_plugins', true );
@@ -718,6 +732,7 @@ class WpakApps {
 			'desc' => $desc,
 			'version' => $version,
 			'version_code' => $version_code,
+			'target_architecture' => $target_architecture,
 			'build_tool' => $build_tool,
 			'phonegap_version' => $phonegap_version,
 			'platform' => !empty( $platform ) ? $platform : '',
@@ -793,6 +808,12 @@ class WpakApps {
 			// Drawbacks are the app's weight and memory footprint that are higher than without the plugin.
 			// Currently we include stable version 2.3.0 which is the one supported by the current version of PhoneGap Build (v6.50):
 			$default_plugins['cordova-plugin-crosswalk-webview'] = array( 'spec' => '2.3.0', 'source' => 'npm' );
+			
+			//Add "cordova-build-architecture" plugin
+			//https://github.com/MBuchalik/cordova-build-architecture
+			//This is to allow to choose between ARM/x86 compilation, as both ARM and x86 APK are needed to release apps on PlayStore.
+			//See https://github.com/uncatcrea/wp-appkit/issues/275 and https://github.com/uncatcrea/wp-appkit/issues/322
+			$default_plugins['cordova-build-architecture'] = array( 'spec' => 'https://github.com/MBuchalik/cordova-build-architecture.git#v1.0.1', 'source' => 'git' );
 		}
 
 		// Activate Deep Linking if a Custom URL Scheme is present

@@ -415,6 +415,7 @@ define( function ( require ) {
 		$app_phonegap_id = $app_main_infos['app_phonegap_id'];
 		$app_version = $app_main_infos['version'];
 		$app_version_code = $app_main_infos['version_code'];
+		$app_target_architecture = $app_main_infos['target_architecture'];
 		$app_build_tool = $app_main_infos['build_tool'];
 		$app_phonegap_version = $app_main_infos['phonegap_version'];
 		$app_author = $app_main_infos['author'];
@@ -452,6 +453,12 @@ define( function ( require ) {
 	<author href="<?php echo esc_url( $app_author_website ) ?>" email="<?php echo esc_attr( $app_author_email ) ?>"><?php echo ent2ncr( htmlentities( $app_author, ENT_QUOTES, 'UTF-8', false ) ); ?></author>
 
 	<gap:platform name="<?php echo esc_attr( $app_platform ); ?>" />
+	
+	<!-- General preferences -->
+<?php if( !empty( $app_target_architecture ) && $app_platform == 'android' ): ?>
+	<preference name="buildArchitecture" value="<?php echo esc_attr( $app_target_architecture ); ?>" />
+	<preference name="xwalkMultipleApk" value="true" />
+<?php endif ?>
 <?php if( !empty( $app_build_tool ) && $app_platform == 'android' ): ?>
 	<preference name="android-build-tool" value="<?php echo esc_attr( $app_build_tool ); ?>" />
 <?php endif ?>
