@@ -86,9 +86,6 @@ RewriteRule ^ - [L]
 RewriteRule ^$prefix.*/wp-appkit/app/config.(js|xml) index.php [L]
 RewriteRule ^$prefix.*/wp-appkit/app/themes/.* index.php [L]
 RewriteRule ^$prefix.*/wp-appkit/app/addons/.* index.php [L]
-RewriteRule ^$prefix.*/wp-appkit/app/vendor/jquery.js /". WPINC ."/js/jquery/jquery.js [L]
-RewriteRule ^$prefix.*/wp-appkit/app/vendor/underscore.js /". WPINC ."/js/underscore.min.js [L]
-RewriteRule ^$prefix.*/wp-appkit/app/vendor/backbone.js /". WPINC ."/js/backbone.min.js [L]
 </IfModule>
 # END WP-AppKit Rules\n\n";
 			

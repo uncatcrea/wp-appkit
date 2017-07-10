@@ -3,7 +3,7 @@
 Plugin Name: WP-AppKit
 Plugin URI:  https://github.com/uncatcrea/wp-appkit
 Description: Build Phonegap Mobile apps based on your WordPress content.
-Version:     1.0.2
+Version:     1.0.9
 Author:      Uncategorized Creations
 Author URI:  http://getwpappkit.com
 Text Domain: wp-appkit
@@ -121,7 +121,6 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			WpakWebServices::add_rewrite_tags_and_rules();
 			WpakConfigFile::rewrite_rules();
 			WpakThemes::rewrite_rules();
-			WpakWpCoreJsFiles::rewrite_rules();
 		}
 
 		/**
@@ -168,6 +167,10 @@ if ( !class_exists( 'WpAppKit' ) ) {
 				self::upgrade_100();
 			}
 			
+			if( version_compare( $db_version, '1.0.9', '<' ) ) { //TODO: set 1.1 here when releasing 1.1
+				self::upgrade_110();
+			}
+			
 			if ( !version_compare( $plugin_file_version, $db_version, '=' ) ) {
 				//Update db version not to run update scripts again and so that
 				//db version is up to date:
@@ -207,7 +210,22 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			//in case something goes wrong in next upgrade routines:
 			update_option( 'wpak_version', '1.0' );
 		}
-
+		
+		/**
+		 * Execute changes made in WP-AppKit 1.1
+		 */
+		protected static function upgrade_110() {
+			//New rewrite rules to take into account new management of WP core's assets
+			self::add_rewrite_rules();
+			flush_rewrite_rules();
+			if( is_multisite() ) {
+				WpakServerRewrite::prepend_wp_network_wpak_rules_to_htaccess();
+			}
+			//Memorize we've gone that far successfully, to not re-run this routine 
+			//in case something goes wrong in next upgrade routines:
+			update_option( 'wpak_version', '1.0.9' ); //TODO: set 1.1 here when releasing 1.1
+		}
+		
 		/**
 		 * If permalinks are not activated, send an admin notice
 		 */
