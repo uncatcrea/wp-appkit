@@ -27,11 +27,14 @@ class WpakToken {
 	public static function get_hash_key() {
 		$hash_key = '';
 		
-		//WPPH_AUTH_KEY can be defined in wp-config.php
-		if ( defined( 'WPPH_AUTH_KEY' ) ) {
-			$hash_key = WPPH_AUTH_KEY;
+		//WPAK_HASH_KEY can be defined in wp-config.php
+		if ( defined( 'WPAK_HASH_KEY' ) ) {
+			$hash_key = WPAK_HASH_KEY;
 		} else {
-			$hash_key = AUTH_KEY;
+			$hash_key = get_option( 'wpak_hash_key' );
+			if ( empty( $hash_key ) ) {
+				$hash_key = wp_generate_password( 64, true, true );
+			}
 		}
 
 		$hash_key = apply_filters( 'wpak_hash_key', $hash_key );
