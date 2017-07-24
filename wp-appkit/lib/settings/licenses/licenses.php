@@ -59,8 +59,8 @@ class WpakLicenses {
                 <p>
                     <?php
                         echo sprintf(
-                            __( 'Enter your support, addon or theme license keys here to receive support and updates for purchased items. If your license key has expired, please <a href="%s" target="_blank">renew your license (TODO)</a>.', WpAppKit::i18n_domain ),
-                            'http://docs.easydigitaldownloads.com/article/1000-license-renewal' //TODO
+                            __( 'Enter your support, addon or theme license keys here to receive support and updates for purchased items. If your license key has expired, please <a href="%s" target="_blank">renew your license</a>.', WpAppKit::i18n_domain ),
+                            WpakConfig::license_renewal_url
                         );
                     ?>
                 </p>

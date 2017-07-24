@@ -5,5 +5,6 @@ class WpakConfig {
     const support_url = 'https://uncategorized-creations.com/contact-us/';
     const my_account_url = 'https://uncategorized-creations.com/my-account/';
     const checkout_url = 'https://uncategorized-creations.com/checkout/';
+	const license_renewal_url = 'https://uncategorized-creations.com/pro-support-license-renewal/';
 }
 
