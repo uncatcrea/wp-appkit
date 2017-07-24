@@ -18,7 +18,7 @@ class WpakThemes {
 
 		'q-ios' => array(
 			'name' => 'Q for iOS',
-			'version' => '1.0.4',
+			'version' => '1.0.5',
 		),
 
 		'q-android' => array(
