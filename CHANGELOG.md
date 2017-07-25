@@ -1,3 +1,18 @@
+## 1.1 (2017-07-26)
+
+### License Management 
+- **Pro Support license keys can now be registered directly from WP-AppKit settings panel**
+
+### Default themes update
+- **Embed last version (1.0.5) of [Q for iOS](https://github.com/uncatcrea/q-ios/releases/tag/v1.0.5) and [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.0.5) default app themes**
+
+### Bugfixes
+- **Add x86/ARM compilation choice in PhoneGap Build export settings** ([#275](https://github.com/uncatcrea/wp-appkit/issues/275), [@mleroi](https://github.com/mleroi))
+- **Theme error when empty post content** ([#321](https://github.com/uncatcrea/wp-appkit/issues/321), [@mleroi](https://github.com/mleroi))
+- **Custom WP-AppKit user role stays even after deactivation** ([#320](https://github.com/uncatcrea/wp-appkit/issues/320), [@mleroi](https://github.com/mleroi))
+- **getCurrentScreenObject() error on some custom screens** ([#273](https://github.com/uncatcrea/wp-appkit/issues/273), [@mleroi](https://github.com/mleroi))
+- **Wrong routing initialization when no network at first app launch** ([#323](https://github.com/uncatcrea/wp-appkit/issues/323), [@mleroi](https://github.com/mleroi))
+
 ## 1.0.2 (2017-05-05)
 
 - Bugfix: User authentication fails randomly ([#303](https://github.com/uncatcrea/wp-appkit/issues/303), [@mleroi](https://github.com/mleroi))
