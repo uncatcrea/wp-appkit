@@ -978,8 +978,8 @@ define( function( require, exports ) {
 				screen_object = {
 					id: screen_data.item_id,
 					route: screen_data.item_id,
-					title: current_view.custom_page_data.hasOwnProperty( 'title' ) ? current_view.custom_page_data.title : '',
-					data: current_view.custom_page_data,
+					title: current_view.custom_page_data && current_view.custom_page_data.hasOwnProperty( 'title' ) ? current_view.custom_page_data.title : '',
+					data: current_view.custom_page_data ? current_view.custom_page_data : {},
 					template: current_view.template_name
 				};
 				break;
