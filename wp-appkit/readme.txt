@@ -113,6 +113,24 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
 
+= 1.1 (2017-07-26) =
+
+*License Management*
+
+* Pro Support license keys can now be registered directly from WP-AppKit settings panel
+
+*Default themes update*
+
+* Embed last version (1.0.5) of [Q for iOS](https://github.com/uncatcrea/q-ios/releases/tag/v1.0.5) and [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.0.5) default app themes
+
+*Bugfixes*
+
+* Add x86/ARM compilation choice in PhoneGap Build export settings
+* Theme error when empty post content
+* Custom WP-AppKit user role stays even after deactivation
+* getCurrentScreenObject() error on some custom screens
+* Wrong routing initialization when no network at first app launch
+
 = 1.0.2 (2017-05-05) = 
 
 * Bugfix: User authentication fails randomly
