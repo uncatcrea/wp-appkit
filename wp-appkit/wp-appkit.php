@@ -3,7 +3,7 @@
 Plugin Name: WP-AppKit
 Plugin URI:  https://github.com/uncatcrea/wp-appkit
 Description: Build Phonegap Mobile apps based on your WordPress content.
-Version:     1.0.9
+Version:     1.1
 Author:      Uncategorized Creations
 Author URI:  http://getwpappkit.com
 Text Domain: wp-appkit
@@ -167,7 +167,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 				self::upgrade_100();
 			}
 			
-			if( version_compare( $db_version, '1.0.9', '<' ) ) { //TODO: set 1.1 here when releasing 1.1
+			if( version_compare( $db_version, '1.1', '<' ) ) {
 				self::upgrade_110();
 			}
 			
@@ -221,9 +221,13 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			if( is_multisite() ) {
 				WpakServerRewrite::prepend_wp_network_wpak_rules_to_htaccess();
 			}
+			
+			//Create new default themes version zips (v1.0.5) so that they're available as download packages:
+			WpakThemes::create_themes_zip();
+			
 			//Memorize we've gone that far successfully, to not re-run this routine 
 			//in case something goes wrong in next upgrade routines:
-			update_option( 'wpak_version', '1.0.9' ); //TODO: set 1.1 here when releasing 1.1
+			update_option( 'wpak_version', '1.1' );
 		}
 		
 		/**
