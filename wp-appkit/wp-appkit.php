@@ -3,7 +3,7 @@
 Plugin Name: WP-AppKit
 Plugin URI:  https://github.com/uncatcrea/wp-appkit
 Description: Build Phonegap Mobile apps based on your WordPress content.
-Version:     1.0.2
+Version:     1.1
 Author:      Uncategorized Creations
 Author URI:  http://getwpappkit.com
 Text Domain: wp-appkit
@@ -22,7 +22,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 
 		const resources_version = '1.0';
 		const i18n_domain = 'wp-appkit';
-
+        
 		public static function hooks() {
 			add_action( 'plugins_loaded', array( __CLASS__, 'plugins_loaded' ) );
 
@@ -37,6 +37,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 		}
 
 		protected static function lib_require() {
+            require_once(dirname( __FILE__ ) . '/lib/config.php');
 			require_once(dirname( __FILE__ ) . '/lib/addons/addons.php');
 			require_once(dirname( __FILE__ ) . '/lib/user-permissions/user-login.php');
 			require_once(dirname( __FILE__ ) . '/lib/web-services/web-services.php');
@@ -45,6 +46,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			require_once(dirname( __FILE__ ) . '/lib/themes/themes.php');
 			require_once(dirname( __FILE__ ) . '/lib/themes/upload-themes.php');
 			require_once(dirname( __FILE__ ) . '/lib/user-permissions/user-permissions.php');
+			require_once(dirname( __FILE__ ) . '/lib/settings/licenses/licenses.php');
 			require_once(dirname( __FILE__ ) . '/lib/settings/settings.php');
 			require_once(dirname( __FILE__ ) . '/lib/components/components.php');
 			require_once(dirname( __FILE__ ) . '/lib/navigation/navigation.php');
@@ -75,6 +77,13 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			if( is_multisite() ) {
 				WpakServerRewrite::prepend_wp_network_wpak_rules_to_htaccess();
 			}
+			
+			//If WP-AppKit custom user role was activated before deactivating 
+			//the plugin, reactivate it:
+			$settings = WpakSettings::get_settings();
+			if ( $settings['activate_wp_appkit_editor_role'] ) {
+				WpakUserPermissions::create_wp_appkit_user_role();
+			}
 		}
 
 		public static function on_deactivation( $network_wide ) {
@@ -94,6 +103,9 @@ if ( !class_exists( 'WpAppKit' ) ) {
 				WpakServerRewrite::delete_wp_network_wpak_rules_from_htaccess();
 			}
 
+			//Remove WP-AppKit custom user role on deactivation (if it was 
+			//activated in settings panel):
+			WpakUserPermissions::remove_wp_appkit_user_role();
 		}
 
 		public static function init() {
@@ -109,7 +121,6 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			WpakWebServices::add_rewrite_tags_and_rules();
 			WpakConfigFile::rewrite_rules();
 			WpakThemes::rewrite_rules();
-			WpakWpCoreJsFiles::rewrite_rules();
 		}
 
 		/**
@@ -156,6 +167,10 @@ if ( !class_exists( 'WpAppKit' ) ) {
 				self::upgrade_100();
 			}
 			
+			if( version_compare( $db_version, '1.1', '<' ) ) {
+				self::upgrade_110();
+			}
+			
 			if ( !version_compare( $plugin_file_version, $db_version, '=' ) ) {
 				//Update db version not to run update scripts again and so that
 				//db version is up to date:
@@ -195,7 +210,26 @@ if ( !class_exists( 'WpAppKit' ) ) {
 			//in case something goes wrong in next upgrade routines:
 			update_option( 'wpak_version', '1.0' );
 		}
-
+		
+		/**
+		 * Execute changes made in WP-AppKit 1.1
+		 */
+		protected static function upgrade_110() {
+			//New rewrite rules to take into account new management of WP core's assets
+			self::add_rewrite_rules();
+			flush_rewrite_rules();
+			if( is_multisite() ) {
+				WpakServerRewrite::prepend_wp_network_wpak_rules_to_htaccess();
+			}
+			
+			//Create new default themes version zips (v1.0.5) so that they're available as download packages:
+			WpakThemes::create_themes_zip();
+			
+			//Memorize we've gone that far successfully, to not re-run this routine 
+			//in case something goes wrong in next upgrade routines:
+			update_option( 'wpak_version', '1.1' );
+		}
+		
 		/**
 		 * If permalinks are not activated, send an admin notice
 		 */

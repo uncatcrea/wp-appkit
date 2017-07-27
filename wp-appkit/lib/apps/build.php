@@ -384,23 +384,6 @@ class WpakBuild {
 				}
 			}
 			
-			//Add JS Files that must be copied from WordPress core:
-			$core_js_files = array(
-				'vendor/jquery.js' => ABSPATH . WPINC .'/js/jquery/jquery.js',
-				'vendor/underscore.js' => ABSPATH . WPINC .'/js/underscore.min.js',
-				'vendor/backbone.js' => ABSPATH . WPINC .'/js/backbone.min.js',
-			);
-			
-			foreach( $core_js_files as $app_file => $real_file ) {
-				$zip_filename = $source_root . $app_file;
-				if ( !$zip->addFile( $real_file, $zip_filename ) ) {
-					$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
-					$answer['ok'] = 0;
-					return $answer;
-				}
-				$webapp_files[] = $zip_filename;
-			}
-
 			//Add themes files :
 			if( !empty( $themes ) ) {
 

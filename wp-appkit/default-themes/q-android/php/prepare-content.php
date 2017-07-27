@@ -6,6 +6,11 @@
  */
 function wpak_prepare_content($content,$post){
 
+	// Bail in case of empty content
+	if( empty( $content ) ) {
+		return $content;
+	}
+	
     libxml_use_internal_errors(true);
 
     // Create a DOM document from the post content
