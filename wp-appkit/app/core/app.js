@@ -893,6 +893,10 @@ define(function (require) {
 				_.each( data.items, function ( value, key, list ) {
 					comments.add( value );
 				} );
+				
+				post.set( 'nb_comments', comments.length );
+				post.save();
+						
 				cb_ok( comments, post, item_global );
 			};
 
@@ -915,11 +919,13 @@ define(function (require) {
 		}
 	};
 
-	app.getPostComments = function ( post_id, cb_ok, cb_error ) {
+	app.getPostComments = function ( post_id, cb_ok, cb_error, force_refresh ) {
+
+		force_refresh = force_refresh === true;
 
 		var post_comments_memory = app.comments.get( post_id );
-		if ( post_comments_memory ) {
-
+		if ( post_comments_memory && !force_refresh ) {
+			
 			var post_comments = post_comments_memory.get( 'post_comments' );
 			var post = post_comments_memory.get( 'post' );
 			var item_global = post_comments_memory.get( 'item_global' );
@@ -929,6 +935,7 @@ define(function (require) {
 			cb_ok( post_comments, post, item_global );
 
 		} else {
+			
 			fetchPostComments(
 				post_id,
 				function( post_comments, post, item_global ) {

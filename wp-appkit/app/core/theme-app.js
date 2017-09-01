@@ -332,6 +332,14 @@ define( function( require, exports ) {
 		var current_view = RegionManager.getCurrentView();
 		current_view.render();
 	};
+	
+	/**
+	 * Retrieve current Backbone view object
+	 */
+	themeApp.getCurrentView = function() {
+		var current_view = RegionManager.getCurrentView();
+		return current_view;
+	};
 
 	/************************************************
 	 * Back button
@@ -435,6 +443,48 @@ define( function( require, exports ) {
 		);
 
 	};
+	
+	/**
+	 * When on a comments screen, reloads the comments for the current post and
+	 * re-renders the view to display new comments.
+	 * 
+	 * @param {function} cb_ok      What to do when comment screen was updated successfully 
+	 * @param {function} cb_error   What to do if an error occurs while updating comment screen
+	 */
+	themeApp.updateCurrentCommentScreen = function ( cb_ok, cb_error ) {
+		
+		var current_screen_info = this.getCurrentScreenObject();
+		
+		if ( current_screen_info.screen_type !== 'comments' ) {
+			return;
+		}
+
+		//Retrieve post id corresponding to the current comments screen:
+		var post_id = current_screen_info.post.id;
+
+		var _this = this;
+		
+		//Reload post comments from server:
+		App.getPostComments(
+			post_id,
+			function ( comments, post ) {
+				//New comments loaded successfully				
+				
+				//Update current view's comments with new comments
+				var comments_view = RegionManager.getCurrentView();
+				comments_view.comments = comments;
+				
+				//Rerender screen:
+				_this.rerenderCurrentScreen();
+				
+				cb_ok( comments, post );
+			},
+			function ( error ) {
+				cb_error( error );
+			},
+			true //To force post comments cache flush
+		);
+	}
 
 	/************************************************
 	 * Components
