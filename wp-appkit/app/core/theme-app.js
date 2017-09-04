@@ -883,7 +883,7 @@ define( function( require, exports ) {
 	 *
 	 * @param {int} item_id Post ID of the post to retrieve
 	 * @param {string} global_key (Optional) global to retrieve the item from: 'posts' (default) or 'pages'.
-	 * @returns {JSON Object} item (post or page) object
+	 * @returns {JSON Object | null} item (post or page) object if found, null if no post found with the given item_id.
 	 */
 	themeApp.getItem = function( item_id, global_key ) {
 

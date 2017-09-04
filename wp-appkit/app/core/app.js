@@ -1349,7 +1349,7 @@ define(function (require) {
 		//auto_interpret_result defaults to true :
 		var auto_interpret_result = !options.hasOwnProperty('auto_interpret_result') || options.auto_interpret_result === true;
 
-		//interpretation_type defaults to 'update' :
+		//interpretation_type defaults to 'replace-keep-global-items' :
 		var interpretation_type = options.hasOwnProperty('type') ? options.type : 'replace-keep-global-items';
 
 		//persistent defaults to false :
