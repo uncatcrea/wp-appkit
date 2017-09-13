@@ -105,25 +105,96 @@ define(function (require) {
         single: function (item_global,item_id) {
 			route_asked = 'single/'+ item_global +'/'+ item_id;
 
+			var _this = this;
+			
+			var show_single = function( item ) {
+				var item_json = item.toJSON();
+				var item_data = item_global == 'posts' ? {post:item_json} : {item:item_json};
+
+				if( check_route('single/'+ item_global +'/'+ item_id) ){
+					RegionManager.show(
+						'single',
+						{item:item,global:item_global},
+						{screen_type:'single',component_id:'',item_id:parseInt(item_id),global:item_global,data:item_data,label:item_json.title}
+					);
+				}
+			}
+
         	require(["core/app"],function(App){
 	        	var global = App.globals[item_global];
 	        	if( global ){
 		        	var item = global.get(item_id);
 		        	if( item ){
-						var item_json = item.toJSON();
-		        		var item_data = item_global == 'posts' ? {post:item_json} : {item:item_json};
-
-						if( check_route('single/'+ item_global +'/'+ item_id) ){
-							RegionManager.show(
-								'single',
-								{item:item,global:item_global},
-								{screen_type:'single',component_id:'',item_id:parseInt(item_id),global:item_global,data:item_data,label:item_json.title}
-							);
-						}
-
+						
+						show_single( item );
+						
 		        	}else{
-		        		Utils.log('Error : router single route : item with id "'+ item_id +'" not found in global "'+ item_global +'".');
-	        			App.router.default_route();
+						
+		        		Utils.log('Router single route : item with id "'+ item_id +'" not found in global "'+ item_global +'".');
+	        			
+						var load_from_remote =  Hooks.applyFilters('load-unfound-items-from-remote', true, [item_id,item_global]);
+						
+						if ( load_from_remote ) {
+							
+							/**
+							 * Use 'load-unfound-items-component-id' and 'load-unfound-items-component-type' to customize
+							 * which component is used to retrieve the item from remote. 
+							 * Default is the first "posts-list" component found.
+							 */
+							var item_component_id = Hooks.applyFilters('load-unfound-items-component-id', '', [item_id,item_global]);
+							var item_component_type = Hooks.applyFilters('load-unfound-items-component-type', 'posts-list', [item_id,item_global]);
+							
+							App.triggerInfo( 'load-item-from-remote:start', { 
+								item_id: item_id, item_global: item_global, item_component_id: item_component_id, item_component_type: item_component_type 
+							} );
+							
+							App.getItemsFromRemote( [item_id], {
+								item_component_id: item_component_id,
+								item_component_type: item_component_type,
+								success: function() {
+									var item = global.get(item_id);
+									
+									App.triggerInfo( 'load-item-from-remote:stop', { 
+										item_id: item_id, item_global: item_global, item: item, 
+										item_component_id: item_component_id, item_component_type: item_component_type,
+										success: !!item,
+									} );
+									
+									if ( item ) {
+										
+										//Success! display single screen:
+										show_single( item );
+										
+									} else {
+										Utils.log('Router single route : unexpected error "'+ item_id +'" not found in global "'+ item_global +'" even after remote call.');
+										
+										App.triggerError(
+											'get-items:remote:item-not-found-in-global',
+											{ type:'not-found', where:'router::single', message: 'Requested items not found', data: { 
+												item_id: item_id, item_global: item_global, item: item, 
+												item_component_id: item_component_id, item_component_type: item_component_type
+											} },
+											options.error
+										);
+								
+										App.router.default_route();
+									}
+								},
+								error: function() {
+									
+									App.triggerInfo( 'load-item-from-remote:stop', { 
+										item_id: item_id, item_global: item_global, 
+										item_component_id: item_component_id, item_component_type: item_component_type,
+										success: false,
+									} );
+									
+									App.router.default_route();
+								}
+							} );
+							
+						} else {
+							App.router.default_route();
+						}
 	        		}
 	        	}else{
 	        		Utils.log('Error : router single route : global "'+ item_global +'" not found.');

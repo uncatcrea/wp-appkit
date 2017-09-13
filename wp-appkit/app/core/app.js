@@ -1695,6 +1695,108 @@ define(function (require) {
 
     	  return item;
       };
+	  
+		/**
+		 * Retrieve items (posts/pages etc) from remote server and merge them into existing app's items.
+		 * 
+		 * @param Array items array of ids of pages/posts to retrieve. 
+		 * @param JSON Object options:
+		 *  - component_id:   Int (optional) Slug of the component we want to retrieve items for.
+		 *                    If not provided, the first component of "component_type" found
+		 *                    will be used.
+		 *  - component_type: String (optional) Type of component ("posts-list", "pages") we want to
+		 *                    retrieve items for. Only useful if component_id is not provided.
+		 *                    If not provided, defaults to "posts-list".
+		 *  - persistent:     Boolean (optional) Whether to persist retrieved items to local storage.
+		 *                    Defaults to true.
+		 *  - success:        Callback (optional) Called if items are retrieved successfully
+		 *  - error:          Callback (optional) Called if an error occured while retrieving items from server.
+		 *                    App error events are also triggered in that case.
+		 */
+		app.getItemsFromRemote = function ( items_ids, options ) {
+
+			options = options || {};
+			
+			Utils.log('Retrieving items from remote server.', items_ids);
+			
+			//Posts/pages/items can only be retrieved by component, as their content is formatted
+			//according to the component type they belong to.
+			var component = null;
+			if ( options.component_id ) {
+				if ( this.components.get( options.component_id ) ) {
+					component = this.components.get( options.component_id );
+				} else {
+					this.triggerError(
+						'get-items:remote:wrong-component-given',
+						{ type:'wrong-data', where:'app::getItemsFromRemote', message: 'Provided component not found ['+ options.component_id +']', data: { options: options, items_ids: items_ids } },
+						options.error
+					);
+					return;
+				}
+			}
+			
+			if ( !component ) {
+				var component_type = options.component_type ? options.component_type : 'posts-list';
+				component = _.findWhere( this.getComponents(), { type: component_type } );
+			}
+
+			if ( component ) {
+
+				var _this = this;
+				
+				var persistent = !options.persistent || options.persistent === true;
+
+				//Call liveQuery to retrieve the given items from server and store them in local storage:
+				this.liveQuery(
+					{
+						wpak_component_slug: component.id,
+						wpak_query_action: 'get-items',
+						wpak_items_ids: items_ids
+					},
+					function( answer, results ){
+
+						var items_found = _.find( results, function( result ) {
+							return result.data.new_items.length > 0;
+						} );
+
+						if ( items_found ) {
+							Utils.log('Items retrieved successfully from remote server.', items_ids, results);
+							if ( options.success ) {
+								options.success( answer, results );
+							}
+						} else {
+							//Requested posts where not found. Trigger error
+							if ( options.error ) {
+								_this.triggerError(
+									'get-items:remote:no-item-found',
+									{ type:'not-found', where:'app::getItemsFromRemote', message: 'Requested items not found', data: { options: options, items_ids: items_ids } },
+									options.error
+								);
+							}
+						}
+
+					},
+					function( error ){
+						//liveQuery error: error event has been triggered in liveQuery,
+						//simply call the error callback here:
+						if ( options.error ) {
+							options.error( error );
+						}
+					},
+					{
+						type: 'update',
+						persistent: persistent
+					}
+				);
+
+			} else {
+				app.triggerError(
+					'get-items:remote:wrong-component',
+					{ type:'wrong-data', where:'app::getItemsFromRemote', message: 'Could not find a valid component', data: { options: options, items_ids: items_ids } },
+					options.error
+				);
+			}
+		};
 
 	  /**
        * App options:

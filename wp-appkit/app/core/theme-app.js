@@ -9,8 +9,6 @@ define( function( require, exports ) {
 	var _ = require( 'underscore' ),
 			Backbone = require( 'backbone' ),
 			RegionManager = require( 'core/region-manager' ),
-			Utils = require( 'core/app-utils' ),
-			Config = require( 'root/config' ),
 			Messages = require( 'core/messages' ),
 			App = require( 'core/app' ),
 			Hooks = require( 'core/lib/hooks' ),
@@ -893,6 +891,27 @@ define( function( require, exports ) {
 		global_key = global_key || 'posts';
 
 		return App.getGlobalItem( global_key, item_id );
+	};
+	
+	/**
+	* Retrieve items (posts/pages etc) from remote server and merge them into existing app's items.
+	* 
+	* @param Array items array of ids of pages/posts to retrieve. 
+	* @param JSON Object options:
+	*  - component_id:   Int (optional) Slug of the component we want to retrieve items for.
+	*                    If not provided, the first component of "component_type" found
+	*                    will be used.
+	*  - component_type: String (optional) Type of component ("posts-list", "pages") we want to
+	*                    retrieve items for. Only useful if component_id is not provided.
+	*                    If not provided, defaults to "posts-list".
+	*  - persistent:     Boolean (optional) Whether to persist retrieved items to local storage.
+	*                    Defaults to true.
+	*  - success:        Callback (optional) Called if items are retrieved successfully
+	*  - error:          Callback (optional) Called if an error occured while retrieving items from server.
+	*                    App error events are also triggered in that case.
+	*/
+	themeApp.getItemsFromRemote = function( items_ids, options ) {
+		App.getItemsFromRemote( items_ids, options );
 	};
 
 	/**
