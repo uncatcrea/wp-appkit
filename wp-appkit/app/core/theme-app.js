@@ -819,17 +819,20 @@ define( function( require, exports ) {
 	 * App custom pages and custom routes management
 	 */
 
-	themeApp.showCustomPage = function( template, data, id ) {
+	themeApp.showCustomPage = function( template, data, fragment, silent ) {
 		if ( template === undefined ) {
 			template = 'custom';
 		}
 		if ( data === undefined ) {
 			data = {};
 		}
-		if ( id === undefined ) {
-			id = 'auto-custom-page';
+		if ( fragment === undefined ) {
+			fragment = 'auto-custom-page';
 		}
-		App.showCustomPage( template, data, id );
+		if ( silent === undefined ) {
+			silent = true;
+		}
+		App.showCustomPage( template, data, fragment, silent );
 	};
 
 	themeApp.addCustomRoute = function( fragment, template, data ) {

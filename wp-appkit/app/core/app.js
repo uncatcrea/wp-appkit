@@ -93,13 +93,18 @@ define(function (require) {
 	   * Displays a custom page using the given template.
 	   * @param data see models/custom-page.js for data fields
 	   */
-	  app.showCustomPage = function(template,data,id){
+	  app.showCustomPage = function(template,data,fragment,silent){
 		  var args = {template: template, data: data};
-		  if( id !== undefined ){
-			  args.id = id;
+		  if( fragment !== undefined ){
+			  args.id = fragment;
 		  }
 		  current_custom_page = new CustomPage(args);
-		  app.router.navigate( app.getScreenFragment( 'custom-page' ), { trigger: true } );
+		  if ( silent === true ) {
+			  app.router.execute_route_silently( app.getScreenFragment( 'custom-page' ) );
+			  app.router.navigate( fragment, { trigger: false } );
+		  } else {
+			  app.router.navigate( app.getScreenFragment( 'custom-page' ), { trigger: true } );
+		  }
 	  };
 
 	  app.addCustomRoute = function( fragment, template, data ) {
