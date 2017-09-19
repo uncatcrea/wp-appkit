@@ -1520,6 +1520,18 @@ define(function (require) {
 
 		$.ajax( ajax_args );
 	};
+	
+	  app.getPageComponentByPageId = function( page_id, default_to_first_component ) {
+			var page_component = _.find( this.getComponents(), function( component ){
+				return component.type === 'page' && component.global === 'pages' && component.data.root_id === page_id;
+			} );
+			
+			if ( !page_component && default_to_first_component === true ) {
+				page_component = this.findFirstComponentOfType( 'page' );
+			}
+			
+			return page_component;
+	  };
 
       app.getComponentData = function(component_id){
     	  var component_data = null;
@@ -1737,7 +1749,7 @@ define(function (require) {
 			
 			if ( !component ) {
 				var component_type = options.component_type ? options.component_type : 'posts-list';
-				component = _.findWhere( this.getComponents(), { type: component_type } );
+				component = this.findFirstComponentOfType( component_type );
 			}
 
 			if ( component ) {
@@ -1762,7 +1774,7 @@ define(function (require) {
 						if ( items_found ) {
 							Utils.log('Items retrieved successfully from remote server.', items_ids, results);
 							if ( options.success ) {
-								options.success( answer, results );
+								options.success( answer, component, results );
 							}
 						} else {
 							//Requested posts where not found. Trigger error
@@ -1795,6 +1807,87 @@ define(function (require) {
 					{ type:'wrong-data', where:'app::getItemsFromRemote', message: 'Could not find a valid component', data: { options: options, items_ids: items_ids } },
 					options.error
 				);
+			}
+		};
+		
+		app.findFirstComponentOfType = function( component_type ) {
+			return _.findWhere( this.getComponents(), { type: component_type } )
+		};
+		
+		app.loadRouteItemFromRemote = function( item_id, item_global, component_type, options ){
+			var load_from_remote =  Hooks.applyFilters('load-unfound-items-from-remote', true, [item_id,item_global]);
+			if ( load_from_remote ) {
+
+				/**
+				 * Use 'load-unfound-items-component-id' and 'load-unfound-items-component-type' to customize
+				 * which component is used to retrieve the item from remote. 
+				 * Default is the first "posts-list" component found.
+				 */
+				var item_component_id = Hooks.applyFilters('load-unfound-items-component-id', '', [item_id,item_global]);
+				var item_component_type = Hooks.applyFilters('load-unfound-items-component-type', component_type, [item_id,item_global]);
+
+				this.triggerInfo( 'load-item-from-remote:start', { 
+					item_id: item_id, item_global: item_global, item_component_id: item_component_id, item_component_type: item_component_type 
+				} );
+				
+				var global = this.globals[item_global];
+				
+				var _this = this;
+
+				this.getItemsFromRemote( [item_id], {
+					component_id: item_component_id,
+					component_type: item_component_type,
+					success: function( answer, component, results ) {
+						var item = global.get(item_id);
+
+						_this.triggerInfo( 'load-item-from-remote:stop', { 
+							item_id: item_id, item_global: item_global, item: item, 
+							item_component_id: item_component_id, item_component_type: item_component_type,
+							success: !!item
+						} );
+
+						if ( item ) {
+
+							//Success!
+							if ( options.success ) {
+								options.success( item, component );
+							}
+
+						} else {
+							Utils.log('loadRouteItemFromRemote : unexpected error "'+ item_id +'" not found in global "'+ item_global +'" even after remote call.');
+
+							_this.triggerError(
+								'get-items:remote:item-not-found-in-global',
+								{ type:'not-found', where:'app::loadRouteItemFromRemote', message: 'Requested items not found', data: { 
+									item_id: item_id, item_global: item_global, item: item, 
+									item_component_id: item_component_id, item_component_type: item_component_type
+								} }
+							);
+					
+							if ( options.error ) {
+								options.error();
+							}
+						}
+					},
+					error: function() {
+
+						_this.triggerInfo( 'load-item-from-remote:stop', { 
+							item_id: item_id, item_global: item_global, 
+							item_component_id: item_component_id, item_component_type: item_component_type,
+							success: false
+						} );
+
+						if ( options.error ) {
+							options.error();
+						}
+					}
+					
+				} );
+
+			} else {
+				if ( options.error ) {
+					options.error();
+				}
 			}
 		};
 
