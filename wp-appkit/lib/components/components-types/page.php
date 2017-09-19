@@ -127,7 +127,7 @@ class WpakComponentTypePage extends WpakComponentType {
 		$posts_by_ids = array();
 		foreach ( $items_ids as $post_id ) {
 			$post = get_post( $post_id );
-			if( !empty($post) && $post->post_status == 'publish' ) {
+			if( !empty($post) && $post->post_status == 'publish' && $post->post_type == 'page' ) {
 				$posts_by_ids[$post_id] = self::get_page_data( $component, $post );
 			}
 		}
