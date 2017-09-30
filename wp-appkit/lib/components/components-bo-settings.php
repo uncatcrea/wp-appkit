@@ -295,12 +295,7 @@ class WpakComponentsBoSettings {
 				self::exit_sending_json( $answer );
 			}
 
-			if ( is_numeric( $component_label ) ) {
-				$answer['message'] = __( "The component label can't be numeric.", WpAppKit::i18n_domain );
-				self::exit_sending_json( $answer );
-			}
-
-			$component_slug = $edit ? trim( $data['component_slug'] ) : $component_label;
+			$component_slug = $edit ? trim( $data['component_slug'] ) : ( !is_numeric( $component_label ) ? $component_label : 'slug-'. $component_label );
 			$component_slug = sanitize_title_with_dashes( remove_accents( $component_slug ) );
 
 			if ( empty( $component_slug ) ) {
