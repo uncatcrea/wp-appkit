@@ -379,7 +379,10 @@ define(function (require) {
 
 			  var history_action = '';
 
-			  if( queried_screen_data.screen_type == 'list' ){
+			  if( queried_screen_data.fragment == current_screen.fragment ) { 
+				  //Redisplaying same screen: do nothing
+				  history_action = 'none';
+			  }else if( queried_screen_data.screen_type == 'list' ){
 				  history_action = 'empty-then-push';
 			  }else if( queried_screen_data.screen_type == 'single' ){
 				  if( current_screen.screen_type == 'list' ){
