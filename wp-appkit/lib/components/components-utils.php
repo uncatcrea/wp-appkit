@@ -60,7 +60,8 @@ class WpakComponentsUtils {
 			$featured_image_size = apply_filters( 'wpak_post_featured_image_size', 'full', $post, $component );
 			
 			$featured_img_src = wp_get_attachment_image_src( $post_featured_img_id, $featured_image_size );
-			@$post_data['thumbnail']['src'] = $featured_img_src[0];
+            $post_data['thumbnail'] = array();
+			$post_data['thumbnail']['src'] = $featured_img_src[0];
 			$post_data['thumbnail']['width'] = $featured_img_src[1];
 			$post_data['thumbnail']['height'] = $featured_img_src[2];
 		}
