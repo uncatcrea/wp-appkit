@@ -113,6 +113,22 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
 
+= 1.2 (2017-10-16) =
+
+*Features*
+
+* Automatically retrieve posts and pages from server if not in the app
+* Allow easy comment screen refresh from theme
+
+*Bugfixes*
+
+* Better history management when re-triggering same route
+* Can't go back from custom page
+* Component's label can't be numeric
+* Apply "the_title" filter on post title returned in webservice
+* Warning: Illegal string offset 'current_theme'
+* Warning on post's thumbnail array
+
 = 1.1 (2017-07-26) =
 
 *License Management*
