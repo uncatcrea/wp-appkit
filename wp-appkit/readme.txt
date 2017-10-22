@@ -113,12 +113,16 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
 
-= 1.2 (2017-10-16) =
+= 1.2 (2017-10-22) =
 
 *Features*
 
 * Automatically retrieve posts and pages from server if not in the app
 * Allow easy comment screen refresh from theme
+
+*Default themes update*
+
+* Embed last version (1.0.6) of [Q for iOS](https://github.com/uncatcrea/q-ios/releases/tag/v1.0.6) and [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.0.6) default app themes
 
 *Bugfixes*
 

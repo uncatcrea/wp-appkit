@@ -103,7 +103,55 @@ define([
         return template_args;
         
     } );
+	
+	//@desc Memorize the last history action so that we can decide what to do when
+	//doing "single to single" transitions:
+	var last_history_action = '';
 
+	// @desc Catch if we're going to a single and coming from a single (it is the case when clicking on a post in the last posts widget at the bottom of a post)
+    // Update properly the history stack
+    App.filter( 'make-history', function( history_action, history_stack, queried_screen, current_screen, previous_screen ) {
+
+        if( queried_screen.screen_type === 'single' && current_screen.screen_type === 'single' ) {
+            if ( ( queried_screen.item_id !== previous_screen.item_id ) ) { // Going to a single to another single that is not the one we came from
+                history_action = 'push';
+            } else { // Going back to the previous single
+                history_action = 'pop';
+            }
+        }
+        
+		last_history_action = history_action;
+		
+        // Return the proper history action
+        return history_action;
+
+    });
+	
+	// @desc Handle "single to single" transition:
+	App.filter( 'transition-direction', function( transition, current_screen, next_screen ){
+		
+		if( current_screen.screen_type === 'single' && next_screen.screen_type === 'single' ) {
+			if ( last_history_action === 'push' ) {
+				transition = 'next-screen';
+			} else {
+				transition = 'previous-screen';
+			}
+			
+		}
+		
+		return transition;
+	});
+
+    // @desc Handle transitions for deeplinks:
+    App.filter( 'transition-direction', function( transition, current_screen, next_screen ){
+
+        //Display single in a slide up panel when opening from deeplinks:
+        if( next_screen.screen_type === 'single' && _.isEmpty( current_screen ) ) {
+                transition = 'next-screen';
+        }
+
+        return transition;
+    });
     
 
     /*
@@ -281,6 +329,18 @@ define([
 		}
 
     });
+
+	// @desc The app starts retrieving a new post from remote server
+	App.on('info:load-item-from-remote:start',function(){
+		// Start refresh icon animation
+		$("#refresh-button").removeClass("refresh-off").addClass("refresh-on");
+	});
+	
+	// @desc A new post was retrieved from remote server
+	App.on('info:load-item-from-remote:stop',function(){
+		// Stop refresh icon animation
+        $("#refresh-button").removeClass("refresh-on").addClass("refresh-off");
+	});
 
     // @desc An error occurs
     // @param error

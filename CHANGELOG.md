@@ -1,8 +1,11 @@
-## 1.2 (2017-10-16)
+## 1.2 (2017-10-22)
 
 ### Features
 - **Automatically retrieve posts and pages from server if not in the app**([#327](https://github.com/uncatcrea/wp-appkit/issues/330), [@mleroi](https://github.com/mleroi))
 - **Allow easy comment screen refresh from theme** ([#327](https://github.com/uncatcrea/wp-appkit/issues/327), [@mleroi](https://github.com/mleroi))
+
+### Default themes update
+- **Embed last version (1.0.6) of [Q for iOS](https://github.com/uncatcrea/q-ios/releases/tag/v1.0.6) and [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.0.6) default app themes**
 
 ### Bugfixes
 - **Better history management when re-triggering same route** ([#262](https://github.com/uncatcrea/wp-appkit/issues/262), [@mleroi](https://github.com/mleroi))
