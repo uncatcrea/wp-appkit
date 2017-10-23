@@ -27,8 +27,7 @@ define([
     'theme/js/jquery.fitvids'
     ], function($,App,Storage,TemplateTags,Config,Moment,Velocity) {
 
-    
-    
+
     /*
      * App's parameters
      */
@@ -113,6 +112,10 @@ define([
         
     } );
     
+	//@desc Memorize the last history action so that we can decide what to do when
+	//doing "single to single" transitions:
+	var last_history_action = '';
+	
     // @desc Catch if we're going to a single and coming from a single (it is the case when clicking on a post in the last posts widget at the bottom of a post)
     // Update properly the history stack
     App.filter( 'make-history', function( history_action, history_stack, queried_screen, current_screen, previous_screen ) {
@@ -125,17 +128,43 @@ define([
             }
         }
         
+		last_history_action = history_action;
+		
         // Return the proper history action
         return history_action;
 
     });
 
+	// @desc Handle "single to single" transition:
+	App.filter( 'transition-direction', function( transition, current_screen, next_screen ){
+		
+		if( current_screen.screen_type === 'single' && next_screen.screen_type === 'single' ) {
+			if ( last_history_action === 'push' ) {
+				transition = 'next-screen';
+			} else {
+				transition = 'previous-screen';
+			}
+			
+		}
+		
+		return transition;
+	});
 
-    
+    // @desc Handle transitions for deeplinks:
+    App.filter( 'transition-direction', function( transition, current_screen, next_screen ){
+
+        //Display single in a slide up panel when opening from deeplinks:
+        if( next_screen.screen_type === 'single' && _.isEmpty( current_screen ) ) {
+                transition = 'next-screen';
+        }
+
+        return transition;
+    });
+
     /*
      * Actions
      */
-    
+	
     // @desc Detect transition types (aka directions) and launch corresponding animations
     App.action( 'screen-transition', function( $wrapper, $current, $next, current_screen, next_screen, $deferred ) {
 
@@ -237,6 +266,9 @@ define([
 		// Simply replace current screen with the new one
         $current.remove();
 		$wrapper.empty().append( $next );
+		if ( $currentContainer ) {
+			removeContainer($currentContainer);
+		}
 		$deferred.resolve();
         
 	};
@@ -284,6 +316,20 @@ define([
 		}
 
     });
+	
+	// @desc The app starts retrieving a new post from remote server
+	App.on('info:load-item-from-remote:start',function(){
+		// Start refresh icon animation
+		$("#refresh-button").hide();
+        $(".loading-from-remote-button").show();
+	});
+	
+	// @desc A new post was retrieved from remote server
+	App.on('info:load-item-from-remote:stop',function(){
+		// Stop refresh icon animation
+        $(".loading-from-remote-button").hide();
+		$("#refresh-button").show();
+	});
 
     // @desc An error occurs
     // @param error
@@ -344,10 +390,6 @@ define([
         // Actions shared by single and page
         if (current_screen.screen_type=="single" || current_screen.screen_type=="page") {
 
-            // Redirect all content hyperlinks clicks
-            // @todo: put it into prepareContent()
-            $("#app-layout").on("click", ".single-content a", openInBrowser);
-            
             // Make any necessary modification to post/page content
             prepareContent( currentScreenObject );
             
@@ -463,7 +505,9 @@ define([
     $('#app-layout').on( 'touchstart', '.has-ripple-feedback', rippleItemTapOn );
     $('#app-layout').on( 'touchend', '.has-ripple-feedback', rippleItemTapOff );
     
-    
+    // Redirect all content hyperlinks clicks
+	// @todo: put it into prepareContent()
+	$("#app-layout").on("click", ".single-content a", openInBrowser);
     
     /*
      * @desc Display default image if an error occured when loading an image element (eg. offline)
@@ -748,10 +792,9 @@ define([
             
         } else { // href begins with # (ie. it's an internal link)
             
-            App.navigate( href ); // Navigate to the corresponding screen
-            
+			App.navigate( href );
+			
         }
-        
 
     }
 

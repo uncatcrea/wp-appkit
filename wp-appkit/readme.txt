@@ -3,7 +3,7 @@ Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
 Tags: mobile app, android, ios, progressive web app, phonegap build
 Requires at least: 4.0
 Tested up to: 4.8
-Stable tag: 1.1
+Stable tag: 1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -112,6 +112,26 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 == Changelog ==
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
+
+= 1.2 (2017-10-22) =
+
+*Features*
+
+* Automatically retrieve posts and pages from server if not in the app
+* Allow easy comment screen refresh from theme
+
+*Default themes update*
+
+* Embed last version (1.0.6) of [Q for iOS](https://github.com/uncatcrea/q-ios/releases/tag/v1.0.6) and [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.0.6) default app themes
+
+*Bugfixes*
+
+* Better history management when re-triggering same route
+* Can't go back from custom page
+* Component's label can't be numeric
+* Apply "the_title" filter on post title returned in webservice
+* Warning: Illegal string offset 'current_theme'
+* Warning on post's thumbnail array
 
 = 1.1 (2017-07-26) =
 

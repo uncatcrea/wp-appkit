@@ -6,11 +6,11 @@ class WpakComponentsUtils {
 	 * Default function to retrieve web service formated data for a post
 	 */
 	public static function get_post_data( $wp_post, $component = null ) {
-		
+
 		if ( $component === null ) {
 			$component = new WpakComponent( 'wpak-internal', 'Internal', 'wpak-internal' );
 		}
-		
+
 		global $post;
 		$post = $wp_post;
 		setup_postdata( $post );
@@ -19,7 +19,7 @@ class WpakComponentsUtils {
 			'id' => $post->ID,
 			'post_type' => $post->post_type,
 			'date' => strtotime( $post->post_date ),
-			'title' => $post->post_title,
+			'title' => apply_filters( 'the_title', $post->post_title, $post->ID ),
 			'content' => '',
 			'excerpt' => '',
 			'thumbnail' => '',
@@ -51,16 +51,17 @@ class WpakComponentsUtils {
 
 		$post_featured_img_id = get_post_thumbnail_id( $post->ID );
 		if ( !empty( $post_featured_img_id ) ) {
-			
+
 			/**
 			 * Use this 'wpak_post_featured_image_size' to define a specific image
 			 * size to pass to the web service for posts.
 			 * By default the full (original) image size is used.
 			 */
 			$featured_image_size = apply_filters( 'wpak_post_featured_image_size', 'full', $post, $component );
-			
+
 			$featured_img_src = wp_get_attachment_image_src( $post_featured_img_id, $featured_image_size );
-			@$post_data['thumbnail']['src'] = $featured_img_src[0];
+            $post_data['thumbnail'] = array();
+			$post_data['thumbnail']['src'] = $featured_img_src[0];
 			$post_data['thumbnail']['width'] = $featured_img_src[1];
 			$post_data['thumbnail']['height'] = $featured_img_src[2];
 		}
@@ -78,14 +79,14 @@ class WpakComponentsUtils {
 
 		return $post_data;
 	}
-	
+
 	public static function get_formated_content() {
-		
+
 		//Set global $more to 1 so that get_the_content() behaves correctly with <!-- more --> tag:
 		//(See wp-includes/class-wp.php::register_globals() and get_the_content())
 		global $more;
-		$more = 1; 
-		
+		$more = 1;
+
 		$post = get_post();
 
 		$content = get_the_content();
@@ -108,7 +109,7 @@ class WpakComponentsUtils {
 		if ( !empty( $allowed_tags ) ) {
 			$content = strip_tags( $content, $allowed_tags );
 		}
-		
+
 		/**
 		 * Filter a single post content.
 		 *

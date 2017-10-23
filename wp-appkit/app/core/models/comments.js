@@ -29,7 +29,7 @@ define( function ( require ) {
 	var PostCommentsMemory = Backbone.Collection.extend( {
 		model: PostComments,
 		addPostComments: function( post_id, post, item_global, comments ) {
-			this.add( { id: post_id, post: post, item_global: item_global, post_comments: comments.clone() } );
+			this.add( { id: post_id, post: post, item_global: item_global, post_comments: comments.clone() }, { merge: true } );
 		}
 	} );
 

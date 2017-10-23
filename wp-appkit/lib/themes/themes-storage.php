@@ -92,6 +92,9 @@ class WpakThemesStorage {
 		$themes = get_post_meta( $post_id, self::meta_id, true );
 		
 		if( empty($themes) || !isset( $themes['current_theme'] ) ) {
+            if ( !is_array( $themes ) ) {
+                $themes = array();
+            }
 			$themes['current_theme'] = '';
 		}
 		

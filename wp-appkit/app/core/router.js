@@ -25,6 +25,7 @@ define(function (require) {
             "": "default_route",
             "single/:global/:id" : "single",
             "page/:component_id/:page_id" : "page",
+			"page/:page_id" : "page_no_component",
             "comments-:post_id" : "comments",
             "component-:id" : "component",
             "custom-page" : "custom_page",
@@ -105,25 +106,40 @@ define(function (require) {
         single: function (item_global,item_id) {
 			route_asked = 'single/'+ item_global +'/'+ item_id;
 
+			var show_single = function( item ) {
+				var item_json = item.toJSON();
+				var item_data = item_global == 'posts' ? {post:item_json} : {item:item_json};
+
+				if( check_route('single/'+ item_global +'/'+ item_id) ){
+					RegionManager.show(
+						'single',
+						{item:item,global:item_global},
+						{screen_type:'single',component_id:'',item_id:parseInt(item_id),global:item_global,data:item_data,label:item_json.title}
+					);
+				}
+			};
+
         	require(["core/app"],function(App){
 	        	var global = App.globals[item_global];
 	        	if( global ){
 		        	var item = global.get(item_id);
 		        	if( item ){
-						var item_json = item.toJSON();
-		        		var item_data = item_global == 'posts' ? {post:item_json} : {item:item_json};
-
-						if( check_route('single/'+ item_global +'/'+ item_id) ){
-							RegionManager.show(
-								'single',
-								{item:item,global:item_global},
-								{screen_type:'single',component_id:'',item_id:parseInt(item_id),global:item_global,data:item_data,label:item_json.title}
-							);
-						}
-
+						
+						show_single( item );
+						
 		        	}else{
-		        		Utils.log('Error : router single route : item with id "'+ item_id +'" not found in global "'+ item_global +'".');
-	        			App.router.default_route();
+						
+		        		Utils.log('Router single route : item with id "'+ item_id +'" not found in global "'+ item_global +'".');
+						
+	        			App.loadRouteItemFromRemote( item_id, item_global, 'posts-list', {
+							success: function( item ) {
+								show_single( item );
+							},
+							error: function() {
+								App.router.default_route();
+							}
+						} );
+						
 	        		}
 	        	}else{
 	        		Utils.log('Error : router single route : global "'+ item_global +'" not found.');
@@ -135,38 +151,71 @@ define(function (require) {
         page: function (component_id,page_id) {
 			route_asked = 'page/'+ component_id +'/'+ page_id;
 
+			var item_global = 'pages';
+				
+			var _this = this;	
+			
         	require(["core/app"],function(App){
-        		var item_global = 'pages';
+				
+				var show_page = function( item, page_component_id ) {
+					
+					//To allow page route with no component (#page/[page_id]):
+					if ( page_component_id === 'wpak-page-component-placeholder' ) {
+						//If the page was loaded dynamically, it has no corresponding component,
+						//so we pass true to getPageComponentByPageId() so that the first page component
+						//found is used in that case:
+						var page_component = App.getPageComponentByPageId( item.get('id'), true );
+						if ( page_component ) {
+							page_component_id = page_component.id;
+						}
+					}
+					
+					var component = App.getComponentData( page_component_id );
+
+					if( component ){
+
+						var item_data = {
+							post:item.toJSON(),
+							is_tree_page:component.data.is_tree,
+							is_tree_root:(page_id == component.data.root_id),
+							root_id:component.data.root_id,
+							root_depth:component.data.root_depth
+						};
+
+						//This is still component_id to check the route and not page_component_id, to handle the case
+						//where the page was not in the app and was retrieved from remote.
+						if( check_route('page/'+ component_id +'/'+ page_id) ) { 
+							RegionManager.show(
+								'page',
+								{item:item,global:item_global},
+								{screen_type:'page',component_id:page_component_id,item_id:parseInt(page_id),global:item_global,data:item_data,label:item_data.post.title}
+							);
+						}
+
+					}else{
+						Utils.log('Error : router : page route : component with id "'+ page_component_id +'" not found');
+						_this.default_route();
+					}
+				};
+				
 	        	var global = App.globals[item_global];
 	        	if( global ){
 		        	var item = global.get(page_id);
 		        	if( item ){
-		        		var component = App.getComponentData(component_id);
-		        		if( component ){
-
-		        			var item_data = {
-			        			post:item.toJSON(),
-			        			is_tree_page:component.data.is_tree,
-			        			is_tree_root:(page_id == component.data.root_id),
-			        			root_id:component.data.root_id,
-			        			root_depth:component.data.root_depth
-			        		};
-
-							if( check_route('page/'+ component_id +'/'+ page_id) ){
-								RegionManager.show(
-									'page',
-									{item:item,global:item_global},
-									{screen_type:'page',component_id:component_id,item_id:parseInt(page_id),global:item_global,data:item_data,label:item_data.post.title}
-								);
-							}
-
-		        		}else{
-			        		Utils.log('Error : router : page route : component with id "'+ component_id +'" not found');
-		        			App.router.default_route();
-		        		}
+		        		show_page( item, component_id );
 		        	}else{
+						
 		        		Utils.log('Error : router : page route : item with id "'+ page_id +'" not found in global "'+ item_global +'".');
-	        			App.router.default_route();
+						
+						App.loadRouteItemFromRemote( page_id, item_global, 'page', {
+							success: function( item, item_component ) {
+								show_page( item, item_component.id );
+							},
+							error: function() {
+								App.router.default_route();
+							}
+						} );
+						
 	        		}
 	        	}else{
 	        		Utils.log('Error : router : screen route : global "'+ item_global +'" not found.');
@@ -174,6 +223,10 @@ define(function (require) {
 	    		}
         	});
         },
+		
+		page_no_component: function ( page_id ) {
+			this.page( 'wpak-page-component-placeholder', page_id );
+		},
 
         comments: function ( post_id ) {
 			route_asked = 'comments-' + post_id;
@@ -245,7 +298,7 @@ define(function (require) {
 				var custom_route = App.getCustomRoute(fragment);
 				if( !_.isEmpty(custom_route) ){
 					fragment_not_found = '';
-					App.showCustomPage(custom_route.template,custom_route.data,fragment);
+					App.showCustomPage(custom_route.template,custom_route.data,fragment,true);
 				}
 
 				if( fragment_not_found.length ){
@@ -253,7 +306,28 @@ define(function (require) {
 				}
 			});
 
-        }
+        },
+		
+		/**
+		 * Execute router's method corresponding to the given route without 
+		 * changing current url or fragment.
+		 * Used for custom routes.
+		 */
+		execute_route_silently: function ( route ) {
+
+			var fragment = Backbone.history.getFragment( route );
+			var route_handler = _.find( Backbone.history.handlers, function ( handler ) {
+				return handler.route.test( fragment );
+			} );
+
+			if ( route_handler !== undefined ) {
+				this.execute( route_handler.callback, [ fragment ], '' );
+			} else {
+				Utils.log( 'Router.js error: execute_route_silently: route not found.' );
+			}
+
+		}
+
 
     });
 

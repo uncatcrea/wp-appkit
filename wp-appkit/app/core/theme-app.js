@@ -9,8 +9,6 @@ define( function( require, exports ) {
 	var _ = require( 'underscore' ),
 			Backbone = require( 'backbone' ),
 			RegionManager = require( 'core/region-manager' ),
-			Utils = require( 'core/app-utils' ),
-			Config = require( 'root/config' ),
 			Messages = require( 'core/messages' ),
 			App = require( 'core/app' ),
 			Hooks = require( 'core/lib/hooks' ),
@@ -332,6 +330,14 @@ define( function( require, exports ) {
 		var current_view = RegionManager.getCurrentView();
 		current_view.render();
 	};
+	
+	/**
+	 * Retrieve current Backbone view object
+	 */
+	themeApp.getCurrentView = function() {
+		var current_view = RegionManager.getCurrentView();
+		return current_view;
+	};
 
 	/************************************************
 	 * Back button
@@ -435,6 +441,48 @@ define( function( require, exports ) {
 		);
 
 	};
+	
+	/**
+	 * When on a comments screen, reloads the comments for the current post and
+	 * re-renders the view to display new comments.
+	 * 
+	 * @param {function} cb_ok      What to do when comment screen was updated successfully 
+	 * @param {function} cb_error   What to do if an error occurs while updating comment screen
+	 */
+	themeApp.updateCurrentCommentScreen = function ( cb_ok, cb_error ) {
+		
+		var current_screen_info = this.getCurrentScreenObject();
+		
+		if ( current_screen_info.screen_type !== 'comments' ) {
+			return;
+		}
+
+		//Retrieve post id corresponding to the current comments screen:
+		var post_id = current_screen_info.post.id;
+
+		var _this = this;
+		
+		//Reload post comments from server:
+		App.getPostComments(
+			post_id,
+			function ( comments, post ) {
+				//New comments loaded successfully				
+				
+				//Update current view's comments with new comments
+				var comments_view = RegionManager.getCurrentView();
+				comments_view.comments = comments;
+				
+				//Rerender screen:
+				_this.rerenderCurrentScreen();
+				
+				cb_ok( comments, post );
+			},
+			function ( error ) {
+				cb_error( error );
+			},
+			true //To force post comments cache flush
+		);
+	}
 
 	/************************************************
 	 * Components
@@ -769,17 +817,20 @@ define( function( require, exports ) {
 	 * App custom pages and custom routes management
 	 */
 
-	themeApp.showCustomPage = function( template, data, id ) {
+	themeApp.showCustomPage = function( template, data, fragment, silent ) {
 		if ( template === undefined ) {
 			template = 'custom';
 		}
 		if ( data === undefined ) {
 			data = {};
 		}
-		if ( id === undefined ) {
-			id = 'auto-custom-page';
+		if ( fragment === undefined ) {
+			fragment = 'auto-custom-page';
 		}
-		App.showCustomPage( template, data, id );
+		if ( silent === undefined ) {
+			silent = true;
+		}
+		App.showCustomPage( template, data, fragment, silent );
 	};
 
 	themeApp.addCustomRoute = function( fragment, template, data ) {
@@ -833,13 +884,34 @@ define( function( require, exports ) {
 	 *
 	 * @param {int} item_id Post ID of the post to retrieve
 	 * @param {string} global_key (Optional) global to retrieve the item from: 'posts' (default) or 'pages'.
-	 * @returns {JSON Object} item (post or page) object
+	 * @returns {JSON Object | null} item (post or page) object if found, null if no post found with the given item_id.
 	 */
 	themeApp.getItem = function( item_id, global_key ) {
 
 		global_key = global_key || 'posts';
 
 		return App.getGlobalItem( global_key, item_id );
+	};
+	
+	/**
+	* Retrieve items (posts/pages etc) from remote server and merge them into existing app's items.
+	* 
+	* @param Array items array of ids of pages/posts to retrieve. 
+	* @param JSON Object options:
+	*  - component_id:   Int (optional) Slug of the component we want to retrieve items for.
+	*                    If not provided, the first component of "component_type" found
+	*                    will be used.
+	*  - component_type: String (optional) Type of component ("posts-list", "pages") we want to
+	*                    retrieve items for. Only useful if component_id is not provided.
+	*                    If not provided, defaults to "posts-list".
+	*  - persistent:     Boolean (optional) Whether to persist retrieved items to local storage.
+	*                    Defaults to true.
+	*  - success:        Callback (optional) Called if items are retrieved successfully
+	*  - error:          Callback (optional) Called if an error occured while retrieving items from server.
+	*                    App error events are also triggered in that case.
+	*/
+	themeApp.getItemsFromRemote = function( items_ids, options ) {
+		App.getItemsFromRemote( items_ids, options );
 	};
 
 	/**

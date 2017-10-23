@@ -93,13 +93,18 @@ define(function (require) {
 	   * Displays a custom page using the given template.
 	   * @param data see models/custom-page.js for data fields
 	   */
-	  app.showCustomPage = function(template,data,id){
+	  app.showCustomPage = function(template,data,fragment,silent){
 		  var args = {template: template, data: data};
-		  if( id !== undefined ){
-			  args.id = id;
+		  if( fragment !== undefined ){
+			  args.id = fragment;
 		  }
 		  current_custom_page = new CustomPage(args);
-		  app.router.navigate( app.getScreenFragment( 'custom-page' ), { trigger: true } );
+		  if ( silent === true ) {
+			  app.router.execute_route_silently( app.getScreenFragment( 'custom-page' ) );
+			  app.router.navigate( fragment, { trigger: false } );
+		  } else {
+			  app.router.navigate( app.getScreenFragment( 'custom-page' ), { trigger: true } );
+		  }
 	  };
 
 	  app.addCustomRoute = function( fragment, template, data ) {
@@ -374,7 +379,10 @@ define(function (require) {
 
 			  var history_action = '';
 
-			  if( queried_screen_data.screen_type == 'list' ){
+			  if( queried_screen_data.fragment == current_screen.fragment ) { 
+				  //Redisplaying same screen: do nothing
+				  history_action = 'none';
+			  }else if( queried_screen_data.screen_type == 'list' ){
 				  history_action = 'empty-then-push';
 			  }else if( queried_screen_data.screen_type == 'single' ){
 				  if( current_screen.screen_type == 'list' ){
@@ -893,6 +901,10 @@ define(function (require) {
 				_.each( data.items, function ( value, key, list ) {
 					comments.add( value );
 				} );
+				
+				post.set( 'nb_comments', comments.length );
+				post.save();
+						
 				cb_ok( comments, post, item_global );
 			};
 
@@ -915,11 +927,13 @@ define(function (require) {
 		}
 	};
 
-	app.getPostComments = function ( post_id, cb_ok, cb_error ) {
+	app.getPostComments = function ( post_id, cb_ok, cb_error, force_refresh ) {
+
+		force_refresh = force_refresh === true;
 
 		var post_comments_memory = app.comments.get( post_id );
-		if ( post_comments_memory ) {
-
+		if ( post_comments_memory && !force_refresh ) {
+			
 			var post_comments = post_comments_memory.get( 'post_comments' );
 			var post = post_comments_memory.get( 'post' );
 			var item_global = post_comments_memory.get( 'item_global' );
@@ -929,6 +943,7 @@ define(function (require) {
 			cb_ok( post_comments, post, item_global );
 
 		} else {
+			
 			fetchPostComments(
 				post_id,
 				function( post_comments, post, item_global ) {
@@ -1342,7 +1357,7 @@ define(function (require) {
 		//auto_interpret_result defaults to true :
 		var auto_interpret_result = !options.hasOwnProperty('auto_interpret_result') || options.auto_interpret_result === true;
 
-		//interpretation_type defaults to 'update' :
+		//interpretation_type defaults to 'replace-keep-global-items' :
 		var interpretation_type = options.hasOwnProperty('type') ? options.type : 'replace-keep-global-items';
 
 		//persistent defaults to false :
@@ -1508,6 +1523,18 @@ define(function (require) {
 
 		$.ajax( ajax_args );
 	};
+	
+	  app.getPageComponentByPageId = function( page_id, default_to_first_component ) {
+			var page_component = _.find( this.getComponents(), function( component ){
+				return component.type === 'page' && component.global === 'pages' && component.data.root_id === page_id;
+			} );
+			
+			if ( !page_component && default_to_first_component === true ) {
+				page_component = this.findFirstComponentOfType( 'page' );
+			}
+			
+			return page_component;
+	  };
 
       app.getComponentData = function(component_id){
     	  var component_data = null;
@@ -1683,6 +1710,189 @@ define(function (require) {
 
     	  return item;
       };
+	  
+		/**
+		 * Retrieve items (posts/pages etc) from remote server and merge them into existing app's items.
+		 * 
+		 * @param Array items array of ids of pages/posts to retrieve. 
+		 * @param JSON Object options:
+		 *  - component_id:   Int (optional) Slug of the component we want to retrieve items for.
+		 *                    If not provided, the first component of "component_type" found
+		 *                    will be used.
+		 *  - component_type: String (optional) Type of component ("posts-list", "pages") we want to
+		 *                    retrieve items for. Only useful if component_id is not provided.
+		 *                    If not provided, defaults to "posts-list".
+		 *  - persistent:     Boolean (optional) Whether to persist retrieved items to local storage.
+		 *                    Defaults to true.
+		 *  - success:        Callback (optional) Called if items are retrieved successfully
+		 *  - error:          Callback (optional) Called if an error occured while retrieving items from server.
+		 *                    App error events are also triggered in that case.
+		 */
+		app.getItemsFromRemote = function ( items_ids, options ) {
+
+			options = options || {};
+			
+			Utils.log('Retrieving items from remote server.', items_ids);
+			
+			//Posts/pages/items can only be retrieved by component, as their content is formatted
+			//according to the component type they belong to.
+			var component = null;
+			if ( options.component_id ) {
+				if ( this.components.get( options.component_id ) ) {
+					component = this.components.get( options.component_id );
+				} else {
+					this.triggerError(
+						'get-items:remote:wrong-component-given',
+						{ type:'wrong-data', where:'app::getItemsFromRemote', message: 'Provided component not found ['+ options.component_id +']', data: { options: options, items_ids: items_ids } },
+						options.error
+					);
+					return;
+				}
+			}
+			
+			if ( !component ) {
+				var component_type = options.component_type ? options.component_type : 'posts-list';
+				component = this.findFirstComponentOfType( component_type );
+			}
+
+			if ( component ) {
+
+				var _this = this;
+				
+				var persistent = !options.persistent || options.persistent === true;
+
+				//Call liveQuery to retrieve the given items from server and store them in local storage:
+				this.liveQuery(
+					{
+						wpak_component_slug: component.id,
+						wpak_query_action: 'get-items',
+						wpak_items_ids: items_ids
+					},
+					function( answer, results ){
+
+						var items_found = _.find( results, function( result ) {
+							return result.data.new_items.length > 0;
+						} );
+
+						if ( items_found ) {
+							Utils.log('Items retrieved successfully from remote server.', items_ids, results);
+							if ( options.success ) {
+								options.success( answer, component, results );
+							}
+						} else {
+							//Requested posts where not found. Trigger error
+							if ( options.error ) {
+								_this.triggerError(
+									'get-items:remote:no-item-found',
+									{ type:'not-found', where:'app::getItemsFromRemote', message: 'Requested items not found', data: { options: options, items_ids: items_ids } },
+									options.error
+								);
+							}
+						}
+
+					},
+					function( error ){
+						//liveQuery error: error event has been triggered in liveQuery,
+						//simply call the error callback here:
+						if ( options.error ) {
+							options.error( error );
+						}
+					},
+					{
+						type: 'update',
+						persistent: persistent
+					}
+				);
+
+			} else {
+				app.triggerError(
+					'get-items:remote:wrong-component',
+					{ type:'wrong-data', where:'app::getItemsFromRemote', message: 'Could not find a valid component', data: { options: options, items_ids: items_ids } },
+					options.error
+				);
+			}
+		};
+		
+		app.findFirstComponentOfType = function( component_type ) {
+			return _.findWhere( this.getComponents(), { type: component_type } )
+		};
+		
+		app.loadRouteItemFromRemote = function( item_id, item_global, component_type, options ){
+			var load_from_remote =  Hooks.applyFilters('load-unfound-items-from-remote', true, [item_id,item_global]);
+			if ( load_from_remote ) {
+
+				/**
+				 * Use 'load-unfound-items-component-id' and 'load-unfound-items-component-type' to customize
+				 * which component is used to retrieve the item from remote. 
+				 * Default is the first "posts-list" component found.
+				 */
+				var item_component_id = Hooks.applyFilters('load-unfound-items-component-id', '', [item_id,item_global]);
+				var item_component_type = Hooks.applyFilters('load-unfound-items-component-type', component_type, [item_id,item_global]);
+
+				this.triggerInfo( 'load-item-from-remote:start', { 
+					item_id: item_id, item_global: item_global, item_component_id: item_component_id, item_component_type: item_component_type 
+				} );
+				
+				var global = this.globals[item_global];
+				
+				var _this = this;
+
+				this.getItemsFromRemote( [item_id], {
+					component_id: item_component_id,
+					component_type: item_component_type,
+					success: function( answer, component, results ) {
+						var item = global.get(item_id);
+
+						_this.triggerInfo( 'load-item-from-remote:stop', { 
+							item_id: item_id, item_global: item_global, item: item, 
+							item_component_id: item_component_id, item_component_type: item_component_type,
+							success: !!item
+						} );
+
+						if ( item ) {
+
+							//Success!
+							if ( options.success ) {
+								options.success( item, component );
+							}
+
+						} else {
+							Utils.log('loadRouteItemFromRemote : unexpected error "'+ item_id +'" not found in global "'+ item_global +'" even after remote call.');
+
+							_this.triggerError(
+								'get-items:remote:item-not-found-in-global',
+								{ type:'not-found', where:'app::loadRouteItemFromRemote', message: 'Requested items not found', data: { 
+									item_id: item_id, item_global: item_global, item: item, 
+									item_component_id: item_component_id, item_component_type: item_component_type
+								} }
+							);
+					
+							if ( options.error ) {
+								options.error();
+							}
+						}
+					},
+					error: function() {
+
+						_this.triggerInfo( 'load-item-from-remote:stop', { 
+							item_id: item_id, item_global: item_global, 
+							item_component_id: item_component_id, item_component_type: item_component_type,
+							success: false
+						} );
+
+						if ( options.error ) {
+							options.error();
+						}
+					}
+					
+				} );
+
+			} else {
+				if ( options.error ) {
+					options.error();
+				}
+			}
+		};
 
 	  /**
        * App options:

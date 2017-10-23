@@ -1,3 +1,20 @@
+## 1.2 (2017-10-22)
+
+### Features
+- **Automatically retrieve posts and pages from server if not in the app**([#327](https://github.com/uncatcrea/wp-appkit/issues/330), [@mleroi](https://github.com/mleroi))
+- **Allow easy comment screen refresh from theme** ([#327](https://github.com/uncatcrea/wp-appkit/issues/327), [@mleroi](https://github.com/mleroi))
+
+### Default themes update
+- **Embed last version (1.0.6) of [Q for iOS](https://github.com/uncatcrea/q-ios/releases/tag/v1.0.6) and [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.0.6) default app themes**
+
+### Bugfixes
+- **Better history management when re-triggering same route** ([#262](https://github.com/uncatcrea/wp-appkit/issues/262), [@mleroi](https://github.com/mleroi))
+- **Can't go back from custom page** ([#332](https://github.com/uncatcrea/wp-appkit/issues/332), [@mleroi](https://github.com/mleroi))
+- **Component's label can't be numeric** ([#265](https://github.com/uncatcrea/wp-appkit/issues/265), [@mleroi](https://github.com/mleroi))
+- **Apply "the_title" filter on post title returned in webservice** ([#266](https://github.com/uncatcrea/wp-appkit/issues/266), [@lpointet](https://github.com/lpointet))
+- **Warning: Illegal string offset 'current_theme'** ([#331](https://github.com/uncatcrea/wp-appkit/issues/331), [@mleroi](https://github.com/mleroi))
+- **Warning on post's thumbnail array** ([#337](https://github.com/uncatcrea/wp-appkit/issues/337), [@mleroi](https://github.com/mleroi))
+
 ## 1.1 (2017-07-26)
 
 ### License Management 
