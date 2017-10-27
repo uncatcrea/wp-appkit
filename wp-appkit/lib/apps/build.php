@@ -90,7 +90,10 @@ class WpakBuild {
 		$allowed_export_types = array(
 			'phonegap-build' => __( 'PhoneGap Build', WpAppKit::i18n_domain ),
 			'phonegap-cli' => __( 'PhoneGap CLI', WpAppKit::i18n_domain ),
-			'webapp' => __( 'WebApp', WpAppKit::i18n_domain )
+			'webapp' => __( 'WebApp', WpAppKit::i18n_domain ),
+			//'webapp-appcache' => __( 'WebApp avec Manifest AppCache', WpAppKit::i18n_domain ), //AppCache is Deprectated
+			'pwa' => __( 'Progressive Web App Sources', WpAppKit::i18n_domain ),
+			'pwa-install' => __( 'Progressive Web App Install', WpAppKit::i18n_domain ),
 		);
 		return $allowed_export_types;
 	}
@@ -114,7 +117,7 @@ class WpakBuild {
 		$export_type = isset( $_GET['export_type'] ) && self::is_allowed_export_type( $_GET['export_type'] ) ? $_GET['export_type'] : 'phonegap-build';
 
 		// Re-build sources
-		$answer = self::build_app_sources( $app_id, $export_type );
+		$answer = self::build_app_sources ($app_id, $export_type );
 
 		if( 1 === $answer['ok'] && !empty( $answer['export'] ) ) {
 			$filename = $answer['export'] . '.zip';
@@ -152,6 +155,10 @@ class WpakBuild {
 	*/
 	public static function build_app_sources( $app_id, $export_type = 'phonegap-build' ) {
 		$answer = array();
+		
+		if ( $export_type === 'pwa-install' ) {
+			$export_type = 'pwa';
+		}
 
 		if ( !self::is_allowed_export_type( $export_type ) ) {
 			$answer['ok'] = 0;
@@ -184,7 +191,7 @@ class WpakBuild {
 		$plugin_dir = plugin_dir_path( dirname( dirname( __FILE__ ) ) );
 		$appli_dir = $plugin_dir . 'app';
 
-		$export_filename = self::get_export_file_base_name( $app_id );
+		$export_filename = self::get_export_file_base_name( $app_id, $export_type );
 		$export_filename_full = self::get_export_files_path() . "/" . $export_filename . '.zip';
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
@@ -199,7 +206,7 @@ class WpakBuild {
 				WpakConfigFile::get_platform_icons_and_splashscreens_files( $app_id, $app_platform, $export_type ),
 				$export_type
 		);
-
+		
 		$answer['export'] = $export_filename;
 		$answer['export_full_name'] = $export_filename_full;
 
@@ -221,11 +228,100 @@ class WpakBuild {
 			return;
 		}
 
-		$answer = self::build_app_sources( $app_id );
+		$export_type = isset( $_POST['export_type'] ) ? addslashes( $_POST['export_type'] ) : 'phonegap-build';
+
+		$answer = self::build_app_sources( $app_id, $export_type );
+
+		if ( $answer['ok'] === 1 && $export_type === 'pwa-install' ) {
+
+			if( !WpakApps::isSaved( $app_id ) ) {
+				$answer['ok'] = 0;
+				$answer['msg'] = __( 'Please save the application project before installing PWA.', WpAppKit::i18n_domain );
+				self::exit_sending_json( $answer );
+			}
+
+			$answer['export_uri'] = self::get_pwa_directory_uri( $app_id );
+
+			//Extract sources to Progressive Web App folder:
+
+			$zip_file = $answer['export_full_name'];
+
+			$target_directory = self::get_pwa_directory( $app_id );
+			$check = self::check_pwa_directory( $target_directory );
+			if ( ! $check['ok'] ) {
+				$answer['ok'] = 0;
+				$answer['msg'] = $check['msg'];
+				self::exit_sending_json( $answer );
+			}
+					
+			WP_Filesystem();
+			$result = unzip_file( $zip_file, $target_directory );
+			if ( is_wp_error( $result ) ) {
+				$answer['ok'] = 0;
+				$answer['msg'] = __( 'Could not extract ZIP export to : '. $target_directory, WpAppKit::i18n_domain );
+				self::exit_sending_json( $answer );
+			}
+		}
 
 		self::exit_sending_json( $answer );
 	}
+	
+	public static function get_default_pwa_path( $app_id ) {
+		$default_pwa_path = 'pwa';
+		return apply_filters( 'wpak_default_pwa_path', $default_pwa_path, $app_id );
+	}
 
+	public static function get_pwa_directory_uri( $app_id ) {
+		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
+		return apply_filters( 'wpak_pwa_uri', get_option('siteurl') . '/' . $app_main_infos['pwa_path'], $app_id );
+	}
+	
+	public static function get_pwa_directory( $app_id ){
+		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
+		return apply_filters( 'wpak_pwa_path', ABSPATH . $app_main_infos['pwa_path'], $app_id );
+	}
+	
+	public static function app_pwa_is_installed( $app_id ) {
+		return file_exists( self::get_pwa_directory( $app_id ) .'/index.html' );
+	}
+
+	private static function create_pwa_directory( $app_id ) {
+		$ok = true;
+		$app_pwa_directory = self::get_pwa_directory( $app_id );
+		if( !is_dir( $app_pwa_directory ) ) {
+			$ok = mkdir( $app_pwa_directory, 0777, true );
+		}
+		return $ok;
+	}
+	
+	private static function delete_pwa_directory( $app_id ) {
+		$target_directory = self::get_pwa_directory( $app_id );
+		$files = glob( $target_directory . '/*' );
+		foreach ( $files as $file ) {
+			if ( is_file( $file ) ) {
+				if ( !unlink( $file ) ) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private static function check_pwa_directory( $app_id ) {
+		$result = array( 'ok' => 1, 'msg' => '' );
+		
+		if ( !self::create_pwa_directory( $app_id ) ) {
+			$app_pwa_directory = self::get_pwa_directory( $app_id );
+			$result['ok'] = 0;
+			$result['message'] = sprintf( 
+				__( 'The Progressive Web App directory %s can\'t be created. <br/>Please check that your WordPress install has the permissions to create this directory.', WpAppKit::i18n_domain ),
+		  		$app_pwa_directory
+			);
+		}
+		
+		return $result;
+	}
+	
 	private static function exit_sending_json( $answer ) {
 		//If something was displayed before, clean it so that our answer can
 		//be valid json (and store it in an "echoed_before_json" answer key
@@ -246,8 +342,8 @@ class WpakBuild {
 		return empty( $upload_dir['error'] ) ? $upload_dir['basedir'] . '/wpak-export' : '';
 	}
 
-	private static function get_export_file_base_name( $app_id ) {
-		return 'phonegap-export-' . WpakApps::get_app_slug( $app_id );
+	private static function get_export_file_base_name( $app_id, $export_type ) {
+		return $export_type .'-export-' . WpakApps::get_app_slug( $app_id );
 	}
 
 	private static function create_export_directory_if_doesnt_exist() {
@@ -320,6 +416,7 @@ class WpakBuild {
 			$webapp_files = array();
 
 			$source_root = '';
+			$sw_cache_file_data = array();
 
 			if ( $export_type === 'phonegap-cli' ) {
 				//PhoneGap CLI export is made in www subdirectory
@@ -342,16 +439,16 @@ class WpakBuild {
 				$filename = str_replace( $source, '', $file );
 				$filename = wp_normalize_path( $filename );
 				$filename = ltrim( $filename, '/\\' );
-
+				
 				//Themes are included separately from the wpak themes directory
 				if ( preg_match( '|themes[/\\\].+|', $filename ) ) {
 					continue;
 				}
 
 				$zip_filename = $source_root . $filename;
-
+				
 				if ( is_dir( $file ) === true ) {
-
+					
 					if ( !$zip->addEmptyDir( $zip_filename ) ) {
 						$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
 						$answer['ok'] = 0;
@@ -360,15 +457,27 @@ class WpakBuild {
 
 				} elseif ( is_file( $file ) === true ) {
 
-					if ( $filename == 'index.html' ) {
+					if ( $filename === 'index.html' ) {
 
-						$index_content = self::filter_index( file_get_contents( $file ), $export_type );
+						$index_content = self::filter_index( file_get_contents( $file ), $app_id, $export_type );
 
 						if ( !$zip->addFromString( $zip_filename, $index_content ) ) {
 							$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
 							$answer['ok'] = 0;
 							return $answer;
 						}
+
+					} else if ( $filename === 'service-worker-cache.js' ) {
+
+						//Only include 'service-worker-cache.js' for progressive web apps:
+						if ( $export_type === 'pwa' ) {
+							//We add the service worker file at the end of the export because we need $webapp_files to be all set.
+							//Here we just memorize info about service worker file:
+							$sw_cache_file_data = array( 'file' => $file, 'filename' => $filename, 'zip_filename' => $zip_filename );
+						}
+						
+						//Even if progressive web app, don't include service worker in cached files
+						continue;
 
 					} else {
 
@@ -463,27 +572,45 @@ class WpakBuild {
 					$zip->addFile( $icon['full_path'], $zip_filename );
 				}
 
-				$splashscreens = $icons_and_splashscreens['splashscreens'];
-				foreach ( $splashscreens as $splashscreen ) {
-					$zip_filename = $source_root . $splashscreen['src'];
-					$zip->addFile( $splashscreen['full_path'], $zip_filename );
+				if ( $export_type !== 'pwa' ) { //Don't need splashscreens for progressive web apps
+					$splashscreens = $icons_and_splashscreens['splashscreens'];
+					foreach ( $splashscreens as $splashscreen ) {
+						$zip_filename = $source_root . $splashscreen['src'];
+						$zip->addFile( $splashscreen['full_path'], $zip_filename );
+					}
 				}
 
 			}
 
 			//Create config.js file :
-			$zip->addFromString( $source_root .'config.js', WpakConfigFile::get_config_js( $app_id ) );
+			$zip->addFromString( $source_root .'config.js', WpakConfigFile::get_config_js( $app_id, false, $export_type ) );
 			$webapp_files[] = $source_root .'config.js';
 
-			if ( $export_type !== 'webapp' ) {
+			if ( !in_array( $export_type, array( 'webapp', 'webapp-appcache', 'pwa' ) ) ) {
 				//Create config.xml file (stays at zip root) :
 				$zip->addFromString( 'config.xml', WpakConfigFile::get_config_xml( $app_id, false, $export_type ) );
 			}
 
-			if ( $export_type === 'webapp' ) {
+			if ( $export_type === 'webapp-appcache' ) {
 				//Create html cache manifest file
 				$cache_manifest_content = self::get_cache_manifest_content( $webapp_files );
 				$zip->addFromString( 'wpak.appcache', $cache_manifest_content );
+			}
+			
+			if ( $export_type === 'pwa' && !empty( $sw_cache_file_data ) ) {
+							
+				//Add manifest:
+				$zip->addFromString( $source_root .'manifest.json', self::get_pwa_manifest( $app_id ) );
+				
+				//Add service worker:
+				$sw_cache_content = self::build_pwa_service_worker_cache( $app_id, file_get_contents( $sw_cache_file_data['file'] ), $webapp_files, $export_type );
+
+				if ( !$zip->addFromString( $sw_cache_file_data['zip_filename'], $sw_cache_content ) ) {
+					$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $sw_cache_file_data['zip_filename'] );
+					$answer['ok'] = 0;
+					return $answer;
+				}
+
 			}
 
 		} else {
@@ -501,16 +628,36 @@ class WpakBuild {
 		return $answer;
 	}
 
-	private static function filter_index( $index_content, $export_type ) {
+	private static function filter_index( $index_content, $app_id, $export_type ) {
 
-		if ( $export_type === 'webapp' ) {
+		if ( $export_type === 'webapp-appcache' ) {
 
-			//Add reference to the cache manifest to the <html> tag:
+			//Add reference to the AppCache manifest to the <html> tag:
 			$index_content = str_replace( '<html>', '<html manifest="wpak.appcache" >', $index_content );
 
-			//Remove script used only for app simulation in web browser :
-			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)/is', '', $index_content );
+			//Remove script used only for app simulation in web browser:
+			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)\s*/is', '', $index_content );
 
+		} else if ( $export_type === 'webapp' ) {
+
+			//Remove script used only for app simulation in web browser:
+			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)\s*/is', '', $index_content );
+
+		} else if ( $export_type === 'pwa' ) {
+
+			//Add page title:
+			$app_main_infos = WpakApps::get_app_main_infos( $app_id );
+			$app_title = $app_main_infos['title'];
+			$app_title_html = "<title>". esc_html( $app_title ) ."</title>\n";
+		
+			//Add manifest link:
+			$manifest_html = '<link rel="manifest" href="./manifest.json">'."\n";
+			
+			$index_content = preg_replace( '/<head>(\s*?)<link/is', "<head>$1". $app_title_html ."$1". $manifest_html ."$1<link", $index_content );
+			
+			//Remove script used only for app simulation in web browser:
+			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)\s*/is', '', $index_content );
+			
 		} else {
 
 			//Add cordova.js script (set cordova.js instead of phonegap.js, because PhoneGap Developer App doesn't seem
@@ -523,6 +670,97 @@ class WpakBuild {
 		$index_content = preg_replace( '/<script[^>]*>[^<]*var query[^<]*<\/script>\s*<script/is', '<script', $index_content );
 
 		return $index_content;
+	}
+	
+	private static function build_pwa_service_worker_cache( $app_id, $content, $webapp_files, $export_type ) {
+		
+		$cache_version = 'wpak-app-'. $app_id .'-'. date( 'Ymd-his');
+		
+		$cache_files = '';
+		if ( !empty( $webapp_files ) ) {
+			$cache_files .= "'/',\n";
+			foreach( $webapp_files as $file ) {
+				$cache_files .= "'/". $file ."',\n";
+			}
+			$cache_files = rtrim( $cache_files, ",\n" );
+		}
+		
+		//Set cache version and cached files:
+		$content = preg_replace( "/(var cacheName = ')(';).*/", "$1". $cache_version ."$2", $content );
+		$content = preg_replace( "/(var filesToCache = \[)(\];).*/", "$1". $cache_files ."$2", $content );
+		
+		return $content;
+	}
+	
+	private static function get_pwa_manifest( $app_id ) {
+
+		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
+		
+		$pwa_name = !empty( $app_main_infos['pwa_name'] ) ? $app_main_infos['pwa_name'] : $app_main_infos['title'];
+		$pwa_short_name = !empty( $app_main_infos['pwa_short_name'] ) ? $app_main_infos['pwa_short_name'] : $pwa_name;
+		
+		//"#282E34","#122E4F";
+		
+		$manifest = array(
+			"name" => $pwa_name,
+			"short_name" => $pwa_short_name,
+			"description" => !empty( $app_main_infos['pwa_desc'] ) ? $app_main_infos['pwa_desc'] : '',
+			"icons" => self::get_pwa_manifest_icons( $app_id ),
+			"start_url" => "./",
+			"display" => "standalone",
+		);
+
+		if ( !empty( $app_main_infos['pwa_background_color'] ) ) {
+			$manifest['background_color'] = $app_main_infos['pwa_background_color'];
+		}
+
+		if ( !empty( $app_main_infos['pwa_theme_color'] ) ) {
+			$manifest['theme_color'] = $app_main_infos['pwa_theme_color'];
+		}
+
+		$manifest = apply_filters( 'wpak_pwa_manifest', $manifest, $app_id );
+
+		return json_encode( $manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+	}
+
+	private static function get_pwa_manifest_icons( $app_id ) {
+		$manifest_icons = array();
+
+		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
+		$app_icons = $app_main_infos['pwa_icons'];
+		if ( empty( $app_icons ) ) {
+
+			$icons_and_splash = WpakConfigFile::get_platform_icons_and_splashscreens_files( $app_id, $app_main_infos['platform'], 'pwa' );
+			$icons = $icons_and_splash['icons'];
+
+			if ( !empty( $icons ) ) {
+				foreach( $icons as $icon ) {
+					$manifest_icons[] = array(
+						'src' => $icon['src'],
+						'sizes' => $icon['width'] .'x'. $icon['height'],
+						'type' => $icon['type'],
+					);
+				}
+			}
+
+		} else {
+		    foreach( $app_icons as $icon ) {
+		        $src = str_replace( WpakThemes::get_themes_directory(), 'themes', $icon['path'] );
+		        $manifest_icons[] = array(
+		            'src' => $src,
+		            'sizes' => $icon['size'][0] . 'x' . $icon['size'][1],
+		            'type' => 'image/png',
+		        );
+		    }
+		}
+
+		return $manifest_icons;
+	}
+
+	public static function pwa_icons_json_to_array( $app_icons_json ) {
+		$app_icons_json = stripslashes( $app_icons_json );
+		$app_icons_array = json_decode( $app_icons_json, false );
+		return !empty( $app_icons_array ) && is_array( $app_icons_array ) ? $app_icons_array : array();
 	}
 
 	private static function get_cache_manifest_content( $webapp_files ) {

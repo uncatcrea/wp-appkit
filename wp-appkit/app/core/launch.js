@@ -24,8 +24,17 @@ require.config({
 
 require(['root/config'],function(Config){
 
+	//If Progressive Web App, activate service worker to cache app source files:
+	if ( Config.app_type === 'pwa' && 'serviceWorker' in navigator ) {
+		navigator.serviceWorker
+				.register( location.pathname +'service-worker-cache.js' )
+				.then( function () {
+					console.log( '[WP-AppKit Service Worker] Registered' );
+				} );
+	}
+
 	var dynamic_paths = {
-		theme: '../themes/'+ Config.theme,
+		theme: '../themes/'+ Config.theme
 	};
 
 	require.config({
