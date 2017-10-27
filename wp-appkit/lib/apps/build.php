@@ -247,7 +247,7 @@ class WpakBuild {
 			$zip_file = $answer['export_full_name'];
 
 			$target_directory = self::get_pwa_directory( $app_id );
-			$check = self::check_pwa_directory( $target_directory );
+			$check = self::check_pwa_directory( $app_id );
 			if ( ! $check['ok'] ) {
 				$answer['ok'] = 0;
 				$answer['msg'] = $check['msg'];
