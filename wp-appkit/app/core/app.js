@@ -1,4 +1,4 @@
-define(function (require) {
+define(function (require,exports) {
 
       "use strict";
 
@@ -108,10 +108,12 @@ define(function (require) {
 	  };
 
 	  app.addCustomRoute = function( fragment, template, data ) {
+		  fragment = Utils.removeTrailingSlash( fragment );
 		  custom_routes[fragment] = { template: template, data: data };
 	  };
 
 	  app.removeCustomRoute = function( fragment ) {
+		  fragment = Utils.removeTrailingSlash( fragment );
 		  if( custom_routes.hasOwnProperty(fragment) ) {
 			  delete custom_routes[fragment];
 		  }
@@ -119,6 +121,7 @@ define(function (require) {
 
 	  app.getCustomRoute = function( fragment ) {
 		  var route = {};
+		  fragment = Utils.removeTrailingSlash( fragment );
 		  if( custom_routes.hasOwnProperty(fragment) ) {
 			  route = custom_routes[fragment];
 		  }
@@ -138,6 +141,7 @@ define(function (require) {
 		  'refresh-at-app-launch' : true,
 		  'go-to-default-route-after-refresh' : true,
 		  'custom-screen-rendering' : false,
+          'use-html5-pushstate': false //Automatically set to true only for PWA
 	  };
 
 	  app.getParam = function(param){
@@ -156,8 +160,22 @@ define(function (require) {
 
 	  //--------------------------------------------------------------------------
 	  //App Backbone router :
-	  app.router = null;
+	  app.router = null; //Set in launch.js for now, to avoid circular dependency
 
+      /**
+       * Add a screen to history manually from its route, without triggering 
+       * the route, nor the corresponding screen rendering. 
+       */
+      app.silentlyAddRouteToAppHistory = function( route ) {
+        var route_info = app.router.getRouteTypeAndParameters( route );
+        if ( route_info ) {
+            var route_rendering_data = app.router.getRouteData( route_info.type, route_info.parameters );
+            app.setQueriedScreen( route_rendering_data.screen_data );
+            app.addQueriedScreenToHistory();
+            Utils.log( 'Silently added route to history: '+ route );
+        }
+      };
+      
 	  /**
 	   * Sets the route corresponding to the app homepage : fragment empty or = "#".
 	   * Use the 'default-route' filter to change the default route from functions.js.
@@ -199,19 +217,54 @@ define(function (require) {
 		var default_route = app.resetDefaultRoute(true);
 		var launch_route = default_route;
 		var deep_link_route = DeepLink.getLaunchRoute();
-
+        var url_fragment = window.location.hash; //Retrieve asked route from url's fragment
+        var url_pathname = window.location.pathname; //Retrieve asked route from url's relative path
+        
+		/**
+         * Set default route to the one passed via deeplink or via url fragment or via url slug.
+         * + Disable refresh at app launch because:
+         * 1. it will cause going to default route right after, so our launch route won't be useful
+         * 2. if we're here, it's because we're in launching process, after having retrieved some data
+         * 3. if we disable 'go-to-default-route-after-refresh', we'd have to enable it again after the next refresh
+         */
+        var asked_route = '';
 		if( deep_link_route.length > 0 ) {
-            launch_route = deep_link_route;
-
-            //
-            // Disable refresh at app launch because:
-            //  1. it will cause going to default route right after, so our launch route won't be useful
-            //  2. if we're here, it's because we're in launching process, after having retrieved some data
-            //  3. if we disable 'go-to-default-route-after-refresh', we'd have to enable it again after the next refresh
-            //
+            
+            asked_route = deep_link_route;
 
             app.setParam( 'refresh-at-app-launch', false );
-		}
+            
+		} else if ( url_fragment.length > 0 ) {
+            
+            asked_route = url_fragment;
+            
+            app.setParam( 'refresh-at-app-launch', false );
+        
+        } else if ( app.getParam( 'use-html5-pushstate' ) && url_pathname.length > 0 && url_pathname.indexOf( Config.app_path ) === 0 ) {
+            
+            asked_route = url_pathname.replace( Config.app_path, '' );
+            
+            if ( asked_route.length > 0 ) {
+                asked_route = Utils.addTrailingSlash( asked_route );
+                if ( asked_route !== default_route ) {
+                    app.setParam( 'refresh-at-app-launch', false );
+                }
+            }
+        }
+        
+        //A route was asked by url, that is different from launch route.
+        //Set launch_route to this asked route and manually add the default screen
+        //to history, so that we can go back to it with back button.
+        if ( asked_route.length > 0 && asked_route !== launch_route ) {
+           
+            var add_default_route_before_asked_route = Hooks.applyFilters( 'add-default-route-before-asked-route', true, [ asked_route, default_route, launch_route ] );
+           
+            if ( add_default_route_before_asked_route ) {
+                app.silentlyAddRouteToAppHistory( default_route );
+            }
+            
+            launch_route = asked_route;
+        }
 
 		/**
 		 * Use the 'launch-route' filter to display a specific screen at app launch
@@ -220,22 +273,30 @@ define(function (require) {
 		 * to a choosen page in the "info:app-ready" event for example.
 		 */
 		launch_route = Hooks.applyFilters('launch-route',launch_route,[Stats.getStats()]);
-
+        
 		/**
 		 * 'pre-start-router' action: use this if you need to do some treatment
 		 * before Backbone routing starts.
 		 */
 		Hooks.doActions( 'pre-start-router', [ launch_route, Stats.getStats() ] ).done( function() {
-
+            
 			// Reset DeepLink launch route after hooks are fired to let scripts retrieve this route if needed
 			DeepLink.reset();
 
+            var history_start_args = {};
+            
+            if( app.getParam( 'use-html5-pushstate' ) ) {
+                history_start_args.pushState = true;
+                history_start_args.root = Config.app_path;
+            }
+
 			if( launch_route.length > 0 ){
-				Backbone.history.start();
+				Backbone.history.start( history_start_args );
 				//Navigate to the launch_route :
 				app.router.navigate(launch_route, {trigger: true});
 			}else{
-				Backbone.history.start({silent:true});
+                history_start_args.silent = true;
+				Backbone.history.start( history_start_args );
 				//Hack : Trigger a non existent route so that no view is loaded :
 				app.router.navigate('#wpak-none', {trigger: true});
 			}
@@ -281,27 +342,30 @@ define(function (require) {
 	app.getScreenFragment = function ( link_type, data ) {
 		
 		var screen_link = '';
+        
+        var prefix = app.getParam('use-html5-pushstate') ? '' : '#';
+        var suffix = app.getParam('use-html5-pushstate') ? '/' : '';
 		
 		switch( link_type ) {
 			case 'single':
-				screen_link = '#single/' + data.global + '/' + data.item_id;
+				screen_link = prefix + 'single/' + data.global + '/' + data.item_id + suffix;
 				break;
 			case 'page':
-				screen_link = '#page/' + data.component_id + '/' + data.item_id;
+				screen_link = prefix + 'page/' + data.component_id + '/' + data.item_id + suffix;
 				break;
 			case 'comments':
-				screen_link = '#comments-' + data.item_id;
+				screen_link = prefix + 'comments-' + data.item_id + suffix;
 				break;
 			case 'component':
 				var component = app.getComponentData( data.component_id );
 				if ( component ) {
 					//If page component, return directly page's screen fragment to avoid
 					//redirection in router, which leads to back button not working.
-					screen_link = component.type !== 'page' ? '#component-'+ component.id : '#page/'+ component.id +'/'+ component.data.root_id;
+					screen_link = component.type !== 'page' ? prefix + 'component-'+ component.id + suffix : prefix + 'page/'+ component.id +'/'+ component.data.root_id + suffix;
 				}
 				break;
 			case 'custom-page':
-				screen_link = '#custom-page';
+				screen_link = prefix + 'custom-page' + suffix;
 				break;
 		}
 		
@@ -385,18 +449,13 @@ define(function (require) {
 			  }else if( queried_screen_data.screen_type == 'list' ){
 				  history_action = 'empty-then-push';
 			  }else if( queried_screen_data.screen_type == 'single' ){
-				  if( current_screen.screen_type == 'list' ){
-					  history_action = 'push';
-				  }else if( current_screen.screen_type == 'custom-component' ){
-					  history_action = 'push';
-				  }else if( current_screen.screen_type == 'comments' ){
+				  history_action = 'push';
+				  if( current_screen.screen_type == 'comments' ){
 					  if( previous_screen.screen_type == 'single' && previous_screen.item_id == queried_screen_data.item_id ){
 						  history_action = 'pop';
 					  }else{
 						  history_action = 'empty-then-push';
 					  }
-				  }else{
-					  history_action = 'empty-then-push';
 				  }
 			  }else if( queried_screen_data.screen_type == 'page' ){
 				  if( current_screen.screen_type == 'page'
@@ -640,24 +699,24 @@ define(function (require) {
 	  //--------------------------------------------------------------------------
 	  //App synchronization :
 
-	  app.sync = function(cb_ok,cb_error,force_reload){
+	  app.sync = function( cb_ok, cb_error, force_reload ){
 
 		  var force = force_reload != undefined && force_reload;
-
+          
 		  app.components.fetch({'success': function(components, response, options){
 			  Hooks.doActions( 'components-fetched', [components, response, options] ).done( function() {
 	    		 if( components.length == 0 || force ){
-	    			 syncWebService(cb_ok,cb_error);
+	    			 syncWebService( cb_ok, cb_error );
 	    		 }else{
 	    			 Utils.log('Components retrieved from local storage.',{components:components});
 	    			 app.navigation.fetch({'success': function(navigation, response_nav, options_nav){
 	    	    		 if( navigation.length == 0 ){
-	    	    			 syncWebService(cb_ok,cb_error);
+	    	    			 syncWebService( cb_ok, cb_error );
 	    	    		 }else{
 	    	    			 Utils.log('Menu items retrieved from local storage.',{navigation:navigation});
 	    	    			 globals_keys.fetch({'success': function(global_keys, response_global_keys, options_global_keys){
 	    	    	    		 if( global_keys.length == 0 ){
-	    	    	    			 syncWebService(cb_ok,cb_error);
+	    	    	    			 syncWebService( cb_ok, cb_error );
 	    	    	    		 }else{
 	    	    	    			 var fetch = function(_items,_key){
 	    	    	    				 return _items.fetch({'success': function(fetched_items, response_items, options_items){
@@ -675,7 +734,7 @@ define(function (require) {
 
 	    	    	    			 $.when.apply($, fetches).done(function () {
 	    	    	    				 if( app.globals.length == 0 ){
-		    	    	    				 syncWebService(cb_ok,cb_error);
+		    	    	    				 syncWebService( cb_ok, cb_error );
 		    	    	    			 }else{
 		    	    	    				 Utils.log('Global items retrieved from local storage.',{globals:app.globals});
 		    	    	    				 cb_ok();
@@ -692,8 +751,36 @@ define(function (require) {
 
       };
 
-	  var syncWebService = function(cb_ok,cb_error,force_reload){
-			var token = WsToken.getWebServiceUrlToken( 'synchronization' );
+      /**
+       * Calls synchronization webservice.
+       * Note: cb_ok and cb_error callbacks are given a deferred that they must
+       * resolve so that the refresh:end event is triggered.
+       */
+	  var syncWebService = function( cb_ok, cb_error ){
+			
+            //Set refresh events:
+            
+            //Trigger 'refresh:start' event.
+            //For legacy, this is not an "info" event for now.
+            vent.trigger( 'refresh:start' );
+
+            var sync_deferred = $.Deferred();
+
+            var sync_cb_ok = function() {
+                cb_ok( sync_deferred );
+            };
+
+            var sync_cb_error = function( error_data ) {
+                cb_error( error_data, sync_deferred );
+            };
+
+            //Trigger 'refresh:end' when sync ends
+            sync_deferred.always( function( data ){
+                vent.trigger( 'refresh:end', data );
+            } );
+          
+            //Setup synchronization webservice call:
+            var token = WsToken.getWebServiceUrlToken( 'synchronization' );
 			var ws_url = token + '/synchronization/';
 
 			/**
@@ -785,13 +872,13 @@ define(function (require) {
 								app.triggerError(
 									'synchro:no-component',
 									{ type: 'web-service', where: 'app::syncWebService', message: 'No component found for this App. Please add components to the App on WordPress side.', data: data },
-									cb_error
+									sync_cb_error
 								);
 
 							} else {
 
 								Utils.log( 'Components, menu items and globals retrieved from online.', { components: app.components, navigation: app.navigation, globals: app.globals } );
-								cb_ok();
+								sync_cb_ok();
 
 							}
 
@@ -799,7 +886,7 @@ define(function (require) {
 							app.triggerError(
 								'synchro:wrong-answer',
 								{ type: 'web-service', where: 'app::syncWebService', message: 'Wrong "synchronization" web service answer', data: data },
-								cb_error
+								sync_cb_error
 							);
 						}
 
@@ -807,13 +894,13 @@ define(function (require) {
 						app.triggerError(
 							'synchro:ws-return-error',
 							{ type: 'web-service', where: 'app::syncWebService', message: 'Web service "synchronization" returned an error : [' + data.result.message + ']', data: data },
-							cb_error
+							sync_cb_error
 						);
 					} else {
 						app.triggerError(
 							'synchro:wrong-status',
 							{ type: 'web-service', where: 'app::syncWebService', message: 'Wrong web service answer status', data: data },
-							cb_error
+							sync_cb_error
 						);
 					}
 
@@ -821,7 +908,7 @@ define(function (require) {
 					app.triggerError(
 						'synchro:wrong-format',
 						{ type: 'web-service', where: 'app::syncWebService', message: 'Wrong web service answer format', data: data },
-						cb_error
+						sync_cb_error
 					);
 				}
 
@@ -831,7 +918,7 @@ define(function (require) {
 				app.triggerError(
 					'synchro:ajax',
 					{ type: 'ajax', where: 'app::syncWebService', message: textStatus + ': ' + errorThrown, data: { url: Config.wp_ws_url + ws_url, jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown } },
-					cb_error
+					sync_cb_error
 				);
 			};
 
@@ -1936,6 +2023,14 @@ define(function (require) {
        */
       app.initialize = function ( callback ) {
 
+        //Activate pretty slugs via html5 pushstate for PWA:
+        //(this can be deactivated in theme by setting the param
+        //'use-html5-pushstate' to false)
+        if( Config.app_platform === 'pwa' && Config.app_type !== 'preview' ) {
+            app.setParam( 'use-html5-pushstate', true );
+            Utils.log( 'HTML5 pushstate mode activated.' );
+        }
+
       	document.addEventListener( 'resume', app.onResume, false );
 
 		fetchOptions(function(){
@@ -1988,6 +2083,6 @@ define(function (require) {
 		Utils.log('Network event : offline');
 	};
 
-	return app;
+    return app;
 
 });

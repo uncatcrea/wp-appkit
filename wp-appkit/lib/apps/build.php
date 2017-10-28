@@ -601,6 +601,11 @@ class WpakBuild {
 							
 				//Add manifest:
 				$zip->addFromString( $source_root .'manifest.json', self::get_pwa_manifest( $app_id ) );
+                
+                if ( self::pwa_pretty_slugs_on( $app_id ) ) {
+                    //Add htaccess (required to handle pretty slugs with HTML5 pushstate):
+                    $zip->addFromString( $source_root .'.htaccess', self::get_pwa_htaccess( $app_id ) );
+                }
 				
 				//Add service worker:
 				$sw_cache_content = self::build_pwa_service_worker_cache( $app_id, file_get_contents( $sw_cache_file_data['file'] ), $webapp_files, $export_type );
@@ -627,6 +632,14 @@ class WpakBuild {
 
 		return $answer;
 	}
+    
+    private static function pwa_pretty_slugs_on( $app_id ) {
+        /**
+         * Use this filter to deactivate pretty slugs on Progressive Web App and
+         * go back to standard #fragment navigation.
+         */
+        return apply_filters( 'wpak_pwa_pretty_slugs_on', true, $app_id );
+    }
 
 	private static function filter_index( $index_content, $app_id, $export_type ) {
 
@@ -649,11 +662,20 @@ class WpakBuild {
 			$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 			$app_title = $app_main_infos['title'];
 			$app_title_html = "<title>". esc_html( $app_title ) ."</title>\n";
+            
+            if ( self::pwa_pretty_slugs_on( $app_id ) ) {
+                //Add "base" (required to handle pretty slugs with HTML5 pushstate):
+                $pwa_base_suburl = !empty(  $app_main_infos['pwa_path'] ) ? $app_main_infos['pwa_path'] : '';
+                
+                $pwa_base_suburl = self::add_subdir_prefix( $pwa_base_suburl );
+                
+                $base_html = "<base href=\"/". trailingslashit( ltrim( $pwa_base_suburl, '/' ) )  ."\" />\n";
+            }
 		
 			//Add manifest link:
 			$manifest_html = '<link rel="manifest" href="./manifest.json">'."\n";
 			
-			$index_content = preg_replace( '/<head>(\s*?)<link/is', "<head>$1". $app_title_html ."$1". $manifest_html ."$1<link", $index_content );
+			$index_content = preg_replace( '/<head>(\s*?)<link/is', "<head>$1". $app_title_html ."$1". $manifest_html ."$1". $base_html ."$1<link", $index_content );
 			
 			//Remove script used only for app simulation in web browser:
 			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)\s*/is', '', $index_content );
@@ -671,6 +693,19 @@ class WpakBuild {
 
 		return $index_content;
 	}
+    
+    public static function add_subdir_prefix( $slug ) {
+        //Prefix slug with subdirectory if WP is installed in subdirectory:
+        $subdir = parse_url( get_option( 'siteurl' ), PHP_URL_PATH );
+        if ( $subdir && $subdir !== '/' ) {
+            $left_slash = strpos( $slug, '/' ) === 0;
+            $slug = trailingslashit( ltrim( $subdir, '/' ) ) . ltrim( $slug, '/' );
+            if ( $left_slash ) {
+                $slug = '/'. $slug;
+            }
+        }
+        return $slug;
+    }
 	
 	private static function build_pwa_service_worker_cache( $app_id, $content, $webapp_files, $export_type ) {
 		
@@ -722,6 +757,24 @@ class WpakBuild {
 
 		return json_encode( $manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
 	}
+    
+    private static function get_pwa_htaccess( $app_id ) {
+        
+        $htaccess = ""
+                . "#WP-AppKit rewrite rules\n"
+                . "#Redirect all urls to index.html to allow deeplinks\n"
+                . "#and pretty slugs using HTML5 pushstate\n"
+                . "<IfModule mod_rewrite.c>\n"
+                . "RewriteEngine On\n"
+                . "RewriteCond %{REQUEST_FILENAME} !-f\n"
+                . "RewriteCond %{REQUEST_FILENAME} !-d\n"
+                . "RewriteCond %{REQUEST_URI} !.html\n"
+                . "RewriteCond %{REQUEST_URI} !.js\n"
+                . "RewriteRule (.*) index.html [L]\n"
+                . "</IfModule>\n";
+
+        return $htaccess;
+    }
 
 	private static function get_pwa_manifest_icons( $app_id ) {
 		$manifest_icons = array();
