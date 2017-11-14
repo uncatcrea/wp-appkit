@@ -80,8 +80,7 @@ define(function (require, exports) {
 		},
 
         default_route: function(){
-        	//this.navigate(default_route, {trigger: true});
-            
+            this.navigate( '/', { trigger: true } );
             this.execute_route_silently( default_route );
         },
 		

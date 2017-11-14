@@ -293,7 +293,11 @@ define(function (require,exports) {
 			if( launch_route.length > 0 ){
 				Backbone.history.start( history_start_args );
 				//Navigate to the launch_route :
-				app.router.navigate(launch_route, {trigger: true});
+				if ( launch_route === default_route ) {
+					app.router.default_route();
+				} else {
+					app.router.navigate(launch_route, {trigger: true});
+				}
 			}else{
                 history_start_args.silent = true;
 				Backbone.history.start( history_start_args );
