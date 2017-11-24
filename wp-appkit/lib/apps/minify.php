@@ -6,6 +6,7 @@ class WpakMinify {
     
     public function __construct() {
         require_once( dirname( __FILE__ ) . '/../../vendor/minification/js/JSqueeze.php' );
+        require_once( dirname( __FILE__ ) . '/../../vendor/minification/css/minify.php' );
         $this->jsqueeze = new Patchwork\JSqueeze();
     }
     
@@ -31,6 +32,12 @@ class WpakMinify {
         
         return $minified_content;
     }
-    
+ 
+    public function minify_css( $content_to_minify ) {
+	
+        $minified_content = Minify_CSS_Compressor::process( $content_to_minify );
+
+        return $minified_content;
+    }
 }
 
