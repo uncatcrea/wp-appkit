@@ -598,7 +598,27 @@ class WpakBuild {
 					$addon_files = $addon->get_all_files();
 					foreach ( $addon_files as $addon_file ) {
 						$zip_filename = $source_root .'addons/'. $addon->slug .'/'. $addon_file['relative'];
-						$zip->addFile( $addon_file['full'], $zip_filename );
+						
+                        $file_extension = pathinfo( $addon_file['full'], PATHINFO_EXTENSION );
+                        
+                        $minify_file = self::is_file_to_minify( $addon_file['full'], $export_type, $app_id );
+                            
+                        if ( $minify_file ) {
+
+                            $file_content = file_get_contents( $addon_file['full'] );
+
+                            $file_content = $minifier->minify( $file_extension, $file_content );
+
+                            if ( !$zip->addFromString( $zip_filename, $file_content ) ) {
+                                $answer['msg'] = sprintf( __( 'Could not add minified file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
+                                $answer['ok'] = 0;
+                                return $answer;
+                            }
+
+                        } else {
+                            $zip->addFile( $addon_file['full'], $zip_filename );
+                        }
+                        
 						$webapp_files[] = $zip_filename;
 					}
 				}
@@ -627,8 +647,14 @@ class WpakBuild {
 			}
 
 			//Create config.js file :
-			$zip->addFromString( $source_root .'config.js', WpakConfigFile::get_config_js( $app_id, false, $export_type ) );
-			$webapp_files[] = $source_root .'config.js';
+            $config_js_file = $source_root .'config.js';
+            $config_js_file_content = WpakConfigFile::get_config_js( $app_id, false, $export_type );
+            $minify_file = self::is_file_to_minify( $config_js_file, $export_type, $app_id );
+            if ( $minify_file ) {
+                $config_js_file_content = $minifier->minify( 'js', $config_js_file_content );
+            }
+			$zip->addFromString( $config_js_file, $config_js_file_content );
+			$webapp_files[] = $config_js_file;
 
 			if ( !in_array( $export_type, array( 'webapp', 'webapp-appcache', 'pwa' ) ) ) {
 				//Create config.xml file (stays at zip root) :
