@@ -4,7 +4,7 @@
     src: url('fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('fonts/glyphicons-halflings-regular.woff') format('woff'), url('fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 
-#wpak_app_publish .inside, #wpak_app_project .inside, 
+#wpak_app_publish .inside, #wpak_app_project .inside,
 #wpak_app_export_phonegap_build .inside, #wpak_app_export_pwa .inside  {
     margin: 0;
     padding: 0;
@@ -1137,4 +1137,7 @@ a.list-group-item-danger.active:focus {
     max-width:150px;
     max-height:150px;
     margin-right:3px;
+}
+.wpak_settings .wp-picker-container {
+    display:block;
 }

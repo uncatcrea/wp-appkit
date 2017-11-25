@@ -645,11 +645,11 @@ class WpakApps {
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Background Color', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_pwa_backgound_color" value="<?php echo esc_attr( $main_infos['pwa_backgound_color'] ) ?>" id="wpak_pwa_backgound_color" />
+					<input type="text" name="wpak_app_pwa_backgound_color" value="<?php echo esc_attr( $main_infos['pwa_backgound_color'] ) ?>" id="wpak_pwa_backgound_color" class="color-field" />
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Theme Color', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_pwa_theme_color" value="<?php echo esc_attr( $main_infos['pwa_theme_color'] ) ?>" id="wpak_pwa_theme_color" />
+					<input type="text" name="wpak_app_pwa_theme_color" value="<?php echo esc_attr( $main_infos['pwa_theme_color'] ) ?>" id="wpak_pwa_theme_color" class="color-field" />
 				</div>
 			</fieldset>
 			<?php if( $pwa_installed ): ?>
@@ -939,7 +939,13 @@ class WpakApps {
 		$pwa_icons = WpakThemes::get_pwa_icons( WpakThemesStorage::get_current_theme( $post_id ) );
 
 		$pwa_backgound_color = get_post_meta( $post_id, '_wpak_app_pwa_background_color', true );
+		if( empty( $pwa_backgound_color ) ) {
+			$pwa_backgound_color = '#ffffff'; // White by default
+		}
 		$pwa_theme_color = get_post_meta( $post_id, '_wpak_app_pwa_theme_color', true );
+		if( empty( $pwa_theme_color ) ) {
+			$pwa_theme_color = '#ffffff'; // White by default
+		}
 
 		$build_tool = get_post_meta( $post_id, '_wpak_app_build_tool', true );
 		$build_tool = empty( $build_tool ) ? 'gradle' : $build_tool; //Set gradle as default Android build tool

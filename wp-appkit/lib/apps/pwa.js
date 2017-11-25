@@ -60,5 +60,7 @@ jQuery().ready( function () {
 		});
 	}).change();
 
+	$( '.color-field' ).wpColorPicker();
+
 } );
 
