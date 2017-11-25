@@ -83,7 +83,7 @@ class WpakApps {
 				'messages' => array(
 					'install_successfull' => __( 'Progressive Web App installed successfully', WpAppKit::i18n_domain ),
 					'see_pwa' => __( 'View Progressive Web App', WpAppKit::i18n_domain ),
-					'pwa_icons_detected' => __( 'We detected the following icons in your theme. They will be automatically used by the PWA:', WpAppKit::i18n_domain ),
+					'pwa_icons_detected' => __( 'We detected the following icons in your theme (in %s). They will be automatically used by the PWA:', WpAppKit::i18n_domain ),
 					'pwa_no_icons' => __( 'We didn\'t detect any icons in your theme. You can add them in following <a href="#">our tutorial</a>. If you don\'t provide icons, default ones will be used.', WpAppKit::i18n_domain ),
 				)
 			));
@@ -100,7 +100,7 @@ class WpakApps {
 	public static function apps_custom_post_type() {
 
 		//Handle specific capabilities for the custom "WP AppKit App Editor" role only.
-		//With special case for multisite admin who has all caps by default, so has the 
+		//With special case for multisite admin who has all caps by default, so has the
 		//'wpak_edit_apps' capability (See WP_User::has_cap()).
 		$capability = current_user_can('wpak_edit_apps') && !( is_multisite() && is_super_admin() ) ? 'wpak_app' : 'post';
 
@@ -194,11 +194,11 @@ class WpakApps {
 
 	public static function add_settings_panels() {
 		$capability_required = current_user_can( 'wpak_edit_apps' ) ? 'wpak_edit_apps' : 'manage_options';
-		add_menu_page( 
-			__( 'WP-AppKit', WpAppKit::i18n_domain ), 
-			__( 'WP-AppKit', WpAppKit::i18n_domain ), 
-			$capability_required, 
-			self::menu_item, 
+		add_menu_page(
+			__( 'WP-AppKit', WpAppKit::i18n_domain ),
+			__( 'WP-AppKit', WpAppKit::i18n_domain ),
+			$capability_required,
+			self::menu_item,
 			array( __CLASS__, 'settings_panel' ),
 			'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyAgIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIiAgIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyIgICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiICAgdmVyc2lvbj0iMS4xIiAgIGlkPSJMYXllcl8xIiAgIHg9IjBweCIgICB5PSIwcHgiICAgdmlld0JveD0iMCAwIDE4IDE4IiAgIHhtbDpzcGFjZT0icHJlc2VydmUiICAgaW5rc2NhcGU6dmVyc2lvbj0iMC45MSByMTM3MjUiICAgc29kaXBvZGk6ZG9jbmFtZT0iaWNvbi1taW5pLTIuc3ZnIiAgIHdpZHRoPSIxOCIgICBoZWlnaHQ9IjE4Ij48bWV0YWRhdGEgICAgIGlkPSJtZXRhZGF0YTE1Ij48cmRmOlJERj48Y2M6V29yayAgICAgICAgIHJkZjphYm91dD0iIj48ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD48ZGM6dHlwZSAgICAgICAgICAgcmRmOnJlc291cmNlPSJodHRwOi8vcHVybC5vcmcvZGMvZGNtaXR5cGUvU3RpbGxJbWFnZSIgLz48ZGM6dGl0bGU+PC9kYzp0aXRsZT48L2NjOldvcms+PC9yZGY6UkRGPjwvbWV0YWRhdGE+PGRlZnMgICAgIGlkPSJkZWZzMTMiIC8+PHNvZGlwb2RpOm5hbWVkdmlldyAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIiAgICAgYm9yZGVyY29sb3I9IiM2NjY2NjYiICAgICBib3JkZXJvcGFjaXR5PSIxIiAgICAgb2JqZWN0dG9sZXJhbmNlPSIxMCIgICAgIGdyaWR0b2xlcmFuY2U9IjEwIiAgICAgZ3VpZGV0b2xlcmFuY2U9IjEwIiAgICAgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAiICAgICBpbmtzY2FwZTpwYWdlc2hhZG93PSIyIiAgICAgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIxNjgwIiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTAyOCIgICAgIGlkPSJuYW1lZHZpZXcxMSIgICAgIHNob3dncmlkPSJmYWxzZSIgICAgIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSJmYWxzZSIgICAgIGlua3NjYXBlOnpvb209IjIuOTUiICAgICBpbmtzY2FwZTpjeD0iNDAiICAgICBpbmtzY2FwZTpjeT0iNDAiICAgICBpbmtzY2FwZTp3aW5kb3cteD0iLTgiICAgICBpbmtzY2FwZTp3aW5kb3cteT0iLTgiICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0iTGF5ZXJfMSIgLz48c3R5bGUgICAgIHR5cGU9InRleHQvY3NzIiAgICAgaWQ9InN0eWxlMyI+LnN0MHtmaWxsOiMxRTIzMkQ7fTwvc3R5bGU+PGcgICAgIGlkPSJnNSIgICAgIHN0eWxlPSJmaWxsOiNhMGE1YWE7ZmlsbC1vcGFjaXR5OjEiICAgICB0cmFuc2Zvcm09Im1hdHJpeCgwLjIwNTEyODIxLDAsMCwwLjIwNTEyODIxLDEuNzk0ODcxNCwwLjc5NDg3MTYpIj48cGF0aCAgICAgICBjbGFzcz0ic3QwIiAgICAgICBkPSJNIDQxLjUsMSA1LjUsMSBDIDMsMSAxLDMgMSw1LjUgbCAwLDY5IEMgMSw3NyAzLDc5IDUuNSw3OSBsIDM2LDAgQyA0NCw3OSA0Niw3NyA0Niw3NC41IGwgMCwtNjkgQyA0NiwzIDQ0LDEgNDEuNSwxIFogTSAyOSw3NCAxOCw3NCBjIC0xLjEsMCAtMiwtMC45IC0yLC0yIDAsLTEuMSAwLjksLTIgMiwtMiBsIDExLDAgYyAxLjEsMCAyLDAuOSAyLDIgMCwxLjEgLTAuOSwyIC0yLDIgeiBNIDQwLDY0IGMgMCwwLjYgLTAuNCwxIC0xLDEgTCA4LDY1IEMgNy40LDY1IDcsNjQuNSA3LDY0IEwgNyw4IEMgNyw3LjQgNy40LDcgOCw3IGwgMzEsMCBjIDAuNiwwIDEsMC41IDEsMSBsIDAsNTYgeiIgICAgICAgaWQ9InBhdGg3IiAgICAgICBzdHlsZT0iZmlsbDojYTBhNWFhO2ZpbGwtb3BhY2l0eToxIiAgICAgICBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIiAvPjxwYXRoICAgICAgIGNsYXNzPSJzdDAiICAgICAgIGQ9Ik0gNzQuNywzNSBDIDcyLjYsMzQuNSA3MSwzMyA3MC4yLDMxIDY5LjUsMjkgNjkuOCwyNi44IDcxLDI1LjEgbCAyLjYsLTMuNiAtNS4xLC02LjEgLTQsMS45IGMgLTEuOSwwLjkgLTQuMiwwLjkgLTYsLTAuMiAtMS44LC0xLjEgLTMsLTMgLTMuMiwtNS4xIEwgNTUsNy42IGwgLTYuMiwtMSAwLDE4LjUgYyA2LjcsMS43IDEyLDcuNyAxMiwxNC45IDAsNy4yIC01LjEsMTMuMiAtMTEuOCwxNSBsIDAsMTguNSA2LjIsLTEgMC4zLC00LjQgYyAwLjEsLTIuMSAxLjMsLTQgMy4yLC01LjEgMS44LC0xLjEgNC4xLC0xLjEgNiwtMC4yIGwgNCwxLjkgNS4xLC02LjEgLTIuNywtMy42IGMgLTEuMywtMS43IC0xLjYsLTMuOSAtMC44LC01LjkgMC43LC0yIDIuNCwtMy41IDQuNSwtNCBMIDc5LDQ0IDc5LDM2IDc0LjcsMzUgWiIgICAgICAgaWQ9InBhdGg5IiAgICAgICBzdHlsZT0iZmlsbDojYTBhNWFhO2ZpbGwtb3BhY2l0eToxIiAgICAgICBpbmtzY2FwZTpjb25uZWN0b3ItY3VydmF0dXJlPSIwIiAvPjwvZz48L3N2Zz4='
 		);
@@ -255,7 +255,7 @@ class WpakApps {
 			'normal',
 			'default'
 		);
-		
+
 		add_meta_box(
 			'wpak_app_pwa_data',
 			__( 'Progressive Web App', WpAppKit::i18n_domain ),
@@ -264,7 +264,7 @@ class WpakApps {
 			'normal',
 			'default'
 		);
-		
+
 	}
 
 	public static function get_phonegap_mandatory_fields() {
@@ -726,7 +726,7 @@ class WpakApps {
 		if ( isset( $_POST['wpak_app_version_code'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_version_code', sanitize_text_field( $_POST['wpak_app_version_code'] ) );
 		}
-		
+
 		if ( isset( $_POST['wpak_app_target_architecture'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_target_architecture', sanitize_text_field( $_POST['wpak_app_target_architecture'] ) );
 		}
@@ -923,7 +923,7 @@ class WpakApps {
 
         $target_architecture = get_post_meta( $post_id, '_wpak_app_target_architecture', true );
 		$target_architecture = empty( $target_architecture ) ? 'arm' : $target_architecture; //Set amd as default Android build type
-        
+
 		$pwa_path = get_post_meta( $post_id, '_wpak_app_pwa_path', true );
 
 		$pwa_name = get_post_meta( $post_id, '_wpak_app_pwa_name', true );
@@ -940,13 +940,13 @@ class WpakApps {
 
 		$build_tool = get_post_meta( $post_id, '_wpak_app_build_tool', true );
 		$build_tool = empty( $build_tool ) ? 'gradle' : $build_tool; //Set gradle as default Android build tool
-		
+
 		$phonegap_plugins = '';
 		if ( metadata_exists( 'post', $post_id, '_wpak_app_phonegap_plugins' ) ) {
 			$phonegap_plugins = get_post_meta( $post_id, '_wpak_app_phonegap_plugins', true );
 		}
 
-		return array( 
+		return array(
 			'title' => $title,
 			'name' => $name,
 			'app_phonegap_id' => $app_phonegap_id,
@@ -1037,7 +1037,7 @@ class WpakApps {
 			// Drawbacks are the app's weight and memory footprint that are higher than without the plugin.
 			// Currently we include stable version 2.3.0 which is the one supported by the current version of PhoneGap Build (v6.50):
 			$default_plugins['cordova-plugin-crosswalk-webview'] = array( 'spec' => '2.3.0', 'source' => 'npm' );
-			
+
 			//Add "cordova-build-architecture" plugin
 			//https://github.com/MBuchalik/cordova-build-architecture
 			//This is to allow to choose between ARM/x86 compilation, as both ARM and x86 APK are needed to release apps on PlayStore.

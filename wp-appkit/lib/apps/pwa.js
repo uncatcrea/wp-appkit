@@ -40,7 +40,7 @@ jQuery().ready( function () {
 		$.get( ajaxurl, data, function( response ) {
 			var html = '';
 			if( typeof response.icons !== "undefined" && response.icons.length ) {
-				html = $( '<div>' ).addClass( 'wpak-pwa-icons-text' ).html( wpak_pwa_export.messages.pwa_icons_detected );
+				html = $( '<div>' ).addClass( 'wpak-pwa-icons-text' ).html( wpak_pwa_export.messages.pwa_icons_detected.replace( '%s', response.icons[0].dir ) );
 				$.each( response.icons, function( i, icon ) {
 					var $img = $( '<img />' )
 						.addClass( 'wpak-pwa-icon' )

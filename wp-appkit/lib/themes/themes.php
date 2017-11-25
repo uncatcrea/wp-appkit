@@ -748,10 +748,11 @@ class WpakThemes {
 	        }
 
 	        $icons[] = array(
-	            'name' => $filename,
-	            'path' => $file,
-	            'url' => self::get_themes_directory_uri() . '/' . $theme_slug . '/icons/' . $filename,
-	            'size' => $size,
+		        'name' => $filename,
+		        'dir'  => str_replace( ABSPATH, '/', $icons_dir ),
+		        'path' => $file,
+		        'url'  => self::get_themes_directory_uri() . '/' . $theme_slug . '/icons/' . $filename,
+		        'size' => $size,
 	        );
 	        $widths[] = $size[0];
 	        $heights[] = $size[1];
@@ -784,6 +785,7 @@ class WpakThemes {
 
 	    foreach( $icons as $icon ) {
 	        $answer['icons'][] = array(
+	            'dir' => $icon['dir'],
 	            'url' => $icon['url'],
 	            'width' => $icon['size'][0],
 	            'height' => $icon['size'][1],
