@@ -580,6 +580,9 @@ class WpakApps {
 		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
 		<div class="wpak_settings">
 			<p class="description"><?php _e( '', WpAppKit::i18n_domain ) ?></p>
+			<?php if( !is_ssl() ): ?>
+				<p class="notice notice-warning notice-alt"><?php _e( 'You\'re website doesn\'t seem to be secured by HTTPS. Progressive Web Apps completely work only with HTTPS sites. You will have to enable it if you want to fully benefit from their power.', WpAppKit::i18n_domain ); ?></p>
+			<?php endif; ?>
 			<fieldset>
 				<legend><?php _e( 'Install', WpAppKit::i18n_domain ); ?></legend>
 				<div class="field-group">
