@@ -1,5 +1,7 @@
 <?php
 
+require_once( dirname( __FILE__ ) . '/minify.php' );
+
 class WpakBuild {
 
 	const export_file_memory = 10;
@@ -410,6 +412,8 @@ class WpakBuild {
 			$answer['ok'] = 0;
 			return $answer;
 		}
+        
+        $minifier = new WpakMinify();
 
 		if ( is_dir( $source ) === true ) {
 
@@ -439,13 +443,15 @@ class WpakBuild {
 				$filename = str_replace( $source, '', $file );
 				$filename = wp_normalize_path( $filename );
 				$filename = ltrim( $filename, '/\\' );
-				
+                
 				//Themes are included separately from the wpak themes directory
 				if ( preg_match( '|themes[/\\\].+|', $filename ) ) {
 					continue;
 				}
 
 				$zip_filename = $source_root . $filename;
+                
+                $file_extension = pathinfo( $file, PATHINFO_EXTENSION );
 				
 				if ( is_dir( $file ) === true ) {
 					
@@ -457,6 +463,8 @@ class WpakBuild {
 
 				} elseif ( is_file( $file ) === true ) {
 
+                    $minify_file = self::is_file_to_minify( $file, $export_type, $app_id );
+                    
 					if ( $filename === 'index.html' ) {
 
 						$index_content = self::filter_index( file_get_contents( $file ), $app_id, $export_type );
@@ -481,11 +489,27 @@ class WpakBuild {
 
 					} else {
 
-						if ( !$zip->addFile( $file, $zip_filename ) ) {
-							$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
-							$answer['ok'] = 0;
-							return $answer;
-						}
+                        if ( $minify_file ) {
+                            
+                            $file_content = file_get_contents( $file );
+                            
+                            $file_content = $minifier->minify( $file_extension, $file_content );
+                            
+                            if ( !$zip->addFromString( $zip_filename, $file_content ) ) {
+                                $answer['msg'] = sprintf( __( 'Could not add minified file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
+                                $answer['ok'] = 0;
+                                return $answer;
+                            }
+                            
+                        } else {
+                        
+                            if ( !$zip->addFile( $file, $zip_filename ) ) {
+                                $answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
+                                $answer['ok'] = 0;
+                                return $answer;
+                            }
+                            
+                        }
 
 					}
 
@@ -526,6 +550,8 @@ class WpakBuild {
 						$filename = 'themes/'. $filename;
 
 						$zip_filename = $source_root . $filename;
+                        
+                        $file_extension = pathinfo( $file, PATHINFO_EXTENSION );
 
 						if ( is_dir( $file ) === true ) {
 							if ( !$zip->addEmptyDir( $zip_filename ) ) {
@@ -535,11 +561,29 @@ class WpakBuild {
 							}
 						} elseif ( is_file( $file ) === true ) {
 
-							if ( !$zip->addFile( $file, $zip_filename ) ) {
-								$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
-								$answer['ok'] = 0;
-								return $answer;
-							}
+                            $minify_file = self::is_file_to_minify( $file, $export_type, $app_id );
+                            
+                            if ( $minify_file ) {
+                            
+                                $file_content = file_get_contents( $file );
+
+                                $file_content = $minifier->minify( $file_extension, $file_content );
+
+                                if ( !$zip->addFromString( $zip_filename, $file_content ) ) {
+                                    $answer['msg'] = sprintf( __( 'Could not add minified file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
+                                    $answer['ok'] = 0;
+                                    return $answer;
+                                }
+
+                            } else {
+                                
+                                if ( !$zip->addFile( $file, $zip_filename ) ) {
+                                    $answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
+                                    $answer['ok'] = 0;
+                                    return $answer;
+                                }
+                                
+                            }
 
 							$webapp_files[] = $zip_filename;
 
@@ -554,7 +598,27 @@ class WpakBuild {
 					$addon_files = $addon->get_all_files();
 					foreach ( $addon_files as $addon_file ) {
 						$zip_filename = $source_root .'addons/'. $addon->slug .'/'. $addon_file['relative'];
-						$zip->addFile( $addon_file['full'], $zip_filename );
+						
+                        $file_extension = pathinfo( $addon_file['full'], PATHINFO_EXTENSION );
+                        
+                        $minify_file = self::is_file_to_minify( $addon_file['full'], $export_type, $app_id );
+                            
+                        if ( $minify_file ) {
+
+                            $file_content = file_get_contents( $addon_file['full'] );
+
+                            $file_content = $minifier->minify( $file_extension, $file_content );
+
+                            if ( !$zip->addFromString( $zip_filename, $file_content ) ) {
+                                $answer['msg'] = sprintf( __( 'Could not add minified file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
+                                $answer['ok'] = 0;
+                                return $answer;
+                            }
+
+                        } else {
+                            $zip->addFile( $addon_file['full'], $zip_filename );
+                        }
+                        
 						$webapp_files[] = $zip_filename;
 					}
 				}
@@ -583,8 +647,14 @@ class WpakBuild {
 			}
 
 			//Create config.js file :
-			$zip->addFromString( $source_root .'config.js', WpakConfigFile::get_config_js( $app_id, false, $export_type ) );
-			$webapp_files[] = $source_root .'config.js';
+            $config_js_file = $source_root .'config.js';
+            $config_js_file_content = WpakConfigFile::get_config_js( $app_id, false, $export_type );
+            $minify_file = self::is_file_to_minify( $config_js_file, $export_type, $app_id );
+            if ( $minify_file ) {
+                $config_js_file_content = $minifier->minify( 'js', $config_js_file_content );
+            }
+			$zip->addFromString( $config_js_file, $config_js_file_content );
+			$webapp_files[] = $config_js_file;
 
 			if ( !in_array( $export_type, array( 'webapp', 'webapp-appcache', 'pwa' ) ) ) {
 				//Create config.xml file (stays at zip root) :
@@ -632,6 +702,29 @@ class WpakBuild {
 
 		return $answer;
 	}
+    
+    private static function is_file_to_minify( $file, $export_type, $app_id ) {
+        
+        $file_extension = pathinfo( $file, PATHINFO_EXTENSION );
+        
+        //By default, minify all js and css files:
+        $minify_file = $export_type === 'pwa' && in_array( $file_extension, array( 'js', 'css' ) );
+
+        /**
+         * Use this "wpak_minify_app_file" filter to decide whether a given file or file extension
+         * should be minified or not. By default minification is only enabled on PWA exports, with 
+         * all JS and CSS files minified.
+         * 
+         * @param boolean		$minify_file        return true to minify, false to not minify file.
+         * @param string        $file_extension     file extension
+         * @param string        $file               file path
+         * @param string        $export_type        current export type
+         * @param integer       $app_id             current app id
+         */
+        $minify_file = apply_filters( 'wpak_minify_app_file', $minify_file, $file_extension, $file, $export_type, $app_id );
+        
+        return $minify_file;
+    }
     
     private static function pwa_pretty_slugs_on( $app_id ) {
         /**
