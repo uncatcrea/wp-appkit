@@ -75,7 +75,7 @@ class WpakApps {
 			wp_localize_script( 'wpak_apps_js', 'Apps', $localize );
 
 			global $post;
-			wp_enqueue_script( 'wpak_apps_pwa_js', plugins_url( 'lib/apps/pwa.js', dirname( dirname( __FILE__ ) ) ), array( 'jquery' ), WpAppKit::resources_version );
+			wp_enqueue_script( 'wpak_apps_pwa_js', plugins_url( 'lib/apps/pwa.js', dirname( dirname( __FILE__ ) ) ), array( 'jquery', 'wp-color-picker' ), WpAppKit::resources_version );
 			wp_localize_script( 'wpak_apps_pwa_js', 'wpak_pwa_export', array(
 				'app_id' => $post->ID,
 				'nonce' => wp_create_nonce( 'wpak_build_app_sources_' . $post->ID ),
