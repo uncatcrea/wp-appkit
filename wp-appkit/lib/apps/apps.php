@@ -645,7 +645,7 @@ class WpakApps {
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Background Color', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_pwa_backgound_color" value="<?php echo esc_attr( $main_infos['pwa_backgound_color'] ) ?>" id="wpak_pwa_backgound_color" class="color-field" />
+					<input type="text" name="wpak_app_pwa_background_color" value="<?php echo esc_attr( $main_infos['pwa_background_color'] ) ?>" id="wpak_pwa_background_color" class="color-field" />
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Theme Color', WpAppKit::i18n_domain ) ?></label>
@@ -805,8 +805,8 @@ class WpakApps {
 			update_post_meta( $post_id, '_wpak_app_pwa_desc', sanitize_text_field( $_POST['wpak_app_pwa_desc'] ) );
 		}
 
-		if ( isset( $_POST['wpak_app_pwa_backgound_color'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_pwa_background_color', sanitize_text_field( $_POST['wpak_app_pwa_backgound_color'] ) );
+		if ( isset( $_POST['wpak_app_pwa_background_color'] ) ) {
+			update_post_meta( $post_id, '_wpak_app_pwa_background_color', sanitize_text_field( $_POST['wpak_app_pwa_background_color'] ) );
 		}
 
 		if ( isset( $_POST['wpak_app_pwa_theme_color'] ) ) {
@@ -938,9 +938,9 @@ class WpakApps {
 
 		$pwa_icons = WpakThemes::get_pwa_icons( WpakThemesStorage::get_current_theme( $post_id ) );
 
-		$pwa_backgound_color = get_post_meta( $post_id, '_wpak_app_pwa_background_color', true );
-		if( empty( $pwa_backgound_color ) ) {
-			$pwa_backgound_color = '#ffffff'; // White by default
+		$pwa_background_color = get_post_meta( $post_id, '_wpak_app_pwa_background_color', true );
+		if( empty( $pwa_background_color ) ) {
+			$pwa_background_color = '#ffffff'; // White by default
 		}
 		$pwa_theme_color = get_post_meta( $post_id, '_wpak_app_pwa_theme_color', true );
 		if( empty( $pwa_theme_color ) ) {
@@ -979,7 +979,7 @@ class WpakApps {
 			'pwa_short_name' => $pwa_short_name,
 			'pwa_desc' => !empty( $pwa_description ) ? $pwa_description : '',
 			'pwa_use_default_icons_and_splash' => empty( $pwa_icons ),
-			'pwa_backgound_color' => $pwa_backgound_color,
+			'pwa_background_color' => $pwa_background_color,
 			'pwa_theme_color' => $pwa_theme_color,
 		);
 	}
