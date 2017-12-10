@@ -940,11 +940,11 @@ class WpakApps {
 
 		$pwa_background_color = get_post_meta( $post_id, '_wpak_app_pwa_background_color', true );
 		if( empty( $pwa_background_color ) ) {
-			$pwa_background_color = '#ffffff'; // White by default
+			$pwa_background_color = '#65c4ee'; // Default background color
 		}
 		$pwa_theme_color = get_post_meta( $post_id, '_wpak_app_pwa_theme_color', true );
 		if( empty( $pwa_theme_color ) ) {
-			$pwa_theme_color = '#ffffff'; // White by default
+			$pwa_theme_color = '#122e4f'; // Default theme color
 		}
 
 		$build_tool = get_post_meta( $post_id, '_wpak_app_build_tool', true );
