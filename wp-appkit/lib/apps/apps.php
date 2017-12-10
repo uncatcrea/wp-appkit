@@ -837,7 +837,7 @@ class WpakApps {
 		return array(
 			'ios' => __( 'iOS - Native', WpAppKit::i18n_domain ),
 			'android' => __( 'Android - Native', WpAppKit::i18n_domain ),
-			'pwa' => __( 'Android - Progressive Web App', WpAppKit::i18n_domain ),
+			'pwa' => __( 'Progressive Web App', WpAppKit::i18n_domain ),
 		);
 	}
 
