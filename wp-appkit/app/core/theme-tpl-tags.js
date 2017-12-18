@@ -71,8 +71,9 @@ define(function(require, exports) {
      */
     themeTplTags.isDefaultScreen = function( screen_data ) {
         var fragment = "undefined" != typeof screen_data && screen_data.hasOwnProperty( 'fragment' ) ? screen_data.fragment : Backbone.history.fragment;
-
-        return App.router.getDefaultRoute() == '#' + fragment;
+        var prefix = App.getParam('use-html5-pushstate') ? '' : '#';
+        fragment = prefix + fragment;
+        return fragment.length === 0 || App.router.getDefaultRoute() == fragment;
     };
 
 	/**
