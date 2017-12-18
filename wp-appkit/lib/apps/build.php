@@ -75,6 +75,11 @@ class WpakBuild {
 		return empty( $debug_mode ) ? 'off' : $debug_mode;
 	}
 
+    public static function is_app_in_debug_mode( $app_id ) {
+        $debug_mode = self::get_app_debug_mode( $app_id );
+        return $debug_mode === 'on';
+    }
+    
 	public static function get_app_debug_mode( $app_id ) {
 		$debug_mode = self::get_app_debug_mode_raw( $app_id );
 		return $debug_mode == 'wp' ? (WP_DEBUG ? 'on' : 'off') : $debug_mode;
@@ -781,7 +786,12 @@ class WpakBuild {
 
 		}
 
-		//Remove script used only for app simulation in web browser :
+        //Remove debug CSS if not in debug mode:
+        if ( !self::is_app_in_debug_mode( $app_id ) ) {
+            $index_content = preg_replace( '|<link [^>]*?href=\"core/css/debug.css\">\s*|is', "", $index_content );
+        }
+
+        //Remove script used only for app simulation in web browser :
 		$index_content = preg_replace( '/<script[^>]*>[^<]*var query[^<]*<\/script>\s*<script/is', '<script', $index_content );
 
 		return $index_content;
