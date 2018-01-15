@@ -5,6 +5,9 @@ require_once( dirname( __FILE__ ) . '/minify.php' );
 class WpakBuild {
 
 	const export_file_memory = 10;
+    const layout_file_name = 'layout.html';
+    const launch_content_file_name = 'launch-content.html';
+    const launch_head_file_name = 'launch-head.html';
 
 	public static function hooks() {
 		if ( is_admin() ) {
@@ -794,6 +797,34 @@ class WpakBuild {
         //Remove script used only for app simulation in web browser :
 		$index_content = preg_replace( '/<script[^>]*>[^<]*var query[^<]*<\/script>\s*<script/is', '<script', $index_content );
 
+        //Insert launch content in index.html for very fast "First Meaningful Paint" (only used for pwa by default) :
+        $setup_launch_content = apply_filters( 'wpak_setup_launch_content', $export_type === 'pwa', $export_type, $app_id );
+        if ( $setup_launch_content ) {
+            
+            $launch_content_data = self::get_launch_content_data( $app_id );
+            
+            if ( !empty( $launch_content_data['content'] ) ) {
+                //Here we pre-render app's layout so that we don't have to wait for layout rendering in app. 
+                //Also dynamic app rendering empties app content during content load, which we want to avoid for PWAs.
+
+                //Replace content tag in layout.html by launch content:
+                $launch_layout = preg_replace('/<%= content %>/',"\r\n<div id=\"app-content-wrapper\">\r\n<div class=\"app-screen\">". $launch_content_data['content'] ."\r\n</div></div>\t\t", $launch_content_data['layout'] );
+
+                //Replace menu tag in layout.html by "#app-menu" div:
+                $launch_layout = preg_replace('/<%= menu %>/',"<div id=\"app-menu\"></div>", $launch_layout );
+                
+                //Insert pre-rendered layout in index.html:
+                $index_content = preg_replace('/(<div[^>]+id="app-layout"[^>]*>)/',"$1\r\n". $launch_layout ."\r\n\t\t", $index_content );
+            }
+
+            //Also include in head what's needed by pre-rendered layout to render well:
+            if ( !empty( $launch_content_data['head'] ) ) {
+                $index_content = preg_replace('/(<\/head>)/',"\r\n". $launch_content_data['head'] ."\r\n\r\n$1", $index_content );
+            }
+        }
+
+        $index_content = apply_filters( 'wpak_app_index_content', $index_content, $app_id, $export_type );
+
 		return $index_content;
 	}
     
@@ -912,6 +943,38 @@ class WpakBuild {
 
 		return $manifest_icons;
 	}
+    
+    /**
+     * Get launch content data from theme's files
+     */
+    private static function get_launch_content_data( $app_id ) {
+        $launch_content_data = [
+            'content' => '',
+            'head' => ''
+        ];
+
+        $current_theme = WpakThemesStorage::get_current_theme( $app_id );
+        $themes_directory = WpakThemes::get_themes_directory();
+        $current_theme_directory = $themes_directory .'/'. $current_theme;
+		if( is_dir( $current_theme_directory ) ) {
+            $layout_file = $current_theme_directory .'/'. self::layout_file_name;
+            if ( file_exists( $layout_file ) ) {
+                $launch_content_data['layout'] = file_get_contents( $layout_file ); 
+            }
+            $launch_content_file = $current_theme_directory .'/'. self::launch_content_file_name;
+            if ( file_exists( $launch_content_file ) ) {
+                $launch_content_data['content'] = file_get_contents( $launch_content_file ); 
+            }
+            $launch_head_file = $current_theme_directory .'/'. self::launch_head_file_name;
+            if ( file_exists( $launch_head_file ) ) {
+                $launch_content_data['head'] = file_get_contents( $launch_head_file ); 
+            }
+        }
+
+        $launch_content_data = apply_filters( 'wpak_launch_content_data', $launch_content_data, $app_id, $current_theme, $current_theme_directory );
+
+        return $launch_content_data;
+    }
 
 	public static function pwa_icons_json_to_array( $app_icons_json ) {
 		$app_icons_json = stripslashes( $app_icons_json );

@@ -32,7 +32,7 @@ define(function (require) {
 		var elHeader = "#app-header";
 
 		var currentView = null;
-	    var el = "#app-content-wrapper";
+	    var elContent = "#app-content-wrapper";
 
 	    var elMenu = "#app-menu";
 	    var menuView= null;
@@ -106,7 +106,11 @@ define(function (require) {
 	    	if( layoutView === null ){
 	    		require(['core/views/layout'],function(LayoutView){
 		    		layoutView = new LayoutView({el:elLayout});
-		    		layoutView.render();
+		    		//Layout may already have been pre-rendered before export (for PWAs).
+		    		//If not, render it:
+		    		if ( !layoutView.isRendered() ) {
+		    			layoutView.render();
+		    		}
 		    		cb();
 	    		});
 	    	}else{
@@ -264,7 +268,7 @@ define(function (require) {
 				Utils.log('Re-open existing static view',{view:view});
 			}
 
-			var $el = $(el);
+			var $elContent = $(elContent);
 
 			if( custom_rendering ){
 
@@ -280,7 +284,7 @@ define(function (require) {
 				 */
 				Hooks.doActions(
 					'screen-transition',
-					[$el,$('div:first-child',$el),$(view.el),App.getPreviousScreenMemoryData(),App.getCurrentScreenData()]
+					[$elContent,$('div:first-child',$elContent),$(view.el),App.getPreviousScreenMemoryData(),App.getCurrentScreenData()]
 				).done(function(){
 					 renderSubRegions();
 					 vent.trigger('screen:showed',App.getCurrentScreenData(),currentView,first_static_opening);
@@ -292,7 +296,7 @@ define(function (require) {
 				});
 
 			}else{
-				$el.empty().append(view.el);
+				$elContent.empty().append(view.el);
 				renderSubRegions();
 				vent.trigger('screen:showed',App.getCurrentScreenData(),currentView,first_static_opening);
 			}
