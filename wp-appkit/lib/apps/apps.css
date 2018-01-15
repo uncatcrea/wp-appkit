@@ -1118,6 +1118,9 @@ a.list-group-item-danger.active:focus {
 .pwa-infos-install{
 	float:right;
 }
+.pwa-infos-install .spinner {
+    float:left;
+}
 
 .wpak-pwa-icons {
     padding:5px 0 0 5px;

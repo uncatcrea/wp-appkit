@@ -4,7 +4,11 @@ jQuery().ready( function () {
 	$( '.wpak_export_link_pwa.pwa-install' ).click( function ( e ) {
 		e.preventDefault();
 
-		var $feedback = $(this).siblings( '.wpak_export_pwa_feedback' );
+		var $this = $(this);
+		var $feedback = $this.siblings( '.wpak_export_pwa_feedback' );
+		var $spinner = $this.siblings( '.spinner' );
+
+		$spinner.addClass( 'is-active' );
 
 		var data = {
 			action: 'wpak_build_app_sources',
@@ -14,6 +18,7 @@ jQuery().ready( function () {
 		};
 
 		$.post( ajaxurl, data, function ( response ) {
+			$spinner.removeClass( 'is-active' );
 			if ( response.ok === 1 ) {
 				$feedback.removeClass('updated,error').addClass( 'updated' ).html(
 					wpak_pwa_export.messages['install_successfull']

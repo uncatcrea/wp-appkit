@@ -438,8 +438,9 @@ class WpakApps {
             <?php endif ?>
 
             <div class="export-action platform-specific pwa">
+                <span class="spinner"></span>
                 <?php if( !empty( $pwa_export_types['pwa-install'] ) ): ?>
-                    <a class="wpak_export_link_pwa pwa-install button" href="#"><?php echo !$pwa_installed ? __( 'Install PWA', WpAppKit::i18n_domain ) : __( 'Update PWA', WpAppKit::i18n_domain ); ?></a>
+                    <a class="wpak_export_link_pwa pwa-install button" href="#"><?php echo !$pwa_installed ? __( 'Install PWA', WpAppKit::i18n_domain ) : __( 'Update PWA', WpAppKit::i18n_domain ); ?></a><br/>
                 <?php endif; ?>
                 <?php if( !empty( $pwa_export_types['pwa'] ) ): ?>
                     <a class="wpak_export_link_pwa" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => 'pwa' ) ), 'wpak_download_app_sources' ) ?>" target="_blank"><?php _e( 'Download PWA sources', WpAppKit::i18n_domain ) ?></a>
@@ -600,11 +601,12 @@ class WpakApps {
 					<?php endif ?>
 
 					<div class="pwa-infos-install">
+						<span class="spinner"></span>
 
 						<?php
 						if( self::isSaved( $post ) ): ?>
-							<a class="wpak_export_link_pwa pwa-install button" href="#"><?php echo !$pwa_installed ? __( 'Install PWA', WpAppKit::i18n_domain ) : __( 'Update PWA', WpAppKit::i18n_domain ); ?></a>
-							<a class="wpak_export_link_pwa" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => 'pwa' ) ), 'wpak_download_app_sources' ) ?>" target="_blank"><?php _e( 'Download PWA sources', WpAppKit::i18n_domain ) ?></a>
+                            <a class="wpak_export_link_pwa pwa-install button" href="#"><?php echo !$pwa_installed ? __( 'Install PWA', WpAppKit::i18n_domain ) : __( 'Update PWA', WpAppKit::i18n_domain ); ?></a>
+                            <a class="wpak_export_link_pwa" href="<?php echo wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => 'pwa' ) ), 'wpak_download_app_sources' ) ?>" target="_blank"><?php _e( 'Download PWA sources', WpAppKit::i18n_domain ) ?></a>
 						<?php endif; ?>
 
 						<div class="wpak_export_pwa_feedback"></div>
