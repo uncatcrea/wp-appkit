@@ -712,11 +712,11 @@ class WpakBuild {
 	}
     
     private static function is_file_to_minify( $file, $export_type, $app_id ) {
-        
+  		
         $file_extension = pathinfo( $file, PATHINFO_EXTENSION );
         
-        //By default, minify all js and css files:
-        $minify_file = $export_type === 'pwa' && in_array( $file_extension, array( 'js', 'css' ) );
+        //By default, minify all js and css files that are not already minified:
+        $minify_file = $export_type === 'pwa' && in_array( $file_extension, array( 'js', 'css' ) ) && strpos( $file, '.min.' ) === false;
 
         /**
          * Use this "wpak_minify_app_file" filter to decide whether a given file or file extension
