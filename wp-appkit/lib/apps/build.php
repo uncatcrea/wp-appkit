@@ -899,13 +899,23 @@ class WpakBuild {
                 . "#Redirect all urls to index.html to allow deeplinks\n"
                 . "#and pretty slugs using HTML5 pushstate\n"
                 . "<IfModule mod_rewrite.c>\n"
-                . "RewriteEngine On\n"
+                . "RewriteEngine On\n";
+
+                if ( apply_filters( 'wpak_pwa_htaccess_redirect_https', true, $app_id ) ) {
+					$htaccess .= ""
+					. "RewriteCond %{HTTPS} off\n"
+					. "RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R,L]\n";
+				}
+
+                $htaccess .= ""
                 . "RewriteCond %{REQUEST_FILENAME} !-f\n"
                 . "RewriteCond %{REQUEST_FILENAME} !-d\n"
                 . "RewriteCond %{REQUEST_URI} !.html\n"
                 . "RewriteCond %{REQUEST_URI} !.js\n"
                 . "RewriteRule (.*) index.html [L]\n"
                 . "</IfModule>\n";
+
+        $htaccess = apply_filters( 'wpak_pwa_htaccess', $htaccess, $app_id );
 
         return $htaccess;
     }
