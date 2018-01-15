@@ -82,7 +82,7 @@ class WpakBuild {
         $debug_mode = self::get_app_debug_mode( $app_id );
         return $debug_mode === 'on';
     }
-    
+
 	public static function get_app_debug_mode( $app_id ) {
 		$debug_mode = self::get_app_debug_mode_raw( $app_id );
 		return $debug_mode == 'wp' ? (WP_DEBUG ? 'on' : 'off') : $debug_mode;
@@ -165,7 +165,7 @@ class WpakBuild {
 	*/
 	public static function build_app_sources( $app_id, $export_type = 'phonegap-build' ) {
 		$answer = array();
-		
+
 		if ( $export_type === 'pwa-install' ) {
 			$export_type = 'pwa';
 		}
@@ -192,10 +192,10 @@ class WpakBuild {
 		//If the app current theme has some PHP (hooks!) to be executed before
 		//we build the export, include it here :
 		WpakThemes::include_app_theme_php( $app_id );
-		
+
 		//Include PHP files required by addons activated for this app :
 		WpakAddons::require_app_addons_php_files( $app_id );
-		
+
 		$current_theme = WpakThemesStorage::get_current_theme( $app_id );
 
 		$plugin_dir = plugin_dir_path( dirname( dirname( __FILE__ ) ) );
@@ -216,7 +216,7 @@ class WpakBuild {
 				WpakConfigFile::get_platform_icons_and_splashscreens_files( $app_id, $app_platform, $export_type ),
 				$export_type
 		);
-		
+
 		$answer['export'] = $export_filename;
 		$answer['export_full_name'] = $export_filename_full;
 
@@ -263,7 +263,7 @@ class WpakBuild {
 				$answer['msg'] = $check['msg'];
 				self::exit_sending_json( $answer );
 			}
-					
+
 			WP_Filesystem();
 			$result = unzip_file( $zip_file, $target_directory );
 			if ( is_wp_error( $result ) ) {
@@ -275,7 +275,7 @@ class WpakBuild {
 
 		self::exit_sending_json( $answer );
 	}
-	
+
 	public static function get_default_pwa_path( $app_id ) {
 		$default_pwa_path = 'pwa';
 		return apply_filters( 'wpak_default_pwa_path', $default_pwa_path, $app_id );
@@ -285,12 +285,12 @@ class WpakBuild {
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		return apply_filters( 'wpak_pwa_uri', get_option('siteurl') . '/' . $app_main_infos['pwa_path'], $app_id );
 	}
-	
+
 	public static function get_pwa_directory( $app_id ){
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 		return apply_filters( 'wpak_pwa_path', ABSPATH . $app_main_infos['pwa_path'], $app_id );
 	}
-	
+
 	public static function app_pwa_is_installed( $app_id ) {
 		return file_exists( self::get_pwa_directory( $app_id ) .'/index.html' );
 	}
@@ -303,7 +303,7 @@ class WpakBuild {
 		}
 		return $ok;
 	}
-	
+
 	private static function delete_pwa_directory( $app_id ) {
 		$target_directory = self::get_pwa_directory( $app_id );
 		$files = glob( $target_directory . '/*' );
@@ -319,19 +319,19 @@ class WpakBuild {
 
 	private static function check_pwa_directory( $app_id ) {
 		$result = array( 'ok' => 1, 'msg' => '' );
-		
+
 		if ( !self::create_pwa_directory( $app_id ) ) {
 			$app_pwa_directory = self::get_pwa_directory( $app_id );
 			$result['ok'] = 0;
-			$result['message'] = sprintf( 
+			$result['message'] = sprintf(
 				__( 'The Progressive Web App directory %s can\'t be created. <br/>Please check that your WordPress install has the permissions to create this directory.', WpAppKit::i18n_domain ),
 		  		$app_pwa_directory
 			);
 		}
-		
+
 		return $result;
 	}
-	
+
 	private static function exit_sending_json( $answer ) {
 		//If something was displayed before, clean it so that our answer can
 		//be valid json (and store it in an "echoed_before_json" answer key
@@ -420,7 +420,7 @@ class WpakBuild {
 			$answer['ok'] = 0;
 			return $answer;
 		}
-        
+
         $minifier = new WpakMinify();
 
 		if ( is_dir( $source ) === true ) {
@@ -444,25 +444,25 @@ class WpakBuild {
 			if ( !empty( $source_root ) ) {
 				$source_root .= '/';
 			}
-			
+
 			$files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $source ), RecursiveIteratorIterator::SELF_FIRST );
 
 			foreach ( $files as $file ) {
 				$filename = str_replace( $source, '', $file );
 				$filename = wp_normalize_path( $filename );
 				$filename = ltrim( $filename, '/\\' );
-                
+
 				//Themes are included separately from the wpak themes directory
 				if ( preg_match( '|themes[/\\\].+|', $filename ) ) {
 					continue;
 				}
 
 				$zip_filename = $source_root . $filename;
-                
+
                 $file_extension = pathinfo( $file, PATHINFO_EXTENSION );
-				
+
 				if ( is_dir( $file ) === true ) {
-					
+
 					if ( !$zip->addEmptyDir( $zip_filename ) ) {
 						$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
 						$answer['ok'] = 0;
@@ -472,7 +472,7 @@ class WpakBuild {
 				} elseif ( is_file( $file ) === true ) {
 
                     $minify_file = self::is_file_to_minify( $file, $export_type, $app_id );
-                    
+
 					if ( $filename === 'index.html' ) {
 
 						$index_content = self::filter_index( file_get_contents( $file ), $app_id, $export_type );
@@ -491,32 +491,32 @@ class WpakBuild {
 							//Here we just memorize info about service worker file:
 							$sw_cache_file_data = array( 'file' => $file, 'filename' => $filename, 'zip_filename' => $zip_filename );
 						}
-						
+
 						//Even if progressive web app, don't include service worker in cached files
 						continue;
 
 					} else {
 
                         if ( $minify_file ) {
-                            
+
                             $file_content = file_get_contents( $file );
-                            
+
                             $file_content = $minifier->minify( $file_extension, $file_content );
-                            
+
                             if ( !$zip->addFromString( $zip_filename, $file_content ) ) {
                                 $answer['msg'] = sprintf( __( 'Could not add minified file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
                                 $answer['ok'] = 0;
                                 return $answer;
                             }
-                            
+
                         } else {
-                        
+
                             if ( !$zip->addFile( $file, $zip_filename ) ) {
                                 $answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
                                 $answer['ok'] = 0;
                                 return $answer;
                             }
-                            
+
                         }
 
 					}
@@ -524,7 +524,7 @@ class WpakBuild {
 					$webapp_files[] = $zip_filename;
 				}
 			}
-			
+
 			//Add themes files :
 			if( !empty( $themes ) ) {
 
@@ -558,7 +558,7 @@ class WpakBuild {
 						$filename = 'themes/'. $filename;
 
 						$zip_filename = $source_root . $filename;
-                        
+
                         $file_extension = pathinfo( $file, PATHINFO_EXTENSION );
 
 						if ( is_dir( $file ) === true ) {
@@ -570,9 +570,9 @@ class WpakBuild {
 						} elseif ( is_file( $file ) === true ) {
 
                             $minify_file = self::is_file_to_minify( $file, $export_type, $app_id );
-                            
+
                             if ( $minify_file ) {
-                            
+
                                 $file_content = file_get_contents( $file );
 
                                 $file_content = $minifier->minify( $file_extension, $file_content );
@@ -584,13 +584,13 @@ class WpakBuild {
                                 }
 
                             } else {
-                                
+
                                 if ( !$zip->addFile( $file, $zip_filename ) ) {
                                     $answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
                                     $answer['ok'] = 0;
                                     return $answer;
                                 }
-                                
+
                             }
 
 							$webapp_files[] = $zip_filename;
@@ -606,11 +606,11 @@ class WpakBuild {
 					$addon_files = $addon->get_all_files();
 					foreach ( $addon_files as $addon_file ) {
 						$zip_filename = $source_root .'addons/'. $addon->slug .'/'. $addon_file['relative'];
-						
+
                         $file_extension = pathinfo( $addon_file['full'], PATHINFO_EXTENSION );
-                        
+
                         $minify_file = self::is_file_to_minify( $addon_file['full'], $export_type, $app_id );
-                            
+
                         if ( $minify_file ) {
 
                             $file_content = file_get_contents( $addon_file['full'] );
@@ -626,7 +626,7 @@ class WpakBuild {
                         } else {
                             $zip->addFile( $addon_file['full'], $zip_filename );
                         }
-                        
+
 						$webapp_files[] = $zip_filename;
 					}
 				}
@@ -674,17 +674,17 @@ class WpakBuild {
 				$cache_manifest_content = self::get_cache_manifest_content( $webapp_files );
 				$zip->addFromString( 'wpak.appcache', $cache_manifest_content );
 			}
-			
+
 			if ( $export_type === 'pwa' && !empty( $sw_cache_file_data ) ) {
-							
+
 				//Add manifest:
 				$zip->addFromString( $source_root .'manifest.json', self::get_pwa_manifest( $app_id ) );
-                
+
                 if ( self::pwa_pretty_slugs_on( $app_id ) ) {
                     //Add htaccess (required to handle pretty slugs with HTML5 pushstate):
                     $zip->addFromString( $source_root .'.htaccess', self::get_pwa_htaccess( $app_id ) );
                 }
-				
+
 				//Add service worker:
 				$sw_cache_content = self::build_pwa_service_worker_cache( $app_id, file_get_contents( $sw_cache_file_data['file'] ), $webapp_files, $export_type );
 
@@ -710,19 +710,19 @@ class WpakBuild {
 
 		return $answer;
 	}
-    
+
     private static function is_file_to_minify( $file, $export_type, $app_id ) {
-  		
+
         $file_extension = pathinfo( $file, PATHINFO_EXTENSION );
-        
+
         //By default, minify all js and css files that are not already minified:
         $minify_file = $export_type === 'pwa' && in_array( $file_extension, array( 'js', 'css' ) ) && strpos( $file, '.min.' ) === false;
 
         /**
          * Use this "wpak_minify_app_file" filter to decide whether a given file or file extension
-         * should be minified or not. By default minification is only enabled on PWA exports, with 
+         * should be minified or not. By default minification is only enabled on PWA exports, with
          * all JS and CSS files minified.
-         * 
+         *
          * @param boolean		$minify_file        return true to minify, false to not minify file.
          * @param string        $file_extension     file extension
          * @param string        $file               file path
@@ -730,10 +730,10 @@ class WpakBuild {
          * @param integer       $app_id             current app id
          */
         $minify_file = apply_filters( 'wpak_minify_app_file', $minify_file, $file_extension, $file, $export_type, $app_id );
-        
+
         return $minify_file;
     }
-    
+
     private static function pwa_pretty_slugs_on( $app_id ) {
         /**
          * Use this filter to deactivate pretty slugs on Progressive Web App and
@@ -763,24 +763,30 @@ class WpakBuild {
 			$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 			$app_title = $app_main_infos['title'];
 			$app_title_html = "<title>". esc_html( $app_title ) ."</title>\n";
-            
+
             if ( self::pwa_pretty_slugs_on( $app_id ) ) {
                 //Add "base" (required to handle pretty slugs with HTML5 pushstate):
                 $pwa_base_suburl = !empty(  $app_main_infos['pwa_path'] ) ? $app_main_infos['pwa_path'] : '';
-                
+
                 $pwa_base_suburl = self::add_subdir_prefix( $pwa_base_suburl );
-                
+
                 $base_html = "<base href=\"/". trailingslashit( ltrim( $pwa_base_suburl, '/' ) )  ."\" />\n";
             }
-		
+
 			//Add manifest link:
 			$manifest_html = '<link rel="manifest" href="./manifest.json">'."\n";
-			
-			$index_content = preg_replace( '/<head>(\s*?)<link/is', "<head>$1". $app_title_html ."$1". $manifest_html ."$1". $base_html ."$1<link", $index_content );
-			
+
+			// Add theme color meta
+			$theme_color = '';
+			if( !empty( $app_main_infos['pwa_theme_color'] ) ) {
+				$theme_color = '<meta name="theme-color" content="' . $app_main_infos['pwa_theme_color'] . '">' . "\n";
+			}
+
+			$index_content = preg_replace( '/<head>(\s*?)<link/is', "<head>$1". $app_title_html ."$1". $manifest_html ."$1". $base_html ."$1". $theme_color ."$1<link", $index_content );
+
 			//Remove script used only for app simulation in web browser:
 			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)\s*/is', '', $index_content );
-			
+
 		} else {
 
 			//Add cordova.js script (set cordova.js instead of phonegap.js, because PhoneGap Developer App doesn't seem
@@ -800,11 +806,11 @@ class WpakBuild {
         //Insert launch content in index.html for very fast "First Meaningful Paint" (only used for pwa by default) :
         $setup_launch_content = apply_filters( 'wpak_setup_launch_content', $export_type === 'pwa', $export_type, $app_id );
         if ( $setup_launch_content ) {
-            
+
             $launch_content_data = self::get_launch_content_data( $app_id );
-            
+
             if ( !empty( $launch_content_data['content'] ) ) {
-                //Here we pre-render app's layout so that we don't have to wait for layout rendering in app. 
+                //Here we pre-render app's layout so that we don't have to wait for layout rendering in app.
                 //Also dynamic app rendering empties app content during content load, which we want to avoid for PWAs.
 
                 //Replace content tag in layout.html by launch content:
@@ -812,7 +818,7 @@ class WpakBuild {
 
                 //Replace menu tag in layout.html by "#app-menu" div:
                 $launch_layout = preg_replace('/<%= menu %>/',"<div id=\"app-menu\"></div>", $launch_layout );
-                
+
                 //Insert pre-rendered layout in index.html:
                 $index_content = preg_replace('/(<div[^>]+id="app-layout"[^>]*>)/',"$1\r\n". $launch_layout ."\r\n\t\t", $index_content );
             }
@@ -827,7 +833,7 @@ class WpakBuild {
 
 		return $index_content;
 	}
-    
+
     public static function add_subdir_prefix( $slug ) {
         //Prefix slug with subdirectory if WP is installed in subdirectory:
         $subdir = parse_url( get_option( 'siteurl' ), PHP_URL_PATH );
@@ -840,11 +846,11 @@ class WpakBuild {
         }
         return $slug;
     }
-	
+
 	private static function build_pwa_service_worker_cache( $app_id, $content, $webapp_files, $export_type ) {
-		
+
 		$cache_version = 'wpak-app-'. $app_id .'-'. date( 'Ymd-his');
-		
+
 		$cache_files = '';
 		if ( !empty( $webapp_files ) ) {
 			$cache_files .= "'/',\n";
@@ -853,23 +859,23 @@ class WpakBuild {
 			}
 			$cache_files = rtrim( $cache_files, ",\n" );
 		}
-		
+
 		//Set cache version and cached files:
 		$content = preg_replace( "/(var cacheName = ')(';).*/", "$1". $cache_version ."$2", $content );
 		$content = preg_replace( "/(var filesToCache = \[)(\];).*/", "$1". $cache_files ."$2", $content );
-		
+
 		return $content;
 	}
-	
+
 	private static function get_pwa_manifest( $app_id ) {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
-		
+
 		$pwa_name = !empty( $app_main_infos['pwa_name'] ) ? $app_main_infos['pwa_name'] : $app_main_infos['title'];
 		$pwa_short_name = !empty( $app_main_infos['pwa_short_name'] ) ? $app_main_infos['pwa_short_name'] : $pwa_name;
-		
+
 		//"#282E34","#122E4F";
-		
+
 		$manifest = array(
 			"name" => $pwa_name,
 			"short_name" => $pwa_short_name,
@@ -891,9 +897,9 @@ class WpakBuild {
 
 		return json_encode( $manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
 	}
-    
+
     private static function get_pwa_htaccess( $app_id ) {
-        
+
         $htaccess = ""
                 . "#WP-AppKit rewrite rules\n"
                 . "#Redirect all urls to index.html to allow deeplinks\n"
@@ -953,7 +959,7 @@ class WpakBuild {
 
 		return $manifest_icons;
 	}
-    
+
     /**
      * Get launch content data from theme's files
      */
@@ -969,15 +975,15 @@ class WpakBuild {
 		if( is_dir( $current_theme_directory ) ) {
             $layout_file = $current_theme_directory .'/'. self::layout_file_name;
             if ( file_exists( $layout_file ) ) {
-                $launch_content_data['layout'] = file_get_contents( $layout_file ); 
+                $launch_content_data['layout'] = file_get_contents( $layout_file );
             }
             $launch_content_file = $current_theme_directory .'/'. self::launch_content_file_name;
             if ( file_exists( $launch_content_file ) ) {
-                $launch_content_data['content'] = file_get_contents( $launch_content_file ); 
+                $launch_content_data['content'] = file_get_contents( $launch_content_file );
             }
             $launch_head_file = $current_theme_directory .'/'. self::launch_head_file_name;
             if ( file_exists( $launch_head_file ) ) {
-                $launch_content_data['head'] = file_get_contents( $launch_head_file ); 
+                $launch_content_data['head'] = file_get_contents( $launch_head_file );
             }
         }
 
