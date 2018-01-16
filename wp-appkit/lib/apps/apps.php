@@ -85,6 +85,7 @@ class WpakApps {
 					'see_pwa' => __( 'View Progressive Web App', WpAppKit::i18n_domain ),
 					'pwa_icons_detected' => __( 'We detected the following icons in your theme (in %s). They will be automatically used by the PWA:', WpAppKit::i18n_domain ),
 					'pwa_no_icons' => __( 'We didn\'t detect any icons in your theme. You can add them in following <a href="#">our tutorial</a>. If you don\'t provide icons, default ones will be used.', WpAppKit::i18n_domain ),
+					'install_server_error' => __( 'A network or server error occured', WpAppKit::i18n_domain )
 				)
 			));
 		}

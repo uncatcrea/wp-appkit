@@ -42,9 +42,11 @@
     box-shadow: none;
     border-right: 4px solid #fff;
     border-left: none;
+    text-align: right;
 }
 
-div.updated.wpak_export_pwa_feedback {
+div.updated.wpak_export_pwa_feedback,
+div.error.wpak_export_pwa_feedback {
 	border-left: none;
 	box-shadow: none;
 }

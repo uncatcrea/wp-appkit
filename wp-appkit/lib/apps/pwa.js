@@ -26,9 +26,13 @@ jQuery().ready( function () {
 					'<a href="'+ response.export_uri +'" target="_blank">'+ wpak_pwa_export.messages['see_pwa'] +'</a>'
 				);
 			} else {
-				$feedback.removeClass('updated,error').addClass( 'error' ).html( response.msg );
+				$feedback.removeClass('updated error').addClass( 'error' ).html( response.msg );
 			}
-		} );
+
+		}).fail(function() {
+			$spinner.removeClass( 'is-active' );
+		    $feedback.removeClass('updated error').addClass( 'error' ).html( wpak_pwa_export.messages['install_server_error'] );
+		});
 
 	} );
 
@@ -62,7 +66,12 @@ jQuery().ready( function () {
 				html = $( '<div>' ).addClass( 'wpak-pwa-no-icons' ).html( wpak_pwa_export.messages.pwa_no_icons );
 			}
 			$icons_container.html( html );
+
+		}).fail(function() {
+			var html = $( '<div>' ).addClass( 'wpak-pwa-no-icons' ).html( wpak_pwa_export.messages['install_server_error'] );
+			$icons_container.html( html );
 		});
+
 	}).change();
 
 	$( '.color-field' ).wpColorPicker();
