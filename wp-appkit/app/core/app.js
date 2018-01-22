@@ -290,7 +290,7 @@ define(function (require,exports) {
                 history_start_args.root = Config.app_path;
             }
 
-			if( launch_route.length > 0 ){
+			if( launch_route.length > 0 && default_route.length > 0 ){
 				Backbone.history.start( history_start_args );
 				//Navigate to the launch_route :
 				if ( launch_route === default_route ) {

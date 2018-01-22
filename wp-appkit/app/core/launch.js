@@ -136,7 +136,7 @@ require(['root/config'],function(Config){
 																});
 															},
 															function( error, deferred ){
-																Backbone.history.start();
+																App.launchRouting();
 
 																var error_message = "Error : App could not synchronize with website";
 

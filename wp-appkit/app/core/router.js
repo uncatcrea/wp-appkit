@@ -81,7 +81,9 @@ define(function (require, exports) {
 
         default_route: function(){
             this.navigate( '/', { trigger: true } );
-            this.execute_route_silently( default_route );
+            if ( default_route.length ) {
+                this.execute_route_silently( default_route );
+            }
         },
 		
         component: function ( component_id ) {
