@@ -64,6 +64,7 @@ define(function (require, exports) {
             //Same screen routes with trailing slashes (used when HTML5 pushstate is activated):
             "single/:global/:id/" : "single",
             "page/:component_id/:page_id/" : "page",
+            "page/:page_id/" : "page_no_component",
             "comments-:post_id/" : "comments",
             "component-:id/" : "component",
             "custom-page/" : "custom_page",
