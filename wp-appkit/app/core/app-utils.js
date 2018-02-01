@@ -35,6 +35,12 @@ define( function( require ) {
 	utils.removeTrailingSlash = function( url ) {
         return url.replace( /\/$/, "" );
     };
+
+    utils.trimFragment = function( fragment ) {
+        fragment = fragment.replace( '#', '' );
+        fragment = this.removeTrailingSlash( fragment );
+        return fragment;
+    };
     
     utils.isInternalUrl = function( url ) {
         var is_internal_url = url.indexOf( 'http' ) !== 0;

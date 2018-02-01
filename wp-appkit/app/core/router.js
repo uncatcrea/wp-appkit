@@ -3,22 +3,28 @@ define(function (require, exports) {
     "use strict";
 
     var Backbone       = require('backbone'),
-		_              = require('underscore'),
-    	Utils          = require('core/app-utils'),
+        _              = require('underscore'),
+        Utils          = require('core/app-utils'),
         RegionManager  = require("core/region-manager"),
-		Hooks          = require('core/lib/hooks'),
+        Hooks          = require('core/lib/hooks'),
         App            = require('core/app');
 
     var default_route = '';
 
-	//Hack to avoid render a view after another route has been triggered
-	//(when 2 routes are called in a very short delay),
-	var route_asked = '';
-	var check_route = function(route){
-		var route_asked_trimed = route_asked.replace('#','');
-		route = route.replace('#','');
-		return route_asked_trimed == route;
-	};
+    //Hack to avoid render a view after another route has been triggered
+    //(when 2 routes are called in a very short delay),
+    var route_asked = '';
+    var check_route = function(route){
+        var route_asked_trimed = Utils.trimFragment(route_asked);
+        route = Utils.trimFragment(route);
+        return route_asked_trimed == route;
+    };
+
+    var is_default_route  = function( route ) {
+        var default_route_trimed = Utils.trimFragment( default_route );
+        route = Utils.trimFragment( route );
+        return route == default_route_trimed;
+    };
 
     /**
      * Get route type from Backbone history handler's regexp.
@@ -118,7 +124,7 @@ define(function (require, exports) {
             //Screen routes:
             "single/:global/:id" : "single",
             "page/:component_id/:page_id" : "page",
-			"page/:page_id" : "page_no_component",
+            "page/:page_id" : "page_no_component",
             "comments-:post_id" : "comments",
             "component-:id" : "component",
             "custom-page" : "custom_page",
@@ -131,16 +137,16 @@ define(function (require, exports) {
             "component-:id/" : "component",
             "custom-page/" : "custom_page",
             
-			'*notFound': "not_found"
+            '*notFound': "not_found"
         },
 
         setDefaultRoute: function(_default_route){
-    		default_route = _default_route;
-    	},
+            default_route = _default_route;
+        },
 
-		getDefaultRoute: function(){
-			return default_route;
-		},
+        getDefaultRoute: function(){
+            return default_route;
+        },
 
         default_route: function(){
             this.navigate( '/', { trigger: true } );
@@ -148,10 +154,18 @@ define(function (require, exports) {
                 this.execute_route_silently( default_route );
             }
         },
-		
+
+        default_route_redirect: function( route ) {
+            if ( is_default_route( route ) ) {
+                this.navigate( '/' );
+            }
+        },
+        
         component: function ( component_id ) {
-        	var _this = this;
-			route_asked = 'component-'+ component_id;
+            
+            route_asked = 'component-'+ component_id;
+
+            this.default_route_redirect( route_asked );
             
             var route_data = this.getRouteData( 'component', { component_id: component_id } );
             
@@ -174,7 +188,7 @@ define(function (require, exports) {
                             //fragment, because the following redirection makes the native browser's back button 
                             //fail. To be sure to handle that correctly, just use App.getScreenFragment( 'component', ... )
                             //that will build the correct fragment for you for any component type.
-                            _this.navigate( App.getScreenFragment( 'page', { component_id: component_id, item_id: route_data.screen_data.data.root_id } ), {trigger: true} );
+                            this.navigate( App.getScreenFragment( 'page', { component_id: component_id, item_id: route_data.screen_data.data.root_id } ), {trigger: true} );
                             break;
                         case 'hooks-list':
                         case 'hooks-no-global':
@@ -207,124 +221,128 @@ define(function (require, exports) {
          * The post must be in the "posts" global to be accessed via this "single" route.
          */
         single: function ( item_global, item_id ) {
-			route_asked = 'single/'+ item_global +'/'+ item_id;
+            route_asked = 'single/'+ item_global +'/'+ item_id;
+
+            this.default_route_redirect( route_asked );
             
-			var _this = this;
-			
-			var show_single = function() {
-				var route_data = _this.getRouteData( 'single', { item_global: item_global, item_id: item_id } );
-				if ( route_data.error.length === 0 ) {
-					if ( check_route( 'single/'+ item_global +'/'+ item_id ) ) {
-						RegionManager.show(
-							route_data.view_type,
-							route_data.view_data,
-							route_data.screen_data
-						);
-					}
-				} else {
-					Utils.log( route_data.error );
-					App.router.default_route();
-				}
-			};
-			
-			var global = App.globals[item_global];
-			if( global ){
-				var item = global.get(item_id);
-				if( item ){
+            var _this = this;
+            
+            var show_single = function() {
+                var route_data = _this.getRouteData( 'single', { item_global: item_global, item_id: item_id } );
+                if ( route_data.error.length === 0 ) {
+                    if ( check_route( 'single/'+ item_global +'/'+ item_id ) ) {
+                        RegionManager.show(
+                            route_data.view_type,
+                            route_data.view_data,
+                            route_data.screen_data
+                        );
+                    }
+                } else {
+                    Utils.log( route_data.error );
+                    App.router.default_route();
+                }
+            };
+            
+            var global = App.globals[item_global];
+            if( global ){
+                var item = global.get(item_id);
+                if( item ){
 
-					show_single();
+                    show_single();
 
-				}else{
+                }else{
 
-					Utils.log('Router single route : item with id "'+ item_id +'" not found in global "'+ item_global +'".');
+                    Utils.log('Router single route : item with id "'+ item_id +'" not found in global "'+ item_global +'".');
 
-					App.loadRouteItemFromRemote( item_id, item_global, 'posts-list', {
-						success: function( item ) {
-							show_single();
-						},
-						error: function() {
-							App.router.default_route();
-						}
-					} );
+                    App.loadRouteItemFromRemote( item_id, item_global, 'posts-list', {
+                        success: function( item ) {
+                            show_single();
+                        },
+                        error: function() {
+                            App.router.default_route();
+                        }
+                    } );
 
-				}
-			}else{
-				Utils.log('Error : router single route : global "'+ item_global +'" not found.');
-				App.router.default_route();
-			}
+                }
+            }else{
+                Utils.log('Error : router single route : global "'+ item_global +'" not found.');
+                App.router.default_route();
+            }
         },
 
         page: function (component_id,page_id) {
-			route_asked = 'page/'+ component_id +'/'+ page_id;
+            route_asked = 'page/'+ component_id +'/'+ page_id;
 
-			var item_global = 'pages';
-				
-			var _this = this;	
-			
-			var show_page = function( page_component_id ) {
+            this.default_route_redirect( route_asked );
 
-				//To allow page route with no component (#page/[page_id]):
-				if ( page_component_id === 'wpak-page-component-placeholder' ) {
-					//If the page was loaded dynamically, it has no corresponding component,
-					//so we pass true to getPageComponentByPageId() so that the first page component
-					//found is used in that case:
-					var page_component = App.getPageComponentByPageId( item.get('id'), true );
-					if ( page_component ) {
-						page_component_id = page_component.id;
-					}
-				}
-				
-				var route_data = _this.getRouteData( 'page', { component_id: page_component_id, page_id: page_id } );
+            var item_global = 'pages';
+                
+            var _this = this;   
+            
+            var show_page = function( page_component_id ) {
 
-				if ( route_data.error.length === 0 ) {
-					//This is still component_id to check the route and not page_component_id, to handle the case
-					//where the page was not in the app and was retrieved from remote: in that case the page's fragment
-					//includes component_id but it really displays the page linked to page_component_id 
-					//(TODO: see if we could redirect to real page fragment here).
-					if( check_route('page/'+ component_id +'/'+ page_id) ) { 
-						RegionManager.show(
-							route_data.view_type,
-							route_data.view_data,
-							route_data.screen_data
-						);
-					}
-				} else {
-					Utils.log( route_data.error );
-					App.router.default_route();
-				}
-			};
-				
-			var global = App.globals[item_global];
-			if( global ){
-				var item = global.get(page_id);
-				if( item ){
-					show_page( component_id );
-				}else{
+                //To allow page route with no component (#page/[page_id]):
+                if ( page_component_id === 'wpak-page-component-placeholder' ) {
+                    //If the page was loaded dynamically, it has no corresponding component,
+                    //so we pass true to getPageComponentByPageId() so that the first page component
+                    //found is used in that case:
+                    var page_component = App.getPageComponentByPageId( item.get('id'), true );
+                    if ( page_component ) {
+                        page_component_id = page_component.id;
+                    }
+                }
+                
+                var route_data = _this.getRouteData( 'page', { component_id: page_component_id, page_id: page_id } );
 
-					Utils.log('Error : router : page route : item with id "'+ page_id +'" not found in global "'+ item_global +'".');
+                if ( route_data.error.length === 0 ) {
+                    //This is still component_id to check the route and not page_component_id, to handle the case
+                    //where the page was not in the app and was retrieved from remote: in that case the page's fragment
+                    //includes component_id but it really displays the page linked to page_component_id 
+                    //(TODO: see if we could redirect to real page fragment here).
+                    if( check_route('page/'+ component_id +'/'+ page_id) ) { 
+                        RegionManager.show(
+                            route_data.view_type,
+                            route_data.view_data,
+                            route_data.screen_data
+                        );
+                    }
+                } else {
+                    Utils.log( route_data.error );
+                    App.router.default_route();
+                }
+            };
+                
+            var global = App.globals[item_global];
+            if( global ){
+                var item = global.get(page_id);
+                if( item ){
+                    show_page( component_id );
+                }else{
 
-					App.loadRouteItemFromRemote( page_id, item_global, 'page', {
-						success: function( item, item_component ) {
-							show_page( item, item_component.id );
-						},
-						error: function() {
-							App.router.default_route();
-						}
-					} );
+                    Utils.log('Error : router : page route : item with id "'+ page_id +'" not found in global "'+ item_global +'".');
 
-				}
-			}else{
-				Utils.log('Error : router : screen route : global "'+ item_global +'" not found.');
-				App.router.default_route();
-			}
+                    App.loadRouteItemFromRemote( page_id, item_global, 'page', {
+                        success: function( item, item_component ) {
+                            show_page( item, item_component.id );
+                        },
+                        error: function() {
+                            App.router.default_route();
+                        }
+                    } );
+
+                }
+            }else{
+                Utils.log('Error : router : screen route : global "'+ item_global +'" not found.');
+                App.router.default_route();
+            }
         },
-		
-		page_no_component: function ( page_id ) {
-			this.page( 'wpak-page-component-placeholder', page_id );
-		},
+        
+        page_no_component: function ( page_id ) {
+            this.page( 'wpak-page-component-placeholder', page_id );
+        },
 
         comments: function ( post_id ) {
-			route_asked = 'comments-' + post_id;
+            route_asked = 'comments-' + post_id;
 
             function showCommentsScreen( comments, post, item_global ) {
                 if ( check_route( 'comments-' + post.id ) ) {
@@ -363,10 +381,10 @@ define(function (require, exports) {
                 );
 
             }
-		},
+        },
 
         custom_page: function(){
-			route_asked = 'custom-page';
+            route_asked = 'custom-page';
             
             var route_data = this.getRouteData( 'custom-page', {} );
             
@@ -386,20 +404,20 @@ define(function (require, exports) {
             }
         },
 
-		not_found: function ( fragment ) {
-			var _this = this;
-			var fragment_not_found = Hooks.applyFilters( 'fragment-not-found', '#', [ fragment ] );
+        not_found: function ( fragment ) {
+            
+            var fragment_not_found = Hooks.applyFilters( 'fragment-not-found', '#', [ fragment ] );
 
-			var custom_route = App.getCustomRoute( fragment );
-			if ( !_.isEmpty( custom_route ) ) {
-				fragment_not_found = '';
-				App.showCustomPage( custom_route.template, custom_route.data, fragment, true );
-			}
+            var custom_route = App.getCustomRoute( fragment );
+            if ( !_.isEmpty( custom_route ) ) {
+                fragment_not_found = '';
+                App.showCustomPage( custom_route.template, custom_route.data, fragment, true );
+            }
 
-			if ( fragment_not_found.length ) {
-				_this.navigate( fragment_not_found, { trigger: true } );
-			}
-		},
+            if ( fragment_not_found.length ) {
+                this.navigate( fragment_not_found, { trigger: true } );
+            }
+        },
         
         /**
          * Retrieves the type of the giver route and extracts route parameters.
@@ -529,16 +547,16 @@ define(function (require, exports) {
                     if( component ) {
                         if ( component.type === 'posts-list' ) {
                             route_data.view_type = 'posts-list';
-							route_data.view_data = component.view_data;
+                            route_data.view_data = component.view_data;
                             route_data.screen_data = {screen_type:'list',component_type:component.type,component_id:component_id,item_id:0,global:component.global,data:component.data,label:component.label};
                         } else if ( component.type === 'hooks-list' || component.type === 'hooks-no-global' ) {
                             route_data.view_type = 'hooks';
-							route_data.view_data = {component:component};
+                            route_data.view_data = {component:component};
                             route_data.screen_data = {screen_type:'custom-component',component_type:component.type,component_id:component_id,item_id:0,global:component.global,data:component.data,label:component.label};
                         } else {
                             route_data = Hooks.applyFilters('component-custom-type',route_data,[component]);
                         }
-					} else {
+                    } else {
                         route_data.error = 'Error : component not found: "'+ component_id +'"';
                     }
                     break;
@@ -559,26 +577,26 @@ define(function (require, exports) {
             
             return route_data;
         },
-		
-		/**
-		 * Execute router's method corresponding to the given route without 
-		 * changing current url or fragment.
-		 * Used for default route and custom routes.
-		 */
-		execute_route_silently: function( route ) {
-			
-			var fragment = Backbone.history.getFragment( route );
+        
+        /**
+         * Execute router's method corresponding to the given route without 
+         * changing current url or fragment.
+         * Used for default route and custom routes.
+         */
+        execute_route_silently: function( route ) {
+            
+            var fragment = Backbone.history.getFragment( route );
             var route_handler = _.find( Backbone.history.handlers, function( handler ) {
                 return handler.route.test( fragment );
             });
             
-			if ( route_handler !== undefined ) {
-				this.execute( route_handler.callback, [fragment], '' );
-			} else {
-				Utils.log( 'Router.js error: execute_route_silently: route not found.' );
-			}
-			
-		}
+            if ( route_handler !== undefined ) {
+                this.execute( route_handler.callback, [fragment], '' );
+            } else {
+                Utils.log( 'Router.js error: execute_route_silently: route not found.' );
+            }
+            
+        }
 
     });
 
