@@ -25,6 +25,9 @@ class WpakApps {
 			add_action( 'postbox_classes_wpak_apps_wpak_app_export_pwa', array( __CLASS__, 'add_pwa_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_pwa_data', array( __CLASS__, 'add_platform_specific_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_pwa_data', array( __CLASS__, 'add_pwa_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_addons', array( __CLASS__, 'add_platform_specific_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_addons', array( __CLASS__, 'add_ios_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_addons', array( __CLASS__, 'add_android_class' ) );
 			add_action( 'wpak_inner_simulation_box', array( __CLASS__, 'inner_security_box' ), 10, 2 );
 			add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 			add_filter( 'post_row_actions', array( __CLASS__, 'remove_quick_edit' ), 10, 2 );
