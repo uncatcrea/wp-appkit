@@ -188,7 +188,7 @@ jQuery().ready(function(){
 		var edit = parseInt(navigation_item_id) != 0;
 		var form_tr = edit ? $(this).parents('tr').eq(0) : null;
 		var data = $('div#navigation-item-form-'+ navigation_item_id).find("select, textarea, input").serializeArray();
-		if( !edit && confirm(wpak_navigation.messages.confirm_add) || edit && confirm(wpak_navigation.messages.confirm_edit) ){
+		if( !wpak_navigation.display_modif_alerts || ( !edit && confirm(wpak_navigation.messages.confirm_add) || edit && confirm(wpak_navigation.messages.confirm_edit) ) ){
 			WpakNavigation.ajax_add_or_edit_navigation_row(serializeObject(data),function(answer){
 				if( answer.ok == 1 ){
 					var table = $('#navigation-items-table tbody');
@@ -216,7 +216,7 @@ jQuery().ready(function(){
 		$('#navigation-feedback').hide();
 		var navigation_item_id = $(this).data('id');
 		var post_id = $(this).data('post-id');
-		if( confirm(wpak_navigation.messages.confirm_delete) ){
+		if( !wpak_navigation.display_modif_alerts || confirm(wpak_navigation.messages.confirm_delete) ){
 			WpakNavigation.ajax_delete_navigation_row(post_id,navigation_item_id,function(answer){
 				if( answer.ok == 1 ){
 					$('#navigation-items-table tr#navigation-item-row-'+navigation_item_id).remove();

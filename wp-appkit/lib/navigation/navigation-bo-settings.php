@@ -21,6 +21,7 @@ class WpakNavigationBoSettings{
 			wp_localize_script('wpak_navigation_bo_settings_js', 'wpak_navigation', array(
 				'post_id'=>$post->ID,
 				'nonce'=>wp_create_nonce('wpak-navigation-data-'. $post->ID),
+				'display_modif_alerts' => WpakSettings::get_setting( 'activate_wp_appkit_app_modif_alerts' ),
 				'messages'=>array(
 					'confirm_delete' => __('Deleting a navigation item will remove it from all existing instances of your app (even those already built and running on real phones). Are you sure you want to remove this item from your app navigation?',WpAppKit::i18n_domain),
 					'confirm_edit' => __('Modifying a navigation item will affect it on all existing instances of your app (even those already built and running on real phones). Are you sure you want to modify this navigation item?',WpAppKit::i18n_domain),

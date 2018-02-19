@@ -20,6 +20,7 @@ class WpakComponentsBoSettings {
 			wp_localize_script( 'wpak_components_bo_settings_js', 'wpak_components', array(
 				'post_id' => $post->ID,
 				'nonce' => wp_create_nonce( 'wpak-component-data-' . $post->ID ),
+				'display_modif_alerts' => WpakSettings::get_setting( 'activate_wp_appkit_app_modif_alerts' ),
 				'messages' => array(
 					'confirm_delete' => __( 'Deleting a component will remove it from all existing instances of your app (even those already built and running on real phones). Are you sure you want to delete this component?', WpAppKit::i18n_domain ),
 					'confirm_edit' => __( 'Modifying a component will affect it on all existing instances of your app (even those already built and running on real phones). Are you sure you want to modify this component?', WpAppKit::i18n_domain ),
