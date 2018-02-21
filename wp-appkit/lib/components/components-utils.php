@@ -111,6 +111,25 @@ class WpakComponentsUtils {
 		}
 
 		/**
+		 * Replace internal links in post content so that they open in app and not in browser.
+		 * Only for PWA by default but can be customized with the "wpak_post_content_replace_internal_links" filter.
+		 */
+		$replace_internal_links = wpak_get_current_app_info( 'platform' ) === 'pwa';
+
+		/**
+		 * Use this filter to enable/disable internal links replacement in post content.
+		 *
+		 * @param bool     $replace_internal_links    Whether to replace internal links or not.
+		 * @param WP_Post  $current_app               Current app.
+		 * @param WP_Post  $post                      Post we are replacing internal links for.
+		 */
+		$replace_internal_links = apply_filters( 'wpak_post_content_replace_internal_links', $replace_internal_links, wpak_get_current_app(), $post );
+
+		if ( $replace_internal_links ) {
+			$content = self::replace_internal_links( $content, $post );
+		}
+
+		/**
 		 * Filter a single post content.
 		 *
 		 * To override (replace) this default formatting completely, use
@@ -161,6 +180,63 @@ class WpakComponentsUtils {
 			}
 		}
 		return $content;
+	}
+
+	/**
+	 * Replace internal links in post content so that they open in app and not in browser.
+	 */
+	protected static function replace_internal_links( $content, $post ) {
+		//Find all internal urls:
+	    preg_match_all( '#(["\'])'. get_option('siteurl') .'/([^"\']+)#', $content, $internal_urls  );
+
+	    if ( !empty( $internal_urls ) ) {
+
+	        //For each internal url, find the matching wp entity (post, page etc).
+	        foreach( $internal_urls[2] as $key => $internal_url ) {
+
+	            $wp_query = self::get_wp_query_from_url( $internal_url );
+
+	            if ( $wp_query && !empty( $wp_query->post ) ) {
+	                //If the url correspond to a post or a page, replace the url by the corresponding internal app route:
+	                if ( $wp_query->is_single() ) {
+	                    $content = str_replace( $internal_urls[0][$key], $internal_urls[1][$key] .'#single/posts/'. $wp_query->post->ID .'/', $content );
+	                } else if ( $wp_query->is_page() ) {
+	                    $content = str_replace( $internal_urls[0][$key], $internal_urls[1][$key] .'#page/'. $wp_query->post->ID .'/', $content );
+	                }
+	            }
+
+	        }
+
+	    }
+
+	    return $content;
+	}
+
+	/**
+	 * Get WP_Query object from the given url.
+	 * Url parsing logic inspired from WP::parse_request() (wp-includes/class-wp.php).
+	 */
+	protected static function get_wp_query_from_url( $url ) {
+		global $wp_rewrite;
+
+	    $wp_query = null;
+
+	    $rewrite = $wp_rewrite->wp_rewrite_rules();
+
+	    $match_found = false;
+	    foreach ( (array) $rewrite as $match => $query ) {
+	        if ( preg_match( "#^$match#", $url, $matches ) ) {
+	            $query = preg_replace("!^.+\?!", '', $query);
+
+	            // Substitute the substring matches into the query.
+	            $query = addslashes( WP_MatchesMapRegex::apply( $query, $matches ) );
+
+	            $wp_query = new WP_Query( $query );
+	            break;
+	        }
+	    }
+
+	    return $wp_query;
 	}
 
 }
