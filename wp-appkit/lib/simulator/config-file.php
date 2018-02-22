@@ -271,8 +271,10 @@ define( function ( require ) {
 				array( 'src' => 'icons/icon-small.png', 'qualifier' => '', 'width' => '29', 'height' => '29'  ),
 			),
 			'pwa' => array(
-				array( 'src' => 'icons/icon-wp-appkit-xxhdpi.png', 'qualifier' => 'xxhdpi', 'width' => '144', 'height' => '144', 'type' => 'image/png'  ),
-				array( 'src' => 'icons/icon-wp-appkit-xxxhdpi.png', 'qualifier' => 'xxxhdpi', 'width' => '192', 'height' => '192', 'type' => 'image/png'  ),
+				array( 'src' => 'icons/pwa-icon-48x48.png', 'width' => '48', 'height' => '48', 'type' => 'image/png'  ),
+				array( 'src' => 'icons/pwa-icon-96x96.png', 'width' => '96', 'height' => '96', 'type' => 'image/png'  ),
+				array( 'src' => 'icons/pwa-icon-144x144.png', 'width' => '144', 'height' => '144', 'type' => 'image/png' ),
+				array( 'src' => 'icons/pwa-icon-512x512.png', 'width' => '512', 'height' => '512', 'type' => 'image/png' ),
 			)
 		);
 
@@ -297,7 +299,7 @@ define( function ( require ) {
 				array( 'src' => 'splashscreens/Default-Portrait@2x~iphone.png', 'qualifier' => '', 'width' => '640', 'height' => '960' ),
 				array( 'src' => 'splashscreens/Default-Landscape~iphone.png', 'qualifier' => '', 'width' => '480', 'height' => '320' ),
 				array( 'src' => 'splashscreens/Default-Portrait~iphone.png', 'qualifier' => '', 'width' => '320', 'height' => '480' ),
-			)
+			),
 		);
 
 		$icons_and_splashscreens = array( 'icons' => $default_icons, 'splashscreens' => $default_splashscreens );

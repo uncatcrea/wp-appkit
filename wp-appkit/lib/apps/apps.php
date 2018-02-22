@@ -632,11 +632,11 @@ class WpakApps {
 			<fieldset>
 				<legend><?php _e( 'Manifest', WpAppKit::i18n_domain ); ?></legend>
 				<div class="field-group">
-					<label><?php _e( 'Name', WpAppKit::i18n_domain ) ?></label>
+					<label><?php _e( 'Name (used in the banner)', WpAppKit::i18n_domain ) ?></label>
 					<input type="text" name="wpak_app_pwa_name" value="<?php echo esc_attr( $main_infos['pwa_name'] ) ?>" id="wpak_app_pwa_name" />
 				</div>
 				<div class="field-group">
-					<label><?php _e( 'Short Name', WpAppKit::i18n_domain ) ?></label>
+					<label><?php _e( 'Short Name (used on the home screen)', WpAppKit::i18n_domain ) ?></label>
 					<input type="text" name="wpak_app_pwa_short_name" value="<?php echo esc_attr( $main_infos['pwa_short_name'] ) ?>" id="wpak_app_pwa_short_name" />
 				</div>
 				<div class="field-group">
