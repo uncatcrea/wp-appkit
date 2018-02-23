@@ -763,7 +763,9 @@ class WpakBuild {
 			$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 			$app_title = $app_main_infos['title'];
 			$app_title_html = "<title>". esc_html( $app_title ) ."</title>\n";
+
 			$app_description = $app_main_infos['pwa_desc'];
+			$app_description = apply_filters( 'wpak_meta_description', $app_description, $app_id, $export_type );
 			$app_description_html = "<meta name=\"description\" content=\"". esc_html( $app_description ) ."\" >\n";
 
             if ( self::pwa_pretty_slugs_on( $app_id ) ) {
