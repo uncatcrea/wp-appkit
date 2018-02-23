@@ -763,6 +763,8 @@ class WpakBuild {
 			$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 			$app_title = $app_main_infos['title'];
 			$app_title_html = "<title>". esc_html( $app_title ) ."</title>\n";
+			$app_description = $app_main_infos['pwa_desc'];
+			$app_description_html = "<meta name=\"description\" content=\"". esc_html( $app_description ) ."\" >\n";
 
             if ( self::pwa_pretty_slugs_on( $app_id ) ) {
                 //Add "base" (required to handle pretty slugs with HTML5 pushstate):
@@ -770,7 +772,7 @@ class WpakBuild {
 
                 $pwa_base_suburl = self::add_subdir_prefix( $pwa_base_suburl );
 
-                $base_html = "<base href=\"/". trailingslashit( ltrim( $pwa_base_suburl, '/' ) )  ."\" />\n";
+                $base_html = "<base href=\"/". trailingslashit( ltrim( $pwa_base_suburl, '/' ) )  ."\" >\n";
             }
 
 			//Add manifest link:
@@ -782,7 +784,7 @@ class WpakBuild {
 				$theme_color = '<meta name="theme-color" content="' . $app_main_infos['pwa_theme_color'] . '">' . "\n";
 			}
 
-			$index_content = preg_replace( '/<head>(\s*?)<link/is', "<head>$1". $app_title_html ."$1". $manifest_html ."$1". $base_html ."$1". $theme_color ."$1<link", $index_content );
+			$index_content = preg_replace( '/<head>(\s*?)<link/is', "<head>$1". $app_title_html ."$1". $app_description_html ."$1". $manifest_html ."$1". $base_html ."$1". $theme_color ."$1<link", $index_content );
 
 			//Remove script used only for app simulation in web browser:
 			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)\s*/is', '', $index_content );
