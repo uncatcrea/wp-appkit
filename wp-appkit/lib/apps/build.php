@@ -805,6 +805,10 @@ class WpakBuild {
         //Remove script used only for app simulation in web browser :
 		$index_content = preg_replace( '/<script[^>]*>[^<]*var query[^<]*<\/script>\s*<script/is', '<script', $index_content );
 
+		//Add HTML lang attribute:
+		$lang = apply_filters( 'wpak_html_lang', get_bloginfo( 'language' ), $app_id, $export_type );
+		$index_content = preg_replace( '/<html>/i', '<html lang="'. esc_attr( $lang ) .'">', $index_content );
+
         //Insert launch content in index.html for very fast "First Meaningful Paint" (only used for pwa by default) :
         $setup_launch_content = apply_filters( 'wpak_setup_launch_content', $export_type === 'pwa', $export_type, $app_id );
         if ( $setup_launch_content ) {
