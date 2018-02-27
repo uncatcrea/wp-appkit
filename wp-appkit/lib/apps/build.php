@@ -555,6 +555,8 @@ class WpakBuild {
 							continue;
 						}
 
+						$theme_filename = str_replace( $theme .'/', '', $filename );
+
 						$filename = 'themes/'. $filename;
 
 						$zip_filename = $source_root . $filename;
@@ -568,30 +570,44 @@ class WpakBuild {
 								return $answer;
 							}
 						} elseif ( is_file( $file ) === true ) {
+							
+							if ( $theme_filename === 'head.html' ) {
 
-                            $minify_file = self::is_file_to_minify( $file, $export_type, $app_id );
+								$head_content = self::filter_head_template_content( file_get_contents( $file ), $app_id, $export_type );
 
-                            if ( $minify_file ) {
+								if ( !$zip->addFromString( $zip_filename, $head_content ) ) {
+									$answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
+									$answer['ok'] = 0;
+									return $answer;
+								}
 
-                                $file_content = file_get_contents( $file );
+							} else {
 
-                                $file_content = $minifier->minify( $file_extension, $file_content );
+	                            $minify_file = self::is_file_to_minify( $file, $export_type, $app_id );
 
-                                if ( !$zip->addFromString( $zip_filename, $file_content ) ) {
-                                    $answer['msg'] = sprintf( __( 'Could not add minified file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
-                                    $answer['ok'] = 0;
-                                    return $answer;
-                                }
+	                            if ( $minify_file ) {
 
-                            } else {
+	                                $file_content = file_get_contents( $file );
 
-                                if ( !$zip->addFile( $file, $zip_filename ) ) {
-                                    $answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
-                                    $answer['ok'] = 0;
-                                    return $answer;
-                                }
+	                                $file_content = $minifier->minify( $file_extension, $file_content );
 
-                            }
+	                                if ( !$zip->addFromString( $zip_filename, $file_content ) ) {
+	                                    $answer['msg'] = sprintf( __( 'Could not add minified file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
+	                                    $answer['ok'] = 0;
+	                                    return $answer;
+	                                }
+
+	                            } else {
+
+	                                if ( !$zip->addFile( $file, $zip_filename ) ) {
+	                                    $answer['msg'] = sprintf( __( 'Could not add file [%s] to zip archive', WpAppKit::i18n_domain ), $zip_filename );
+	                                    $answer['ok'] = 0;
+	                                    return $answer;
+	                                }
+
+	                            }
+
+	                        }
 
 							$webapp_files[] = $zip_filename;
 
@@ -812,29 +828,25 @@ class WpakBuild {
 		$index_content = preg_replace( '/<html>/i', '<html lang="'. esc_attr( $lang ) .'">', $index_content );
 
         //Insert launch content in index.html for very fast "First Meaningful Paint" (only used for pwa by default) :
-        $setup_launch_content = apply_filters( 'wpak_setup_launch_content', $export_type === 'pwa', $export_type, $app_id );
-        if ( $setup_launch_content ) {
+        $launch_content_data = self::get_launch_content_data( $app_id, $export_type );
 
-            $launch_content_data = self::get_launch_content_data( $app_id );
+        if ( !empty( $launch_content_data['content'] ) ) {
+            //Here we pre-render app's layout so that we don't have to wait for layout rendering in app.
+            //Also dynamic app rendering empties app content during content load, which we want to avoid for PWAs.
 
-            if ( !empty( $launch_content_data['content'] ) ) {
-                //Here we pre-render app's layout so that we don't have to wait for layout rendering in app.
-                //Also dynamic app rendering empties app content during content load, which we want to avoid for PWAs.
+            //Replace content tag in layout.html by launch content:
+            $launch_layout = preg_replace('/<%= content %>/',"\r\n<div id=\"app-content-wrapper\">\r\n<div class=\"app-screen\">". $launch_content_data['content'] ."\r\n</div></div>\t\t", $launch_content_data['layout'] );
 
-                //Replace content tag in layout.html by launch content:
-                $launch_layout = preg_replace('/<%= content %>/',"\r\n<div id=\"app-content-wrapper\">\r\n<div class=\"app-screen\">". $launch_content_data['content'] ."\r\n</div></div>\t\t", $launch_content_data['layout'] );
+            //Replace menu tag in layout.html by "#app-menu" div:
+            $launch_layout = preg_replace('/<%= menu %>/',"<div id=\"app-menu\"></div>", $launch_layout );
 
-                //Replace menu tag in layout.html by "#app-menu" div:
-                $launch_layout = preg_replace('/<%= menu %>/',"<div id=\"app-menu\"></div>", $launch_layout );
+            //Insert pre-rendered layout in index.html:
+            $index_content = preg_replace('/(<div[^>]+id="app-layout"[^>]*>)/',"$1\r\n". $launch_layout ."\r\n\t\t", $index_content );
+        }
 
-                //Insert pre-rendered layout in index.html:
-                $index_content = preg_replace('/(<div[^>]+id="app-layout"[^>]*>)/',"$1\r\n". $launch_layout ."\r\n\t\t", $index_content );
-            }
-
-            //Also include in head what's needed by pre-rendered layout to render well:
-            if ( !empty( $launch_content_data['head'] ) ) {
-                $index_content = preg_replace('/(<\/head>)/',"\r\n". $launch_content_data['head'] ."\r\n\r\n$1", $index_content );
-            }
+        //Also include in head what's needed by pre-rendered layout to render well:
+        if ( !empty( $launch_content_data['head'] ) ) {
+            $index_content = preg_replace('/(<\/head>)/',"\r\n". $launch_content_data['head'] ."\r\n\r\n$1", $index_content );
         }
 
         $index_content = apply_filters( 'wpak_app_index_content', $index_content, $app_id, $export_type );
@@ -971,41 +983,61 @@ class WpakBuild {
     /**
      * Get launch content data from theme's files
      */
-    private static function get_launch_content_data( $app_id ) {
+    private static function get_launch_content_data( $app_id, $export_type ) {
         $launch_content_data = [
             'content' => '',
             'head' => ''
         ];
 
-        $current_theme = WpakThemesStorage::get_current_theme( $app_id );
-        $themes_directory = WpakThemes::get_themes_directory();
-        $current_theme_directory = $themes_directory .'/'. $current_theme;
-		if( is_dir( $current_theme_directory ) ) {
-            $layout_file = $current_theme_directory .'/'. self::layout_file_name;
-            if ( file_exists( $layout_file ) ) {
-                $launch_content_data['layout'] = file_get_contents( $layout_file );
-            }
-            $launch_content_file = $current_theme_directory .'/'. self::launch_content_file_name;
-            if ( file_exists( $launch_content_file ) ) {
-                $launch_content_data['content'] = file_get_contents( $launch_content_file );
-            }
-            $launch_head_file = $current_theme_directory .'/'. self::launch_head_file_name;
-            if ( file_exists( $launch_head_file ) ) {
-            	$launch_head_content = file_get_contents( $launch_head_file );
+        //Only activate launch content for PWAs by default
+        $activate_launch_content = apply_filters( 'wpak_setup_launch_content', $export_type === 'pwa', $export_type, $app_id );
+        if ( $activate_launch_content ) {
 
-            	//Set assets urls:
-            	//repace JS calls (TemplateTags.getThemeAssetUrl()) by hardcoded theme paths:
-            	$launch_head_content = preg_replace('/<%=\s*TemplateTags.getThemeAssetUrl\(\s*[\'"]([^\'"]+)[\'"]\s*\);?\s*%>/',
-            										'themes/'. $current_theme .'/$1', 
-            										$launch_head_content );
+	        $current_theme = WpakThemesStorage::get_current_theme( $app_id );
+	        $themes_directory = WpakThemes::get_themes_directory();
+	        $current_theme_directory = $themes_directory .'/'. $current_theme;
+			if( is_dir( $current_theme_directory ) ) {
+	            $layout_file = $current_theme_directory .'/'. self::layout_file_name;
+	            if ( file_exists( $layout_file ) ) {
+	                $launch_content_data['layout'] = file_get_contents( $layout_file );
+	            }
+	            $launch_content_file = $current_theme_directory .'/'. self::launch_content_file_name;
+	            if ( file_exists( $launch_content_file ) ) {
+	                $launch_content_data['content'] = file_get_contents( $launch_content_file );
+	            }
+	            $launch_head_file = $current_theme_directory .'/'. self::launch_head_file_name;
+	            if ( file_exists( $launch_head_file ) ) {
+	            	$launch_head_content = file_get_contents( $launch_head_file );
 
-                $launch_content_data['head'] = $launch_head_content;
-            }
-        }
+	            	//Set assets urls:
+	            	//repace JS calls (TemplateTags.getThemeAssetUrl()) by hardcoded theme paths:
+	            	$launch_head_content = preg_replace('/<%=\s*TemplateTags.getThemeAssetUrl\(\s*[\'"]([^\'"]+)[\'"]\s*\);?\s*%>/',
+	            										'themes/'. $current_theme .'/$1', 
+	            										$launch_head_content );
 
-        $launch_content_data = apply_filters( 'wpak_launch_content_data', $launch_content_data, $app_id, $current_theme, $current_theme_directory );
+	                $launch_content_data['head'] = $launch_head_content;
+	            }
+	        }
+
+	        $launch_content_data = apply_filters( 'wpak_launch_content_data', $launch_content_data, $app_id, $current_theme, $current_theme_directory );
+
+	    }
 
         return $launch_content_data;
+    }
+
+    private static function filter_head_template_content( $head_template_content, $app_id, $export_type ) {
+
+    	$launch_content_data = self::get_launch_content_data( $app_id, $export_type );
+    	if ( !empty( $launch_content_data['head'] ) ) {
+    		//If we have a launch head content defined, it replaces default head.html template.
+    		// > We empty head.html template to avoid loading assets twice:
+			$head_template_content = '<!-- head.html is replaced by launch-head.html to handle launch content rendering -->';    		
+    	}
+
+		$head_template_content = apply_filters( 'wpak_head_template_content', $head_template_content, $app_id, $export_type );    	
+
+    	return $head_template_content;
     }
 
 	public static function pwa_icons_json_to_array( $app_icons_json ) {
