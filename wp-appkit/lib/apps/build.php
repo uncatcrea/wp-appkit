@@ -991,7 +991,15 @@ class WpakBuild {
             }
             $launch_head_file = $current_theme_directory .'/'. self::launch_head_file_name;
             if ( file_exists( $launch_head_file ) ) {
-                $launch_content_data['head'] = file_get_contents( $launch_head_file );
+            	$launch_head_content = file_get_contents( $launch_head_file );
+
+            	//Set assets urls:
+            	//repace JS calls (TemplateTags.getThemeAssetUrl()) by hardcoded theme paths:
+            	$launch_head_content = preg_replace('/<%=\s*TemplateTags.getThemeAssetUrl\(\s*[\'"]([^\'"]+)[\'"]\s*\);?\s*%>/',
+            										'themes/'. $current_theme .'/$1', 
+            										$launch_head_content );
+
+                $launch_content_data['head'] = $launch_head_content;
             }
         }
 
