@@ -89,7 +89,7 @@ class WpakConfigFile {
         $pwa_path = WpakBuild::add_subdir_prefix( $pwa_path );
         $app_path = $app_platform === 'pwa' ? '/'. trailingslashit( ltrim( $pwa_path, '/' ) ) : '';
 
-		$app_version = WpakApps::sanitize_app_version( $app_main_infos['version'] );
+		$app_version = WpakApps::sanitize_app_version( $app_platform === 'pwa' ? $app_main_infos['pwa_version'] : $app_main_infos['version'] );
 
 		$gmt_offset = (int)get_option( 'gmt_offset' );
 

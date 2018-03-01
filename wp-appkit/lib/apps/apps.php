@@ -657,14 +657,21 @@ class WpakApps {
 					<label><?php _e( 'Theme Color', WpAppKit::i18n_domain ) ?></label>
 					<input type="text" name="wpak_app_pwa_theme_color" value="<?php echo esc_attr( $main_infos['pwa_theme_color'] ) ?>" id="wpak_pwa_theme_color" class="color-field" />
 				</div>
+				<?php if( $pwa_installed ): ?>
+					<div class="field-group">
+						<a href="<?php echo $pwa_uri . '/manifest.json' ?>" target="_blank"><?php _e( 'View manifest.json', WpAppKit::i18n_domain ) ?></a>
+					</div>
+				<?php endif; ?>
 			</fieldset>
-			<?php if( $pwa_installed ): ?>
+			
+			<fieldset>
+				<legend><?php _e( 'Version', WpAppKit::i18n_domain ); ?></legend>
 				<div class="field-group">
-
-					<a href="<?php echo $pwa_uri . '/manifest.json' ?>" target="_blank"><?php _e( 'View manifest.json', WpAppKit::i18n_domain ) ?></a>
-
+					<label><?php _e( 'Progressive Web App version', WpAppKit::i18n_domain ) ?></label>
+					<input type="text" name="wpak_app_pwa_version" value="<?php echo esc_attr( $main_infos['pwa_version'] ) ?>" id="wpak_app_pwa_version" />
 				</div>
-			<?php endif; ?>
+			</fieldset>
+
 			<?php wp_nonce_field( 'wpak-phonegap-infos-' . $post->ID, 'wpak-nonce-phonegap-infos' ) ?>
 		</div>
 		<?php
@@ -818,6 +825,11 @@ class WpakApps {
 		if ( isset( $_POST['wpak_app_pwa_theme_color'] ) ) {
 			update_post_meta( $post_id, '_wpak_app_pwa_theme_color', sanitize_text_field( $_POST['wpak_app_pwa_theme_color'] ) );
 		}
+
+		if ( isset( $_POST['wpak_app_pwa_version'] ) ) {
+			$app_version = self::sanitize_app_version( $_POST['wpak_app_pwa_version'] );
+			update_post_meta( $post_id, '_wpak_app_pwa_version', $app_version );
+		}
 	}
 
 	/**
@@ -913,6 +925,7 @@ class WpakApps {
 	}
 
 	public static function get_app_main_infos( $post_id ) {
+		$platform = get_post_meta( $post_id, '_wpak_app_platform', true );
 		$title = get_post_meta( $post_id, '_wpak_app_title', true ); //handled in WpakThemesBoSettings
 		$app_phonegap_id = get_post_meta( $post_id, '_wpak_app_phonegap_id', true );
 		$name = get_post_meta( $post_id, '_wpak_app_name', true );
@@ -920,7 +933,6 @@ class WpakApps {
 		$version = get_post_meta( $post_id, '_wpak_app_version', true );
 		$version_code = get_post_meta( $post_id, '_wpak_app_version_code', true );
 		$phonegap_version = get_post_meta( $post_id, '_wpak_app_phonegap_version', true );
-		$platform = get_post_meta( $post_id, '_wpak_app_platform', true );
 		$author = get_post_meta( $post_id, '_wpak_app_author', true );
 		$author_website = get_post_meta( $post_id, '_wpak_app_author_website', true );
 		$author_email = get_post_meta( $post_id, '_wpak_app_author_email', true );
@@ -952,6 +964,8 @@ class WpakApps {
 		if( empty( $pwa_theme_color ) ) {
 			$pwa_theme_color = '#122e4f'; // Default theme color
 		}
+
+		$pwa_version = get_post_meta( $post_id, '_wpak_app_pwa_version', true );
 
 		$build_tool = get_post_meta( $post_id, '_wpak_app_build_tool', true );
 		$build_tool = empty( $build_tool ) ? 'gradle' : $build_tool; //Set gradle as default Android build tool
@@ -987,6 +1001,7 @@ class WpakApps {
 			'pwa_use_default_icons_and_splash' => empty( $pwa_icons ),
 			'pwa_background_color' => $pwa_background_color,
 			'pwa_theme_color' => $pwa_theme_color,
+			'pwa_version' => $pwa_version
 		);
 	}
 
