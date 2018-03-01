@@ -18,7 +18,7 @@ Progressive web apps (PWA) and mobile applications are a great way to offer an o
 = The Toolkit You Need to Build Your App =
 
 * **Native support of WordPress**: custom post types, custom fields, custom taxonomies, comments, secured authentication
-* **Full support of progressive web apps (PWA)
+* **Full support of progressive web apps (PWA)**
 * **iOS and Android support**
 * **PhoneGap/Cordova**: use JavaScript, HTML and CSS to build apps
 * **PhoneGap Build**: Easy online compilation
