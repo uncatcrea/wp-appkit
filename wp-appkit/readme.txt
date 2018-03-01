@@ -9,13 +9,16 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 == Description ==
 
-A great way to build mobile apps for your WordPress site using your favorite technologies: JavaScript, HTML and CSS.
+**NEW FEATURE - Progressive web apps**: support for progressive web applications (PWA) has been added to 1.5 release. PWA are a new way to deliver fast, reliable and great experience on the web notably for mobiles. They allow to create apps accessible as websites that you can install and access as traditionnal mobile apps.
 
-Mobile applications are a great way to offer an outstanding mobile experience for your users. Using push notifications, letting users read offline, using saved accounts to share content are among many wonderful things you can do with mobile applications.
+A great way to build progressive web apps (PWA) and mobile apps for your WordPress site using your favorite technologies: JavaScript, HTML and CSS.
+
+Progressive web apps (PWA) and mobile applications are a great way to offer an outstanding mobile experience for your users. Using push notifications, letting users read offline, using saved accounts to share content are among many wonderful things you can do with mobile applications.
 
 = The Toolkit You Need to Build Your App =
 
 * **Native support of WordPress**: custom post types, custom fields, custom taxonomies, comments, secured authentication
+* **Full support of progressive web apps (PWA)
 * **iOS and Android support**
 * **PhoneGap/Cordova**: use JavaScript, HTML and CSS to build apps
 * **PhoneGap Build**: Easy online compilation
@@ -23,8 +26,6 @@ Mobile applications are a great way to offer an outstanding mobile experience fo
 * **Customizable**: hook into our API to add the features you need
 
 Get a look at all [available features](https://uncategorized-creations.com/features/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_readme)
-
-**NEW FEATURE - Progressive web apps**: We are currently adding support for progressive web applications (PWA). You can follow our progress on [GitHub](https://github.com/mleroi/wp-appkit/tree/feature-pwa). PWA are a new way to deliver fast, reliable and great experience on the web notably for mobiles. They allow to create apps accessible as websites that you can install and access as traditionnal mobile apps.
 
 = Getting Started =
 
