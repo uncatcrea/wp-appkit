@@ -29,11 +29,13 @@ Get a look at all [available features](https://uncategorized-creations.com/featu
 
 = Getting Started =
 
-Even if you are familiar with development, building your first mobile app can be intimidating. We know that, we’ve been there before :-)
+Even if you are familiar with development, building your first PWA or mobile app can be intimidating. We know that, we’ve been there before :-)
 
-For that, we have a tutorial that will guide you through the process to have your first app connected to your WordPress site installed on your phone.
+For that, we have tutorials and documentation that will guide you through the process:
+* to create your first PWA
+* to have your first app connected to your WordPress site installed on your phone.
 
-[Get started with WP-AppKit](https://uncategorized-creations.com/wp-appkit/doc/getting-started/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_readme)
+[WP-AppKit Documentation](https://goo.gl/3yed8t)
 
 You can also check this video that shows in 5 minutes what you will achieve thanks to the *Getting Started* tutorial.
 
