@@ -43,7 +43,7 @@ https://www.youtube.com/watch?v=t6KwLxuoZ2g
 
 = App Themes: a Flexible Way To Build Apps =
 
-WP-AppKit supports JavaScript based app themes. We provide 2 default sister themes named *Q for iOS* and *Q for Android*. These themes are installed with the plugin. You can  also develop your own themes.
+WP-AppKit supports JavaScript based PWA and app themes. We provide 2 default sister themes named *Q for iOS* and *Q for Android*. These themes are installed with the plugin. You can  also develop your own themes.
 
 * [Q for Android](https://www.youtube.com/watch?v=fSQVx8-rqCY) (video)
 * [Q for iOS](https://www.youtube.com/watch?v=jkjtkH6wDys) (video)
