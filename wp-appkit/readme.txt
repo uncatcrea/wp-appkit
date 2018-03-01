@@ -1,9 +1,9 @@
-=== WP-AppKit - Mobile apps for WordPress ===
+=== WP-AppKit - Mobile apps and PWA for WordPress ===
 Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
-Tags: mobile app, android, ios, progressive web app, phonegap build
+Tags: pwa, mobile app, android, ios, progressive web app, phonegap build
 Requires at least: 4.0
-Tested up to: 4.8
-Stable tag: 1.2
+Tested up to: 4.9.4
+Stable tag: 1.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
