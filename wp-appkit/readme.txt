@@ -50,8 +50,8 @@ WP-AppKit supports JavaScript based PWA and app themes. We provide 2 default sis
 
 = Documentation and Tutorials =
 
-* [Complete documentation](https://uncategorized-creations.com/wp-appkit/doc/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_readme).
-* [Tutorials](https://uncategorized-creations.com/tag/tutorials/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_readme).
+* [Complete documentation](https://goo.gl/6EW93W).
+* [Tutorials](https://goo.gl/vKxBFD).
 * [GitHub repository](https://github.com/uncatcrea/wp-appkit)
 
 > **You need more support for WP-AppKit?** [Pro Support](https://uncategorized-creations.com/downloads/1-year-pro-support/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_readme) is an exclusive service where specialists work with you to get the most of WP-AppKit.
