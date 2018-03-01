@@ -274,6 +274,7 @@ define( function ( require ) {
 				array( 'src' => 'icons/pwa-icon-48x48.png', 'width' => '48', 'height' => '48', 'type' => 'image/png'  ),
 				array( 'src' => 'icons/pwa-icon-96x96.png', 'width' => '96', 'height' => '96', 'type' => 'image/png'  ),
 				array( 'src' => 'icons/pwa-icon-144x144.png', 'width' => '144', 'height' => '144', 'type' => 'image/png' ),
+				array( 'src' => 'icons/pwa-icon-192x192.png', 'width' => '192', 'height' => '192', 'type' => 'image/png' ),
 				array( 'src' => 'icons/pwa-icon-512x512.png', 'width' => '512', 'height' => '512', 'type' => 'image/png' ),
 			)
 		);
