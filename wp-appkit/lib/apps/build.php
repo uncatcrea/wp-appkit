@@ -894,8 +894,6 @@ class WpakBuild {
 		$pwa_name = !empty( $app_main_infos['pwa_name'] ) ? $app_main_infos['pwa_name'] : $app_main_infos['title'];
 		$pwa_short_name = !empty( $app_main_infos['pwa_short_name'] ) ? $app_main_infos['pwa_short_name'] : $pwa_name;
 
-		//"#282E34","#122E4F";
-
 		$manifest = array(
 			"name" => $pwa_name,
 			"short_name" => $pwa_short_name,
@@ -1030,9 +1028,11 @@ class WpakBuild {
 
     	$launch_content_data = self::get_launch_content_data( $app_id, $export_type );
     	if ( !empty( $launch_content_data['head'] ) ) {
-    		//If we have a launch head content defined, it replaces default head.html template.
-    		// > We empty head.html template to avoid loading assets twice:
-			$head_template_content = '<!-- head.html is replaced by launch-head.html to handle launch content rendering -->';    		
+    		if ( apply_filters( 'wpak_clean_head_template_if_launch_head', true, $app_id, $export_type ) ) {
+	    		//If we have a launch head content defined, it replaces default head.html template.
+	    		// > We empty head.html template to avoid loading assets twice:
+				$head_template_content = '<!-- head.html is replaced by launch-head.html to handle launch content rendering -->';    		
+			}
     	}
 
 		$head_template_content = apply_filters( 'wpak_head_template_content', $head_template_content, $app_id, $export_type );    	
