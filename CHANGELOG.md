@@ -1,3 +1,32 @@
+## 1.5 (2018-03-04)
+
+### Features
+- **Progressive Web App (PWA) support!**
+
+### Default themes update
+- **Embed last version (1.1.0) of [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.1.0) default app themes, which is compatible with PWAs.**
+
+### Main commits and issues 
+_See Pull Request [#361](https://github.com/uncatcrea/wp-appkit/pull/361) to see all version 1.5 related commits_
+
+- **Add Progressive Web App export type** ([135f927](https://github.com/uncatcrea/wp-appkit/commit/135f927f4e2a7404b66b0b0e8ed3a30bffc412ad), [@mleroi](https://github.com/mleroi))
+- **Add pwa manifest** ([3372106](https://github.com/uncatcrea/wp-appkit/commit/337210620c5a99e734ecda7ad6313e020cc5974b), [@mleroi](https://github.com/mleroi))
+- **Icones PWA** ([f177fee](https://github.com/uncatcrea/wp-appkit/commit/f177fee65aa96173954588d60fbffb48a48cfaa5), [@mleroi](https://github.com/mleroi))
+- **Update available platforms to add PWA** ([#298](https://github.com/uncatcrea/wp-appkit/issues/298), [@lpointet](https://github.com/lpointet))
+- **Show/Hide PhoneGap/PWA metaboxes when needed** ([#299](https://github.com/uncatcrea/wp-appkit/issues/299), [@lpointet](https://github.com/lpointet))
+- **Check/Sanitize PWA install path** ([#300](https://github.com/uncatcrea/wp-appkit/issues/300), [@lpointet](https://github.com/lpointet))
+- **Allow going directly to url fragment at app launch** ([47ac168](https://github.com/uncatcrea/wp-appkit/pull/361/commits/47ac1683c8ca6932f30966310c483de1659f1a54), [@mleroi](https://github.com/mleroi))
+- **Add pretty url support to PWA** ([713d72f](https://github.com/uncatcrea/wp-appkit/pull/361/commits/713d72fb26d219ced9cfddcadf07b3a1946b1184), [@mleroi](https://github.com/mleroi))
+- **Update Export/Install UI** ([#317](https://github.com/uncatcrea/wp-appkit/issues/317), [@lpointet](https://github.com/lpointet))
+- **JS Minification** ([6965425](https://github.com/uncatcrea/wp-appkit/pull/361/commits/6965425edac231fcabb33bcb03b6cd1687859950), [@mleroi](https://github.com/mleroi))
+- **CSS Minification** ([f49ee5e](https://github.com/uncatcrea/wp-appkit/pull/361/commits/f49ee5e21a3f1be56235aa6fdf76ba56f703423b), [@mleroi](https://github.com/mleroi))
+- **Add a warning about https in the PWA box** ([#313](https://github.com/uncatcrea/wp-appkit/issues/313), [@lpointet](https://github.com/lpointet))
+- **Add default background/theme colors and a color picker** ([#314](https://github.com/uncatcrea/wp-appkit/issues/314), [@lpointet](https://github.com/lpointet))
+- **Set auth key from option instead of WP const** ([3ab7720](https://github.com/uncatcrea/wp-appkit/pull/361/commits/3ab772053c9fbd84450338ff8166a03a5fc01b91), [@mleroi](https://github.com/mleroi))
+- **First Launch Content** ([#344](https://github.com/uncatcrea/wp-appkit/issues/344), [@mleroi](https://github.com/mleroi))
+- **Add-ons compatibility** ([#354](https://github.com/uncatcrea/wp-appkit/issues/354), [@lpointet](https://github.com/lpointet))
+- **Handle Internal links** ([#358](https://github.com/uncatcrea/wp-appkit/issues/358), [@mleroi](https://github.com/mleroi))
+
 ## 1.2 (2017-10-22)
 
 ### Features
