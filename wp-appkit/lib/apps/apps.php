@@ -309,7 +309,7 @@ class WpakApps {
 					} else if ( '0000-00-00 00:00:00' == $post->post_date_gmt ) { // draft, 1 or more saves, no date specified
 						$stamp = __( 'Not saved yet', WpAppKit::i18n_domain );
 					}
-					$date = date_i18n( $datef, strtotime( $post->post_date ) );
+					$date = date_i18n( $datef, strtotime( $post->post_modified ) );
 				} else { // draft (no saves, and thus no date specified)
 					$stamp = __( 'Not saved yet', WpAppKit::i18n_domain );
 					$date = date_i18n( $datef, strtotime( current_time('mysql') ) );
