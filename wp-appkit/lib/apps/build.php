@@ -570,7 +570,12 @@ class WpakBuild {
 								return $answer;
 							}
 						} elseif ( is_file( $file ) === true ) {
-							
+
+							//Include PWA icons only for PWA export:
+							if ( $export_type !== 'pwa' && strpos( $theme_filename, 'icons/pwa-icon-' ) === 0 ) {
+								continue;
+							}
+
 							if ( $theme_filename === 'head.html' ) {
 
 								$head_content = self::filter_head_template_content( file_get_contents( $file ), $app_id, $export_type );
