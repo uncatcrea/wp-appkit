@@ -6,7 +6,7 @@
 ### Default themes update
 - **Embed last version (1.1.0) of [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.1.0) default app themes, which is compatible with PWAs.**
 
-### Main commits and issues 
+### Main PWA commits and issues 
 _See Pull Request [#361](https://github.com/uncatcrea/wp-appkit/pull/361) to see all version 1.5 related commits_
 
 - **Add Progressive Web App export type** ([135f927](https://github.com/uncatcrea/wp-appkit/commit/135f927f4e2a7404b66b0b0e8ed3a30bffc412ad), [@mleroi](https://github.com/mleroi))
@@ -26,6 +26,10 @@ _See Pull Request [#361](https://github.com/uncatcrea/wp-appkit/pull/361) to see
 - **First Launch Content** ([#344](https://github.com/uncatcrea/wp-appkit/issues/344), [@mleroi](https://github.com/mleroi))
 - **Add-ons compatibility** ([#354](https://github.com/uncatcrea/wp-appkit/issues/354), [@lpointet](https://github.com/lpointet))
 - **Handle Internal links** ([#358](https://github.com/uncatcrea/wp-appkit/issues/358), [@mleroi](https://github.com/mleroi))
+
+### Bugfixes and evolutions
+- **App last modification date stays to creation date** ([#359](https://github.com/uncatcrea/wp-appkit/issues/359), [@mleroi](https://github.com/mleroi))
+- **Add option to disable warning alerts when modifying components and navigation** ([#362](https://github.com/uncatcrea/wp-appkit/issues/362), [@mleroi](https://github.com/mleroi))
 
 ## 1.2 (2017-10-22)
 

@@ -116,6 +116,40 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
 
+= 1.5 (2018-03-04) =
+
+*Features*
+
+* Progressive Web App (PWA) support!
+
+*Default themes update*
+
+* Embed last version (1.1.0) of [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.1.0) default app themes, which is compatible with PWAs.
+
+*Main evolutions for PWA*
+
+* Add Progressive Web App export type
+* Add pwa manifest
+* Icones PWA
+* Update available platforms to add PWA
+* Show/Hide PhoneGap/PWA metaboxes when needed
+* Check/Sanitize PWA install path
+* Allow going directly to url fragment at app launch
+* Add pretty url support to PWA
+* Update Export/Install UI
+* JS Minification
+* CSS Minification
+* Add default background/theme colors and a color picker
+* Set auth key from option instead of WP const
+* First Launch Content
+* Add-ons compatibility
+* Handle Internal links
+
+*Bugfixes and evolutions*
+
+* App last modification date stays to creation date
+* Add option to disable warning alerts when modifying components and navigation
+
 = 1.2 (2017-10-22) =
 
 *Features*
