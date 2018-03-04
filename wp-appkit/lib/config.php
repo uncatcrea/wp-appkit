@@ -6,5 +6,6 @@ class WpakConfig {
     const my_account_url = 'https://uncategorized-creations.com/my-account/';
     const checkout_url = 'https://uncategorized-creations.com/checkout/';
 	const license_renewal_url = 'https://uncategorized-creations.com/pro-support-license-renewal/';
+    const pwa_icons_tutorial = 'https://uncategorized-creations.com/4217/add-icons-progressive-web-app/';
 }
 
