@@ -115,6 +115,7 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 4. Create app themes. Two themes are pre-installed to get you started in no time
 5. Preview in the browser (using Chrome's emulation mode). Debug with the tools you know (Chrome's dev tools)
 6. Compile online (with PhoneGap build)
+7. Create a progressive web application (PWA)
 
 == Changelog ==
 
