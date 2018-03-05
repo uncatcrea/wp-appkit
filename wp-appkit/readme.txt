@@ -99,7 +99,7 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 
 **No.** You can use PhoneGap Build, an easy to use Adobe’s cloud compilation service or the classic Cordova CLI.
 
-= Doc you deploy progressive web apps for me? =
+= Do you deploy progressive web apps for me? =
 
 **Yes.** Progressive web apps are not distributed through app stores. They are freely available on the web. WP-AppKit allows to deploy and update PWA on your site.
 
