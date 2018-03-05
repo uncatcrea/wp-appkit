@@ -60,7 +60,7 @@ WP-AppKit supports JavaScript based PWA and app themes. We provide 2 default sis
 
 == Frequently Asked Questions ==
 
-You'll find [an always up to date FAQ](https://uncategorized-creations.com/frequently-asked-questions/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_readme) on our website.
+You'll find [an always up to date FAQ](https://goo.gl/cgQWyA) on our website.
 
 = How do I install WP-AppKit? =
 
@@ -73,7 +73,7 @@ Your current WP-AppKit apps and themes (in `wp-content/themes-wp-appkit`) won't 
 
 = How many applications can I create? =
 
-You can create an **unlimited** number of applications and an unlimited number of versions of each application.
+You can create an **unlimited** number of applications and an unlimited number of versions of each application. That includes native apps as well as progressive web apps.
 
 = Can I send push notifications? =
 
@@ -95,11 +95,15 @@ We use a homemade (extendable) REST API. As the WP REST API is now integrated to
 
 You can display WooCommerce content (ie. products) in your themes as any other WordPress content. However, you’ll have to (re)develop functionalities such as cart or checkout.
 
-= Do you compile applications for me? =
+= Do you compile native applications for me? =
 
 **No.** You can use PhoneGap Build, an easy to use Adobe’s cloud compilation service or the classic Cordova CLI.
 
-= Do you release applications in app stores for me? =
+= Doc you deploy progressive web apps for me? =
+
+**Yes.** Progressive web apps are not distributed through app stores. They are freely available on the web. WP-AppKit allows to deploy and update PWA on your site.
+
+= Do you release native applications in app stores for me? =
 
 **No.** This is something you’ll have to do by yourself when your application is ready and compiled.
 
