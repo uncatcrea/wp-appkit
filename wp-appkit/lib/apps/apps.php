@@ -594,9 +594,9 @@ class WpakApps {
 
 					<div class="pwa_installed">
 						<?php if ( $pwa_installed ): ?>
-								Progressive Web App <strong>installed</strong> in:<br><?php echo $pwa_dir ?>
+								<?php _e( "Progressive Web App <strong>installed</strong> in:", WpAppKit::i18n_domain ); ?><br><?php echo $pwa_dir ?>
 						<?php else: ?>
-								Progressive Web App not installed.
+								<?php _e( "Progressive Web App not installed.", WpAppKit::i18n_domain ); ?>
 						<?php endif ?>
 					</div>
 
