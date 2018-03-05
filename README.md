@@ -5,8 +5,8 @@ WP-AppKit is an open source WordPress plugin to **build mobile applications conn
 
 ## Latest News
 
-### 04/10/2017 ###
-* WP-AppKit is officially out of beta and can be installed from [WordPress.org](https://wordpress.org/plugins/wp-appkit/)
+### 04/05/2018 ###
+* Progressive Web Applications (PWA) support
 
 ## Getting Started
 Creating apps with WP-AppKit means creating JavaScript based app themes. (More on that [here](https://github.com/uncatcrea/wp-appkit/blob/master/README.md#app-themes)).
