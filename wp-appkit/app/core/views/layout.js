@@ -49,11 +49,16 @@ define(function (require) {
         	var rendered_content = this.template(template_args);
 			
             $(this.el).html(rendered_content); 
+
             return this;
         },
         
         containsHeader : function(){
         	return contains_header;
+        },
+
+        isRendered: function(){
+            return $(this.el).length > 0 && $(this.el).html().length > 0;
         }
         
     });

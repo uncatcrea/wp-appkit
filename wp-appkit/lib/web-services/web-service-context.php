@@ -31,6 +31,13 @@ class WpakWebServiceContext {
 	protected static $query_data = '';
 
 	/**
+	 * Main info of the app for which the current web service is called.
+	 * We cache this here in context so that it is no re-computed for each later post retrieval.
+	 * @var array
+	 */
+	protected static $app_infos = [];
+
+	/**
 	 * Sets the current web service's crud action
 	 * @param string $crud_action 'create', 'read', 'update' or 'delete'
 	 */
@@ -41,6 +48,7 @@ class WpakWebServiceContext {
 			self::$web_service = $service_slug;
 			self::$crud_action = $crud_action;
 			self::$query_data = $query_data;
+			self::$app_infos = WpakApps::get_app_main_infos( $app_id );
 		}
 	}
 
@@ -113,6 +121,22 @@ class WpakWebServiceContext {
 		return !empty( self::$app );
 	}
 
+	/**
+	 * Get info about current app.
+	 * 
+	 * @param  string $info If provided, will retrieve the specified info. If not provided will return all app infos.
+	 * @return string|array String if $info is provided. Array if not.
+	 */
+	public static function getCurrentAppInfo( $info = '' ) {
+		$app_info = '';
+		if ( !empty( $info ) ) {
+			$app_info = isset( self::$app_infos[$info] ) ? self::$app_infos[$info] : '';
+		} else {
+			$app_info = self::$app_infos;
+		}
+		return $app_info;
+	}
+
 }
 
 /********************************************************************************
@@ -165,4 +189,13 @@ function wpak_get_current_app_id() {
 function wpak_get_current_app_slug() {
 	$current_app = WpakWebServiceContext::get_current_app();
 	return !empty( $current_app ) ? $current_app->post_name : '';
+}
+
+/**
+ * If currently retrieving content for an app (web service), returns the corresponding app info.
+ * @param  string $info If provided, will retrieve the specified info. If not provided will return all app infos.
+ * @return string|array String if $info is provided. Array if not.
+ */
+function wpak_get_current_app_info( $info ) {
+	return WpakWebServiceContext::getCurrentAppInfo( $info );
 }

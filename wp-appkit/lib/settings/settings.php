@@ -81,6 +81,13 @@ class WpakSettings {
 					</td>
 				</tr>
 				<tr>
+					<th><?php _e( 'App modification alerts', WpAppKit::i18n_domain ) ?></th>
+					<td>
+						<input type="checkbox" name="activate_wp_appkit_app_modif_alerts" id="activate_wp_appkit_app_modif_alerts" <?php echo !empty($settings['activate_wp_appkit_app_modif_alerts']) ? 'checked' : ''?> />
+						<label for="activate_wp_appkit_app_modif_alerts"><?php _e('Show a confirmation dialog in app edition panel when modifying apps\' components or navigation', WpAppKit::i18n_domain ) ?></label>
+					</td>
+				</tr>
+				<tr>
 					<th><?php _e( 'WP-AppKit user role', WpAppKit::i18n_domain ) ?></th>
 					<td>
 						<input type="checkbox" name="activate_wp_appkit_editor_role" id="activate_wp_appkit_editor_role" <?php echo !empty($settings['activate_wp_appkit_editor_role']) ? 'checked' : ''?> />
@@ -106,6 +113,7 @@ class WpakSettings {
 		$default_settings = array(
 			'posts_per_page' => get_option( 'posts_per_page' ),
 			'activate_wp_appkit_editor_role' => false,
+			'activate_wp_appkit_app_modif_alerts' => true,
 		);
 		
 		$settings = wp_parse_args( get_option( self::option_id ), $default_settings );
@@ -137,6 +145,12 @@ class WpakSettings {
 			}else{
 				WpakUserPermissions::remove_wp_appkit_user_role();
 				$settings['activate_wp_appkit_editor_role'] = false;
+			}
+
+			if ( isset( $_POST['activate_wp_appkit_app_modif_alerts'] ) ) {
+				$settings['activate_wp_appkit_app_modif_alerts'] = true;
+			} else {
+				$settings['activate_wp_appkit_app_modif_alerts'] = false;
 			}
 
 			self::save_settings( $settings );

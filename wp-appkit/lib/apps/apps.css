@@ -4,7 +4,8 @@
     src: url('fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('fonts/glyphicons-halflings-regular.woff') format('woff'), url('fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 
-#wpak_app_publish .inside, #wpak_app_project .inside {
+#wpak_app_publish .inside, #wpak_app_project .inside,
+#wpak_app_export_phonegap_build .inside, #wpak_app_export_pwa .inside  {
     margin: 0;
     padding: 0;
 }
@@ -13,7 +14,7 @@
     border-top: 1px solid #ddd;
 }
 
-#export-action {
+.export-action {
     text-align:right;
     padding:0 12px 12px 0;
     line-height:28px;
@@ -23,9 +24,43 @@
     vertical-align:middle;
 }
 
-#wpak_export_link {
+#wpak_export_link, .wpak_export_link_pwa {
     margin-left:10px;
     vertical-align:middle;
+}
+
+#wpak_app_project .inside .view-app-pwa {
+	text-align: center;
+    padding: 0;
+    margin: 0 15px 15px;
+    display: block;
+}
+
+.wpak_export_pwa_feedback{
+	line-height: 20px;
+    margin: 11px 10px 6px 10px;
+    box-shadow: none;
+    border-right: 4px solid #fff;
+    border-left: none;
+    text-align: right;
+}
+
+div.updated.wpak_export_pwa_feedback,
+div.error.wpak_export_pwa_feedback {
+	border-left: none;
+	box-shadow: none;
+}
+
+.wpak_export_pwa_feedback.error{
+	border-right-color: #dc3232;
+}
+
+.wpak_export_pwa_feedback.updated{
+	border-right-color: #46b450;
+}
+
+.pwa_installed{
+	margin: 0 0 15px;
 }
 
 .link {
@@ -33,7 +68,7 @@
 }
 
 .field-group {
-    margin:10px 0;
+    margin:0 0 10px;
 }
 
 .fix-align label {
@@ -46,6 +81,10 @@
 
 .wpak_settings input[type=text] {
     width:100%;
+}
+
+.wpak_settings input[name=wpak_app_pwa_path] {
+	width:60%;
 }
 
 .wpak_settings textarea {
@@ -1076,4 +1115,34 @@ a.list-group-item-danger.active:focus {
 }
 .wp-list-table tr.error td:last-child {
     border-right: 1px solid #f00;
+}
+
+.pwa-infos-install{
+	float:right;
+}
+.pwa-infos-install .spinner {
+    float:left;
+}
+
+.wpak-pwa-icons {
+    padding:5px 0 0 5px;
+}
+.wpak-pwa-icons span {
+    min-width:40px;
+    display:inline-block;
+    margin:auto;
+    text-align:center;
+    font-style:italic;
+    font-size:0.85em;
+}
+.wpak-pwa-icons-text {
+    margin-bottom:3px;
+}
+.wpak-pwa-icon {
+    max-width:150px;
+    max-height:150px;
+    margin-right:3px;
+}
+.wpak_settings .wp-picker-container {
+    display:block;
 }

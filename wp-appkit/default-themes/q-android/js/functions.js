@@ -41,16 +41,16 @@ define([
      * Init
      */
     
-    /**
-     * @desc Customizing the status bar to match the theme, relies on // https://github.com/apache/cordova-plugin-statusbar
-     */
-    try { // Testing if the Cordova plugin is available
-        StatusBar.backgroundColorByHexString("#212121");
-    } catch(err) {
-        console.log("StatusBar plugin not available - you're probably in the browser");
+    if ( Config.app_platform !== 'pwa' ) {
+        /**
+         * @desc Customizing the status bar to match the theme, relies on // https://github.com/apache/cordova-plugin-statusbar
+         */
+        try { // Testing if the Cordova plugin is available
+            StatusBar.backgroundColorByHexString("#212121");
+        } catch(err) {
+            console.log("StatusBar plugin not available - you're probably in the browser");
+        }
     }
-
-    
     
 	// Global variables
     var isMenuOpen = false; // Stores if the off-canvas menu is currently opened or closed
@@ -105,6 +105,8 @@ define([
                 return customPostDate;
             }
             
+        } else if ( view_template === 'menu' ) {
+            template_args.Config = Config;
         }
         
         // Return parameters and functions
@@ -474,32 +476,32 @@ define([
      * .app-screen scroll event binding is done in screen:showed because event delegation is not possible for this kind of event
      */
 
-    // Menu button events
-    $("#app-layout").on("touchstart","#menu-button", menuButtonTapOn);
-	$("#app-layout").on("touchend","#menu-button", menuButtonTapOff);
+    // Menu button events *
+    $("#app-layout").on("touchstart mousedown","#menu-button", menuButtonTapOn);
+	$("#app-layout").on("touchend click","#menu-button", menuButtonTapOff);
 
-    // Refresh button events
-    $("#app-layout").on("touchstart","#refresh-button", refreshTapOn);
-	$("#app-layout").on("touchend","#refresh-button", refreshTapOff);
+    // Refresh button events *
+    $("#app-layout").on("touchstart mousedown","#refresh-button", refreshTapOn);
+	$("#app-layout").on("touchend click","#refresh-button", refreshTapOff);
 
-    // Menu item events
-	$("#app-layout").on( "touchstart", "#menu-items li a", menuItemTapOn );
-    $("#app-layout").on( "touchend", "#menu-items li a", menuItemTapOff );
+    // Menu item events *
+	$("#app-layout").on( "touchstart mousedown", "#menu-items li a", menuItemTapOn );
+    $("#app-layout").on( "touchend click", "#menu-items li a", menuItemTapOff );
 	
-    // Content item events
+    // Content item events *
     $("#app-layout").on("touchstart","#content .content-item a", contentItemTapOn);
     $("#app-layout").on("click","#content .content-item a", contentItemTap);
 
-    // Close slideup panel button events
-    $("#app-layout").on("touchstart","#back-button", closePanelButtonTapOn);
-    $("#app-layout").on("touchend","#back-button", closePanelButtonTapOff);
+    // Close slideup panel button events *
+    $("#app-layout").on("touchstart mousedown","#back-button", closePanelButtonTapOn);
+    $("#app-layout").on("touchend click","#back-button", closePanelButtonTapOff);
 
     // Block clicks on images in posts
     $("#app-layout").on("click touchend","#single-content .content-image-link",function(e){e.preventDefault();});
     
-    // Get more button events
-    $('#app-layout').on('touchstart', '#get-more-button', getMoreButtonTapOn);
-    $('#app-layout').on('touchend', '#get-more-button', getMoreButtonTapOff);
+    // Get more button events *
+    $('#app-layout').on('touchstart mousedown', '#get-more-button', getMoreButtonTapOn);
+    $('#app-layout').on('touchend click', '#get-more-button', getMoreButtonTapOff);
     
     // Ripple effect events
     $('#app-layout').on( 'touchstart', '.has-ripple-feedback', rippleItemTapOn );

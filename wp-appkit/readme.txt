@@ -1,21 +1,24 @@
-=== WP-AppKit - Mobile apps for WordPress ===
+=== WP-AppKit - Mobile apps and PWA for WordPress ===
 Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
-Tags: mobile app, android, ios, progressive web app, phonegap build
+Tags: pwa, mobile app, android, ios, progressive web app, phonegap build
 Requires at least: 4.0
-Tested up to: 4.8
-Stable tag: 1.2
+Tested up to: 4.9.4
+Stable tag: 1.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 == Description ==
 
-A great way to build mobile apps for your WordPress site using your favorite technologies: JavaScript, HTML and CSS.
+**NEW FEATURE - Progressive web apps**: support for progressive web applications (PWA) has been added to 1.5 release. PWA are a new way to deliver fast, reliable and great experience on the web notably for mobiles. They allow to create apps accessible as websites that you can install and access as traditionnal mobile apps.
 
-Mobile applications are a great way to offer an outstanding mobile experience for your users. Using push notifications, letting users read offline, using saved accounts to share content are among many wonderful things you can do with mobile applications.
+A great way to build progressive web apps (PWA) and mobile apps for your WordPress site using your favorite technologies: JavaScript, HTML and CSS.
+
+Progressive web apps (PWA) and mobile applications are a great way to offer an outstanding mobile experience for your users. Using push notifications, letting users read offline, using saved accounts to share content are among many wonderful things you can do with mobile applications.
 
 = The Toolkit You Need to Build Your App =
 
 * **Native support of WordPress**: custom post types, custom fields, custom taxonomies, comments, secured authentication
+* **Full support of progressive web apps (PWA)**
 * **iOS and Android support**
 * **PhoneGap/Cordova**: use JavaScript, HTML and CSS to build apps
 * **PhoneGap Build**: Easy online compilation
@@ -24,15 +27,15 @@ Mobile applications are a great way to offer an outstanding mobile experience fo
 
 Get a look at all [available features](https://uncategorized-creations.com/features/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_readme)
 
-**NEW FEATURE - Progressive web apps**: We are currently adding support for progressive web applications (PWA). You can follow our progress on [GitHub](https://github.com/mleroi/wp-appkit/tree/feature-pwa). PWA are a new way to deliver fast, reliable and great experience on the web notably for mobiles. They allow to create apps accessible as websites that you can install and access as traditionnal mobile apps.
-
 = Getting Started =
 
-Even if you are familiar with development, building your first mobile app can be intimidating. We know that, we’ve been there before :-)
+Even if you are familiar with development, building your first PWA or mobile app can be intimidating. We know that, we’ve been there before :-)
 
-For that, we have a tutorial that will guide you through the process to have your first app connected to your WordPress site installed on your phone.
+For that, we have tutorials and documentation that will guide you through the process:
+* to create your first PWA
+* to have your first app connected to your WordPress site installed on your phone.
 
-[Get started with WP-AppKit](https://uncategorized-creations.com/wp-appkit/doc/getting-started/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_readme)
+[WP-AppKit Documentation](https://goo.gl/3yed8t)
 
 You can also check this video that shows in 5 minutes what you will achieve thanks to the *Getting Started* tutorial.
 
@@ -40,24 +43,24 @@ https://www.youtube.com/watch?v=t6KwLxuoZ2g
 
 = App Themes: a Flexible Way To Build Apps =
 
-WP-AppKit supports JavaScript based app themes. We provide 2 default sister themes named *Q for iOS* and *Q for Android*. These themes are installed with the plugin. You can  also develop your own themes.
+WP-AppKit supports JavaScript based PWA and app themes. We provide 2 default sister themes named *Q for iOS* and *Q for Android*. These themes are installed with the plugin. You can  also develop your own themes.
 
 * [Q for Android](https://www.youtube.com/watch?v=fSQVx8-rqCY) (video)
 * [Q for iOS](https://www.youtube.com/watch?v=jkjtkH6wDys) (video)
 
 = Documentation and Tutorials =
 
-* [Complete documentation](https://uncategorized-creations.com/wp-appkit/doc/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_readme).
-* [Tutorials](https://uncategorized-creations.com/tag/tutorials/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_readme).
+* [Complete documentation](https://goo.gl/6EW93W).
+* [Tutorials](https://goo.gl/vKxBFD).
 * [GitHub repository](https://github.com/uncatcrea/wp-appkit)
 
-> **You need more support for WP-AppKit?** [Pro Support](https://uncategorized-creations.com/downloads/1-year-pro-support/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_readme) is an exclusive service where specialists work with you to get the most of WP-AppKit.
+> **Pro Support and add-ons for WP-AppKit** If you need to get further with WP-AppKit, we offer a [paid support](https://goo.gl/pqfNjm) for advanced topics and convenient [add-ons](https://goo.gl/5oisKB) to integrate specific features (eg. push notifications).
 
-**More information at [getwpappkit.com](http://getwpappkit.com?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_readme).**
+**More information at [getwpappkit.com](https://goo.gl/pEYAE4).**
 
 == Frequently Asked Questions ==
 
-You'll find [an always up to date FAQ](https://uncategorized-creations.com/frequently-asked-questions/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=plugin_readme) on our website.
+You'll find [an always up to date FAQ](https://goo.gl/cgQWyA) on our website.
 
 = How do I install WP-AppKit? =
 
@@ -70,7 +73,7 @@ Your current WP-AppKit apps and themes (in `wp-content/themes-wp-appkit`) won't 
 
 = How many applications can I create? =
 
-You can create an **unlimited** number of applications and an unlimited number of versions of each application.
+You can create an **unlimited** number of applications and an unlimited number of versions of each application. That includes native apps as well as progressive web apps.
 
 = Can I send push notifications? =
 
@@ -92,11 +95,15 @@ We use a homemade (extendable) REST API. As the WP REST API is now integrated to
 
 You can display WooCommerce content (ie. products) in your themes as any other WordPress content. However, you’ll have to (re)develop functionalities such as cart or checkout.
 
-= Do you compile applications for me? =
+= Do you compile native applications for me? =
 
 **No.** You can use PhoneGap Build, an easy to use Adobe’s cloud compilation service or the classic Cordova CLI.
 
-= Do you release applications in app stores for me? =
+= Do you deploy progressive web apps for me? =
+
+**Yes.** Progressive web apps are not distributed through app stores. They are freely available on the web. WP-AppKit allows to deploy and update PWA on your site.
+
+= Do you release native applications in app stores for me? =
 
 **No.** This is something you’ll have to do by yourself when your application is ready and compiled.
 
@@ -108,10 +115,45 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 4. Create app themes. Two themes are pre-installed to get you started in no time
 5. Preview in the browser (using Chrome's emulation mode). Debug with the tools you know (Chrome's dev tools)
 6. Compile online (with PhoneGap build)
+7. Create a progressive web application (PWA)
 
 == Changelog ==
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
+
+= 1.5 (2018-03-04) =
+
+*Features*
+
+* Progressive Web App (PWA) support!
+
+*Default themes update*
+
+* Embed last version (1.1.0) of [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.1.0) default app themes, which is compatible with PWAs.
+
+*Main evolutions for PWA*
+
+* Add Progressive Web App export type
+* Add pwa manifest
+* Icones PWA
+* Update available platforms to add PWA
+* Show/Hide PhoneGap/PWA metaboxes when needed
+* Check/Sanitize PWA install path
+* Allow going directly to url fragment at app launch
+* Add pretty url support to PWA
+* Update Export/Install UI
+* JS Minification
+* CSS Minification
+* Add default background/theme colors and a color picker
+* Set auth key from option instead of WP const
+* First Launch Content
+* Add-ons compatibility
+* Handle Internal links
+
+*Bugfixes and evolutions*
+
+* App last modification date stays to creation date
+* Add option to disable warning alerts when modifying components and navigation
 
 = 1.2 (2017-10-22) =
 

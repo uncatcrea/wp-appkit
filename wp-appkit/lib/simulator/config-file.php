@@ -73,7 +73,7 @@ class WpakConfigFile {
 		}
 	}
 
-	public static function get_config_js( $app_id, $echo = false ) {
+	public static function get_config_js( $app_id, $echo = false, $export_type = '' ) {
 		$wp_ws_url = WpakWebServices::get_app_web_service_base_url( $app_id );
 		$theme = WpakThemesStorage::get_current_theme( $app_id );
 
@@ -84,8 +84,12 @@ class WpakConfigFile {
 
 		$app_platform = $app_main_infos['platform'];
 		$app_platform = empty( $app_platform ) ? 'all' : $app_platform;
+        
+        $pwa_path = !empty( $app_main_infos['pwa_path'] ) ? trailingslashit( $app_main_infos['pwa_path'] ) : '';
+        $pwa_path = WpakBuild::add_subdir_prefix( $pwa_path );
+        $app_path = $app_platform === 'pwa' ? '/'. trailingslashit( ltrim( $pwa_path, '/' ) ) : '';
 
-		$app_version = WpakApps::sanitize_app_version( $app_main_infos['version'] );
+		$app_version = WpakApps::sanitize_app_version( $app_platform === 'pwa' ? $app_main_infos['pwa_version'] : $app_main_infos['version'] );
 
 		$gmt_offset = (int)get_option( 'gmt_offset' );
 
@@ -115,8 +119,10 @@ define( function ( require ) {
 		wp_url : '<?php echo home_url() ?>',
 		theme : '<?php echo addslashes($theme) ?>',
 		version : '<?php echo $app_version ?>',
+		app_type : '<?php echo !empty( $export_type ) ? $export_type : 'preview' ?>',
 		app_title : '<?php echo addslashes($app_title) ?>',
 		app_platform : '<?php echo addslashes($app_platform) ?>',
+		app_path: '<?php echo addslashes($app_path) ?>',
 		gmt_offset : <?php echo addslashes($gmt_offset) ?>,
 		debug_mode : '<?php echo $debug_mode ?>'<?php
 		if( !empty( $auth_key ) ):
@@ -147,6 +153,7 @@ define( function ( require ) {
 	 * (see https://github.com/apache/cordova-plugin-whitelist).
 	 *
 	 * @param int $app_id Application ID
+	 * @param string $app_platform Platform (see WpakApps::get_platforms to get the list)
 	 * @param string $export_type 'phonegap-build' (default), 'phonegap-cli' or 'webapp'
 	 */
 	protected static function get_whitelist_settings( $app_id, $app_platform, $export_type = 'phonegap-build' ) {
@@ -184,6 +191,16 @@ define( function ( require ) {
 		return $whitelist_settings;
 	}
 
+	/**
+	 * Return settings useful to configure splashscreen in a PhoneGap Build config.xml file.
+	 * This shouldn't be used for a platform that won't need PhoneGap Build (ex: pwa).
+	 *
+	 * @param int       $app_id         Application ID.
+	 * @param string    $app_platform   App platform (see WpakApps::get_platforms to get the list).
+	 * @param string    $export_type    Export type.
+	 *
+	 * @return array $splashcreen_settings
+	 */
 	protected static function get_splashscreen_settings( $app_id, $app_platform, $export_type ) {
 		$splashcreen_settings = array( 'preferences' => array(), 'gap:config-file' => array() );
 
@@ -252,6 +269,13 @@ define( function ( require ) {
 				array( 'src' => 'icons/icon.png', 'qualifier' => '', 'width' => '57', 'height' => '57'  ),
 				array( 'src' => 'icons/icon-40.png', 'qualifier' => '', 'width' => '40', 'height' => '40'  ),
 				array( 'src' => 'icons/icon-small.png', 'qualifier' => '', 'width' => '29', 'height' => '29'  ),
+			),
+			'pwa' => array(
+				array( 'src' => 'icons/pwa-icon-48x48.png', 'width' => '48', 'height' => '48', 'type' => 'image/png'  ),
+				array( 'src' => 'icons/pwa-icon-96x96.png', 'width' => '96', 'height' => '96', 'type' => 'image/png'  ),
+				array( 'src' => 'icons/pwa-icon-144x144.png', 'width' => '144', 'height' => '144', 'type' => 'image/png' ),
+				array( 'src' => 'icons/pwa-icon-192x192.png', 'width' => '192', 'height' => '192', 'type' => 'image/png' ),
+				array( 'src' => 'icons/pwa-icon-512x512.png', 'width' => '512', 'height' => '512', 'type' => 'image/png' ),
 			)
 		);
 
@@ -276,7 +300,7 @@ define( function ( require ) {
 				array( 'src' => 'splashscreens/Default-Portrait@2x~iphone.png', 'qualifier' => '', 'width' => '640', 'height' => '960' ),
 				array( 'src' => 'splashscreens/Default-Landscape~iphone.png', 'qualifier' => '', 'width' => '480', 'height' => '320' ),
 				array( 'src' => 'splashscreens/Default-Portrait~iphone.png', 'qualifier' => '', 'width' => '320', 'height' => '480' ),
-			)
+			),
 		);
 
 		$icons_and_splashscreens = array( 'icons' => $default_icons, 'splashscreens' => $default_splashscreens );
@@ -318,7 +342,9 @@ define( function ( require ) {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
 
-		if ( $app_main_infos['use_default_icons_and_splash'] ) {
+		if ( ( $export_type !== 'pwa' && $app_main_infos['use_default_icons_and_splash'] )
+			 || ( $export_type === 'pwa' && $app_main_infos['pwa_use_default_icons_and_splash'] )
+			) {
 
 			$default_icons_and_splash = self::get_default_icons_and_splashscreens( $app_id, $export_type );
 			$default_icons = $default_icons_and_splash['icons'];
@@ -327,6 +353,10 @@ define( function ( require ) {
 			//Handle universal platform (case empty( $app_platform ) ):
 			$platforms = $app_platform === '' ? array( 'ios', 'android' ) : array( $app_platform );
 
+			if ( $export_type === 'pwa' ) {
+				$platforms = array( 'pwa' );
+			}
+			
 			$icons_splashscreens_dir = self::get_icons_splashscreens_dir( $app_id, $app_platform, $export_type );
 
 			foreach( $platforms as $platform ) {
@@ -361,7 +391,14 @@ define( function ( require ) {
 	}
 
 	/**
-	 * Retrieves icons and splashscreens for build export.
+	 * Retrieves icons and splashscreens for build export. This returns XML string to be used inside PhoneGap Build config.xml file.
+	 * This shouldn't be called for a platform that doesn't need PhoneGap Build (ex: pwa).
+	 *
+	 * @param int       $app_id         Application ID.
+	 * @param string    $app_platform   App platform (see WpakApps::get_platforms to get the list).
+	 * @param string    $export_type    Export type.
+	 *
+	 * @return string $app_icons_and_splashscreens_files
 	 */
 	protected static function get_icons_and_splashscreens_xml( $app_id, $app_platform, $export_type ) {
 

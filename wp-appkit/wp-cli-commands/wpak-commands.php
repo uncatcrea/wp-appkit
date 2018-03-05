@@ -32,7 +32,7 @@ class Wpak_Commands extends WP_CLI_Command {
 			$export_type = "phonegap-cli";
 		}
 		
-		if ( !in_array( $export_type, array( "phonegap-cli", "phonegap-build", "webapp" ) ) ) {
+		if ( !WpakBuild::is_allowed_export_type( $export_type ) ) {
 			WP_CLI::error( 'Unknown export type "'. $export_type .'"' );
 		}
 

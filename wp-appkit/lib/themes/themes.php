@@ -23,7 +23,7 @@ class WpakThemes {
 
 		'q-android' => array(
 			'name' => 'Q for Android',
-			'version' => '1.0.6',
+			'version' => '1.1.0',
 		),
 
 	);
@@ -32,6 +32,10 @@ class WpakThemes {
 		add_action( 'init', array( __CLASS__, 'rewrite_rules' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'template_redirect' ), 5 );
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
+
+		if( is_admin() ) {
+		    add_action( 'wp_ajax_wpak_get_pwa_icons', array( __CLASS__, 'ajax_get_pwa_icons' ) );
+		}
 	}
 
 
@@ -715,6 +719,118 @@ class WpakThemes {
 		}
 
 		return $return;
+	}
+
+	/**
+	 * Return PWA icons available in a theme, if any.
+	 * These icons must be provided as PNG images into the 'icons/' theme's directory.
+	 *
+	 * @param string $theme_slug
+	 *
+	 * @return array
+	 */
+	public static function get_pwa_icons( $theme_slug ) {
+	    if( !self::is_theme( $theme_slug ) ) {
+	        return array();
+	    }
+
+	    $icons_dir = self::get_themes_directory() . '/' . $theme_slug . '/icons/';
+	    $files = glob( $icons_dir . '*.png' );
+	    $icons = array();
+	    $widths = array(); // Used for sorting
+	    $heights = array(); // Used for sorting
+	    foreach( $files as $file ) {
+	        $filename = basename( $file );
+	        $size = self::get_pwa_icon_size( $filename );
+
+	        if( empty( $size ) ) {
+	            continue;
+	        }
+
+	        $icons[] = array(
+		        'name' => $filename,
+		        'dir'  => str_replace( ABSPATH, '/', $icons_dir ),
+		        'path' => $file,
+		        'url'  => self::get_themes_directory_uri() . '/' . $theme_slug . '/icons/' . $filename,
+		        'size' => $size,
+	        );
+	        $widths[] = $size[0];
+	        $heights[] = $size[1];
+	    }
+
+	    array_multisort( $heights, SORT_ASC, $widths, SORT_ASC, $icons );
+
+	    return $icons;
+	}
+
+	/**
+	 * Handle AJAX request to get PWA icons for a given theme/app.
+	 */
+	public static function ajax_get_pwa_icons() {
+	    $answer = array( 'icons' => array() );
+
+	    if ( empty( $_GET ) || empty( $_GET['app_id'] ) || !is_numeric( $_GET['app_id'] ) ) {
+		    self::exit_sending_json( $answer );
+	    }
+
+	    $app_id = addslashes( $_GET['app_id'] );
+
+	    if ( !check_admin_referer( 'wpak_get_pwa_icons_' . $app_id, 'nonce' ) ) {
+		    return;
+	    }
+
+	    $theme = !empty( $_GET['theme'] ) ? addslashes( $_GET['theme'] ) : WpakThemesStorage::get_current_theme( $app_id );
+
+	    $icons = self::get_pwa_icons( $theme );
+
+	    foreach( $icons as $icon ) {
+	        $answer['icons'][] = array(
+	            'dir' => $icon['dir'],
+	            'url' => $icon['url'],
+	            'width' => $icon['size'][0],
+	            'height' => $icon['size'][1],
+	        );
+	    }
+
+	    self::exit_sending_json( $answer );
+	}
+
+	/**
+	 * Get the size of a PWA icon given its file name.
+	 * Size must be provided in the filename as follow: icon-name-width-height.png
+	 *
+	 * @param string $filename
+	 *
+	 * @return array
+	 */
+	public static function get_pwa_icon_size( $filename ) {
+	    preg_match( '/-([0-9]+)x([0-9]+)\.png/U', $filename, $matches );
+
+	    if( empty( $matches[2] ) || empty( $matches[1] ) ) {
+	        return array();
+	    }
+
+	    return array( $matches[1], $matches[2] );
+	}
+
+	/**
+	 * @todo: maybe refactor this method and all similar ones around the plugin (e.g. into a WpakAjax class)?
+	 *
+	 * @param $answer
+	 */
+	private static function exit_sending_json( $answer ) {
+	    //If something was displayed before, clean it so that our answer can
+	    //be valid json (and store it in an "echoed_before_json" answer key
+	    //so that we can warn the user about it) :
+	    $content_already_echoed = ob_get_contents();
+	    if ( !empty( $content_already_echoed ) ) {
+		    $answer['echoed_before_json'] = $content_already_echoed;
+		    ob_end_clean();
+	    }
+
+	    header( 'Content-type: application/json' );
+	    echo json_encode( $answer );
+	    exit();
 	}
 }
 

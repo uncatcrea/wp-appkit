@@ -32,7 +32,7 @@ define(function (require) {
 		var elHeader = "#app-header";
 
 		var currentView = null;
-	    var el = "#app-content-wrapper";
+	    var elContent = "#app-content-wrapper";
 
 	    var elMenu = "#app-menu";
 	    var menuView= null;
@@ -46,6 +46,49 @@ define(function (require) {
 	    region.off = function(event,callback){
 	    	vent.off(event,callback);
 	    };
+
+        /**
+        * Intercept internal navigation in the app to trigger Backbone router navigation
+        * instead of browser page refresh. Mandatory for pretty slugs with HTML5 pushstate.
+        */
+        region.handleNavigationInterception = function() {
+            if ( App.getParam( 'use-html5-pushstate' ) ) {
+                var auto_prevent_page_reload = true;
+                
+                /**
+                 * When using HTML5 pushstate pretty urls, clicking on an internal link in the app
+                 * leads to the browser refreshing the page. To avoid that we have to 
+                 * intercept clicks on links and do a Backbone router.navigate() instead
+                 * of letting the browser handling the navigation. By default we do that
+                 * by intercepting all click events on body element.
+                 * To handle this in your own way directly in theme, use this 'auto-prevent-page-reload'
+                 * filter and return false.
+                 */
+                auto_prevent_page_reload = Hooks.applyFilters( 'auto-prevent-page-reload', auto_prevent_page_reload, [] );
+                
+                if ( auto_prevent_page_reload ) {
+                    $( 'body' ).on( 'click', 'a', preventPageReloadForInternalLinks );
+                }
+            }
+        };
+        
+        /**
+         * When clicking on internal links, cancel click event and do a manual
+         * Backbone router navigation. This is to avoid the browser refreshing
+         * the page when clicking internal links and using HTML5 pushstate.
+         */
+        var preventPageReloadForInternalLinks = function( e ) {
+			var $link_el = $( e.currentTarget );
+            
+			var href = $link_el.attr( 'href' ).trim();
+
+			if ( Utils.isInternalUrl( href ) && href !== '#' ) {
+				e.preventDefault();
+                var route = Utils.extractRouteFromUrlPath( href );
+				App.router.navigate( route, { trigger: true } );
+			}
+
+		};
 
 	    region.buildHead = function(cb){
 	    	if( headView === null ){
@@ -63,7 +106,11 @@ define(function (require) {
 	    	if( layoutView === null ){
 	    		require(['core/views/layout'],function(LayoutView){
 		    		layoutView = new LayoutView({el:elLayout});
-		    		layoutView.render();
+		    		//Layout may already have been pre-rendered before export (for PWAs).
+		    		//If not, render it:
+		    		if ( !layoutView.isRendered() ) {
+		    			layoutView.render();
+		    		}
 		    		cb();
 	    		});
 	    	}else{
@@ -221,7 +268,7 @@ define(function (require) {
 				Utils.log('Re-open existing static view',{view:view});
 			}
 
-			var $el = $(el);
+			var $elContent = $(elContent);
 
 			if( custom_rendering ){
 
@@ -237,7 +284,7 @@ define(function (require) {
 				 */
 				Hooks.doActions(
 					'screen-transition',
-					[$el,$('div:first-child',$el),$(view.el),App.getPreviousScreenMemoryData(),App.getCurrentScreenData()]
+					[$elContent,$('div:first-child',$elContent),$(view.el),App.getPreviousScreenMemoryData(),App.getCurrentScreenData()]
 				).done(function(){
 					 renderSubRegions();
 					 vent.trigger('screen:showed',App.getCurrentScreenData(),currentView,first_static_opening);
@@ -249,7 +296,7 @@ define(function (require) {
 				});
 
 			}else{
-				$el.empty().append(view.el);
+				$elContent.empty().append(view.el);
 				renderSubRegions();
 				vent.trigger('screen:showed',App.getCurrentScreenData(),currentView,first_static_opening);
 			}

@@ -40,7 +40,7 @@ define(function (require) {
 			
 			var renderedContent = this.template(template_args);
 			
-			$('head').prepend(renderedContent); 
+			$('head').append(renderedContent); 
             return this;
         }
         

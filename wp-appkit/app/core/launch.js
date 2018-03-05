@@ -24,8 +24,18 @@ require.config({
 
 require(['root/config'],function(Config){
 
+	//If Progressive Web App, activate service worker to cache app source files:
+	if ( Config.app_type === 'pwa' && 'serviceWorker' in navigator ) {
+		navigator.serviceWorker
+				.register( Config.app_path +'service-worker-cache.js' )
+				.then( function () {
+					console.log( '[WP-AppKit Service Worker] Registered' );
+				} );
+        
+	}
+
 	var dynamic_paths = {
-		theme: '../themes/'+ Config.theme,
+		theme: '../themes/'+ Config.theme
 	};
 
 	require.config({
@@ -47,11 +57,17 @@ require(['root/config'],function(Config){
 
 								RegionManager.buildHeader(function(){
 
-									App.router = new Router();
+                                    App.router = new Router();
 
 									require(Addons.getJs('theme','before'),function(){
 										require(['theme/js/functions'],function(){
 											
+                                            /**
+                                             * Intercept navigation inside the app to trigger Backbone router navigation
+                                             * instead of browser page refresh. 
+                                             */
+                                            RegionManager.handleNavigationInterception();
+                                            
 											/**
 											 * Templates that are preloaded by default for before perf.
 											 * Note: we can't require 'page' template here as it is not required in themes.
@@ -80,7 +96,7 @@ require(['root/config'],function(Config){
 												require(Addons.getJs('theme','after'),
 													function(){
 														App.sync(
-															function(){
+															function( deferred ){
 																RegionManager.buildMenu(function(){ //Menu items are loaded by App.sync
 
 																	Stats.updateVersion();
@@ -94,6 +110,10 @@ require(['root/config'],function(Config){
 																	}
 
 																	App.launchRouting();
+
+                                                                    if ( deferred ) {
+                                                                        deferred.resolve( { ok: true, message: '', data: {} } );
+                                                                    }
 
 																	App.triggerInfo('app-launched'); //triggers info:app-ready, info:app-first-launch and info:app-version-changed
 
@@ -115,7 +135,7 @@ require(['root/config'],function(Config){
 																	PhoneGap.hideSplashScreen();
 																});
 															},
-															function( error ){
+															function( error, deferred ){
 																App.launchRouting();
 
 																var error_message = "Error : App could not synchronize with website";
@@ -126,9 +146,13 @@ require(['root/config'],function(Config){
 
 																Utils.log( error_message );
 
-																PhoneGap.hideSplashScreen();
+                                                                if ( deferred ) {
+                                                                    deferred.reject( { ok: false, message: error_message, data: error } );
+                                                                }
 
 																App.triggerInfo('no-content');
+                                                                
+                                                                PhoneGap.hideSplashScreen();
 															},
 															false //true to force refresh local storage at each app launch.
 														);
