@@ -582,7 +582,7 @@ class WpakApps {
 		$pwa_dir = WpakBuild::get_pwa_directory( $post->ID );
 		$pwa_installed = WpakBuild::app_pwa_is_installed( $post->ID );
 		?>
-		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
+		<?php /* <a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a> */ ?>
 		<div class="wpak_settings">
 			<p class="description"><?php _e( '', WpAppKit::i18n_domain ) ?></p>
 			<?php if( !is_ssl() ): ?>
