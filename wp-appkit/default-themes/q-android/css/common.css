@@ -68,6 +68,17 @@ a {
     background-color: #FCFCFC;
 }
 
+#app-menu .app-version{
+    position:absolute;
+    bottom:0;
+    font-size:14px;
+    height:48px;
+    line-height:48px;
+    padding:0px
+    16px 0px 16px;
+    color:rgba(0,0,0,.87)
+}
+
 /* Encloses nav bar, content and toolbar  */
 #app-canvas {
     position: absolute;
