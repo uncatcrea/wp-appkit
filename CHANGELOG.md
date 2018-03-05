@@ -1,3 +1,13 @@
+## 1.5.1 (2018-03-06)
+
+### Minor fixes
+- **Fix error message when wrong permissions on PWA export directory** ([080d533](https://github.com/uncatcrea/wp-appkit/commit/080d5333a2b4356523e21d7054f9b8359228a867), [@mleroi](https://github.com/mleroi))
+- **Fix HTTPS warning message** ([68a8d01](https://github.com/uncatcrea/wp-appkit/commit/68a8d01521c9875dd74889040f21d47c105d274a), [@mleroi](https://github.com/mleroi))
+- **Enable translation on PWA installation messages** ([864244f](https://github.com/uncatcrea/wp-appkit/commit/864244fc9c5475387034b77f622880cd6119444f), [@mleroi](https://github.com/mleroi))
+- **Redirect http to https only if site is https** ([5294c4e](https://github.com/uncatcrea/wp-appkit/commit/5294c4e1d653c97e61c8837ffd52e0212116f419), [@mleroi](https://github.com/mleroi))
+- **q-android version 1.1.1: fix app version display** ([02bf786](https://github.com/uncatcrea/wp-appkit/commit/02bf786beeacb5337fa78131b81a0887bbe78bf2), [@mleroi](https://github.com/mleroi))
+- **Remove empty 'help me' messages** ([5de5aea](https://github.com/uncatcrea/wp-appkit/commit/5de5aea714e8d6605143e94da8f129f56ef7c03f), [@mleroi](https://github.com/mleroi))
+
 ## 1.5 (2018-03-04)
 
 ### Features

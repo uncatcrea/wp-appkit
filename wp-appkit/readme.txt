@@ -121,6 +121,17 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
 
+= 1.5.1 (2018-03-06) =
+
+*Minor fixes*
+
+* Fix error message when wrong permissions on PWA export directory
+* Fix HTTPS warning message
+* Enable translation on PWA installation messages
+* Redirect http to https only if site is https
+* q-android version 1.1.1: fix app version display
+* Remove empty 'help me' messages
+
 = 1.5 (2018-03-04) =
 
 *Features*
