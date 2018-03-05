@@ -16,4 +16,6 @@
 
 </ul>
 
-<div class="app-version">Version <%= Config.version %></div>
+<% if ( Config.version.length ) { %>
+    <div class="app-version">Version <%= Config.version %></div>
+<% } %>
