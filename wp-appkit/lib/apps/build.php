@@ -260,7 +260,7 @@ class WpakBuild {
 			$check = self::check_pwa_directory( $app_id );
 			if ( ! $check['ok'] ) {
 				$answer['ok'] = 0;
-				$answer['msg'] = $check['msg'];
+				$answer['msg'] = $check['message'];
 				self::exit_sending_json( $answer );
 			}
 
