@@ -23,7 +23,7 @@ class WpakThemes {
 
 		'q-android' => array(
 			'name' => 'Q for Android',
-			'version' => '1.1.0',
+			'version' => '1.1.1',
 		),
 
 	);

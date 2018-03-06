@@ -260,7 +260,7 @@ class WpakBuild {
 			$check = self::check_pwa_directory( $app_id );
 			if ( ! $check['ok'] ) {
 				$answer['ok'] = 0;
-				$answer['msg'] = $check['msg'];
+				$answer['msg'] = $check['message'];
 				self::exit_sending_json( $answer );
 			}
 
@@ -931,7 +931,15 @@ class WpakBuild {
                 . "<IfModule mod_rewrite.c>\n"
                 . "RewriteEngine On\n";
 
-                if ( apply_filters( 'wpak_pwa_htaccess_redirect_https', true, $app_id ) ) {
+                /**
+                 * PWA requirements include redirecting http to https.
+                 * Use this 'wpak_pwa_htaccess_redirect_https' to deactivate http to https redirections
+                 * (for example if working on a local non-https environment).
+                 *
+                 * @param $redirect boolean   Whether to redirect http to https or not (defaults to is_ssl()). Return false to deactivate http to https redirection.
+                 * @param $app_id   int       App id
+                 */
+                if ( apply_filters( 'wpak_pwa_htaccess_redirect_https', is_ssl(), $app_id ) ) {
 					$htaccess .= ""
 					. "RewriteCond %{HTTPS} off\n"
 					. "RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R,L]\n";
