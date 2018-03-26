@@ -250,7 +250,7 @@ class WpakAddons {
 
 		// Force having no addon activated on PWA platform
 		if( !empty( $_POST['wpak_app_platform'] ) && $_POST['wpak_app_platform'] == 'pwa' ) {
-		    $_POST['wpak-addons'] = null;
+		    //$_POST['wpak-addons'] = null;
 		}
 
 		if ( isset( $_POST['wpak-addons'] ) && is_array( $_POST['wpak-addons'] ) ) {
