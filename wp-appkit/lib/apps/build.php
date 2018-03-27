@@ -890,6 +890,8 @@ class WpakBuild {
 		$content = preg_replace( "/(var cacheName = ')(';).*/", "$1". $cache_version ."$2", $content );
 		$content = preg_replace( "/(var filesToCache = \[)(\];).*/", "$1". $cache_files ."$2", $content );
 
+		$content = apply_filters( 'wpak_pwa_service_worker', $content, $app_id, $webapp_files, $export_type );
+
 		return $content;
 	}
 
