@@ -4,6 +4,7 @@ class WpakAddon {
 
 	protected $name = '';
 	protected $slug = '';
+	protected $platforms = [];
 	protected $directory = '';
 	protected $url = '';
 	protected $js_files = array();
@@ -16,13 +17,14 @@ class WpakAddon {
 	protected $app_dynamic_data_callback = null;
 	protected $app_dynamic_data = null;
 
-	public function __construct( $name, $slug = '' ) {
+	public function __construct( $name, $slug = '', $platforms = ['ios','android'] ) {
 		$this->name = $name;
 		$this->slug = sanitize_title_with_dashes( remove_accents( empty($slug) ? $name : $slug ) );
+		$this->platforms = is_array( $platforms ) ? $platforms : [];
 	}
 
 	public function __get( $property ) {
-		if ( in_array( $property, array( 'name', 'slug' ) ) ) {
+		if ( in_array( $property, array( 'name', 'slug', 'platforms' ) ) ) {
 			return $this->{$property};
 		}
 		return null;
@@ -305,4 +307,5 @@ class WpakAddon {
 	public function get_dynamic_data() {
 		return ( object ) $this->app_dynamic_data;
 	}
+
 }

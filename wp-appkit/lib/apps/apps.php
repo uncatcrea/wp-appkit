@@ -851,7 +851,7 @@ class WpakApps {
 		return $app_version;
 	}
 
-	private static function get_platforms() {
+	public static function get_platforms() {
 		return array(
 			'ios' => __( 'iOS - Native', WpAppKit::i18n_domain ),
 			'android' => __( 'Android - Native', WpAppKit::i18n_domain ),
