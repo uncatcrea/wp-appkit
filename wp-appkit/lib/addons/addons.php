@@ -183,7 +183,7 @@ class WpakAddons {
 		$app_addons_raw = self::get_app_addons( $app_id_or_slug );
 		if ( !empty( $app_addons_raw ) ) {
 			foreach ( $app_addons_raw as $app_addon_raw ) {
-				$app_addons[] = $app_addon_raw->to_config_object();
+				$app_addons[] = $app_addon_raw->to_config_object( WpakApps::get_app_id( $app_id_or_slug ) );
 			}
 		}
 
@@ -214,7 +214,7 @@ class WpakAddons {
 		$app_addons_raw = self::get_app_addons( $app_id_or_slug );
 		if ( !empty( $app_addons_raw ) ) {
 			foreach ( $app_addons_raw as $addon_slug => $app_addon_raw ) {
-				$app_addon_raw->require_php_files();
+				$app_addon_raw->require_php_files( WpakApps::get_app_id( $app_id_or_slug ) );
 			}
 		}
 

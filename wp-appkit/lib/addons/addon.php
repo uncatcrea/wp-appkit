@@ -35,7 +35,7 @@ class WpakAddon {
 		$this->url = plugins_url( '', $addon_file ); // > An addon must be a plugin
 	}
 
-	public function add_js( $js_file, $type = 'module', $position = '' ) {
+	public function add_js( $js_file, $type = 'module', $position = '', $platforms = [] ) {
 		
 		$file_type = pathinfo( $js_file, PATHINFO_EXTENSION );
 		if( $file_type !== 'js' ){
@@ -65,13 +65,14 @@ class WpakAddon {
 				$this->js_files[] = array( 
 					'file' => $js_file, 
 					'type' => $type, 
-					'position' => $position 
+					'position' => $position,
+					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : ['android', 'ios', 'pwa']
 				);
 			}
 		}
 	}
 
-	public function add_css( $css_file, $position = 'after' ) {
+	public function add_css( $css_file, $position = 'after', $platforms = [] ) {
 
 		$file_type = pathinfo( $css_file, PATHINFO_EXTENSION );
 		if( $file_type !== 'css' ){
@@ -93,13 +94,14 @@ class WpakAddon {
 				$this->css_files[] = array( 
 					'file' => $css_file, 
 					'type' => 'theme',
-					'position' => $position
+					'position' => $position,
+					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : ['android', 'ios', 'pwa']
 				);
 			}
 		}
 	}
 	
-	public function add_html( $html_file, $type = 'layout', $position = 'after', $data = array() ) {
+	public function add_html( $html_file, $type = 'layout', $position = 'after', $data = array(), $platforms = [] ) {
 
 		$file_type = pathinfo( $html_file, PATHINFO_EXTENSION );
 		if( $file_type !== 'html' ){
@@ -122,13 +124,14 @@ class WpakAddon {
 					'file' => $html_file, 
 					'type' => $type ,
 					'position' => $position,
-					'data' => $data
+					'data' => $data,
+					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : ['android', 'ios', 'pwa']
 				);
 			}
 		}
 	}
 	
-	public function add_template( $template_file ) {
+	public function add_template( $template_file, $platforms = [] ) {
 
 		$file_type = pathinfo( $template_file, PATHINFO_EXTENSION );
 		if( $file_type !== 'html' ){
@@ -148,7 +151,8 @@ class WpakAddon {
 		if ( file_exists( $full_template_file ) ) {
 			if ( !in_array( $template_file, $this->template_files ) ) {
 				$this->template_files[] = array( 
-					'file' => $template_file
+					'file' => $template_file,
+					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : ['android', 'ios', 'pwa']
 				);
 			}
 		}
@@ -158,7 +162,7 @@ class WpakAddon {
 	 * PHP files that are included only if the addon is activated
 	 * for a given app.
 	 */
-	public function require_php( $php_file ) {
+	public function require_php( $php_file, $platforms = [] ) {
 		$file_type = pathinfo( $php_file, PATHINFO_EXTENSION );
 		if( $file_type !== 'php' ){
 			return;
@@ -177,14 +181,19 @@ class WpakAddon {
 		if ( file_exists( $full_php_file ) ) {
 			if ( !in_array( $php_file, $this->php_files ) ) {
 				$this->php_files[] = array( 
-					'file' => $php_file
+					'file' => $php_file,
+					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : ['android', 'ios', 'pwa']
 				);
 			}
 		}
 	}
 	
-	public function require_php_files() {
+	public function require_php_files( $app_id ) {
+		$app_platform = WpakApps::get_app_info( $app_id, 'platform' );
 		foreach ( $this->php_files as $php_file ) {
+			if ( !in_array( $app_platform, $php_file['platforms'] ) ) {
+				continue;
+			}
 			$full_php_file = $this->directory . '/' . $php_file['file'];
 			if ( file_exists( $full_php_file ) ) {
 				require_once( $full_php_file );
@@ -264,27 +273,46 @@ class WpakAddon {
 	/**
 	 * Export data for config.js file
 	 */
-	public function to_config_object() {
+	public function to_config_object( $app_id ) {
 		return ( object ) array(
 			'name' => $this->name,
 			'slug' => $this->slug,
 			'url' => $this->url,
-			'js_files' => $this->js_files,
-			'css_files' => $this->css_files,
-			'html_files' => $this->html_files,
-			'template_files' => $this->template_files,
+			'js_files' => $this->filter_files_by_platform( $this->js_files, $app_id ),
+			'css_files' => $this->filter_files_by_platform( $this->css_files, $app_id ),
+			'html_files' => $this->filter_files_by_platform( $this->html_files, $app_id ),
+			'template_files' => $this->filter_files_by_platform( $this->template_files, $app_id ),
 			'app_data' => $this->app_static_data
 		);
 	}
+
+	protected function filter_files_by_platform( $files, $app_id ) {
+		$filtered_files = [];
+
+		$app_platform = WpakApps::get_app_info( $app_id, 'platform' );
+
+		foreach( $files as $file ) {
+			if ( in_array( $app_platform, $file['platforms'] ) ) {
+				$filtered_files[] = $file;
+			}
+		}
+
+		return $filtered_files;
+	}
 	
-	public function get_all_files( $indexed_by_type = false ) {
+	public function get_all_files( $app_id, $indexed_by_type = false ) {
 		$all_files = array();
 
 		$file_types = array( 'js', 'css', 'html', 'template' );
 
+		$app_platform = WpakApps::get_app_info( $app_id, 'platform' );
+
 		foreach ( $file_types as $file_type ) {
 			if ( isset( $this->{$file_type . '_files'} ) ) {
 				foreach ( $this->{$file_type . '_files'} as $file ) {
+					if ( !in_array( $app_platform, $file['platforms'] ) ) {
+						continue;
+					}
 					$file_full_path = $this->directory . '/' . $file['file'];
 					if ( file_exists( $file_full_path ) ) {
 						$file_paths = array( 'full' => $file_full_path, 'relative' => $file['file'] );

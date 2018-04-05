@@ -624,7 +624,7 @@ class WpakBuild {
 			//Add addons files :
 			if ( !empty( $addons ) ) {
 				foreach ( $addons as $addon ) {
-					$addon_files = $addon->get_all_files();
+					$addon_files = $addon->get_all_files( $app_id );
 					foreach ( $addon_files as $addon_file ) {
 						$zip_filename = $source_root .'addons/'. $addon->slug .'/'. $addon_file['relative'];
 
