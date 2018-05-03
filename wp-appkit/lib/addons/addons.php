@@ -124,19 +124,24 @@ class WpakAddons {
 		$app_platform = WpakApps::get_app_info( $post->ID, 'platform' );
 		$app_platform_name = !empty( $all_platforms[$app_platform] ) ? $all_platforms[$app_platform] : '';
 		$app_addons = self::get_app_addons( $post->ID );
+		$auto_draft_warning = $post->post_status !== 'publish' ? ' ('. __( 'please save your App to be able to activate addons') .')' : '';
 		?>
 		<div class="wpak_addons">
-			<span><?php _e( 'Addons activated for this App', WpAppKit::i18n_domain ) ?></span><br/>
+			<span><?php _e( 'Addons activated for this App', WpAppKit::i18n_domain ); ?><?php echo $auto_draft_warning; ?>:</span>
+			<ul>
 			<?php foreach ( self::get_addons() as $addon ): ?>
 				<?php 
 					$allowed = in_array( $app_platform, $addon->platforms );
 					$checked = $allowed && array_key_exists( $addon->slug, $app_addons ) ? 'checked' : '';
 					$disabled = !$allowed ? 'disabled' : '';
-					$platform_warning = !$allowed ? ' ('. sprintf( __( 'Not available for platform "%s"', WpAppKit::i18n_domain ), $app_platform_name ) . ')' : '';
+					$platform_warning = !$allowed && !empty( $app_platform_name ) ? ' ('. sprintf( __( 'Not available for platform "%s"', WpAppKit::i18n_domain ), $app_platform_name ) . ')' : '';
 				?>
-				<input type="checkbox" name="wpak-addons[]" id="<?php echo esc_attr( $addon->slug ) ?>" value="<?php echo esc_attr( $addon->slug ) ?>" <?php echo $checked ?> <?php echo $disabled; ?> />
-				<label for="<?php echo esc_attr( $addon->slug ) ?>"><?php echo esc_html( $addon->name ) ?><?php echo esc_html( $platform_warning ); ?></label>
+				<li>
+					<input type="checkbox" name="wpak-addons[]" id="<?php echo esc_attr( $addon->slug ) ?>" value="<?php echo esc_attr( $addon->slug ) ?>" <?php echo $checked ?> <?php echo $disabled; ?> />
+					<label for="<?php echo esc_attr( $addon->slug ) ?>"><?php echo esc_html( $addon->name ) ?><?php echo esc_html( $platform_warning ); ?></label>
+				</li>
 			<?php endforeach ?>
+			</ul>
 			<?php wp_nonce_field( 'wpak-addons-' . $post->ID, 'wpak-nonce-addons' ) ?>
 		</div>
 		<?php
