@@ -624,7 +624,7 @@ class WpakBuild {
 			//Add addons files :
 			if ( !empty( $addons ) ) {
 				foreach ( $addons as $addon ) {
-					$addon_files = $addon->get_all_files();
+					$addon_files = $addon->get_all_files( $app_id );
 					foreach ( $addon_files as $addon_file ) {
 						$zip_filename = $source_root .'addons/'. $addon->slug .'/'. $addon_file['relative'];
 
@@ -889,6 +889,8 @@ class WpakBuild {
 		//Set cache version and cached files:
 		$content = preg_replace( "/(var cacheName = ')(';).*/", "$1". $cache_version ."$2", $content );
 		$content = preg_replace( "/(var filesToCache = \[)(\];).*/", "$1". $cache_files ."$2", $content );
+
+		$content = apply_filters( 'wpak_pwa_service_worker', $content, $app_id, $webapp_files, $export_type );
 
 		return $content;
 	}

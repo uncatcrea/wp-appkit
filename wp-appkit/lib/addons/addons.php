@@ -120,15 +120,28 @@ class WpakAddons {
 	}
 
 	public static function inner_addon_box( $post ) {
+		$all_platforms = WpakApps::get_platforms();
+		$app_platform = WpakApps::get_app_info( $post->ID, 'platform' );
+		$app_platform_name = !empty( $all_platforms[$app_platform] ) ? $all_platforms[$app_platform] : '';
 		$app_addons = self::get_app_addons( $post->ID );
+		$auto_draft_warning = $post->post_status !== 'publish' ? ' ('. __( 'please save your App to be able to activate addons') .')' : '';
 		?>
 		<div class="wpak_addons">
-			<span><?php _e( 'Addons activated for this App', WpAppKit::i18n_domain ) ?></span><br/>
+			<span><?php _e( 'Addons activated for this App', WpAppKit::i18n_domain ); ?><?php echo $auto_draft_warning; ?>:</span>
+			<ul>
 			<?php foreach ( self::get_addons() as $addon ): ?>
-				<?php $checked = array_key_exists( $addon->slug, $app_addons ) ? 'checked' : '' ?>
-					<input type="checkbox" name="wpak-addons[]" id="<?php echo esc_attr( $addon->slug ) ?>" value="<?php echo esc_attr( $addon->slug ) ?>" <?php echo $checked ?> />
-					<label for="<?php echo esc_attr( $addon->slug ) ?>"><?php echo esc_html( $addon->name ) ?></label>
+				<?php 
+					$allowed = in_array( $app_platform, $addon->platforms );
+					$checked = $allowed && array_key_exists( $addon->slug, $app_addons ) ? 'checked' : '';
+					$disabled = !$allowed ? 'disabled' : '';
+					$platform_warning = !$allowed && !empty( $app_platform_name ) ? ' ('. sprintf( __( 'Not available for platform "%s"', WpAppKit::i18n_domain ), $app_platform_name ) . ')' : '';
+				?>
+				<li>
+					<input type="checkbox" name="wpak-addons[]" id="<?php echo esc_attr( $addon->slug ) ?>" value="<?php echo esc_attr( $addon->slug ) ?>" <?php echo $checked ?> <?php echo $disabled; ?> />
+					<label for="<?php echo esc_attr( $addon->slug ) ?>"><?php echo esc_html( $addon->name ) ?><?php echo esc_html( $platform_warning ); ?></label>
+				</li>
 			<?php endforeach ?>
+			</ul>
 			<?php wp_nonce_field( 'wpak-addons-' . $post->ID, 'wpak-nonce-addons' ) ?>
 		</div>
 		<?php
@@ -175,7 +188,7 @@ class WpakAddons {
 		$app_addons_raw = self::get_app_addons( $app_id_or_slug );
 		if ( !empty( $app_addons_raw ) ) {
 			foreach ( $app_addons_raw as $app_addon_raw ) {
-				$app_addons[] = $app_addon_raw->to_config_object();
+				$app_addons[] = $app_addon_raw->to_config_object( WpakApps::get_app_id( $app_id_or_slug ) );
 			}
 		}
 
@@ -206,7 +219,7 @@ class WpakAddons {
 		$app_addons_raw = self::get_app_addons( $app_id_or_slug );
 		if ( !empty( $app_addons_raw ) ) {
 			foreach ( $app_addons_raw as $addon_slug => $app_addon_raw ) {
-				$app_addon_raw->require_php_files();
+				$app_addon_raw->require_php_files( WpakApps::get_app_id( $app_id_or_slug ) );
 			}
 		}
 
@@ -248,17 +261,16 @@ class WpakAddons {
 			return;
 		}
 
-		// Force having no addon activated on PWA platform
-		if( !empty( $_POST['wpak_app_platform'] ) && $_POST['wpak_app_platform'] == 'pwa' ) {
-		    $_POST['wpak-addons'] = null;
-		}
-
 		if ( isset( $_POST['wpak-addons'] ) && is_array( $_POST['wpak-addons'] ) ) {
 
 			$app_addons = array();
-			$all_addons = array_keys( self::get_addons() );
+			$all_addons = self::get_addons();
+			$all_addons_slugs = array_keys( $all_addons );
+			$app_platform = $_POST['wpak_app_platform'];
 			foreach ( $_POST['wpak-addons'] as $addon_slug ) {
-				if ( in_array( $addon_slug, $all_addons ) ) {
+				$addon = !empty( $all_addons[$addon_slug] ) ? $all_addons[$addon_slug] : null;
+				//Only activate addon if it is compatible with current app platform:
+				if ( $addon && in_array( $addon_slug, $all_addons_slugs ) && in_array( $app_platform, $addon->platforms ) ) {
 					$app_addons[] = $addon_slug;
 				}
 			}
