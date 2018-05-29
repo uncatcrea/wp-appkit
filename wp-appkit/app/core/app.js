@@ -252,10 +252,12 @@ define(function (require,exports) {
             }
         }
         
+        var is_deeplink = asked_route.length > 0 && asked_route !== launch_route;
+
         //A route was asked by url, that is different from launch route.
         //Set launch_route to this asked route and manually add the default screen
         //to history, so that we can go back to it with back button.
-        if ( asked_route.length > 0 && asked_route !== launch_route ) {
+        if ( is_deeplink ) {
            
             var add_default_route_before_asked_route = Hooks.applyFilters( 'add-default-route-before-asked-route', true, [ asked_route, default_route, launch_route ] );
            
@@ -288,6 +290,12 @@ define(function (require,exports) {
             if( app.getParam( 'use-html5-pushstate' ) ) {
                 history_start_args.pushState = true;
                 history_start_args.root = Config.app_path;
+            }
+
+            if ( is_deeplink ) {
+                //We don't want to trigger '/' route when router starts and we have a deeplink to open: 
+                //it leads to 2 routes triggered very closely causing history/view rendering issue.
+                history_start_args.silent = true;
             }
 
 			if( launch_route.length > 0 && default_route.length > 0 ){
