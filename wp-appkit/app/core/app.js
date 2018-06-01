@@ -228,12 +228,15 @@ define(function (require,exports) {
          * 3. if we disable 'go-to-default-route-after-refresh', we'd have to enable it again after the next refresh
          */
         var asked_route = '';
+        var is_deeplink = false;
 		if( deep_link_route.length > 0 ) {
             
+            is_deeplink = true;
+
             asked_route = deep_link_route;
 
             app.setParam( 'refresh-at-app-launch', false );
-            
+
 		} else if ( url_fragment.length > 0 ) {
             
             asked_route = url_fragment;
@@ -252,12 +255,10 @@ define(function (require,exports) {
             }
         }
         
-        var is_deeplink = asked_route.length > 0 && asked_route !== launch_route;
-
         //A route was asked by url, that is different from launch route.
         //Set launch_route to this asked route and manually add the default screen
         //to history, so that we can go back to it with back button.
-        if ( is_deeplink ) {
+        if ( asked_route.length > 0 && asked_route !== launch_route ) {
            
             var add_default_route_before_asked_route = Hooks.applyFilters( 'add-default-route-before-asked-route', true, [ asked_route, default_route, launch_route ] );
            
@@ -299,13 +300,19 @@ define(function (require,exports) {
             }
 
 			if( launch_route.length > 0 && default_route.length > 0 ){
+
+                //Start router
+                //(history.start triggers the current url fragment or pathname if any)
 				Backbone.history.start( history_start_args );
+
 				//Navigate to the launch_route :
 				if ( launch_route === default_route ) {
 					app.router.default_route();
-				} else {
+				} else if ( is_deeplink ) {
+                    //Deeplinks start silently, we need to manually navigate to launch_route:
 					app.router.navigate(launch_route, {trigger: true});
 				}
+
 			}else{
                 history_start_args.silent = true;
 				Backbone.history.start( history_start_args );
