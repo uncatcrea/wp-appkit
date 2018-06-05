@@ -298,11 +298,15 @@ define( function( require, exports ) {
 	 */
 
 	themeApp.navigate = function( navigate_to_fragment ) {
-		App.router.navigate( navigate_to_fragment, { trigger: true } );
+		if ( !App.isLaunching() ) { //Don't allow to navigate from theme if app is launching
+			App.router.navigate( navigate_to_fragment, { trigger: true } );
+		}
 	};
 
 	themeApp.navigateToDefaultRoute = function() {
-		App.router.default_route();
+		if ( !App.isLaunching() ) { //Don't allow to navigate from theme if app is launching
+			App.router.default_route();
+		}
 	};
 
 	themeApp.navigateToPreviousScreen = function() {

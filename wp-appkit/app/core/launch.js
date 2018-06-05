@@ -48,6 +48,9 @@ require(['root/config'],function(Config){
 			var launch = function() {
 				
 				require(Addons.getJs('init','before'),function(){
+
+					App.setIsLaunching( true );
+
 					// Initialize application before using it
 					App.initialize( function() {
 
@@ -133,6 +136,8 @@ require(['root/config'],function(Config){
 																	}
 
 																	PhoneGap.hideSplashScreen();
+
+																	App.setIsLaunching( false );
 																});
 															},
 															function( error, deferred ){
@@ -153,6 +158,8 @@ require(['root/config'],function(Config){
 																App.triggerInfo('no-content');
                                                                 
                                                                 PhoneGap.hideSplashScreen();
+
+                                                                App.setIsLaunching( false );
 															},
 															false //true to force refresh local storage at each app launch.
 														);
@@ -162,10 +169,12 @@ require(['root/config'],function(Config){
 											},
 											function(error){
 												Utils.log('Error : could not preload templates', error);
+												App.setIsLaunching( false );
 											});
 										},
 										function(error){
 											Utils.log('Error : theme/js/functions.js not found', error);
+											App.setIsLaunching( false );
 										});
 									});
 								});

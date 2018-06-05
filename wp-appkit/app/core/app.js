@@ -212,6 +212,23 @@ define(function (require,exports) {
 		return default_route;
 	  };
 
+      /**
+       * Flag to know if the app is currently launching.
+       * (is_launching state is set and updated in launch.js).
+       */
+      var is_launching = false;
+
+      app.setIsLaunching = function( launching ) {
+        is_launching = launching;
+      };
+
+      app.isLaunching = function() {
+        return is_launching;
+      };
+
+      /**
+       * Initialize and start app router, taking deeplink and url fragment/pathname into account.
+       */
 	  app.launchRouting = function() {
 
 		var default_route = app.resetDefaultRoute(true);
@@ -777,6 +794,12 @@ define(function (require,exports) {
        */
 	  var syncWebService = function( cb_ok, cb_error ){
 			
+            //If we're asking a sync with server at app launch (meaning there's no or wrong data in the app
+            //at launch), we don't need to re-trigger app refresh after launch.
+            if ( app.isLaunching() ) {
+                app.setParam( 'refresh-at-app-launch', false );
+            }
+
             //Set refresh events:
             
             //Trigger 'refresh:start' event.
