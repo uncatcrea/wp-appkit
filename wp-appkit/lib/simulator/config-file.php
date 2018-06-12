@@ -444,6 +444,24 @@ define( function ( require ) {
 		return $app_icons_and_splashscreens_files;
 	}
 
+	protected static function get_target_sdk_version( $app_id, $app_platform, $export_type ) {
+
+		$default_target_sdk_version = 26;
+
+		/**
+		 * 'wpak_config_xml_target_sdk_version' filter. 
+		 * Allows to set the "android-targetSdkVersion" preference. 
+		 * Return an empty value to avoid forcing any targetSdkVersion value.
+		 * (This filters only applies to non PWA exports).
+		 * 
+		 * @param int 		Value of android-targetSdkVersion preference.   
+		 * @param int       $app_id         Application ID.
+	 	 * @param string    $app_platform   App platform (see WpakApps::get_platforms to get the list).
+	 	 * @param string    $export_type    Export type.
+		 */
+		return apply_filters( 'wpak_config_xml_target_sdk_version', $default_target_sdk_version, $app_id, $app_platform, $export_type );
+	}
+
 	protected static function get_custom_preferences( $app_id, $app_platform, $export_type ) {
 		/**
 		 * 'wpak_config_xml_custom_preferences' filter. 
@@ -478,6 +496,9 @@ define( function ( require ) {
 		$whitelist_settings = self::get_whitelist_settings( $app_id, $app_platform, $export_type );
 		$splashscreen_settings = self::get_splashscreen_settings( $app_id, $app_platform, $export_type );
 
+		//Target sdk version
+		$target_sdk_version = self::get_target_sdk_version( $app_id, $app_platform, $export_type );
+
 		//Custom preferences (added via hook):
 		$custom_preferences = self::get_custom_preferences( $app_id, $app_platform, $export_type );
 
@@ -509,6 +530,9 @@ define( function ( require ) {
 	<gap:platform name="<?php echo esc_attr( $app_platform ); ?>" />
 	
 	<!-- General preferences -->
+<?php if( !empty( $target_sdk_version ) && $app_platform == 'android' ): ?>
+	<preference name="android-targetSdkVersion" value="<?php echo esc_attr( $target_sdk_version ); ?>" />
+<?php endif; ?>
 <?php if( !empty( $app_target_architecture ) && $app_platform == 'android' ): ?>
 	<preference name="buildArchitecture" value="<?php echo esc_attr( $app_target_architecture ); ?>" />
 <?php if( WpakApps::is_crosswalk_activated( $app_id ) ): ?>
