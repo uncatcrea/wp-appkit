@@ -511,7 +511,9 @@ define( function ( require ) {
 	<!-- General preferences -->
 <?php if( !empty( $app_target_architecture ) && $app_platform == 'android' ): ?>
 	<preference name="buildArchitecture" value="<?php echo esc_attr( $app_target_architecture ); ?>" />
+<?php if( WpakApps::is_crosswalk_activated( $app_id ) ): ?>
 	<preference name="xwalkMultipleApk" value="true" />
+<?php endif; ?>
 <?php endif ?>
 <?php if( !empty( $app_build_tool ) && $app_platform == 'android' ): ?>
 	<preference name="android-build-tool" value="<?php echo esc_attr( $app_build_tool ); ?>" />
