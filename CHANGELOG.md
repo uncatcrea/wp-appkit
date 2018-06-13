@@ -1,3 +1,15 @@
+## 1.5.2 (2018-06-15)
+
+### Features
+- Deactivate CrossWalk by default (fixes PhoneGap Build "FontFamilyFont" error) ([b5017eb](https://github.com/uncatcrea/wp-appkit/commit/b5017eb7350789fe3a1ec8a252575c92b54ad0d1), [@mleroi](https://github.com/mleroi))
+- Force android-targetSdkVersion to 26 ([969893a](https://github.com/uncatcrea/wp-appkit/commit/969893a2caa40e53096f2207a72f5fb668a12331), [@mleroi](https://github.com/mleroi))
+- Allow addon activation for PWA ([9b978a4](https://github.com/uncatcrea/wp-appkit/commit/9b978a4b1f3c715a9013bbd1dbba4326a7adfaa6), [@mleroi](https://github.com/mleroi))
+- Allow to add custom preferences to config.xml ([7fb8413](https://github.com/uncatcrea/wp-appkit/commit/7fb8413e29dc79577f703fbec2403eabe1b9afaf), [@mleroi](https://github.com/mleroi))
+
+### Fixes
+- Fix launch routing for deeplinks ([3c40550](https://github.com/uncatcrea/wp-appkit/commit/3c40550c9c48553250b7d910444b6b144e3dcbab), [@mleroi](https://github.com/mleroi))
+- Fix error when inserting custom component created by addons in navigation ([c416cea](https://github.com/uncatcrea/wp-appkit/commit/c416ceaf22d14aa292d6ee3a1c46238242733f9c), [@mleroi](https://github.com/mleroi))
+
 ## 1.5.1 (2018-03-06)
 
 ### Minor fixes
