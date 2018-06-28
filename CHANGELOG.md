@@ -10,6 +10,9 @@
 - Fix launch routing for deeplinks ([3c40550](https://github.com/uncatcrea/wp-appkit/commit/3c40550c9c48553250b7d910444b6b144e3dcbab), [@mleroi](https://github.com/mleroi))
 - Fix error when inserting custom component created by addons in navigation ([c416cea](https://github.com/uncatcrea/wp-appkit/commit/c416ceaf22d14aa292d6ee3a1c46238242733f9c), [@mleroi](https://github.com/mleroi))
 
+### Default themes update
+- **Embed last version (1.1.2) of [Q for iOS](https://github.com/uncatcrea/q-ios/releases/tag/v1.1.2) and [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.1.2) default app themes**
+
 ## 1.5.1 (2018-03-06)
 
 ### Minor fixes
