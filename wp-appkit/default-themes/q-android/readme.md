@@ -1,7 +1,7 @@
 <!--
 Theme Name: Q for Android
 Description:  A clean and simple Android app news theme featuring: back button, comments, content refresh, custom post types, embeds, infinite list, latest posts, native sharing, network detection, off-canvas menu, offline content, pages, posts, pull to refresh, responsive, status bar, touch, transitions
-Version: 1.1.1
+Version: 1.1.2
 Theme URI: https://github.com/uncatcrea/q-android
 Author: Uncategorized Creations			
 Author URI: http://uncategorized-creations.com	
