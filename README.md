@@ -1,5 +1,5 @@
 # WP-AppKit
-WP-AppKit is an open source WordPress plugin to **build mobile applications connected to WordPress**. Applications are created with HTML, CSS and JavaScript (thanks to the Cordova/PhoneGap technology). Developers, you can extend and customize applications using our API.
+WP-AppKit is an open source WordPress plugin to **build PWA and mobile applications connected to WordPress**. Applications are created with HTML, CSS and JavaScript. Developers, you can extend and customize applications using our API.
 
 > Get Started: [all you need to know to get your first app up and running](http://uncategorized-creations.com/wp-appkit/doc/getting-started/)
 
@@ -27,7 +27,7 @@ It's a WordPress plugin which provides:
 * A JavaScript engine to create app's themes
 * Starter themes to trigger your natural inclination to unbridled creativity
 
-WP-AppKit uses the [Cordova](http://cordova.apache.org/) technology for the app. It means that the app is developed with HTML, CSS and JavaScript but still can be distribued in app stores.
+When building mobile apps, WP-AppKit uses the [Cordova](http://cordova.apache.org/) technology for the app. It means that the app is developed with HTML, CSS and JavaScript but still can be distribued in app stores.
 
 More on that [here](http://uncategorized-creations.com/wp-appkit/).
 
@@ -47,7 +47,7 @@ WP-AppKit adds a menu to the WordPress admin.
 ![Preview WP-AppKit App in Browser](https://cloud.githubusercontent.com/assets/6179747/16171844/45c5729a-357a-11e6-819a-0f3d80dbaec1.jpg)
 
 ## App Themes
-WP-AppKit allows to create themes for your apps. As we use the Cordova technology, app themes are build with HTML, CSS and JavaScript. WP-AppKit provides a JavaScript engine able to interact with the WP-AppKit web services. It also mimics WordPress themes with files such as single, archive... You will also be able to use template tags.
+WP-AppKit allows to create themes for your apps. App themes are build with HTML, CSS and JavaScript. WP-AppKit provides a JavaScript engine able to interact with the WP-AppKit web services. It also mimics WordPress themes with files such as single, archive... You will also be able to use template tags.
 
 However an app's theme *is not* a WordPress theme.
 
