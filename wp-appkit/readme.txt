@@ -121,7 +121,7 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
 
-= 1.5.2 (2018-06-02) =
+= 1.5.2 (2018-07-02) =
 
 *Features*
 

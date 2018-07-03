@@ -1,4 +1,4 @@
-## 1.5.2 (2018-06-15)
+## 1.5.2 (2018-07-02)
 
 ### Features
 - Deactivate CrossWalk by default (fixes PhoneGap Build "FontFamilyFont" error) ([b5017eb](https://github.com/uncatcrea/wp-appkit/commit/b5017eb7350789fe3a1ec8a252575c92b54ad0d1), [@mleroi](https://github.com/mleroi))
