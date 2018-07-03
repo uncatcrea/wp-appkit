@@ -780,9 +780,11 @@ define([
 
         e.preventDefault();
         
+        var $link = $(e.target);
+
         // Get the href attribute value
         // Using attr() rather than directly .href to get the not modified value of the href attribute
-        var href = $(e.target).attr('href');
+        var href = $link.attr('href');
         
         if ( href.charAt(0) !== '#' ) { // href doesn't begin with #
             
@@ -794,7 +796,11 @@ define([
             
         } else { // href begins with # (ie. it's an internal link)
             
-			App.navigate( href );
+            //Add the 'q-theme-prevent-navigation' class to the link if you don't want the following 
+            //auto navigation to occur:
+            if ( !$link.hasClass( 'q-theme-prevent-navigation' ) ) {
+                App.navigate( href );
+            }
 			
         }
 

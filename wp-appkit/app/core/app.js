@@ -212,6 +212,23 @@ define(function (require,exports) {
 		return default_route;
 	  };
 
+      /**
+       * Flag to know if the app is currently launching.
+       * (is_launching state is set and updated in launch.js).
+       */
+      var is_launching = false;
+
+      app.setIsLaunching = function( launching ) {
+        is_launching = launching;
+      };
+
+      app.isLaunching = function() {
+        return is_launching;
+      };
+
+      /**
+       * Initialize and start app router, taking deeplink and url fragment/pathname into account.
+       */
 	  app.launchRouting = function() {
 
 		var default_route = app.resetDefaultRoute(true);
@@ -228,12 +245,15 @@ define(function (require,exports) {
          * 3. if we disable 'go-to-default-route-after-refresh', we'd have to enable it again after the next refresh
          */
         var asked_route = '';
+        var is_deeplink = false;
 		if( deep_link_route.length > 0 ) {
             
+            is_deeplink = true;
+
             asked_route = deep_link_route;
 
             app.setParam( 'refresh-at-app-launch', false );
-            
+
 		} else if ( url_fragment.length > 0 ) {
             
             asked_route = url_fragment;
@@ -290,14 +310,26 @@ define(function (require,exports) {
                 history_start_args.root = Config.app_path;
             }
 
+            if ( is_deeplink ) {
+                //We don't want to trigger '/' route when router starts and we have a deeplink to open: 
+                //it leads to 2 routes triggered very closely causing history/view rendering issue.
+                history_start_args.silent = true;
+            }
+
 			if( launch_route.length > 0 && default_route.length > 0 ){
+
+                //Start router
+                //(history.start triggers the current url fragment or pathname if any)
 				Backbone.history.start( history_start_args );
+
 				//Navigate to the launch_route :
 				if ( launch_route === default_route ) {
 					app.router.default_route();
-				} else {
+				} else if ( is_deeplink ) {
+                    //Deeplinks start silently, we need to manually navigate to launch_route:
 					app.router.navigate(launch_route, {trigger: true});
 				}
+
 			}else{
                 history_start_args.silent = true;
 				Backbone.history.start( history_start_args );
@@ -762,6 +794,12 @@ define(function (require,exports) {
        */
 	  var syncWebService = function( cb_ok, cb_error ){
 			
+            //If we're asking a sync with server at app launch (meaning there's no or wrong data in the app
+            //at launch), we don't need to re-trigger app refresh after launch.
+            if ( app.isLaunching() ) {
+                app.setParam( 'refresh-at-app-launch', false );
+            }
+
             //Set refresh events:
             
             //Trigger 'refresh:start' event.

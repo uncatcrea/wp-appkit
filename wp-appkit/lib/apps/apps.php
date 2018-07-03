@@ -25,9 +25,6 @@ class WpakApps {
 			add_action( 'postbox_classes_wpak_apps_wpak_app_export_pwa', array( __CLASS__, 'add_pwa_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_pwa_data', array( __CLASS__, 'add_platform_specific_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_pwa_data', array( __CLASS__, 'add_pwa_class' ) );
-			add_action( 'postbox_classes_wpak_apps_wpak_app_addons', array( __CLASS__, 'add_platform_specific_class' ) );
-			add_action( 'postbox_classes_wpak_apps_wpak_app_addons', array( __CLASS__, 'add_ios_class' ) );
-			add_action( 'postbox_classes_wpak_apps_wpak_app_addons', array( __CLASS__, 'add_android_class' ) );
 			add_action( 'wpak_inner_simulation_box', array( __CLASS__, 'inner_security_box' ), 10, 2 );
 			add_action( 'save_post', array( __CLASS__, 'save_post' ) );
 			add_filter( 'post_row_actions', array( __CLASS__, 'remove_quick_edit' ), 10, 2 );
@@ -851,7 +848,7 @@ class WpakApps {
 		return $app_version;
 	}
 
-	private static function get_platforms() {
+	public static function get_platforms() {
 		return array(
 			'ios' => __( 'iOS - Native', WpAppKit::i18n_domain ),
 			'android' => __( 'Android - Native', WpAppKit::i18n_domain ),
@@ -1048,6 +1045,15 @@ class WpakApps {
 		return $merged_plugins;
 	}
 
+	public static function is_crosswalk_activated( $app_id ) {
+		/**
+		 * Crosswalk is deactivated by default as of WP-AppKit version 1.5.2.
+		 * Use this 'wpak_crosswalk_activated' filter to reactivate it: 
+		 * Usage example: add_filter( 'wpak_crosswalk_activated', '__return_true' );
+		 */
+		return apply_filters( 'wpak_crosswalk_activated', false, $app_id );
+	}
+
 	protected static function get_default_phonegap_plugins( $app_id, $export_type = 'phonegap-build' ) {
 
 		$default_plugins = array(
@@ -1067,11 +1073,14 @@ class WpakApps {
 		}
 
 		if( $app_main_infos['platform'] == 'android' ) {
-			// Add CrossWalk Cordova plugin.
-			// This is useful to have a consistent behaviour between all Android webviews, and to have better performance as well. Especially with animations.
-			// Drawbacks are the app's weight and memory footprint that are higher than without the plugin.
-			// Currently we include stable version 2.3.0 which is the one supported by the current version of PhoneGap Build (v6.50):
-			$default_plugins['cordova-plugin-crosswalk-webview'] = array( 'spec' => '2.3.0', 'source' => 'npm' );
+
+			if ( self::is_crosswalk_activated( $app_id ) ) {
+				// Add CrossWalk Cordova plugin.
+				// This is useful to have a consistent behaviour between all Android webviews, and to have better performance as well. Especially with animations.
+				// Drawbacks are the app's weight and memory footprint that are higher than without the plugin.
+				// Currently we include stable version 2.3.0 which is the one supported by the current version of PhoneGap Build (v6.50):
+				$default_plugins['cordova-plugin-crosswalk-webview'] = array( 'spec' => '2.3.0', 'source' => 'npm' );
+			}
 
 			//Add "cordova-build-architecture" plugin
 			//https://github.com/MBuchalik/cordova-build-architecture

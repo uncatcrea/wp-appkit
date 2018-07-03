@@ -444,6 +444,38 @@ define( function ( require ) {
 		return $app_icons_and_splashscreens_files;
 	}
 
+	protected static function get_target_sdk_version( $app_id, $app_platform, $export_type ) {
+
+		$default_target_sdk_version = 26;
+
+		/**
+		 * 'wpak_config_xml_target_sdk_version' filter. 
+		 * Allows to set the "android-targetSdkVersion" preference. 
+		 * Return an empty value to avoid forcing any targetSdkVersion value.
+		 * (This filters only applies to non PWA exports).
+		 * 
+		 * @param int 		Value of android-targetSdkVersion preference.   
+		 * @param int       $app_id         Application ID.
+	 	 * @param string    $app_platform   App platform (see WpakApps::get_platforms to get the list).
+	 	 * @param string    $export_type    Export type.
+		 */
+		return apply_filters( 'wpak_config_xml_target_sdk_version', $default_target_sdk_version, $app_id, $app_platform, $export_type );
+	}
+
+	protected static function get_custom_preferences( $app_id, $app_platform, $export_type ) {
+		/**
+		 * 'wpak_config_xml_custom_preferences' filter. 
+		 * Allows to add custom preferences to config.xml file.
+		 * (This filters only applies to non PWA exports).
+		 * 
+		 * @param array     custom preferences to add: array of [ 'name' => 'preferenceName', 'value' => 'preferenceValue' ]
+		 * @param int       $app_id         Application ID.
+	 	 * @param string    $app_platform   App platform (see WpakApps::get_platforms to get the list).
+	 	 * @param string    $export_type    Export type.
+		 */
+		return apply_filters( 'wpak_config_xml_custom_preferences', [], $app_id, $app_platform, $export_type );
+	}
+
 	public static function get_config_xml( $app_id, $echo = false, $export_type = 'phonegap-build' ) {
 
 		$app_main_infos = WpakApps::get_app_main_infos( $app_id );
@@ -463,6 +495,12 @@ define( function ( require ) {
 
 		$whitelist_settings = self::get_whitelist_settings( $app_id, $app_platform, $export_type );
 		$splashscreen_settings = self::get_splashscreen_settings( $app_id, $app_platform, $export_type );
+
+		//Target sdk version
+		$target_sdk_version = self::get_target_sdk_version( $app_id, $app_platform, $export_type );
+
+		//Custom preferences (added via hook):
+		$custom_preferences = self::get_custom_preferences( $app_id, $app_platform, $export_type );
 
 		//Merge our default Phonegap Build plugins to those set in BO :
 		$app_phonegap_plugins = WpakApps::get_merged_phonegap_plugins_xml( $app_id, $export_type, $app_main_infos['phonegap_plugins'] );
@@ -492,9 +530,14 @@ define( function ( require ) {
 	<gap:platform name="<?php echo esc_attr( $app_platform ); ?>" />
 	
 	<!-- General preferences -->
+<?php if( !empty( $target_sdk_version ) && $app_platform == 'android' ): ?>
+	<preference name="android-targetSdkVersion" value="<?php echo esc_attr( $target_sdk_version ); ?>" />
+<?php endif; ?>
 <?php if( !empty( $app_target_architecture ) && $app_platform == 'android' ): ?>
 	<preference name="buildArchitecture" value="<?php echo esc_attr( $app_target_architecture ); ?>" />
+<?php if( WpakApps::is_crosswalk_activated( $app_id ) ): ?>
 	<preference name="xwalkMultipleApk" value="true" />
+<?php endif; ?>
 <?php endif ?>
 <?php if( !empty( $app_build_tool ) && $app_platform == 'android' ): ?>
 	<preference name="android-build-tool" value="<?php echo esc_attr( $app_build_tool ); ?>" />
@@ -516,6 +559,13 @@ define( function ( require ) {
 
 	<preference name="<?php echo $app_platform == 'android' ? 'd' : 'D' ?>isallowOverscroll" value="true" />
 	<preference name="webviewbounce" value="false" />
+<?php endif ?>
+
+	<!-- Custom preferences -->
+<?php if( !empty( $custom_preferences ) ) : ?>
+<?php foreach( $custom_preferences as $preference ): ?>
+	<preference name="<?php echo esc_attr( $preference['name'] ); ?>" value="<?php echo esc_attr( $preference['value'] ); ?>" />
+<?php endforeach ?>
 <?php endif ?>
 
 	<!-- PhoneGap plugin declaration -->

@@ -219,6 +219,8 @@ class WpakNavigationBoSettings{
 		$action = sanitize_key( $_POST['wpak_action'] );
 		$data = is_array( $_POST['data'] ) ? $_POST['data'] : array(); //Each data value is sanitized hereunder before being used
 
+		WpakAddons::require_app_addons_php_files( $post_id );
+
 		if( $action == 'add_or_update' ){
 
 			$post_id = intval( $data['navigation_post_id'] );
@@ -313,7 +315,9 @@ class WpakNavigationBoSettings{
 			exit();
 		}
 
-		$post_id = $_POST['post_id'];
+		$post_id = intval( $_POST['post_id'] );
+
+		WpakAddons::require_app_addons_php_files( $post_id );
 
 		ob_start();
 		self::echo_item_form($post_id);

@@ -2,8 +2,8 @@
 Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
 Tags: pwa, mobile app, android, ios, progressive web app, phonegap build
 Requires at least: 4.0
-Tested up to: 4.9.4
-Stable tag: 1.5.1
+Tested up to: 4.9.6
+Stable tag: 1.5.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -120,6 +120,24 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 == Changelog ==
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
+
+= 1.5.2 (2018-07-02) =
+
+*Features*
+
+* Deactivate CrossWalk by default (fixes PhoneGap Build "FontFamilyFont" error)
+* Force android-targetSdkVersion to 26
+* Allow addon activation for PWA
+* Allow to add custom preferences to config.xml
+
+*Fixes*
+
+* Fix launch routing for deeplinks
+* Fix error when inserting custom component created by addons in navigation
+
+*Default themes update*
+
+* q-android version 1.1.2, q-ios vesion 1.0.7: fix link opening in post content
 
 = 1.5.1 (2018-03-06) =
 
