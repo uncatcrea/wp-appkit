@@ -13,6 +13,7 @@ define(function(require, exports) {
 		Stats         = require('core/stats'),
 		Addons        = require('core/addons-internal'),
         ThemeApp      = require('core/theme-app'),
+        DynamicData   = require('core/app-dynamic-data'),
         Hooks         = require('core/lib/hooks'),
 		Utils         = require('core/app-utils');
 
@@ -677,6 +678,21 @@ define(function(require, exports) {
         var components = App.components.where( { type: type } );
 
         return components.length > 0;
+    };
+
+    /**
+     * Retrieve GMT offset from dynamic data if available, from config.js if not
+     * 
+     * @return int GMT offset
+     */
+    themeTplTags.getGmtOffset = function() {
+        var gmt_offset = DynamicData.getDynamicData( 'gmt_offset' );
+
+        if ( gmt_offset === undefined ) {
+            gmt_offset = Config.gmt_offset;
+        }
+
+        return gmt_offset;
     };
 
     //Use exports so that theme-tpl-tags and theme-app (which depend on each other, creating
