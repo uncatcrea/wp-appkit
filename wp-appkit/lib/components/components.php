@@ -16,8 +16,6 @@ class WpakComponents {
 		$components = array();
 		$components_data = array();
 
-		WpakAddons::require_app_addons_php_files( $app_id );
-
 		$components_raw = WpakComponentsStorage::get_components( $app_id );
 
 		if ( !empty( $components_raw ) ) {
@@ -47,8 +45,6 @@ class WpakComponents {
 			$components_data['components'] = $components;
 			$components_data['globals'] = $globals;
 
-			$components_data['addons'] = WpakAddons::get_app_addons_dynamic_data( $app_id );
-			
 		} else {
 			
 			//No component : return empty components, navigation, globals and 
@@ -58,8 +54,6 @@ class WpakComponents {
 			$components_data['components'] = array();
 			$components_data['globals'] = array();
 
-			$components_data['addons'] = WpakAddons::get_app_addons_dynamic_data( $app_id );
-			
 		}
 
 		return $components_data;
