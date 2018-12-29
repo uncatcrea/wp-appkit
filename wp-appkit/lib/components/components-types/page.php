@@ -225,7 +225,7 @@ class WpakComponentTypePage extends WpakComponentType {
 		?>
 		<div>
 			<label for="post_type"><?php _e( 'Post type', WpAppKit::i18n_domain ) ?> : </label>
-			<select id="post_type" name="post_type" class="post-type-list">
+			<select id="post_type" name="component_post_type" class="post-type-list">
 				<?php foreach ( $all_post_types as $post_type ): ?>
 					<?php $selected = $post_type->name == $current_post_type ? 'selected="selected"' : '' ?>
 					<option value="<?php echo esc_attr( $post_type->name ) ?>" <?php echo $selected ?>><?php echo esc_html( $post_type->labels->name ) ?></option>
