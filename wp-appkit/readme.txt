@@ -91,7 +91,7 @@ You can create an **unlimited** number of applications and an unlimited number o
 
 We use a homemade (extendable) REST API. As the WP REST API is now integrated to WordPress core, we’ll probably rely on it in the future.
 
-= Is WP-AppKit compatible with WooCommerce? = 
+= Is WP-AppKit compatible with WooCommerce? =
 
 You can display WooCommerce content (ie. products) in your themes as any other WordPress content. However, you’ll have to (re)develop functionalities such as cart or checkout.
 
@@ -120,6 +120,22 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 == Changelog ==
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
+
+= 1.5.3 (2019-01-21) =
+
+*Features*
+
+* Allow to pass custom dynamic data to the app through synchronization webservice
+* Handle local time changes in app
+
+*Fixes*
+
+* Fix post_type conflict on app save ("Post type mismatch" error)
+* Fix license expiration message throws notice
+
+*Default themes update*
+
+* q-android version 1.2.0 : Handle local time changes / Add compatibility with Offline favorites addon
 
 = 1.5.2 (2018-07-02) =
 
@@ -222,15 +238,15 @@ Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/maste
 * getCurrentScreenObject() error on some custom screens
 * Wrong routing initialization when no network at first app launch
 
-= 1.0.2 (2017-05-05) = 
+= 1.0.2 (2017-05-05) =
 
 * Bugfix: User authentication fails randomly
 
-= 1.0.1 (2017-04-11) = 
+= 1.0.1 (2017-04-11) =
 
 * Update readme file
 
-= 1.0 (2017-03-24) = 
+= 1.0 (2017-03-24) =
 
 *Release on WordPress.org!*
 

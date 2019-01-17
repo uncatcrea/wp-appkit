@@ -1,3 +1,16 @@
+## 1.5.3 (2019-01-21)
+
+### Features
+- Allow to pass custom dynamic data to the app through synchronization webservice ([2aeafe7](https://github.com/uncatcrea/wp-appkit/commit/2aeafe75d28c4ba48985b406df28e78f455fac90), [@mleroi](https://github.com/mleroi))
+- Handle local time changes in app ([#158](https://github.com/uncatcrea/wp-appkit/issues/158), [@mleroi](https://github.com/mleroi))
+
+### Fixes
+- Fix post_type conflict on app save ("Post type mismatch" error) ([#376](https://github.com/uncatcrea/wp-appkit/issues/376), [@mleroi](https://github.com/mleroi))
+- Fix license expiration message throws notice ([2a7400a](https://github.com/uncatcrea/wp-appkit/commit/2a7400a8002ec93c0e01876b16911533f685e378), [@mleroi](https://github.com/mleroi))
+
+### Default themes update
+- Embed last version of [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.2.0) (version 1.2.0) default app theme
+
 ## 1.5.2 (2018-07-02)
 
 ### Features
@@ -31,7 +44,7 @@
 ### Default themes update
 - **Embed last version (1.1.0) of [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.1.0) default app themes, which is compatible with PWAs.**
 
-### Main PWA commits and issues 
+### Main PWA commits and issues
 _See Pull Request [#361](https://github.com/uncatcrea/wp-appkit/pull/361) to see all version 1.5 related commits_
 
 - **Add Progressive Web App export type** ([135f927](https://github.com/uncatcrea/wp-appkit/commit/135f927f4e2a7404b66b0b0e8ed3a30bffc412ad), [@mleroi](https://github.com/mleroi))
@@ -75,7 +88,7 @@ _See Pull Request [#361](https://github.com/uncatcrea/wp-appkit/pull/361) to see
 
 ## 1.1 (2017-07-26)
 
-### License Management 
+### License Management
 - **Pro Support license keys can now be registered directly from WP-AppKit settings panel**
 
 ### Default themes update
@@ -234,18 +247,18 @@ _See Pull Request [#361](https://github.com/uncatcrea/wp-appkit/pull/361) to see
 ### Bugfixes:
 - **Error navigating to a comments screen from a page screen** ([#117](https://github.com/uncatcrea/wp-appkit/issues/117), [@mleroi](https://github.com/mleroi))
 - **Fix Default to single for page appears to be broken** ([#18](https://github.com/uncatcrea/wp-appkit/issues/18), [@mleroi](https://github.com/mleroi))
-- **Default embedded Android splashscreen raises error in Phonegap Build** ([#173](https://github.com/uncatcrea/wp-appkit/issues/173), [@lpointet](https://github.com/lpointet)) 
-- **Fix 404 error for "Upload Theme" link** ([PR#151](https://github.com/uncatcrea/wp-appkit/pull/151), [@petitphp](https://github.com/petitphp)) 
+- **Default embedded Android splashscreen raises error in Phonegap Build** ([#173](https://github.com/uncatcrea/wp-appkit/issues/173), [@lpointet](https://github.com/lpointet))
+- **Fix 404 error for "Upload Theme" link** ([PR#151](https://github.com/uncatcrea/wp-appkit/pull/151), [@petitphp](https://github.com/petitphp))
 - **Fix Handle the case where the app has no component more gracefully** ([#116](https://github.com/uncatcrea/wp-appkit/issues/116), [@mleroi](https://github.com/mleroi))
 - **Fix Problem with read-more on singular post. Thanks Willy! :)** ([#106](https://github.com/uncatcrea/wp-appkit/issues/106), [@mleroi](https://github.com/mleroi))
-- **Translation : include texts** ([#175](https://github.com/uncatcrea/wp-appkit/issues/175), [@lpointet](https://github.com/lpointet)) 
+- **Translation : include texts** ([#175](https://github.com/uncatcrea/wp-appkit/issues/175), [@lpointet](https://github.com/lpointet))
 - **TemplateTags.isTreePage() called with wrong arguments** ([#176](https://github.com/uncatcrea/wp-appkit/issues/176), [@mleroi](https://github.com/mleroi))
 
 ### Evolutions:
 - **Allow Web service authentication (Add an action hook that fires just before web services dispatch)** ([#145](https://github.com/uncatcrea/wp-appkit/issues/145), [@mleroi](https://github.com/mleroi))
 - **Finish testing iOS9 compatibility by making https tests** ([#110](https://github.com/uncatcrea/wp-appkit/issues/110), [@mleroi](https://github.com/mleroi))
 - **Add WP Network specific htaccess rules automatically at WP-AppKit installation** ([#167](https://github.com/uncatcrea/wp-appkit/issues/167), [@mleroi](https://github.com/mleroi))
-- **Config.xml plugin declarations** ([#172](https://github.com/uncatcrea/wp-appkit/issues/172), [@lpointet](https://github.com/lpointet)) 
+- **Config.xml plugin declarations** ([#172](https://github.com/uncatcrea/wp-appkit/issues/172), [@lpointet](https://github.com/lpointet))
 - **Activate whitelist plugin by default for iOS builds with Phonegap CLI** ([#113](https://github.com/uncatcrea/wp-appkit/issues/113), [@mleroi](https://github.com/mleroi))
 - **Allow all HTML tags in post content by default** ([#140](https://github.com/uncatcrea/wp-appkit/issues/140), [@mleroi](https://github.com/mleroi))
 - **Allow to git checkout directly the root of wp-appkit repository** ([#179](https://github.com/uncatcrea/wp-appkit/issues/179), [@mleroi](https://github.com/mleroi))
