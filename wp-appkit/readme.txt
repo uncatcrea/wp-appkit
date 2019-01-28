@@ -2,14 +2,16 @@
 Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
 Tags: pwa, mobile app, android, ios, progressive web app, phonegap build
 Requires at least: 4.0
-Tested up to: 4.9.6
-Stable tag: 1.5.2
+Tested up to: 5.0.3
+Stable tag: 1.5.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 == Description ==
 
-**NEW FEATURE - Progressive web apps**: support for progressive web applications (PWA) has been added to 1.5 release. PWA are a new way to deliver fast, reliable and great experience on the web notably for mobiles. They allow to create apps accessible as websites that you can install and access as traditionnal mobile apps.
+**Important ✋**: beginning with version 1.5.3, we don't support anymore native iOS app. This is a tough choice [we explain here](https://uncategorized-creations.com/4550/dropping-ios-support-%F0%9F%98%B1/).
+
+**Progressive web apps**: support for progressive web applications (PWA) has been added to 1.5x release. PWA are a new way to deliver fast, reliable and great experience on the web notably for mobiles. They allow to create apps accessible as websites that you can install and access as traditionnal mobile apps.
 
 A great way to build progressive web apps (PWA) and mobile apps for your WordPress site using your favorite technologies: JavaScript, HTML and CSS.
 
@@ -19,7 +21,7 @@ Progressive web apps (PWA) and mobile applications are a great way to offer an o
 
 * **Native support of WordPress**: custom post types, custom fields, custom taxonomies, comments, secured authentication
 * **Full support of progressive web apps (PWA)**
-* **iOS and Android support**
+* **Android support**
 * **PhoneGap/Cordova**: use JavaScript, HTML and CSS to build apps
 * **PhoneGap Build**: Easy online compilation
 * **Themes**: create app themes
@@ -46,7 +48,6 @@ https://www.youtube.com/watch?v=t6KwLxuoZ2g
 WP-AppKit supports JavaScript based PWA and app themes. We provide 2 default sister themes named *Q for iOS* and *Q for Android*. These themes are installed with the plugin. You can  also develop your own themes.
 
 * [Q for Android](https://www.youtube.com/watch?v=fSQVx8-rqCY) (video)
-* [Q for iOS](https://www.youtube.com/watch?v=jkjtkH6wDys) (video)
 
 = Documentation and Tutorials =
 
@@ -77,7 +78,7 @@ You can create an **unlimited** number of applications and an unlimited number o
 
 = Can I send push notifications? =
 
-**Yes.** It is not implemented by default. We recommend that you use a service such as PushWoosh or OneSignal to implement push notifications for your app.
+**Yes.** It is not implemented by default. We recommend that you use a service such as OneSignal to implement push notifications for your app.
 
 = Do you support Custom Fields? =
 
