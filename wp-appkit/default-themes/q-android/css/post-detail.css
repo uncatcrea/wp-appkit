@@ -176,7 +176,7 @@
 .wp-caption {
     margin: 0px;
     width: 100%;
-	height: auto;    
+	height: auto;
 }
 
 
@@ -234,7 +234,7 @@
 	line-height: 24px;
 	color: #333;
 	margin: 10px 0px 0px 0px;
-    
+
 }
 
 .subhead {
@@ -263,4 +263,14 @@
 	font-size: 17px;
 	line-height: 27px;
 	margin: 20px 0px 10px 0px;
+}
+
+/**
+* Favorites
+*/
+.single-template .favorite-toggle {
+	position: relative;
+	display: inline;
+  top: 4px;
+  margin: 16px;
 }

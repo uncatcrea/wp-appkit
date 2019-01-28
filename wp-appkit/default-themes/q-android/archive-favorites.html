@@ -12,7 +12,7 @@
 
 			<div class="content-item has-ripple-feedback">
 
-                <a href="<%= TemplateTags.getPostLink(post.id) %>">
+                <a href="<%= TemplateTags.getPostLink(post.id, post.global) %>">
 
                     <% if ( post.subhead ) { %>
 
@@ -41,15 +41,18 @@
 
 		<% }); %>
 
-        <% if( TemplateTags.displayGetMoreLink() ){ %>
-			<div class="get-more-button-wrapper">
-                <button type="button" id="get-more-button" class="get-more-button has-ripple-feedback ripple-small">More (<%= TemplateTags.getMoreLinkNbLeft() %>)</button>
-
-            </div>
-		<% } %>
+    <% if( TemplateTags.isComponentTypeLoaded( 'favorites' ) ) { %>
+        <div class="reset-favorite-button-wrapper">
+            <button type="button" class="reset-favorite-button has-ripple-feedback ripple-small favorite-reset">
+              Reset favorites
+            </button>
+        </div>
+    <% } %>
 
 	<% }else{ %>
-		<div class='content-message'>No post found</div>
+
+            <div class="no-post-message">No favorite found</div>
+
 	<% } %>
 
 </div>
