@@ -205,7 +205,7 @@ class WpakLicense {
                     case 'expired' :
                         $message = sprintf(
                             __( 'Your license key expired on %s.', WpAppKit::i18n_domain ),
-                            date_i18n( get_option( 'date_format' ), strtotime( $license_data->expires, current_time( 'timestamp' ) ) )
+                            date_i18n( get_option( 'date_format' ), strtotime( $this->license_active->expires, current_time( 'timestamp' ) ) )
                         );
                         $status = 'license-expired-notice';
                         $type = 'expired';

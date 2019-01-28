@@ -27,11 +27,11 @@
 }
 
 .list-template h2 {
-	margin: 0px 0px 5px 0px;
+	margin: 0px 16px 5px 0px;
     font-size: 21px;
 	line-height: 24px;
 	color: #333;
-	font-family:'Roboto Bold',sans-serif;    
+	font-family:'Roboto Bold',sans-serif;
 }
 
 .list-template .content-thumbnail {
@@ -81,4 +81,33 @@
 
 .get-more-button .spinner .path {
     stroke: #fff;
+}
+
+/**
+* Favorites
+*/
+
+.reset-favorite-button-wrapper {
+    padding: 0px 20px 0px 20px;
+}
+
+.reset-favorite-button {
+    position: relative;
+    height: 46px;
+    overflow: hidden;
+    background-color: #bbb;
+    border-radius: 2px;
+    font-size: 14px;
+    border: none;
+    color: #fff;
+    width: 100%;
+    padding: 11px 14px 11px 14px;
+    margin: 20px 0;
+    line-height: 24px;
+    font-family:HelveticaNeue-Bold,sans-serif;
+}
+
+.no-post-message{
+    margin: 30px 0;
+    text-align: center;
 }

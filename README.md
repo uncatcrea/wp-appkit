@@ -5,15 +5,13 @@ WP-AppKit is an open source WordPress plugin to **build PWA and mobile applicati
 
 ## Latest News
 
-### 04/05/2018 ###
-* Progressive Web Applications (PWA) support
+### 01/28/2019 ###
+* New version of Q for Android theme (offline favorites support)
 
 ## Getting Started
 Creating apps with WP-AppKit means creating JavaScript based app themes. (More on that [here](https://github.com/uncatcrea/wp-appkit/blob/master/README.md#app-themes)).
 
-By default, we provide 2 simple and elegant starter themes ([Q for iOS](https://www.youtube.com/watch?v=jkjtkH6wDys) and [Q for Android](https://www.youtube.com/watch?v=fSQVx8-rqCY)). These themes are pre-installed (since version 0.6).
-
-[![Q for iOS screencast](https://cloud.githubusercontent.com/assets/6179747/16109069/3ce3516c-33a7-11e6-8b90-507d661a3ffc.png)](https://www.youtube.com/watch?v=jkjtkH6wDys)
+By default, we provide 1 simple and elegant starter themes [Q for Android](https://www.youtube.com/watch?v=fSQVx8-rqCY)). This theme is pre-installed.
 
 [![Screencast of Q for Android](https://cloud.githubusercontent.com/assets/7415862/16109551/c05a183a-33a9-11e6-868f-bcc1c23df5da.png)](https://www.youtube.com/watch?v=fSQVx8-rqCY)
 
@@ -25,7 +23,7 @@ It's a WordPress plugin which provides:
 * An admin panel to configure your app
 * JSON web services to feed your app with WordPress content
 * A JavaScript engine to create app's themes
-* Starter themes to trigger your natural inclination to unbridled creativity
+* Starter theme to trigger your natural inclination to unbridled creativity
 
 When building mobile apps, WP-AppKit uses the [Cordova](http://cordova.apache.org/) technology for the app. It means that the app is developed with HTML, CSS and JavaScript but still can be distribued in app stores.
 

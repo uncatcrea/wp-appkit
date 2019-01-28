@@ -12,6 +12,7 @@ define( function( require, exports ) {
 			Messages = require( 'core/messages' ),
 			App = require( 'core/app' ),
 			Hooks = require( 'core/lib/hooks' ),
+			DynamicData = require( 'core/app-dynamic-data' ),
 			TemplateTags = require( 'core/theme-tpl-tags' ),
 			PhoneGap = require( 'core/phonegap/utils' );
 
@@ -720,6 +721,14 @@ define( function( require, exports ) {
 
 			}
 		}
+	};
+
+	/************************************************
+	 * Dynamic data from synchronization web service
+	 */
+	
+	themeApp.getDynamicData = function ( field ) {
+		return DynamicData.getDynamicData( field );
 	};
 
 	/************************************************

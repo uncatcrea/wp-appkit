@@ -16,6 +16,7 @@ define(function (require,exports) {
           Utils               = require('core/app-utils'),
           Hooks               = require('core/lib/hooks'),
 		  Stats               = require('core/stats'),
+          DynamicData         = require('core/app-dynamic-data'),
 		  Addons              = require('core/addons-internal'),
 		  WsToken             = require('core/lib/encryption/token'),
           DeepLink			  = require( 'core/modules/deep-link' );
@@ -865,6 +866,7 @@ define(function (require,exports) {
 						if ( data.hasOwnProperty( 'components' )
 								&& data.hasOwnProperty( 'navigation' )
 								&& data.hasOwnProperty( 'globals' )
+                                && data.hasOwnProperty( 'dynamic_data' )
 								) {
 
 							app.components.resetAll();
@@ -906,6 +908,8 @@ define(function (require,exports) {
 							app.comments.reset();
 
 							Stats.incrementContentLastUpdate();
+
+                            DynamicData.setDynamicDataFromWebService( data.dynamic_data );
 
 							Addons.setDynamicDataFromWebService( data.addons );
 
@@ -2079,17 +2083,22 @@ define(function (require,exports) {
 
 			Addons.initialize( function(){
 
-				if( Config.debug_mode == 'on' ) {
-					require( ['core/views/debug', 'jquery.velocity'], function( DebugView ) {
-						var debugView = new DebugView();
-						debugView.render();
-					});
-				}
+                DynamicData.initialize( function() {
 
-				// If a callback was passed, call it
-				if( undefined !== callback ) {
-					callback();
-				}
+                    if( Config.debug_mode == 'on' ) {
+                        require( ['core/views/debug', 'jquery.velocity'], function( DebugView ) {
+                            var debugView = new DebugView();
+                            debugView.render();
+                        });
+                    }
+
+                    // If a callback was passed, call it
+                    if( undefined !== callback ) {
+                        callback();
+                    }
+
+                });
+				
 			});
 
 		});
