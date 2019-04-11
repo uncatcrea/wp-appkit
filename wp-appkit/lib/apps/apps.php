@@ -1023,6 +1023,13 @@ class WpakApps {
 		return isset( $main_infos[$info] ) ? $main_infos[$info] : null;
 	}
 
+	public static function get_app_version( $app_id ) {
+		$app_main_infos = self::get_app_main_infos( $app_id );
+		$app_platform = $app_main_infos['platform'];
+		$app_version = self::sanitize_app_version( $app_platform === 'pwa' ? $app_main_infos['pwa_version'] : $app_main_infos['version'] );
+		return $app_version;
+	}
+
 	public static function get_app_is_secured( $post_id ) {
 		return apply_filters( 'wpak_app_secured', true );
 	}

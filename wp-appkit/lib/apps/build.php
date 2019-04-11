@@ -353,7 +353,8 @@ class WpakBuild {
 	}
 
 	private static function get_export_file_base_name( $app_id, $export_type ) {
-		return $export_type .'-export-' . WpakApps::get_app_slug( $app_id );
+		$app_version = WpakApps::get_app_info( $app_id, 'version' );
+		return $export_type .'-export-' . WpakApps::get_app_slug( $app_id ) . ( !empty( $app_version ) ? '-'. $app_version : '');
 	}
 
 	private static function create_export_directory_if_doesnt_exist() {
