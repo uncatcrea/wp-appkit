@@ -660,7 +660,7 @@ class WpakApps {
 					</div>
 				<?php endif; ?>
 			</fieldset>
-			
+
 			<fieldset>
 				<legend><?php _e( 'Version', WpAppKit::i18n_domain ); ?></legend>
 				<div class="field-group">
@@ -923,13 +923,28 @@ class WpakApps {
 
 	public static function get_app_main_infos( $post_id ) {
 		$platform = get_post_meta( $post_id, '_wpak_app_platform', true );
+
+		/**
+		 * Filter wpak_app_platform_attributes
+		 * Use this filter to set some platform attributes to the app (eg "resource-file" attribute).
+		 * By default, platform attributes are empty.
+		 */
+		$platform_attributes = apply_filters( 'wpak_app_platform_attributes', '', $post_id );
+
 		$title = get_post_meta( $post_id, '_wpak_app_title', true ); //handled in WpakThemesBoSettings
 		$app_phonegap_id = get_post_meta( $post_id, '_wpak_app_phonegap_id', true );
 		$name = get_post_meta( $post_id, '_wpak_app_name', true );
 		$desc = get_post_meta( $post_id, '_wpak_app_desc', true );
 		$version = get_post_meta( $post_id, '_wpak_app_version', true );
 		$version_code = get_post_meta( $post_id, '_wpak_app_version_code', true );
+
 		$phonegap_version = get_post_meta( $post_id, '_wpak_app_phonegap_version', true );
+		/**
+		 * Filter wpak_app_platform_attributes
+		 * Use this filter to set some platform attributes to the app (eg "resource-file" attribute)
+		 */
+		$phonegap_version = apply_filters( 'wpak_app_phonegap_version', $phonegap_version, $post_id );
+
 		$author = get_post_meta( $post_id, '_wpak_app_author', true );
 		$author_website = get_post_meta( $post_id, '_wpak_app_author_website', true );
 		$author_email = get_post_meta( $post_id, '_wpak_app_author_email', true );
@@ -983,6 +998,7 @@ class WpakApps {
 			'build_tool' => $build_tool,
 			'phonegap_version' => $phonegap_version,
 			'platform' => !empty( $platform ) ? $platform : '',
+			'platform_attributes' => !empty( $platform_attributes ) ? $platform_attributes : '',
 			'author' => $author,
 			'author_website' => $author_website,
 			'author_email' => $author_email,
@@ -1048,7 +1064,7 @@ class WpakApps {
 	public static function is_crosswalk_activated( $app_id ) {
 		/**
 		 * Crosswalk is deactivated by default as of WP-AppKit version 1.5.2.
-		 * Use this 'wpak_crosswalk_activated' filter to reactivate it: 
+		 * Use this 'wpak_crosswalk_activated' filter to reactivate it:
 		 * Usage example: add_filter( 'wpak_crosswalk_activated', '__return_true' );
 		 */
 		return apply_filters( 'wpak_crosswalk_activated', false, $app_id );

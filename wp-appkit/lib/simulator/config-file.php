@@ -84,7 +84,7 @@ class WpakConfigFile {
 
 		$app_platform = $app_main_infos['platform'];
 		$app_platform = empty( $app_platform ) ? 'all' : $app_platform;
-        
+
         $pwa_path = !empty( $app_main_infos['pwa_path'] ) ? trailingslashit( $app_main_infos['pwa_path'] ) : '';
         $pwa_path = WpakBuild::add_subdir_prefix( $pwa_path );
         $app_path = $app_platform === 'pwa' ? '/'. trailingslashit( ltrim( $pwa_path, '/' ) ) : '';
@@ -356,7 +356,7 @@ define( function ( require ) {
 			if ( $export_type === 'pwa' ) {
 				$platforms = array( 'pwa' );
 			}
-			
+
 			$icons_splashscreens_dir = self::get_icons_splashscreens_dir( $app_id, $app_platform, $export_type );
 
 			foreach( $platforms as $platform ) {
@@ -449,12 +449,12 @@ define( function ( require ) {
 		$default_target_sdk_version = 26;
 
 		/**
-		 * 'wpak_config_xml_target_sdk_version' filter. 
-		 * Allows to set the "android-targetSdkVersion" preference. 
+		 * 'wpak_config_xml_target_sdk_version' filter.
+		 * Allows to set the "android-targetSdkVersion" preference.
 		 * Return an empty value to avoid forcing any targetSdkVersion value.
 		 * (This filters only applies to non PWA exports).
-		 * 
-		 * @param int 		Value of android-targetSdkVersion preference.   
+		 *
+		 * @param int 		Value of android-targetSdkVersion preference.
 		 * @param int       $app_id         Application ID.
 	 	 * @param string    $app_platform   App platform (see WpakApps::get_platforms to get the list).
 	 	 * @param string    $export_type    Export type.
@@ -464,10 +464,10 @@ define( function ( require ) {
 
 	protected static function get_custom_preferences( $app_id, $app_platform, $export_type ) {
 		/**
-		 * 'wpak_config_xml_custom_preferences' filter. 
+		 * 'wpak_config_xml_custom_preferences' filter.
 		 * Allows to add custom preferences to config.xml file.
 		 * (This filters only applies to non PWA exports).
-		 * 
+		 *
 		 * @param array     custom preferences to add: array of [ 'name' => 'preferenceName', 'value' => 'preferenceValue' ]
 		 * @param int       $app_id         Application ID.
 	 	 * @param string    $app_platform   App platform (see WpakApps::get_platforms to get the list).
@@ -491,6 +491,7 @@ define( function ( require ) {
 		$app_author_email = $app_main_infos['author_email'];
 		$app_author_website = $app_main_infos['author_website'];
 		$app_platform = $app_main_infos['platform'];
+		$app_platform_attributes = $app_main_infos['platform_attributes'];
 		$app_icons_splashscreens = self::get_icons_and_splashscreens_xml( $app_id, $app_platform, $export_type );
 
 		$whitelist_settings = self::get_whitelist_settings( $app_id, $app_platform, $export_type );
@@ -527,8 +528,14 @@ define( function ( require ) {
 
 	<author href="<?php echo esc_url( $app_author_website ) ?>" email="<?php echo esc_attr( $app_author_email ) ?>"><?php echo ent2ncr( htmlentities( $app_author, ENT_QUOTES, 'UTF-8', false ) ); ?></author>
 
-	<gap:platform name="<?php echo esc_attr( $app_platform ); ?>" />
-	
+<?php if( !empty( $app_platform_attributes ) ): ?>
+	<platform name="<?php echo esc_attr( $app_platform ); ?>">
+	    <?php echo $app_platform_attributes; ?>
+	</platform>
+<?php else: ?>
+	<platform name="<?php echo esc_attr( $app_platform ); ?>" />
+<?php endif; ?>
+
 	<!-- General preferences -->
 <?php if( !empty( $target_sdk_version ) && $app_platform == 'android' ): ?>
 	<preference name="android-targetSdkVersion" value="<?php echo esc_attr( $target_sdk_version ); ?>" />
