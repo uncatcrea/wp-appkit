@@ -660,7 +660,7 @@ class WpakApps {
 					</div>
 				<?php endif; ?>
 			</fieldset>
-			
+
 			<fieldset>
 				<legend><?php _e( 'Version', WpAppKit::i18n_domain ); ?></legend>
 				<div class="field-group">
@@ -1048,7 +1048,7 @@ class WpakApps {
 	public static function is_crosswalk_activated( $app_id ) {
 		/**
 		 * Crosswalk is deactivated by default as of WP-AppKit version 1.5.2.
-		 * Use this 'wpak_crosswalk_activated' filter to reactivate it: 
+		 * Use this 'wpak_crosswalk_activated' filter to reactivate it:
 		 * Usage example: add_filter( 'wpak_crosswalk_activated', '__return_true' );
 		 */
 		return apply_filters( 'wpak_crosswalk_activated', false, $app_id );
