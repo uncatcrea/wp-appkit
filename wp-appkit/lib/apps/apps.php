@@ -1115,7 +1115,7 @@ class WpakApps {
 		// Activate Deep Linking if a Custom URL Scheme is present
 		if( !empty( $app_main_infos['url_scheme'] ) ) {
 			$default_plugins['cordova-plugin-customurlscheme'] = array(
-				'spec' => '4.2.0',
+				'spec' => '4.4.0',
 				'params' => array(
 					array(
 						'name' => 'URL_SCHEME',
