@@ -1109,7 +1109,7 @@ class WpakApps {
 			//https://github.com/MBuchalik/cordova-build-architecture
 			//This is to allow to choose between ARM/x86 compilation, as both ARM and x86 APK are needed to release apps on PlayStore.
 			//See https://github.com/uncatcrea/wp-appkit/issues/275 and https://github.com/uncatcrea/wp-appkit/issues/322
-			$default_plugins['cordova-build-architecture'] = array( 'spec' => 'https://github.com/MBuchalik/cordova-build-architecture.git#v1.0.1', 'source' => 'git' );
+			$default_plugins['cordova-build-architecture'] = array( 'spec' => 'https://github.com/MBuchalik/cordova-build-architecture.git#v1.0.4', 'source' => 'git' );
 		}
 
 		// Activate Deep Linking if a Custom URL Scheme is present
