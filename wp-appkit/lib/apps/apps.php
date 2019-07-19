@@ -923,13 +923,28 @@ class WpakApps {
 
 	public static function get_app_main_infos( $post_id ) {
 		$platform = get_post_meta( $post_id, '_wpak_app_platform', true );
+
+		/**
+		 * Filter wpak_app_platform_attributes
+		 * Use this filter to set some platform attributes to the app (eg "resource-file" attribute).
+		 * By default, platform attributes are empty.
+		 */
+		$platform_attributes = apply_filters( 'wpak_app_platform_attributes', '', $post_id );
+
 		$title = get_post_meta( $post_id, '_wpak_app_title', true ); //handled in WpakThemesBoSettings
 		$app_phonegap_id = get_post_meta( $post_id, '_wpak_app_phonegap_id', true );
 		$name = get_post_meta( $post_id, '_wpak_app_name', true );
 		$desc = get_post_meta( $post_id, '_wpak_app_desc', true );
 		$version = get_post_meta( $post_id, '_wpak_app_version', true );
 		$version_code = get_post_meta( $post_id, '_wpak_app_version_code', true );
+
 		$phonegap_version = get_post_meta( $post_id, '_wpak_app_phonegap_version', true );
+		/**
+		 * Filter wpak_app_platform_attributes
+		 * Use this filter to set some platform attributes to the app (eg "resource-file" attribute)
+		 */
+		$phonegap_version = apply_filters( 'wpak_app_phonegap_version', $phonegap_version, $post_id );
+
 		$author = get_post_meta( $post_id, '_wpak_app_author', true );
 		$author_website = get_post_meta( $post_id, '_wpak_app_author_website', true );
 		$author_email = get_post_meta( $post_id, '_wpak_app_author_email', true );
@@ -983,6 +998,7 @@ class WpakApps {
 			'build_tool' => $build_tool,
 			'phonegap_version' => $phonegap_version,
 			'platform' => !empty( $platform ) ? $platform : '',
+			'platform_attributes' => !empty( $platform_attributes ) ? $platform_attributes : '',
 			'author' => $author,
 			'author_website' => $author_website,
 			'author_email' => $author_email,
@@ -1005,6 +1021,13 @@ class WpakApps {
 	public static function get_app_info( $post_id, $info ) {
 		$main_infos = self::get_app_main_infos( $post_id );
 		return isset( $main_infos[$info] ) ? $main_infos[$info] : null;
+	}
+
+	public static function get_app_version( $app_id ) {
+		$app_main_infos = self::get_app_main_infos( $app_id );
+		$app_platform = $app_main_infos['platform'];
+		$app_version = self::sanitize_app_version( $app_platform === 'pwa' ? $app_main_infos['pwa_version'] : $app_main_infos['version'] );
+		return $app_version;
 	}
 
 	public static function get_app_is_secured( $post_id ) {
@@ -1086,13 +1109,13 @@ class WpakApps {
 			//https://github.com/MBuchalik/cordova-build-architecture
 			//This is to allow to choose between ARM/x86 compilation, as both ARM and x86 APK are needed to release apps on PlayStore.
 			//See https://github.com/uncatcrea/wp-appkit/issues/275 and https://github.com/uncatcrea/wp-appkit/issues/322
-			$default_plugins['cordova-build-architecture'] = array( 'spec' => 'https://github.com/MBuchalik/cordova-build-architecture.git#v1.0.1', 'source' => 'git' );
+			$default_plugins['cordova-build-architecture'] = array( 'spec' => 'https://github.com/MBuchalik/cordova-build-architecture.git#v1.0.4', 'source' => 'git' );
 		}
 
 		// Activate Deep Linking if a Custom URL Scheme is present
 		if( !empty( $app_main_infos['url_scheme'] ) ) {
 			$default_plugins['cordova-plugin-customurlscheme'] = array(
-				'spec' => '4.2.0',
+				'spec' => '4.4.0',
 				'params' => array(
 					array(
 						'name' => 'URL_SCHEME',
