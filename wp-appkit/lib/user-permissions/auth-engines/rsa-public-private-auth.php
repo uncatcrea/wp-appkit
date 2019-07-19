@@ -51,6 +51,8 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 					<?php _e( 'Copy here an OpenSSL RSA Encryption Key to secure logins from your app.', WpAppKit::i18n_domain ) ?>
 					<br>
 					<?php _e( 'See our user authentication tutorial here:', WpAppKit::i18n_domain ) ?> <a href="https://uncategorized-creations.com/2323/wordpress-user-authentication-in-wp-appkit/">https://uncategorized-creations.com/2323/wordpress-user-authentication-in-wp-appkit/</a>
+					<br>
+					<?php _e( 'And our user authentication demo theme here:', WpAppKit::i18n_domain ) ?> <a href="https://github.com/mleroi/q-android/tree/feat-authentication">https://github.com/mleroi/q-android/tree/feat-authentication</a>
 				</p>
 			</div>
 			<?php
@@ -99,7 +101,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 							<table style="width:100%">
 							<?php foreach( $connections as $device_id => $connection ): ?>
 								<tr>
-									<td style="width:33%"><?php echo $device_id ?></td>
+									<td style="width:33%"><?php echo $device_id !== 0 ? $device_id : __( 'Unknown (old app version)', WpAppKit::i18n_domain ) ?></td>
 									<td style="width:33%"><?php echo get_date_from_gmt( date( 'Y-m-d H:i:s', $connection['login_time'] ) ) ?></td>
 									<td style="width:33%"><?php echo get_date_from_gmt( date( 'Y-m-d H:i:s', $connection['last_access_time'] ) ) ?></td>
 								</tr>
@@ -133,7 +135,15 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		//$current_connections_raw
 		if ( !empty( $current_connections_raw ) ) {
 			foreach( $current_connections_raw as $current_connection ) {
-				$current_connections[$current_connection['user_id']] = unserialize($current_connection['meta_value']);
+				$user_auth_data = unserialize($current_connection['meta_value']);
+				if( !empty( $user_auth_data['key'] ) ) {
+					$user_auth_data = ['legacy' => [
+						'key' => $user_auth_data['key'],
+						'login_time' => $user_auth_data['time'],
+						'last_access_time' => $user_auth_data['time'],
+					]];
+				}
+				$current_connections[$current_connection['user_id']] = $user_auth_data;
 			}
 		}
 		return $current_connections;
@@ -530,6 +540,21 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 
 							$device_id = !empty( $auth_data['device_id'] ) ? $auth_data['device_id'] : 0;
 
+							//For legacy: if the user was connected to server with old meta format:
+							$user_meta = '_wpak_auth_'. $app_id;
+							$user_auth_data = get_user_meta( $user_wp->ID, $user_meta, true );
+							if ( !empty( $user_auth_data ) && is_array( $user_auth_data )
+								 && !empty( $user_auth_data['key'] ) && !empty( $user_auth_data['time'] ) ) {
+								//Replace old format by new one:
+								$user_auth_data = [
+									'key' => $user_auth_data['key'],
+									'login_time' => $user_auth_data['time'],
+									'last_access_time' => $user_auth_data['time'],
+								];
+								$user_auth_data = [$device_id => $user_auth_data];
+								update_user_meta( $user_wp->ID, $user_meta, $user_auth_data );
+							}
+
 							$control_key = $this->get_user_secret( $user_wp->ID, $device_id, $app_id ); //If the user is authenticated, he has a secret key
 
 							$control = $auth_data['control'];
@@ -664,13 +689,12 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		$allow_multiple_login = apply_filters( 'wpak_auth_allow_multiple_login', true, $user_id, $app_id );
 
 		if ( $allow_multiple_login && !empty( $user_auth_data ) && is_array( $user_auth_data ) ) {
-			//Check that array data is correct (for legacy)
-			$first = reset( $user_auth_data );
-			if ( !empty( $first['key'] ) ) {
+			if ( !empty( $user_auth_data['key'] ) ) {
+				//Legacy
+				$user_auth_data = [$device_id => $auth_data];
+			} else {
 				//Register user connection for the given device id:
 				$user_auth_data[$device_id] = $auth_data;
-			} else {
-				$user_auth_data = [$device_id => $auth_data];
 			}
 		} else {
 			$user_auth_data = [$device_id => $auth_data];
@@ -725,9 +749,8 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		$user_auth_data = get_user_meta( $user_id, $user_meta, true );
 		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) ) {
 
-			//Check that array data is correct (for legacy)
-			$first = reset( $user_auth_data );
-			if ( empty( $first['key'] ) ) {
+			//For legacy:
+			if ( !empty( $user_auth_data['key'] ) ) {
 				return;
 			}
 
@@ -784,7 +807,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		/**
 		* Filter 'wpak_auth_connection_expiration_time' :
 		* use this to set the user connection expiration time.
-		* Defaults is 3 days. Set -1 for no connection expiration.
+		* Default is 3 days. Set -1 for no connection expiration.
 		*
 		* @param $expiration_time     int    Connection duration (in seconds). Defaults to 3 days. Return -1 for no expiration.
 		* @param $user_id             int    User ID
@@ -812,6 +835,15 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 
 		$user_auth_data = get_user_meta( $user_id, $user_meta, true );
 		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) ) {
+
+			//For legacy
+			if ( !empty( $user_auth_data['key'] ) && !empty( $user_auth_data['time'] ) ) {
+				$user_auth_data = [[
+					'key' => $user_auth_data['key'],
+					'login_time' => $user_auth_data['time'],
+					'last_access_time' => $user_auth_data['time'],
+				]];
+			}
 
 			$last_login_time = 0;
 			$last_access_time = 0;
