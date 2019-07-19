@@ -446,7 +446,7 @@ define( function ( require ) {
 
 	protected static function get_target_sdk_version( $app_id, $app_platform, $export_type ) {
 
-		$default_target_sdk_version = 26;
+		$default_target_sdk_version = 28;
 
 		/**
 		 * 'wpak_config_xml_target_sdk_version' filter.
