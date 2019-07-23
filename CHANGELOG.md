@@ -1,3 +1,17 @@
+
+## 1.5.4 (2019-07-23)
+
+### Features
+- Allow multiple user login from multiple devices. Information about currently logged in users. ([#378](https://github.com/uncatcrea/wp-appkit/issues/378), [@mleroi](https://github.com/mleroi))
+- Add version to export file name ([@mleroi](https://github.com/mleroi))
+- Allow platform attributes and phonegap version hook ([@mleroi](https://github.com/mleroi))
+- Allow addons and plugins to add custom files to app export ([@mleroi](https://github.com/mleroi))
+
+### Upgrades
+- Upgrade android-targetSdkVersion to 28 ([@HammyHavoc](https://github.com/HammyHavoc))
+- Upgrade cordova-plugin-customurlscheme to v4.4.0 ([@mleroi](https://github.com/mleroi))
+- Upgrade cordova-build-architecture to v1.0.4 ([@mleroi](https://github.com/mleroi))
+
 ## 1.5.3 (2019-01-21)
 
 ### Features
