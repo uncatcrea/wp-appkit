@@ -5,8 +5,8 @@ WP-AppKit is an open source WordPress plugin to **build PWA and mobile applicati
 
 ## Latest News
 
-### 01/28/2019 ###
-* New version of Q for Android theme (offline favorites support)
+### 07/23/2019 ###
+* Version 1.5.4 - WP-AppKit authentication feature now supports user login from multiple devices at the same time. Also allows to list and have information about currently logged in users.
 
 ## Getting Started
 Creating apps with WP-AppKit means creating JavaScript based app themes. (More on that [here](https://github.com/uncatcrea/wp-appkit/blob/master/README.md#app-themes)).

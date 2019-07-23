@@ -353,7 +353,8 @@ class WpakBuild {
 	}
 
 	private static function get_export_file_base_name( $app_id, $export_type ) {
-		return $export_type .'-export-' . WpakApps::get_app_slug( $app_id );
+		$app_version = WpakApps::get_app_info( $app_id, 'version' );
+		return $export_type .'-export-' . WpakApps::get_app_slug( $app_id ) . ( !empty( $app_version ) ? '-'. $app_version : '');
 	}
 
 	private static function create_export_directory_if_doesnt_exist() {
@@ -685,6 +686,29 @@ class WpakBuild {
 			$zip->addFromString( $config_js_file, $config_js_file_content );
 			$webapp_files[] = $config_js_file;
 
+			//Allow addons or plugins to add custom files to export:
+			/**
+	         * Use this "wpak_export_custom_files" filter to add custom files to the app export
+	         *
+	         * @param array 		$custom_files       Array of custom files to add. Each file must be an array: [string 'name', string 'content', bool optionnal 'add-to-webapp']
+	         * @param string        $export_type        current export type
+	         * @param integer       $app_id             current app id
+	         */
+			$custom_files = apply_filters( 'wpak_export_custom_files', [], $export_type, $app_id );
+			foreach( $custom_files as $custom_file ) {
+				$file = $source_root . $custom_file['name'];
+				$file_content = $custom_file['content'];
+	            $minify_file = self::is_file_to_minify( $file, $export_type, $app_id );
+	            if ( $minify_file ) {
+	            	$file_extension = pathinfo( $file, PATHINFO_EXTENSION );
+	                $file_content = $minifier->minify( $file_extension, $file_content );
+	            }
+				$zip->addFromString( $file, $file_content );
+				if ( !empty( $custom_file['add-to-webapp'] ) ) {
+					$webapp_files[] = $file;
+				}
+			}
+
 			if ( !in_array( $export_type, array( 'webapp', 'webapp-appcache', 'pwa' ) ) ) {
 				//Create config.xml file (stays at zip root) :
 				$zip->addFromString( 'config.xml', WpakConfigFile::get_config_xml( $app_id, false, $export_type ) );
@@ -737,7 +761,7 @@ class WpakBuild {
         $file_extension = pathinfo( $file, PATHINFO_EXTENSION );
 
         //By default, minify all js and css files that are not already minified, if we're not in debug mode:
-        $minify_file = $export_type === 'pwa' && !self::is_app_in_debug_mode( $app_id ) 
+        $minify_file = $export_type === 'pwa' && !self::is_app_in_debug_mode( $app_id )
         				&& in_array( $file_extension, array( 'js', 'css' ) ) && strpos( $file, '.min.' ) === false;
 
         /**
@@ -1026,7 +1050,7 @@ class WpakBuild {
 	            	//Set assets urls:
 	            	//repace JS calls (TemplateTags.getThemeAssetUrl()) by hardcoded theme paths:
 	            	$launch_head_content = preg_replace('/<%=\s*TemplateTags.getThemeAssetUrl\(\s*[\'"]([^\'"]+)[\'"]\s*\);?\s*%>/',
-	            										'themes/'. $current_theme .'/$1', 
+	            										'themes/'. $current_theme .'/$1',
 	            										$launch_head_content );
 
 	                $launch_content_data['head'] = $launch_head_content;
@@ -1047,11 +1071,11 @@ class WpakBuild {
     		if ( apply_filters( 'wpak_clean_head_template_if_launch_head', true, $app_id, $export_type ) ) {
 	    		//If we have a launch head content defined, it replaces default head.html template.
 	    		// > We empty head.html template to avoid loading assets twice:
-				$head_template_content = '<!-- head.html is replaced by launch-head.html to handle launch content rendering -->';    		
+				$head_template_content = '<!-- head.html is replaced by launch-head.html to handle launch content rendering -->';
 			}
     	}
 
-		$head_template_content = apply_filters( 'wpak_head_template_content', $head_template_content, $app_id, $export_type );    	
+		$head_template_content = apply_filters( 'wpak_head_template_content', $head_template_content, $app_id, $export_type );
 
     	return $head_template_content;
     }

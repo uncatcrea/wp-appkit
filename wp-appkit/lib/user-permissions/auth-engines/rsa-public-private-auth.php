@@ -49,11 +49,104 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 				<textarea name="wpak_app_private_key" id="wpak_app_private_key" style="height:23em"><?php echo esc_textarea( $auth_settings['private_key'] ) ?></textarea>
 				<p class="description">
 					<?php _e( 'Copy here an OpenSSL RSA Encryption Key to secure logins from your app.', WpAppKit::i18n_domain ) ?>
-					<?php //TODO : add a link to our soon coming tutorial about this :) ?>
+					<br>
+					<?php _e( 'See our user authentication tutorial here:', WpAppKit::i18n_domain ) ?> <a href="https://uncategorized-creations.com/2323/wordpress-user-authentication-in-wp-appkit/">https://uncategorized-creations.com/2323/wordpress-user-authentication-in-wp-appkit/</a>
+					<br>
+					<?php _e( 'And our user authentication demo theme here:', WpAppKit::i18n_domain ) ?> <a href="https://github.com/mleroi/q-android/tree/feat-authentication">https://github.com/mleroi/q-android/tree/feat-authentication</a>
 				</p>
 			</div>
 			<?php
 		}
+
+		if ( !empty( $auth_settings['private_key'] ) ) {
+			?><h4><?php _e( 'User connections', WpAppKit::i18n_domain ) ?></h4><?php
+			$current_connections = $this->get_current_connections( $post->ID );
+			?>
+			<p class="description">
+				<?php _e( "Here are the users that are currently having an active connection from their app.
+						   <br>Note that it does not necessarily mean that they are currently connected right now.
+				           It means that they last accessed the app while being connected on one of their device less than 'connection_expiration_time' ago.
+				           <br>The connection is persistent accross devices: when the user accesses the app on one device it extends its connection validity on the other devices he/she is connected on.
+				           <br>Users are automatically logged out from a device if they:
+				           <br>- did not access the app from the device for a time longer than 'purge_time' (customizable with 'wpak_auth_purge_time' hook).
+				           <br>- did not access the app from any of their devices for a time longer than 'connection_expiration_time' (customizable with 'wpak_auth_connection_expiration_time' hook).
+				           ", WpAppKit::i18n_domain ) ?>
+			</p>
+			<table class="wp-list-table widefat fixed">
+				<thead>
+					<tr>
+						<th style="width:25%"><?php _e( 'User', WpAppKit::i18n_domain ) ?></th>
+						<th style="width:25%"><?php _e( 'Device ID', WpAppKit::i18n_domain ) ?></th>
+						<th style="width:25%"><?php _e( 'Login time', WpAppKit::i18n_domain ) ?></th>
+						<th style="width:25%"><?php _e( 'Last access time', WpAppKit::i18n_domain ) ?></th>
+					</tr>
+				</thead>
+				<tbody>
+
+			<?php
+			if ( !empty( $current_connections ) ) {
+				$cpt=0;
+				foreach( $current_connections as $user_id => $connections ) {
+					$alternate_class = $cpt%2 ? '' : 'alternate';
+					$user = get_user_by( 'id', $user_id );
+					?>
+					<tr class="component-row <?php echo $alternate_class; ?>">
+						<td>
+							<a href="<?php echo get_edit_user_link( $user_id ) ?>"><?php echo $user->user_login; ?></a>
+							<br>
+							<?php $nb_devices = count($connections); ?>
+							<?php echo $nb_devices .' '. _n( 'active device', 'active devices', $nb_devices, WpAppKit::i18n_domain ); ?>
+						</td>
+						<td colspan="3" style="padding:0">
+							<table style="width:100%">
+							<?php foreach( $connections as $device_id => $connection ): ?>
+								<tr>
+									<td style="width:33%"><?php echo $device_id !== 0 ? $device_id : __( 'Unknown (old app version)', WpAppKit::i18n_domain ) ?></td>
+									<td style="width:33%"><?php echo get_date_from_gmt( date( 'Y-m-d H:i:s', $connection['login_time'] ) ) ?></td>
+									<td style="width:33%"><?php echo get_date_from_gmt( date( 'Y-m-d H:i:s', $connection['last_access_time'] ) ) ?></td>
+								</tr>
+							<?php endforeach; ?>
+							</table>
+						</td>
+					</tr>
+					<?php
+					$cpt++;
+				}
+			} else {
+				?>
+				<tr class="component-row alternate">
+					<td colspan="2"><?php _e( 'No active user connections for now', WpAppKit::i18n_domain ); ?></td>
+				</tr>
+				<?php
+			}
+			?>
+				</tbody>
+			</table>
+			<?php
+		}
+
+	}
+
+	protected function get_current_connections( $app_id ) {
+		global $wpdb;
+		$user_meta = '_wpak_auth_'. $app_id;
+		$current_connections = [];
+		$current_connections_raw = $wpdb->get_results( "SELECT user_id, meta_value FROM {$wpdb->prefix}usermeta WHERE meta_key = '$user_meta'", ARRAY_A );
+		//$current_connections_raw
+		if ( !empty( $current_connections_raw ) ) {
+			foreach( $current_connections_raw as $current_connection ) {
+				$user_auth_data = unserialize($current_connection['meta_value']);
+				if( !empty( $user_auth_data['key'] ) ) {
+					$user_auth_data = ['legacy' => [
+						'key' => $user_auth_data['key'],
+						'login_time' => $user_auth_data['time'],
+						'last_access_time' => $user_auth_data['time'],
+					]];
+				}
+				$current_connections[$current_connection['user_id']] = $user_auth_data;
+			}
+		}
+		return $current_connections;
 	}
 
 	protected function get_authentication_settings( $app_id ) {
@@ -137,17 +230,17 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 
 		return $decrypted;
 	}
-	
+
 	protected function get_wp_user( $user_login ) {
-		
+
 		$user_login = sanitize_user( $user_login );
-		
+
 		$user_wp = get_user_by( 'login', $user_login );
 
 		if ( !$user_wp && strpos( $user_login, '@' ) ) {
 			$user_wp = get_user_by( 'email', $user_login );
 		}
-		
+
 		return !empty( $user_wp ) ? $user_wp : false;
 	}
 
@@ -246,6 +339,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 					$control = $auth_params['control'];
 					$timestamp = $auth_params['timestamp'];
 					$encrypted = $auth_params['encrypted'];
+					$device_id = !empty( $auth_params['device_id'] ) ? $auth_params['device_id'] : 0; //Have to handle possible empty device_id for legacy
 
 					//Decrypt data to retrieve user HMAC secret key :
 					$decrypted = $this->decrypt( $app_id, $encrypted );
@@ -256,7 +350,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 
 						if ( $this->check_secret_format( $user_secret_key ) ) {
 
-							if ( $this->check_hmac( $auth_params['auth_action'] . $user . $timestamp . $encrypted, $control_key, $control )
+							if ( $this->check_hmac( $auth_params['auth_action'] . $user . $timestamp . $encrypted . (!empty( $device_id) ? $device_id : ''), $control_key, $control )
 								 && $user == $decrypted['user']
 								) {
 
@@ -276,26 +370,29 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 											if ( wp_check_password( $pass, $user_wp->data->user_pass, $user_wp->ID ) ) {
 
 												if ( $this->check_user_permissions( $user_wp->ID, $app_id ) ) {
-													
+
+													//Purge old user sessions
+													$this->clean_user_auth_data( $user_wp->ID, $app_id );
+
 													//Memorize user as registered and store its secret control key
-													$this->authenticate_user( $user_wp->ID, $user_secret_key, $app_id );
+													$this->authenticate_user( $user_wp->ID, $user_secret_key, $device_id, $app_id );
 
 													//Return authentication result to client :
 													$service_answer['authenticated'] = 1;
 
 													//Get user permissions :
 													$service_answer['permissions'] = $this->get_user_permissions( $user_wp->ID, $app_id );
-													
+
 													//Get user info :
 													$service_answer['info'] = $this->get_user_info( $user_wp->ID, $app_id );
 
 													//Add control key :
 													$service_answer['control'] = $this->generate_hmac( 'authenticated' . $user, $user_secret_key );
-													
+
 												} else {
 													$service_answer['auth_error'] = 'wrong-permissions';
 												}
-												
+
 											} else {
 												$service_answer['auth_error'] = 'wrong-pass';
 											}
@@ -340,32 +437,41 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 					 && !empty( $auth_params['control'] )
 					 && !empty( $auth_params['timestamp'] )
 					) {
-					
+
 					$user_wp = $this->get_wp_user( $auth_params['user'] );
 
 					if ( $user_wp ) {
 						if ( !empty( $auth_params['hash'] ) && !empty( $auth_params['hasher'] ) ) {
-							$result = $this->check_authenticated_action( $app_id, 'check_user_auth', $auth_params, array( $auth_params['hash'], $auth_params['hasher'] ) );
+
+							$device_id = !empty( $auth_params['device_id'] ) ? $auth_params['device_id'] : 0; //Have to handle possible empty device_id for legacy
+
+							$to_check = array( $auth_params['hash'], $auth_params['hasher'] );
+
+							if ( !empty( $device_id ) ) {
+								$to_check[] = $device_id;
+							}
+
+							$result = $this->check_authenticated_action( $app_id, 'check_user_auth', $auth_params, $to_check );
 							if ( $result['ok'] ) {
 								//Means that the user is authenticated ok on server side, with secret ok.
 								//Now, check that the public key has not changed :
 								$app_public_key = $this->get_app_public_key( $app_id );
 								$hash = $this->generate_hmac( $app_public_key, $auth_params['hasher'] );
 								if ( $auth_params['hash'] === $hash ) {
-									
+
 									//Check if user permissions have not changed:
 									if ( $this->check_user_permissions( $user_wp->ID, $app_id ) ) {
-										
+
 										$service_answer['user_auth_ok'] = 1;
 
 										//Re-send updated user permissions and info so that it can be checked on app side:
 										$service_answer['permissions'] = $this->get_user_permissions( $user_wp->ID, $app_id );
 										$service_answer['info'] = $this->get_user_info( $user_wp->ID, $app_id );
-								
+
 									} else {
 										$service_answer['auth_error'] = 'wrong-permissions';
 									}
-									
+
 								} else {
 									$service_answer['auth_error'] = 'wrong-public-key';
 								}
@@ -418,18 +524,38 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 			//Check user exists
 			$user = $auth_data['user'];
 			$user_wp = $this->get_wp_user( $user );
-			
+
 			if ( $user_wp ) {
 
 				//Check the user is not banned :
 				if ( $this->check_user_is_allowed_to_authenticate( $user_wp->ID, $app_id ) ) {
+
+					//Purge old user sessions
+					$this->clean_user_auth_data( $user_wp->ID, $app_id );
 
 					//Check if the user is authenticated for the given app :
 					if ( $this->user_is_authenticated( $user_wp->ID, $app_id ) ) {
 
 						if ( !empty( $auth_data['control'] ) && !empty( $auth_data['timestamp'] ) ) {
 
-							$control_key = $this->get_user_secret( $user_wp->ID, $app_id ); //If the user is authenticated, he has a secret key
+							$device_id = !empty( $auth_data['device_id'] ) ? $auth_data['device_id'] : 0;
+
+							//For legacy: if the user was connected to server with old meta format:
+							$user_meta = '_wpak_auth_'. $app_id;
+							$user_auth_data = get_user_meta( $user_wp->ID, $user_meta, true );
+							if ( !empty( $user_auth_data ) && is_array( $user_auth_data )
+								 && !empty( $user_auth_data['key'] ) && !empty( $user_auth_data['time'] ) ) {
+								//Replace old format by new one:
+								$user_auth_data = [
+									'key' => $user_auth_data['key'],
+									'login_time' => $user_auth_data['time'],
+									'last_access_time' => $user_auth_data['time'],
+								];
+								$user_auth_data = [$device_id => $user_auth_data];
+								update_user_meta( $user_wp->ID, $user_meta, $user_auth_data );
+							}
+
+							$control_key = $this->get_user_secret( $user_wp->ID, $device_id, $app_id ); //If the user is authenticated, he has a secret key
 
 							$control = $auth_data['control'];
 
@@ -444,7 +570,6 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 								}
 							}
 
-							//Check control data :
 							if ( $this->check_hmac( $action . $user . $timestamp . $control_string, $control_key, $control ) ) {
 
 								if ( $this->check_query_time( $timestamp ) ) {
@@ -452,10 +577,13 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 									$result['ok'] = true;
 									$result['user'] = $user;
 
+									$this->update_user_access_time( $user_wp->ID, $device_id, $app_id );
+
 								} else {
 									//If not in debug mode, don't give error details for security concern :
 									$result['auth_error'] = $debug_mode ? 'wrong-query-time' : 'auth-error'; //Don't give more details for security concern
 								}
+
 							} else {
 								//If not in debug mode, don't give error details for security concern :
 								$result['auth_error'] = $debug_mode ? 'wrong-hmac' : 'auth-error'; //Don't give more details for security concern
@@ -540,19 +668,36 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	 * Stores locally (user meta) that the user is authenticated to access
 	 * the given app.
 	 */
-	protected function authenticate_user( $user_id, $user_secret_key, $app_id ) {
+	protected function authenticate_user( $user_id, $user_secret_key, $device_id, $app_id ) {
 
 		$user_meta = '_wpak_auth_'. $app_id;
 
+		//For legacy:
+		if ( empty( $device_id ) ) {
+			$device_id = 0;
+		}
+
 		$user_auth_data = get_user_meta( $user_id, $user_meta, true );
-		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) && array_key_exists( 'key', $user_auth_data ) ) {
-			$user_auth_data['key'] = $user_secret_key;
-			$user_auth_data['time'] = time();
+
+		$time = time();
+		$auth_data = [
+			'key' => $user_secret_key,
+			'login_time' => $time,
+			'last_access_time' => $time,
+		];
+
+		$allow_multiple_login = apply_filters( 'wpak_auth_allow_multiple_login', true, $user_id, $app_id );
+
+		if ( $allow_multiple_login && !empty( $user_auth_data ) && is_array( $user_auth_data ) ) {
+			if ( !empty( $user_auth_data['key'] ) ) {
+				//Legacy
+				$user_auth_data = [$device_id => $auth_data];
+			} else {
+				//Register user connection for the given device id:
+				$user_auth_data[$device_id] = $auth_data;
+			}
 		} else {
-			$user_auth_data = array(
-				'key' => $user_secret_key,
-				'time' => time()
-			);
+			$user_auth_data = [$device_id => $auth_data];
 		}
 
 		update_user_meta( $user_id, $user_meta, $user_auth_data );
@@ -569,14 +714,106 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	/**
 	 * Retrieves user secret key used to connect to the given app
 	 */
-	protected function get_user_secret( $user_id, $app_id ) {
+	protected function get_user_secret( $user_id, $user_device_id, $app_id ) {
 		$user_secret = '';
 		$user_meta = '_wpak_auth_'. $app_id;
 		$user_auth_data = get_user_meta( $user_id, $user_meta, true );
-		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) && !empty( $user_auth_data['key'] ) ) {
-			$user_secret = $user_auth_data['key'];
+		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) && !empty( $user_auth_data[$user_device_id]['key'] ) ) {
+			$user_secret = $user_auth_data[$user_device_id]['key'];
 		}
 		return $user_secret;
+	}
+
+	/**
+	 * Updates user's last access time for the given secret key
+	 */
+	protected function update_user_access_time( $user_id, $device_id, $app_id ) {
+		$user_meta = '_wpak_auth_'. $app_id;
+		$user_auth_data = get_user_meta( $user_id, $user_meta, true );
+		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) && !empty( $user_auth_data[$device_id]['key'] ) ) {
+			$user_auth_data[$device_id]['last_access_time'] = time();
+			update_user_meta( $user_id, $user_meta, $user_auth_data );
+		}
+	}
+
+	/**
+	 * Removes expired devices from given auth_data
+	 *
+	 * Note: a device can have a "last_access_time" > "connection_expiration_time" but its connection is still
+	 * valid if at least one other device from the same user accessed the app less than "connection_expiration_time" ago (see get_user_connection_validity()).
+	 * Here we remove the devices that have not accessed the app longer than "purge_time" ago, so that unused devices are removed from the list.
+	 * We also remove all the user devices if none has access the app for a time longer than "expiration_time".
+	 */
+	protected function clean_user_auth_data( $user_id, $app_id ) {
+		$user_meta = '_wpak_auth_'. $app_id;
+		$user_auth_data = get_user_meta( $user_id, $user_meta, true );
+		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) ) {
+
+			//For legacy:
+			if ( !empty( $user_auth_data['key'] ) ) {
+				return;
+			}
+
+			$purge_time = apply_filters( 'wpak_auth_purge_time', 30*24*3600, $user_id, $app_id ); //1 month by default
+
+			$expiration_type = $this->get_expiration_type( $user_id, $app_id );
+			$expiration_time = $this->get_expiration_time( $user_id, $app_id );
+
+			$time = time();
+			$changed = false;
+			$all_expired = true;
+			foreach( $user_auth_data as $device_id => $auth_data ) {
+				//Purge devices that did not access the app more than "purge_time" ago
+				if ( $time - $auth_data['last_access_time'] > $purge_time ) {
+					unset( $user_auth_data[$device_id] );
+					$changed = true;
+				}
+				if ( $time - $auth_data[$expiration_type] < $expiration_time ) {
+					unset( $user_auth_data[$device_id] );
+					$all_expired = false;
+				}
+			}
+
+			if ( $all_expired ) {
+				$user_auth_data = [];
+				$changed = true;
+			}
+
+			if ( $changed ) {
+				update_user_meta( $user_id, $user_meta, $user_auth_data );
+			}
+		}
+	}
+
+	protected function get_expiration_type( $user_id, $app_id ) {
+		/**
+		* Filter 'wpak_auth_connection_expiration_type' :
+		* use this to choose the type of connection expiration: login_time or last_access_time
+		* Defaults is 'last_access_time'.
+		* 'login_time': connection expires when last user login happened more than $expiration_time ago
+		* 'last_access_time': connection expires when last user authenticated access happened more than $expiration_time ago
+		*
+		* @param $expiration_type     int    Expiration type
+		* @param $user_id             int    User ID
+		* @param $app_id              int    Application ID
+		*/
+		return apply_filters( 'wpak_auth_connection_expiration_type', 'last_access_time', $user_id, $app_id );
+	}
+
+	protected function get_expiration_time( $user_id, $app_id ) {
+
+		$default_connection_expiration_time = 3600*24*3; //3 days
+
+		/**
+		* Filter 'wpak_auth_connection_expiration_time' :
+		* use this to set the user connection expiration time.
+		* Default is 3 days. Set -1 for no connection expiration.
+		*
+		* @param $expiration_time     int    Connection duration (in seconds). Defaults to 3 days. Return -1 for no expiration.
+		* @param $user_id             int    User ID
+		* @param $app_id              int    Application ID
+		*/
+		return apply_filters( 'wpak_auth_connection_expiration_time', $default_connection_expiration_time, $user_id, $app_id );
 	}
 
 	/**
@@ -597,25 +834,46 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		$user_meta = '_wpak_auth_'. $app_id;
 
 		$user_auth_data = get_user_meta( $user_id, $user_meta, true );
-		if ( !empty( $user_auth_data ) && is_array( $user_auth_data )
-			 && !empty( $user_auth_data['key'] )
-			 &&	!empty( $user_auth_data['time'] )
-			) {
+		if ( !empty( $user_auth_data ) && is_array( $user_auth_data ) ) {
 
-			$user_secret_time = (int)$user_auth_data['time'];
+			//For legacy
+			if ( !empty( $user_auth_data['key'] ) && !empty( $user_auth_data['time'] ) ) {
+				$user_auth_data = [[
+					'key' => $user_auth_data['key'],
+					'login_time' => $user_auth_data['time'],
+					'last_access_time' => $user_auth_data['time'],
+				]];
+			}
 
-			$default_expiration_time = 3600*24*3; //3 days
+			$last_login_time = 0;
+			$last_access_time = 0;
+			foreach( $user_auth_data as $auth_data ) {
+				if ( empty( $auth_data['key'] ) || empty( $auth_data['login_time'] ) || empty( $auth_data['last_access_time'] ) ) {
+					continue;
+				}
+				$auth_data_login_time = (int)$auth_data['login_time'];
+				if ( $auth_data_login_time > $last_login_time ) {
+					$last_login_time = $auth_data_login_time;
+				}
+				$auth_data_access_time = (int)$auth_data['last_access_time'];
+				if ( $auth_data_access_time > $last_access_time ) {
+					$last_access_time = $auth_data_access_time;
+				}
+			}
 
-			/**
-			* Filter 'wpak_auth_connection_expiration_time' :
-			* use this to set the user connection expiration time.
-			* Defaults is 3 days. Set -1 for no connection expiration.
-			*
-			* @param $expiration_time     int    Connection duration (in seconds). Defaults to 3 days. Return -1 for no expiration.
-			* @param $user_id             int    User ID
-			* @param $app_id              int    Application ID
-			*/
-			$expiration_time = apply_filters( 'wpak_auth_connection_expiration_time', $default_expiration_time, $user_id, $app_id );
+			if ( empty( $last_login_time ) ) {
+				return 0; //Not connected
+			}
+
+			$expiration_type = $this->get_expiration_type( $user_id, $app_id );
+
+			if ( $expiration_type === 'login_time' ) {
+				$user_secret_time = $last_login_time;
+			} else if ( $expiration_type === 'last_access_time' ) {
+				$user_secret_time = $last_access_time;
+			}
+
+			$expiration_time = $this->get_expiration_time( $user_id, $app_id );
 
 			if ( $expiration_time === -1 ) {
 				$connection_validity = 1;
@@ -649,7 +907,7 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		/**
 		 * 'wpak_auth_user_permissions' filter: use this to add custom permissions info
 		 * (like membership levels from a membership level for example) to default WP permissions data.
-		 * 
+		 *
 		 * @param array $user_permissions WP roles and capabilities by default. Add your own custom permissions to that array.
 		 * @param int   $user_id          User's WP ID
 		 * @param int   $app_id           The app we're retrieving user's permissions for.
@@ -658,31 +916,31 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 
 		return $user_permissions;
 	}
-	
+
 	/**
 	 * Retrieves user info (login etc) to return to the app when a user logs in.
 	 */
 	protected function get_user_info( $user_id, $app_id ) {
-		
+
 		$wp_user = get_user_by( 'id', $user_id );
-		
+
 		if ( $wp_user ) {
-			
+
 			$user_info = array(
 				'login' => $wp_user->user_login
 			);
 
 			/**
 			 * 'wpak_auth_user_info' filter: use this to return custom user info to the app at login.
-			 * 
+			 *
 			 * @param array $user_info  WP user info (by default, just user's login). Add your own custom user info to that array.
 			 * @param int   $user_id    User's WP ID
 			 * @param int   $app_id     The app we're retrieving user's info for.
 			 */
 			$user_info = apply_filters( 'wpak_auth_user_info', $user_info, $user_id, $app_id );
-			
+
 		}
-		
+
 		return $user_info;
 	}
 
@@ -697,11 +955,11 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		 */
 		return apply_filters( 'wpak_auth_user_is_allowed_to_authenticate', true, $user_id, $app_id );
 	}
-	
+
 	protected function check_user_permissions( $user_id, $app_id ) {
-		
+
 		$user_permissions = $this->get_user_permissions( $user_id, $app_id );
-				
+
 		/**
 		 * Filter 'wpak_auth_user_permissions_ok' :
 		 * this filter triggers when log in is ok, to allow further tests on user's permissions

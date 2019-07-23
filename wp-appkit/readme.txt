@@ -2,8 +2,8 @@
 Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
 Tags: pwa, mobile app, android, ios, progressive web app, phonegap build
 Requires at least: 4.0
-Tested up to: 5.0.3
-Stable tag: 1.5.3
+Tested up to: 5.2.2
+Stable tag: 1.5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,6 +121,21 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 == Changelog ==
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
+
+= 1.5.4 (2019-07-23) =
+
+*Features*
+
+- Allow multiple user login from multiple devices. Information about currently logged in users.
+- Add version to export file name
+- Allow platform attributes and phonegap version hook
+- Allow addons and plugins to add custom files to app export
+
+*Upgrades*
+
+- Upgrade android-targetSdkVersion to 28
+- Upgrade cordova-plugin-customurlscheme to v4.4.0
+- Upgrade cordova-build-architecture to v1.0.4
 
 = 1.5.3 (2019-01-28) =
 
