@@ -6,37 +6,37 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		global $wpdb;
 
 		do_action( 'wpak_before_component_posts_list', $component, $options );
-		
+
 		/**
 		 * Pagination:
-		 * 2 kinds of pagination supported: 
-		 * 
+		 * 2 kinds of pagination supported:
+		 *
 		 * - "Infinite Scroll pagination": we retrieve posts before the given "before_item".
 		 *   It avoids post duplication when getting page>1 and a new post was created in the meantime.
 		 *   This is the default behaviour for the "Get More Posts" button in WP-AppKit's post lists.
-		 * 
+		 *
 		 * - "Standard pagination": corresponds to the standard use of "paged" param in WP_Query.
 		 *   To use this standard pagination for a post list component you'll have to manually set it
-		 *   on appside using the 
-		 * 
+		 *   on appside using the
+		 *
 		 * Those 2 pagination types are exclusive: you can't use both at the same time.
 		 * If a standard pagination page is provided, infinite scroll pagination is ignored.
 		 */
 		$before_post_date = ''; //"Infinite Scroll" pagination type
 		$pagination_page = 0; //Standard pagination type
 		if ( !empty( $args['pagination_page'] ) && is_numeric( $args['pagination_page'] ) ) {
-			
+
 			$pagination_page = (int)$args['pagination_page'];
-			
+
 		} else if ( !empty( $args['before_item'] ) && is_numeric( $args['before_item'] ) ) {
-			
+
 			$before_post = get_post( $args['before_item'] );
 			if ( !empty( $before_post ) ) {
 				$before_post_date = $before_post->post_date;
 			}
-			
+
 		}
-		
+
 		//WP_Query args
 		$query_args = array();
 
@@ -99,11 +99,11 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			}elseif ( !empty( $options['taxonomy'] ) ) {
 
 				if ( $options['taxonomy'] === 'wpak-none' ) {
-					
+
 					$query['type'] = 'post-type';
-					
+
 				} elseif ( !empty( $options['term'] ) ) {
-					
+
 					$query_args['tax_query'] = array(
 						array(
 							'taxonomy' => $options['taxonomy'],
@@ -115,21 +115,21 @@ class WpakComponentTypePostsList extends WpakComponentType {
 					$query['type'] = 'taxonomy';
 					$query['taxonomy'] = $options['taxonomy'];
 					$query['terms'] = is_array( $options['term'] ) ? $options['term'] : array( $options['term'] );
-					
+
 				}
-				
+
 			}
 
 			if ( !empty( $pagination_page ) ) {
-				
+
 				$query_args['paged'] = $pagination_page;
-				
+
 			} else if ( !empty( $before_post_date ) ) {
 
 				if ( is_numeric( $before_post_date ) ) { //timestamp
 					$before_post_date = date( 'Y-m-d H:i:s', $before_post_date );
 				}
-				
+
 				if ( preg_match( '/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/', $before_post_date ) ) {
 					$query['before_item'] = intval( $args['before_item'] );
 					$posts_where_callback = create_function( '$where', 'return $where .= " AND post_date < \'' . $before_post_date . '\'";' );
@@ -137,9 +137,9 @@ class WpakComponentTypePostsList extends WpakComponentType {
 				} else {
 					$before_post_date = '';
 				}
-				
+
 			}
-			
+
 			/**
 			 * Filter args used for the query made into a posts list component.
 			 *
@@ -166,14 +166,14 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		foreach ( $posts as $post ) {
 			$posts_by_ids[$post->ID] = self::get_post_data( $component, $post );
 		}
-		
+
 		//Allow to return custom meta data (like term meta):
 		$post_list_meta = array();
-		
+
 		/**
 		 * Use this 'wpak_posts_list_meta' filter to send custom meta data along with the web service answer.
 		 * Can be used to add terms meta for example.
-		 * 
+		 *
 		 * @param array             $post_list_meta     Set your meta here (default empty)
 		 * @param WpakComponent 	$component 			The component object.
 		 * @param array 			$query 				Summary data ('type', 'post_type', 'taxonomy', 'terms') about the current "post list" query.
@@ -186,20 +186,20 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		$this->set_specific( 'ids', array_keys( $posts_by_ids ) );
 		$this->set_specific( 'total', $total );
 		$this->set_specific( 'query', $query );
-		
+
 		if ( !empty( $post_list_meta ) ) {
 			$this->set_specific( 'meta', $post_list_meta );
 		}
-		
+
 		$this->set_globals( 'posts', $posts_by_ids );
 	}
-	
+
 	/**
 	 * To retrieve only items given in $items_ids
 	 */
 	protected function get_items_data( $component, $options, $items_ids, $args = array() ) {
 		$items = array( 'posts' => array() );
-		
+
 		$posts_by_ids = array();
 		foreach ( $items_ids as $post_id ) {
 			$post = get_post( $post_id );
@@ -208,22 +208,22 @@ class WpakComponentTypePostsList extends WpakComponentType {
 				$posts_by_ids[$post_id]->title = $posts_by_ids[$post_id]->title;
 			}
 		}
-		
+
 		if( $options['post-type'] == 'custom' ) {
 			$posts_by_ids = apply_filters( 'wpak_posts_list_custom_items-' . $options['hook'], $posts_by_ids, $component, $options, $items_ids, $args );
-		} 
-		
+		}
+
 		$items['posts'] = $posts_by_ids;
-		
+
 		return $items;
 	}
 
 	protected static function get_post_data( $component, $post ) {
-		
+
 		$post_data = WpakComponentsUtils::get_post_data( $post, $component );
-		
+
 		/**
-		 * Filter post content for posts list components. 
+		 * Filter post content for posts list components.
 		 * Use this to format app posts content your own way only for posts list component.
 		 *
 		 * To apply a custom content to all component types, use the "wpak_post_data_post_content" filter instead.
@@ -246,7 +246,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		 * @param WpakComponent 	$component		The component object.
 		 */
 		$post_data = apply_filters( 'wpak_posts_list_post_data', $post_data, $post, $component );
-		
+
 		return ( object ) $post_data;
 	}
 
@@ -262,30 +262,36 @@ class WpakComponentTypePostsList extends WpakComponentType {
 			);
 		} elseif ( !empty ( $component->options['post-type'] ) ) {
 			$post_type = get_post_type_object( $component->options['post-type'] );
-			$taxo_name = '';
-			$term_name = '';
-			if ( !empty( $component->options['taxonomy'] ) && $component->options['taxonomy'] !== 'wpak-none' ) {
-				$taxonomy = get_taxonomy( $component->options['taxonomy'] );
-				$term = get_term_by( 'slug', $component->options['term'], $component->options['taxonomy'] );
-				if ( !is_wp_error( $term ) ) {
-					$taxo_name = $taxonomy->labels->name;
-					$term_name = $term->name;
+			if ( empty( $post_type ) ) {
+				$options = array(
+					'post-type' => array( 'label' => __( 'Post type' ), 'value' => __( 'Not found' ) )
+				);
+			} else {
+				$taxo_name = '';
+				$term_name = '';
+				if ( !empty( $component->options['taxonomy'] ) && $component->options['taxonomy'] !== 'wpak-none' ) {
+					$taxonomy = get_taxonomy( $component->options['taxonomy'] );
+					$term = get_term_by( 'slug', $component->options['term'], $component->options['taxonomy'] );
+					if ( !is_wp_error( $term ) ) {
+						$taxo_name = $taxonomy->labels->name;
+						$term_name = $term->name;
+					}
 				}
-			}
-			$options = array(
-				'post-type' => array( 'label' => __( 'Post type' ), 'value' => $post_type->labels->name )
-			);
-			if ( !empty( $taxo_name ) ) {
-				$options['taxonomy'] = array( 'label' => __( 'Taxonomy' ), 'value' => $taxo_name );
-				$options['term'] = array( 'label' => __( 'Term' ), 'value' => $term_name );
+				$options = array(
+					'post-type' => array( 'label' => __( 'Post type' ), 'value' => $post_type->labels->name )
+				);
+				if ( !empty( $taxo_name ) ) {
+					$options['taxonomy'] = array( 'label' => __( 'Taxonomy' ), 'value' => $taxo_name );
+					$options['term'] = array( 'label' => __( 'Term' ), 'value' => $term_name );
+				}
 			}
 		}
 		return $options;
 	}
 
 	public function echo_form_fields( $component ) {
-		
-		$post_types_slugs = array_keys( get_post_types( array( 'public' => true ), 'names' ) ); 
+
+		$post_types_slugs = array_keys( get_post_types( array( 'public' => true ), 'names' ) );
 		if ( in_array( 'attachment', $post_types_slugs ) ) {
 			unset( $post_types_slugs[array_search( 'attachment', $post_types_slugs )] );
 		}
@@ -293,12 +299,12 @@ class WpakComponentTypePostsList extends WpakComponentType {
 		/**
 		 * Use this "wpak_posts_list_post_types" to customize which post types are
 		 * available in post list components.
-		 * 
+		 *
 		 * @param $post_types_slugs     array              Array of post types slugs to be filtered
 		 * @param $component            WpakComponent      Current "post list" component
 		 */
 		$post_types_slugs = apply_filters( 'wpak_posts_list_post_types', $post_types_slugs, $component );
-		
+
 		//Retrieve post types objects
 		$post_types = array();
 		foreach( $post_types_slugs as $post_type_slug ) {
@@ -307,7 +313,7 @@ class WpakComponentTypePostsList extends WpakComponentType {
 				$post_types[$post_type_slug] = $post_type_object;
 			}
 		}
-		
+
 		$has_options = !empty( $component ) && !empty( $component->options );
 
 		reset( $post_types );
