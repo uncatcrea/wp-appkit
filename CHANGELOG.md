@@ -1,4 +1,15 @@
 
+## 1.5.5 (2019-11-20)
+
+### Fixes
+- Corrupted PhoneGap build export on some installs. ([#382](https://github.com/uncatcrea/wp-appkit/issues/382), [@mleroi](https://github.com/mleroi))
+- Update jQuery in apps core: 3.2.1 to 3.4.1. ([#384](https://github.com/uncatcrea/wp-appkit/issues/384), [@mleroi](https://github.com/mleroi))
+- Notice in WP-AppKit admin interface ([#385](https://github.com/uncatcrea/wp-appkit/issues/385), [@mleroi](https://github.com/mleroi))
+- Add charset to app HTML ([@mleroi](https://github.com/mleroi))
+
+### Default themes update
+- Embed last version of [Q for Android](https://github.com/uncatcrea/q-android/releases/tag/v1.2.1) (version 1.2.1) default app theme
+
 ## 1.5.4 (2019-07-23)
 
 ### Features
