@@ -346,39 +346,39 @@ define([
     App.on( 'screen:showed', function( current_screen, view ) {
 
         var currentScreenObject = App.getCurrentScreenObject();
-        
+
         /*
          * 1. Off canvas menu
          */
-        
+
         // Close off-canvas menu
         if (isMenuOpen) {
-			$("#app-canvas").css("left","85%"); 
+			$("#app-canvas").css("left","85%");
 			closeMenu();
 		}
 
         /*
          * 2. Post list
          */
-        
+
         if ( current_screen.screen_type == "list" ) {
-            
+
             // Change app bar title (display the component label)
             // Todo: create a generic function
             if ( $('#app-header > h1').html() != current_screen.label ) {
                 $('#app-header > h1').html(current_screen.label);
             }
-            
+
             // Scroll position is handled in the preparation of the transition (transition_previous_screen)
         }
 
 		/*
          * 3. Single and page
          */
-        
+
         // Page
-        if (current_screen.screen_type=="page") {
-            
+        if (current_screen.screen_type=="page" || current_screen.screen_type=="custom-page") {
+
             // Change nav bar title
             // Todo: create a generic function
             if ( $('#app-header > h1').html() != '' ) {
@@ -595,11 +595,15 @@ define([
     function menuItemTapOn(e) {
         showRipple = true; // Show ripple effect
     }
-    
+
     function menuItemTapOff(e) {
-        
+
+        if ( $(this).hasClass('q-theme-prevent-navigation') ) {
+            return;
+        }
+
         e.preventDefault();
-        
+
 		if (isMenuOpen) {
 
 			// Select tapped item

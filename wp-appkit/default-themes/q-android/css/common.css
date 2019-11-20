@@ -86,7 +86,7 @@ a {
     left: 0px;
     bottom: 0px;
     width: 100%;
-    z-index: 10; /* Positionned above the app's menu / z-index relative to #app-layout */
+    z-index: 10; /* Positioned above the app's menu / z-index relative to #app-layout */
     overflow: hidden;
     -webkit-backface-visibility: hidden;
     box-shadow: -2px 0px 5px rgba(0,0,0,0.26);
