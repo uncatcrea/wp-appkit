@@ -2,8 +2,8 @@
 Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
 Tags: pwa, mobile app, android, ios, progressive web app, phonegap build
 Requires at least: 4.0
-Tested up to: 5.2.2
-Stable tag: 1.5.4
+Tested up to: 5.3
+Stable tag: 1.5.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,6 +121,19 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 == Changelog ==
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
+
+= 1.5.5 (2019-11-20) =
+
+*Fixes*
+
+- Corrupted PhoneGap build export on some installs
+- Update jQuery in apps core: 3.2.1 to 3.4.1
+- Notice in WP-AppKit admin interface
+- Add charset to app HTML
+
+*Default themes update*
+
+* q-android version 1.2.1 : Fix custom pages titles, external links in menu and other minor fixes
 
 = 1.5.4 (2019-07-23) =
 
