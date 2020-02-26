@@ -8,6 +8,10 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 
 	public function settings_meta_box_content( $post, $current_box ) {
 
+		//Include theme and addons php files so that authentication hooks are applied
+		WpakThemes::include_app_theme_php( $post->ID );
+		WpakAddons::require_app_addons_php_files( $post->ID );
+
 		$auth_settings = $this->get_authentication_settings( $post->ID );
 
 		$error_message = '';
