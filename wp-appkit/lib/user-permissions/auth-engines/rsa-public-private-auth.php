@@ -59,7 +59,8 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		}
 
 		if ( !empty( $auth_settings['private_key'] ) ) {
-			?><h4><?php _e( 'User connections', WpAppKit::i18n_domain ) ?></h4><?php
+			?><h4><?php _e( 'User connections', WpAppKit::i18n_domain ) ?></h4>
+			<?php
 			$current_connections = $this->get_current_connections( $post->ID );
 			?>
 			<p class="description">
@@ -79,6 +80,8 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 						<th style="width:25%"><?php _e( 'Device ID', WpAppKit::i18n_domain ) ?></th>
 						<th style="width:25%"><?php _e( 'Login time', WpAppKit::i18n_domain ) ?></th>
 						<th style="width:25%"><?php _e( 'Last access time', WpAppKit::i18n_domain ) ?></th>
+						<th style="width:25%"><?php _e( 'Validity', WpAppKit::i18n_domain ) ?></th>
+						<th style="width:25%"><?php _e( 'Expiration time', WpAppKit::i18n_domain ) ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -107,6 +110,17 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 								</tr>
 							<?php endforeach; ?>
 							</table>
+						</td>
+						<td>
+							<?php
+								$expiration_type = $this->get_expiration_type($user_id, $post->ID);
+								$validity_duration = $this->get_expiration_time($user_id, $post->ID);
+								echo human_time_diff( 0, $validity_duration ) .' ';
+								echo $expiration_type == 'last_access_time' ? __( 'from last access time', WpAppKit::i18n_domain ) : __( 'from login time', WpAppKit::i18n_domain );
+							?>
+						</td>
+						<td>
+							<?php echo get_date_from_gmt( date( 'Y-m-d H:i:s', $connection['last_access_time'] + $validity_duration ) ) ?>
 						</td>
 					</tr>
 					<?php
