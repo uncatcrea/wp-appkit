@@ -772,10 +772,14 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 				return;
 			}
 
-			$purge_time = apply_filters( 'wpak_auth_purge_time', 30*24*3600, $user_id, $app_id ); //1 month by default
-
 			$expiration_type = $this->get_expiration_type( $user_id, $app_id );
 			$expiration_time = $this->get_expiration_time( $user_id, $app_id );
+
+			//Purge time. 1 month by default :
+			$purge_time = apply_filters( 'wpak_auth_purge_time', 30*24*3600, $user_id, $app_id );
+			if ( $purge_time < $expiration_time ) {
+				$purge_time = $expiration_time; //Purge time must be >= to expiration time
+			}
 
 			$time = time();
 			$changed = false;
