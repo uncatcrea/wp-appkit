@@ -834,7 +834,7 @@ class WpakBuild {
 				$theme_color = '<meta name="theme-color" content="' . $app_main_infos['pwa_theme_color'] . '">' . "\n";
 			}
 
-			$index_content = preg_replace( '/<head>(\s*?)<link/is', "<head>$1". $app_title_html ."$1". $app_description_html ."$1". $manifest_html ."$1". $base_html ."$1". $theme_color ."$1<link", $index_content );
+			$index_content = preg_replace( '/<meta charset="([^"]*)">(\s*?)<link/is', "<meta charset=\"$1\">$2". $app_title_html ."$2". $app_description_html ."$2". $manifest_html ."$2". $base_html ."$2". $theme_color ."$2<link", $index_content );
 
 			//Remove script used only for app simulation in web browser:
 			$index_content = preg_replace( '/<script[^>]*>[^<]*var require[^<]*?(<\/script>)\s*/is', '', $index_content );
