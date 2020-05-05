@@ -117,14 +117,21 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 						</td>
 						<td>
 							<?php
-								$expiration_type = $this->get_expiration_type($user_id, $post->ID);
-								$validity_duration = $this->get_expiration_time($user_id, $post->ID);
-								echo human_time_diff( 0, $validity_duration ) .' ';
-								echo $expiration_type == 'last_access_time' ? __( 'from last access time', WpAppKit::i18n_domain ) : __( 'from login time', WpAppKit::i18n_domain );
+								$user_last_time = $this->get_user_last_time( $user_id, $post->ID );
+								if ( $user_last_time ) {
+									$expiration_type = $this->get_expiration_type($user_id, $post->ID);
+									$validity_duration = $this->get_expiration_time($user_id, $post->ID);
+									echo human_time_diff( 0, $validity_duration ) .' ';
+									echo $expiration_type == 'last_access_time' ? __( 'from last access time', WpAppKit::i18n_domain ) : __( 'from login time', WpAppKit::i18n_domain );
+								}
 							?>
 						</td>
 						<td>
-							<?php echo get_date_from_gmt( date( 'Y-m-d H:i:s', $connection['last_access_time'] + $validity_duration ) ) ?>
+							<?php
+								if ( $user_last_time ) {
+									echo get_date_from_gmt( date( 'Y-m-d H:i:s', $user_last_time + $validity_duration ) );
+								}
+							?>
 						</td>
 					</tr>
 					<?php
@@ -150,7 +157,6 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 		$user_meta = '_wpak_auth_'. $app_id;
 		$current_connections = [];
 		$current_connections_raw = $wpdb->get_results( "SELECT user_id, meta_value FROM {$wpdb->prefix}usermeta WHERE meta_key = '$user_meta'", ARRAY_A );
-		//$current_connections_raw
 		if ( !empty( $current_connections_raw ) ) {
 			foreach( $current_connections_raw as $current_connection ) {
 				$user_auth_data = unserialize($current_connection['meta_value']);
@@ -853,6 +859,31 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 	protected function get_user_connection_validity( $user_id, $app_id ) {
 		$connection_validity = 0;
 
+		$user_last_time = $this->get_user_last_time( $user_id, $app_id );
+		if ( $user_last_time ) {
+
+			$expiration_time = $this->get_expiration_time( $user_id, $app_id );
+
+			if ( $expiration_time === -1 ) {
+				$connection_validity = 1;
+			} else {
+				$connection_validity = ( ( time() - $user_last_time ) <= $expiration_time ) ? 1 : -1;
+			}
+		}
+
+		return $connection_validity;
+	}
+
+	/**
+	 * Get the given user last login or access time (according to expiration_type)
+	 *
+	 * @param int  $user_id              User id
+	 * @param int  $app_id               App id
+	 * @return int $user_last_time       Timestamp or 0 if no valid last time found
+	 */
+	protected function get_user_last_time( $user_id, $app_id ) {
+		$user_last_time = 0;
+
 		$user_meta = '_wpak_auth_'. $app_id;
 
 		$user_auth_data = get_user_meta( $user_id, $user_meta, true );
@@ -890,22 +921,14 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 			$expiration_type = $this->get_expiration_type( $user_id, $app_id );
 
 			if ( $expiration_type === 'login_time' ) {
-				$user_secret_time = $last_login_time;
+				$user_last_time = $last_login_time;
 			} else if ( $expiration_type === 'last_access_time' ) {
-				$user_secret_time = $last_access_time;
-			}
-
-			$expiration_time = $this->get_expiration_time( $user_id, $app_id );
-
-			if ( $expiration_time === -1 ) {
-				$connection_validity = 1;
-			} else {
-				$connection_validity = ( ( time() - $user_secret_time ) <= $expiration_time ) ? 1 : -1;
+				$user_last_time = $last_access_time;
 			}
 
 		}
 
-		return $connection_validity;
+		return $user_last_time;
 	}
 
 	/**
