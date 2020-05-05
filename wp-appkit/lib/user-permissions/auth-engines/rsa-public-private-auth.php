@@ -796,8 +796,8 @@ class WpakRsaPublicPrivateAuth extends WpakAuthEngine {
 					unset( $user_auth_data[$device_id] );
 					$changed = true;
 				}
+				//Check if all devices have expired
 				if ( $time - $auth_data[$expiration_type] < $expiration_time ) {
-					unset( $user_auth_data[$device_id] );
 					$all_expired = false;
 				}
 			}
