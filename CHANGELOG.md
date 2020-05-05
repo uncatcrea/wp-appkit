@@ -1,3 +1,13 @@
+## 1.5.6 (2020-05-05)
+
+### Fixes
+- Fix PWA: manifest.json not linked properly ([@mleroi](https://github.com/mleroi))
+- User authentication: fix purge time when long expiration time ([@mleroi](https://github.com/mleroi))
+- User authentication: fix old connections cleanup ([@mleroi](https://github.com/mleroi))
+- Fix PHP notice when accessing preview for private app ([@mleroi](https://github.com/mleroi))
+
+### Features
+- User authentication: add expiration time info ([@mleroi](https://github.com/mleroi))
 
 ## 1.5.5 (2019-11-20)
 

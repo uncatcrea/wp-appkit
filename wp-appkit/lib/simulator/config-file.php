@@ -37,7 +37,7 @@ class WpakConfigFile {
 					$capability = apply_filters( 'wpak_private_simulation_capability', $default_capability, $app_id );
 
 					if ( WpakApps::get_app_simulation_is_secured( $app_id ) && !current_user_can( $capability ) ) {
-						wp_nonce_ays( $action );
+						wp_nonce_ays('');
 					}
 
 					//If the app current theme has some PHP (hooks!) to be executed before

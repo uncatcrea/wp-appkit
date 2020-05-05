@@ -3,7 +3,7 @@
 Plugin Name: WP-AppKit
 Plugin URI:  https://github.com/uncatcrea/wp-appkit
 Description: Build mobile apps and PWA based on your WordPress content.
-Version:     1.5.5
+Version:     1.5.6
 Author:      Uncategorized Creations
 Author URI:  http://getwpappkit.com
 Text Domain: wp-appkit
@@ -20,7 +20,7 @@ if ( !class_exists( 'WpAppKit' ) ) {
 
 	class WpAppKit {
 
-		const resources_version = '1.5.5';
+		const resources_version = '1.5.6';
 		const i18n_domain = 'wp-appkit';
 
 		public static function hooks() {
