@@ -98,6 +98,7 @@ class WpakBuild {
 
 	public static function get_allowed_export_types() {
 		$allowed_export_types = array(
+			'cordova-template' => __( 'Cordova', WpAppKit::i18n_domain ),
 			'phonegap-build' => __( 'PhoneGap Build', WpAppKit::i18n_domain ),
 			'phonegap-cli' => __( 'PhoneGap CLI', WpAppKit::i18n_domain ),
 			'webapp' => __( 'WebApp', WpAppKit::i18n_domain ),
@@ -124,7 +125,7 @@ class WpakBuild {
 			return;
 		}
 
-		$export_type = isset( $_GET['export_type'] ) && self::is_allowed_export_type( $_GET['export_type'] ) ? $_GET['export_type'] : 'phonegap-build';
+		$export_type = isset( $_GET['export_type'] ) && self::is_allowed_export_type( $_GET['export_type'] ) ? $_GET['export_type'] : 'cordova-template';
 
 		// Re-build sources
 		$answer = self::build_app_sources ($app_id, $export_type );
@@ -443,6 +444,14 @@ class WpakBuild {
 					return $answer;
 				}
 			}
+			else if ( $export_type === 'cordova-template' ) {
+				$source_root = 'template_src/www';
+				if ( !$zip->addEmptyDir( $source_root ) ) {
+					$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $source_root );
+					$answer['ok'] = 0;
+					return $answer;
+				}
+			}
 
 			if ( !empty( $source_root ) ) {
 				$source_root .= '/';
@@ -662,16 +671,18 @@ class WpakBuild {
 				 && array_key_exists( 'splashscreens', $icons_and_splashscreens )
 				) {
 
+				$icons_and_splashscreens_root = $export_type === 'cordova-template' ? 'template_src/' : $source_root;
+
 				$icons = $icons_and_splashscreens['icons'];
 				foreach ( $icons as $icon ) {
-					$zip_filename = $source_root . $icon['src'];
+					$zip_filename = $icons_and_splashscreens_root . $icon['src'];
 					$zip->addFile( $icon['full_path'], $zip_filename );
 				}
 
 				if ( $export_type !== 'pwa' ) { //Don't need splashscreens for progressive web apps
 					$splashscreens = $icons_and_splashscreens['splashscreens'];
 					foreach ( $splashscreens as $splashscreen ) {
-						$zip_filename = $source_root . $splashscreen['src'];
+						$zip_filename = $icons_and_splashscreens_root . $splashscreen['src'];
 						$zip->addFile( $splashscreen['full_path'], $zip_filename );
 					}
 				}
@@ -712,8 +723,15 @@ class WpakBuild {
 			}
 
 			if ( !in_array( $export_type, array( 'webapp', 'webapp-appcache', 'pwa' ) ) ) {
-				//Create config.xml file (stays at zip root) :
-				$zip->addFromString( 'config.xml', WpakConfigFile::get_config_xml( $app_id, false, $export_type ) );
+				//Create config.xml file (stays at zip root for PhoneGap, inside template_src for cordova-template) :
+				$config_xml_root = $export_type === 'cordova-template' ? 'template_src/' : '';
+				$zip->addFromString( $config_xml_root .'config.xml', WpakConfigFile::get_config_xml( $app_id, false, $export_type ) );
+			}
+
+			if ( $export_type === 'cordova-template' ) {
+				//Create index.js file at cordova template's root
+				// https://cordova.apache.org/docs/en/9.x/guide/cli/template.html
+				$zip->addFromString( 'index.js', self::get_cordova_template_index_js() );
 			}
 
 			if ( $export_type === 'webapp-appcache' ) {
@@ -1106,6 +1124,20 @@ class WpakBuild {
 		}
 
 		return $cache_manifest;
+	}
+
+	private static function get_cordova_template_index_js() {
+		ob_start();
+?>
+const path = require('path');
+
+module.exports = {
+    dirname: path.join(__dirname, 'template_src')
+};
+<?php
+		$content = ob_get_contents();
+		ob_end_clean();
+		return $content;
 	}
 
 }

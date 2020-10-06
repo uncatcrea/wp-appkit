@@ -15,12 +15,16 @@ class WpakApps {
 			add_action( 'postbox_classes_wpak_apps_wpak_app_export_phonegap_build', array( __CLASS__, 'add_platform_specific_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_export_phonegap_build', array( __CLASS__, 'add_ios_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_export_phonegap_build', array( __CLASS__, 'add_android_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_export_phonegap_build', array( __CLASS__, 'add_android_cordova_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_phonegap_data', array( __CLASS__, 'add_platform_specific_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_phonegap_data', array( __CLASS__, 'add_ios_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_phonegap_data', array( __CLASS__, 'add_android_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_cordova_data', array( __CLASS__, 'add_platform_specific_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_cordova_data', array( __CLASS__, 'add_android_cordova_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_deep_linking', array( __CLASS__, 'add_platform_specific_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_deep_linking', array( __CLASS__, 'add_ios_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_deep_linking', array( __CLASS__, 'add_android_class' ) );
+			add_action( 'postbox_classes_wpak_apps_wpak_app_deep_linking', array( __CLASS__, 'add_android_cordova_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_export_pwa', array( __CLASS__, 'add_platform_specific_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_export_pwa', array( __CLASS__, 'add_pwa_class' ) );
 			add_action( 'postbox_classes_wpak_apps_wpak_app_pwa_data', array( __CLASS__, 'add_platform_specific_class' ) );
@@ -55,6 +59,12 @@ class WpakApps {
 		return $classes;
 	}
 
+	public static function add_android_cordova_class( $classes ) {
+		$classes[] = 'android-cordova';
+
+		return $classes;
+	}
+
 	public static function add_pwa_class( $classes ) {
 		$classes[] = 'pwa';
 
@@ -67,6 +77,7 @@ class WpakApps {
 			wp_enqueue_script( 'wpak_apps_js', plugins_url( 'lib/apps/apps.js', dirname( dirname( __FILE__ ) ) ), array( 'jquery' ), WpAppKit::resources_version );
 			$localize = array(
 				'phonegap_mandatory' => self::get_phonegap_mandatory_fields(),
+				'cordova_mandatory' => self::get_cordova_mandatory_fields(),
 				'i18n' => array(
 					'show_help' => __( 'Help me', WpAppKit::i18n_domain ),
 					'hide_help' => __( 'Hide help texts', WpAppKit::i18n_domain ),
@@ -249,6 +260,15 @@ class WpakApps {
 	public static function add_secondary_meta_boxes() {
 
 		add_meta_box(
+			'wpak_app_cordova_data',
+			__( 'Cordova', WpAppKit::i18n_domain ),
+			array( __CLASS__, 'inner_cordova_infos_box' ),
+			'wpak_apps',
+			'normal',
+			'default'
+		);
+
+		add_meta_box(
 			'wpak_app_phonegap_data',
 			__( 'PhoneGap Build', WpAppKit::i18n_domain ),
 			array( __CLASS__, 'inner_phonegap_infos_box' ),
@@ -269,6 +289,18 @@ class WpakApps {
 	}
 
 	public static function get_phonegap_mandatory_fields() {
+		return array(
+			'name',
+			'app_phonegap_id',
+			'version',
+			'desc',
+			'author',
+			'author_website',
+			'author_email',
+		);
+	}
+
+	public static function get_cordova_mandatory_fields() {
 		return array(
 			'name',
 			'app_phonegap_id',
@@ -359,15 +391,24 @@ class WpakApps {
 			'save' => self::isSaved( $post ),
 			'phonegap' => true,
 			'pwa' => true,
+			'cordova' => true,
 		);
 
 		// Update phonegap checked value thanks to mandatory fields
 		$main_infos = self::get_app_main_infos( $post->ID );
-		$mandatory = self::get_phonegap_mandatory_fields();
 
+		$mandatory = self::get_phonegap_mandatory_fields();
 		foreach( $mandatory as $key ) {
 			if( '' === $main_infos[$key] ) {
 				$checked['phonegap'] = false;
+				break;
+			}
+		}
+
+		$mandatory = self::get_cordova_mandatory_fields();
+		foreach( $mandatory as $key ) {
+			if( '' === $main_infos[$key] ) {
+				$checked['cordova'] = false;
 				break;
 			}
 		}
@@ -404,34 +445,25 @@ class WpakApps {
 					</li>
                     <li id="wpak_app_wizard_phonegap" class="list-group-item platform-specific android ios <?php echo $checked['phonegap'] ? 'list-group-item-success' : ''; ?>">
                         <span class="glyphicon glyphicon-<?php echo $checked['phonegap'] ? 'check' : 'unchecked'; ?>"></span>
-			    <?php _e( 'Setup PhoneGap config', WpAppKit::i18n_domain ); ?>
+			    		<?php _e( 'Setup PhoneGap config', WpAppKit::i18n_domain ); ?>
                     </li>
                     <li id="wpak_app_wizard_pwa" class="list-group-item platform-specific pwa <?php echo $checked['pwa'] ? 'list-group-item-success' : ''; ?>">
                         <span class="glyphicon glyphicon-<?php echo $checked['pwa'] ? 'check' : 'unchecked'; ?>"></span>
-			    <?php _e( 'Setup Progressive Web App config', WpAppKit::i18n_domain ); ?>
+			    		<?php _e( 'Setup Progressive Web App config', WpAppKit::i18n_domain ); ?>
+                    </li>
+                    <li id="wpak_app_wizard_cordova" class="list-group-item platform-specific android-cordova <?php echo $checked['cordova'] ? 'list-group-item-success' : ''; ?>">
+                        <span class="glyphicon glyphicon-<?php echo $checked['cordova'] ? 'check' : 'unchecked'; ?>"></span>
+			    		<?php _e( 'Setup Cordova config', WpAppKit::i18n_domain ); ?>
                     </li>
 				</ul>
 			</div>
 
             <div class="export-action platform-specific android ios">
-                <?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a id="wpak_export_link" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ); ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+                <?php _e( 'PhoneGap Build', WpAppKit::i18n_domain ); ?><a class="wpak_export_link button" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export-type' => 'phonegap-build' ) ), 'wpak_download_app_sources' ) ); ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+            </div>
 
-                <?php
-                /*
-                     * 2016-03-05: Export type select commented for now as we have to stabilize export features other
-                     * than PhoneGap Build before releasing it.
-                     * Was added in https://github.com/uncatcrea/wp-appkit/commit/ac4af270f8ea6273f4d653878c69fceec85a9dd8 along with
-                     * the corresponding JS in apps.js.
-                     *
-                    <?php $default_export_type = 'phonegap-build'; ?>
-                    <select name="export_type" id="wpak_export_type" >
-                        <?php foreach( WpakBuild::get_allowed_export_types() as $export_type => $label ): ?>
-                        <option value="<?php echo esc_attr( $export_type ) ?>" <?php selected( $export_type === $default_export_type )?>><?php echo esc_html( $label ) ?></option>
-                        <?php endforeach ?>
-                    </select>
-                    <a id="wpak_export_link" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => $default_export_type ) ), 'wpak_download_app_sources' ) ) ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
-                    */
-                ?>
+            <div class="export-action platform-specific android-cordova">
+                <?php _e( 'Cordova App Template', WpAppKit::i18n_domain ); ?><a class="wpak_export_link button" href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => 'cordova-template' ) ), 'wpak_download_app_sources' ) ); ?>" class="button" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
             </div>
 
             <?php if ( $pwa_installed ): ?>
@@ -566,7 +598,95 @@ class WpakApps {
 			</fieldset>
 			<div class="field-group wpak_phonegap_links">
 				<a href="<?php echo esc_url( WpakBuild::get_appli_dir_url() . '/config.xml?wpak_app_id=' . self::get_app_slug( $post->ID ) ) ?>" target="_blank"><?php _e( 'View config.xml', WpAppKit::i18n_domain ) ?></a>
-				<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources' ) ), 'wpak_download_app_sources' ) ) ?>" class="button wpak_phonegap_export" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+				<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export-type' => 'phonegap-build' ) ), 'wpak_download_app_sources' ) ) ?>" class="button wpak_phonegap_export" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
+			</div>
+			<?php wp_nonce_field( 'wpak-phonegap-infos-' . $post->ID, 'wpak-nonce-phonegap-infos' ) ?>
+		</div>
+		<?php
+	}
+
+	public static function inner_cordova_infos_box( $post, $current_box ) {
+		$main_infos = self::get_app_main_infos( $post->ID );
+		?>
+		<a href="#" class="hide-if-no-js wpak_help"><?php _e( 'Help me', WpAppKit::i18n_domain ); ?></a>
+		<div class="wpak_settings">
+			<p class="description"><?php _e( 'Information will be used when compiling your app and may be displayed in app stores. It will be stored in the config.xml file of your project.', WpAppKit::i18n_domain ) ?></p>
+			<fieldset>
+				<legend><?php _e( 'Application', WpAppKit::i18n_domain ); ?></legend>
+				<div class="field-group">
+					<label><?php _e( 'Name', WpAppKit::i18n_domain ) ?></label>
+					<input type="text" name="wpak_app_name" value="<?php echo esc_attr( $main_infos['name'] ) ?>" id="wpak_app_cordova_name" />
+				</div>
+				<div class="field-group">
+					<label><?php _e( 'Description', WpAppKit::i18n_domain ) ?></label>
+					<textarea name="wpak_app_desc" id="wpak_app_desc"><?php echo esc_textarea( $main_infos['desc'] ) ?></textarea>
+				</div>
+				<div class="field-group">
+					<label><?php _e( 'ID', WpAppKit::i18n_domain ) ?></label>
+					<input type="text" name="wpak_app_phonegap_id" value="<?php echo esc_attr( $main_infos['app_phonegap_id'] ) ?>" id="wpak_app_cordova_app_phonegap_id" />
+				</div>
+				<div class="field-group">
+					<label><?php _e( 'Version', WpAppKit::i18n_domain ) ?></label>
+					<input type="text" name="wpak_app_version" value="<?php echo esc_attr( $main_infos['version'] ) ?>" id="wpak_app_cordova_version" />
+				</div>
+				<div class="field-group platform-specific android-cordova">
+					<label><?php _e( 'VersionCode (Android only)', WpAppKit::i18n_domain ) ?></label>
+					<input type="text" name="wpak_app_version_code" value="<?php echo esc_attr( $main_infos['version_code'] ) ?>" id="wpak_app_cordova_version_code" />
+				</div>
+				<div class="field-group platform-specific android-cordova">
+					<label><?php _e( 'Target Architecture (Android only)', WpAppKit::i18n_domain ) ?></label><br>
+					<select name="wpak_app_target_architecture">
+						<option value="arm" <?php selected( $main_infos['target_architecture'], 'gradle' ) ?>><?php echo esc_html( __( 'ARM' ), WpAppKit::i18n_domain ) ?></option>
+						<option value="x86" <?php selected( $main_infos['target_architecture'], 'x86' ) ?>><?php echo esc_html( __( 'x86' ), WpAppKit::i18n_domain ) ?></option>
+					</select>
+				</div>
+				<div class="field-group platform-specific android-cordova">
+					<label><?php _e( 'Build Tool (Android only)', WpAppKit::i18n_domain ) ?></label><br>
+					<select name="wpak_app_build_tool">
+						<option value="gradle" <?php selected( $main_infos['build_tool'], 'gradle' ) ?>><?php echo esc_html( __( 'Gradle' ), WpAppKit::i18n_domain ) ?></option>
+						<option value="ant" <?php selected( $main_infos['build_tool'], 'ant' ) ?>><?php echo esc_html( __( 'Ant' ), WpAppKit::i18n_domain ) ?></option>
+					</select>
+				</div>
+				<div class="field-group">
+					<label><?php _e( 'Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
+					<textarea name="wpak_app_icons" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
+					<span class="description"><?php printf( __( 'Add here the tags defining where are the app icons and splashscreens.<br/>Example: %s', WpAppKit::i18n_domain ), '&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;' ) ?><br><br></span>
+					<br>
+					<input type="checkbox" id="wpak_use_default_icons_and_splash" name="wpak_use_default_icons_and_splash" <?php checked( $main_infos['use_default_icons_and_splash'] ) ?> />
+					<label for="wpak_use_default_icons_and_splash"><?php _e( 'Use default WP-AppKit Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
+					<span class="description"><?php _e( 'If checked and "Icons and Splashscreens" is empty, the app export will embed the default WP-AppKit Icons and Splashscreens.', WpAppKit::i18n_domain )?></span>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend><?php _e( 'Author', WpAppKit::i18n_domain ) ?></legend>
+				<div class="field-group">
+					<label><?php _e( 'Name', WpAppKit::i18n_domain ) ?></label>
+					<input type="text" name="wpak_app_author" value="<?php echo esc_attr( $main_infos['author'] ) ?>" id="wpak_app_cordova_author" />
+				</div>
+				<div class="field-group">
+					<label><?php _e( 'Website', WpAppKit::i18n_domain ) ?></label>
+					<input type="text" name="wpak_app_author_website" value="<?php echo esc_attr( $main_infos['author_website'] ) ?>" id="wpak_app_cordova_author_website" />
+				</div>
+				<div class="field-group">
+					<label><?php _e( 'Email', WpAppKit::i18n_domain ) ?></label>
+					<input type="text" name="wpak_app_author_email" value="<?php echo esc_attr( $main_infos['author_email'] ) ?>" id="wpak_app_cordova_author_email" />
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend><?php _e( 'Cordova', WpAppKit::i18n_domain ) ?></legend>
+				<div class="field-group">
+					<label><?php _e( 'Version', WpAppKit::i18n_domain ) ?></label>
+					<input type="text" name="wpak_app_phonegap_version" value="<?php echo esc_attr( $main_infos['phonegap_version'] ) ?>" id="wpak_app_cordova_phonegap_version" />
+				</div>
+				<div class="field-group">
+					<label><?php _e( 'Plugins', WpAppKit::i18n_domain ) ?></label>
+					<textarea name="wpak_app_phonegap_plugins" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
+					<span class="description"><?php __( 'Add here the tags defining the plugins you want to include in your app. Before adding a plugin, check which one is included by default.', WpAppKit::i18n_domain ) ?></span>
+				</div>
+			</fieldset>
+			<div class="field-group wpak_phonegap_links">
+				<a href="<?php echo esc_url( WpakBuild::get_appli_dir_url() . '/config.xml?wpak_app_id=' . self::get_app_slug( $post->ID ) ) ?>" target="_blank"><?php _e( 'View config.xml', WpAppKit::i18n_domain ) ?></a>
+				<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'action' => 'wpak_download_app_sources', 'export_type' => 'cordova-template' ) ), 'wpak_download_app_sources' ) ) ?>" class="button wpak_cordova_template_export" target="_blank"><?php _e( 'Export', WpAppKit::i18n_domain ) ?></a>
 			</div>
 			<?php wp_nonce_field( 'wpak-phonegap-infos-' . $post->ID, 'wpak-nonce-phonegap-infos' ) ?>
 		</div>
@@ -850,9 +970,10 @@ class WpakApps {
 
 	public static function get_platforms() {
 		return array(
-			'ios' => __( 'iOS - Native', WpAppKit::i18n_domain ),
-			'android' => __( 'Android - Native', WpAppKit::i18n_domain ),
-			'pwa' => __( 'Progressive Web App', WpAppKit::i18n_domain ),
+			'pwa'             => __( 'Progressive Web App', WpAppKit::i18n_domain ),
+			'android-cordova' => __( 'Android - Native - Cordova export', WpAppKit::i18n_domain ),
+			'android'         => __( 'Android - Native - PhoneGap export - Legacy, not maintained', WpAppKit::i18n_domain ),
+			'ios'             => __( 'iOS - Native - PhoneGap export - Legacy, not maintained', WpAppKit::i18n_domain ),
 		);
 	}
 

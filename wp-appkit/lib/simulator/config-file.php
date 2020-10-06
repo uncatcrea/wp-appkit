@@ -250,6 +250,15 @@ define( function ( require ) {
 	protected static function get_default_icons_and_splashscreens( $app_id, $export_type ) {
 
 		$default_icons = array(
+			'android-cordova' => array (
+				array( 'src' => 'icon.png', 'qualifier' => '', 'width' => '', 'height' => '' ),
+				array( 'src' => 'icons/icon-wp-appkit-ldpi.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'icons/icon-wp-appkit-mdpi.png', 'qualifier' => 'mdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'icons/icon-wp-appkit-hdpi.png', 'qualifier' => 'hdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'icons/icon-wp-appkit-xhdpi.png', 'qualifier' => 'xhdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'icons/icon-wp-appkit-xxhdpi.png', 'qualifier' => 'xxhdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'icons/icon-wp-appkit-xxxhdpi.png', 'qualifier' => 'xxxhdpi', 'width' => '', 'height' => ''  ),
+			),
 			'android' => array (
 				array( 'src' => 'icon.png', 'qualifier' => '', 'width' => '', 'height' => '' ),
 				array( 'src' => 'icons/icon-wp-appkit-ldpi.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => ''  ),
@@ -280,6 +289,14 @@ define( function ( require ) {
 		);
 
 		$default_splashscreens = array(
+			'android-cordova' => array (
+				array( 'src' => 'splashscreens/splashscreen-wp-appkit-ldpi.9.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'splashscreens/splashscreen-wp-appkit-mdpi.9.png', 'qualifier' => 'mdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'splashscreens/splashscreen-wp-appkit-hdpi.9.png', 'qualifier' => 'hdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'splashscreens/splashscreen-wp-appkit-xhdpi.9.png', 'qualifier' => 'xhdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'splashscreens/splashscreen-wp-appkit-xxhdpi.9.png', 'qualifier' => 'xxhdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'splashscreens/splashscreen-wp-appkit-xxxhdpi.9.png', 'qualifier' => 'xxxhdpi', 'width' => '', 'height' => '' ),
+			),
 			'android' => array (
 				array( 'src' => 'splash.9.png', 'qualifier' => '', 'width' => '', 'height' => '' ),
 				array( 'src' => 'splashscreens/splashscreen-wp-appkit-ldpi.9.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => '' ),
@@ -347,6 +364,7 @@ define( function ( require ) {
 			) {
 
 			$default_icons_and_splash = self::get_default_icons_and_splashscreens( $app_id, $export_type );
+
 			$default_icons = $default_icons_and_splash['icons'];
 			$default_splashscreens = $default_icons_and_splash['splashscreens'];
 
@@ -415,26 +433,44 @@ define( function ( require ) {
 			$icons_str = '';
 			if ( !empty( $icons ) ) {
 				foreach( $icons as $icon ) {
-					$icons_str .= '<icon '
-							. 'src="'. $icon['src'] .'" '
-							. 'gap:platform="'. $icon['platform'] .'" '
-							. ( !empty( $icon['qualifier']  ) ? 'gap:qualifier="'. $icon['qualifier'] .'" ' : '' )
-							. ( !empty( $icon['width']  ) ? 'width="'. $icon['width'] .'" ' : '' )
-							. ( !empty( $icon['height']  ) ? 'height="'. $icon['height'].'" ' : '' )
-					.'/>'."\n";
+					if ( $export_type === "phonegap-build" ) {
+						$icons_str .= '<icon '
+								. 'src="'. $icon['src'] .'" '
+								. 'gap:platform="'. $icon['platform'] .'" '
+								. ( !empty( $icon['qualifier']  ) ? 'gap:qualifier="'. $icon['qualifier'] .'" ' : '' )
+								. ( !empty( $icon['width']  ) ? 'width="'. $icon['width'] .'" ' : '' )
+								. ( !empty( $icon['height']  ) ? 'height="'. $icon['height'].'" ' : '' )
+						.'/>'."\n";
+					} else {
+						$icons_str .= '<icon '
+								. 'src="'. $icon['src'] .'" '
+								. ( !empty( $icon['qualifier']  ) ? 'density="'. $icon['qualifier'] .'" ' : '' )
+								. ( !empty( $icon['width']  ) ? 'width="'. $icon['width'] .'" ' : '' )
+								. ( !empty( $icon['height']  ) ? 'height="'. $icon['height'].'" ' : '' )
+						.'/>'."\n";
+					}
 				}
 			}
 
 			$splashscreens_str = '';
 			if ( !empty( $splashscreens) ) {
 				foreach( $splashscreens as $splashscreen ) {
-					$splashscreens_str .= '<gap:splash '
-								. 'src="'. $splashscreen['src'] .'" '
-								. 'gap:platform="'. $splashscreen['platform'] .'" '
-								. ( !empty( $splashscreen['qualifier']  ) ? 'gap:qualifier="'. $splashscreen['qualifier'] .'" ' : '' )
-								. ( !empty( $splashscreen['width']  ) ? 'width="'. $splashscreen['width'] .'" ' : '' )
-								. ( !empty( $splashscreen['height']  ) ? 'height="'. $splashscreen['height'] .'" ' : '' )
-						.'/>'."\n";
+					if ( $export_type === "phonegap-build" ) {
+						$splashscreens_str .= '<gap:splash '
+									. 'src="'. $splashscreen['src'] .'" '
+									. 'gap:platform="'. $splashscreen['platform'] .'" '
+									. ( !empty( $splashscreen['qualifier']  ) ? 'gap:qualifier="'. $splashscreen['qualifier'] .'" ' : '' )
+									. ( !empty( $splashscreen['width']  ) ? 'width="'. $splashscreen['width'] .'" ' : '' )
+									. ( !empty( $splashscreen['height']  ) ? 'height="'. $splashscreen['height'] .'" ' : '' )
+							.'/>'."\n";
+					} else {
+						$splashscreens_str .= '<splash '
+									. 'src="'. $splashscreen['src'] .'" '
+									. ( !empty( $splashscreen['qualifier']  ) ? 'density="'. $splashscreen['qualifier'] .'" ' : '' )
+									. ( !empty( $splashscreen['width']  ) ? 'width="'. $splashscreen['width'] .'" ' : '' )
+									. ( !empty( $splashscreen['height']  ) ? 'height="'. $splashscreen['height'] .'" ' : '' )
+							.'/>'."\n";
+					}
 				}
 			}
 
@@ -506,9 +542,6 @@ define( function ( require ) {
 		//Merge our default Phonegap Build plugins to those set in BO :
 		$app_phonegap_plugins = WpakApps::get_merged_phonegap_plugins_xml( $app_id, $export_type, $app_main_infos['phonegap_plugins'] );
 
-		$xmlns = 'http://www.w3.org/ns/widgets';
-		$xmlns_gap = 'http://phonegap.com/ns/1.0';
-
 		if ( !$echo ) {
 			ob_start();
 		}
@@ -516,8 +549,12 @@ define( function ( require ) {
 		echo '<?xml version="1.0" encoding="UTF-8" ?>';
 ?>
 
-<widget xmlns       = "<?php echo esc_url( $xmlns ); ?>"
-        xmlns:gap   = "<?php echo esc_url( $xmlns_gap ); ?>"
+<widget xmlns       = "http://www.w3.org/ns/widgets"
+<?php if ( $export_type === "phonegap-build" ): ?>
+        xmlns:gap   = "http://phonegap.com/ns/1.0"
+<?php elseif ( $export_type === "cordova-template" ): ?>
+        xmlns:cdv="http://cordova.apache.org/ns/1.0"
+<?php endif; ?>
         id          = "<?php echo esc_attr( $app_phonegap_id ); ?>"
         versionCode = "<?php echo esc_attr( $app_version_code ); ?>"
         version     = "<?php echo esc_attr( $app_version ); ?>" >
@@ -528,16 +565,17 @@ define( function ( require ) {
 
 	<author href="<?php echo esc_url( $app_author_website ) ?>" email="<?php echo esc_attr( $app_author_email ) ?>"><?php echo ent2ncr( htmlentities( $app_author, ENT_QUOTES, 'UTF-8', false ) ); ?></author>
 
+<?php $platform_name = $app_platform === 'android-cordova' ? 'android' : $app_platform; ?>
 <?php if( !empty( $app_platform_attributes ) ): ?>
-	<platform name="<?php echo esc_attr( $app_platform ); ?>">
+	<platform name="<?php echo esc_attr( $platform_name ); ?>">
 	    <?php echo $app_platform_attributes; ?>
 	</platform>
 <?php else: ?>
-	<platform name="<?php echo esc_attr( $app_platform ); ?>" />
+	<platform name="<?php echo esc_attr( $platform_name ); ?>" />
 <?php endif; ?>
 
 	<!-- General preferences -->
-<?php if( !empty( $target_sdk_version ) && $app_platform == 'android' ): ?>
+<?php if( !empty( $target_sdk_version ) && in_array($app_platform, ['android','android-cordova']) ): ?>
 	<preference name="android-targetSdkVersion" value="<?php echo esc_attr( $target_sdk_version ); ?>" />
 <?php endif; ?>
 <?php if( !empty( $app_target_architecture ) && $app_platform == 'android' ): ?>
@@ -565,7 +603,10 @@ define( function ( require ) {
 	if( apply_filters('wpak_config_xml_preference_disallow_overscroll', true, $app_id ) ): ?>
 
 	<preference name="<?php echo $app_platform == 'android' ? 'd' : 'D' ?>isallowOverscroll" value="true" />
+<?php if( $app_platform == 'android' ): ?>
 	<preference name="webviewbounce" value="false" />
+<?php endif; ?>
+
 <?php endif ?>
 
 	<!-- Custom preferences -->
