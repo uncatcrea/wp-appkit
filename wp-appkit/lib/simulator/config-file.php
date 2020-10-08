@@ -251,13 +251,13 @@ define( function ( require ) {
 
 		$default_icons = array(
 			'android-cordova' => array (
-				array( 'src' => 'icon.png', 'qualifier' => '', 'width' => '', 'height' => '' ),
-				array( 'src' => 'icons/icon-wp-appkit-ldpi.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => ''  ),
-				array( 'src' => 'icons/icon-wp-appkit-mdpi.png', 'qualifier' => 'mdpi', 'width' => '', 'height' => ''  ),
-				array( 'src' => 'icons/icon-wp-appkit-hdpi.png', 'qualifier' => 'hdpi', 'width' => '', 'height' => ''  ),
-				array( 'src' => 'icons/icon-wp-appkit-xhdpi.png', 'qualifier' => 'xhdpi', 'width' => '', 'height' => ''  ),
-				array( 'src' => 'icons/icon-wp-appkit-xxhdpi.png', 'qualifier' => 'xxhdpi', 'width' => '', 'height' => ''  ),
-				array( 'src' => 'icons/icon-wp-appkit-xxxhdpi.png', 'qualifier' => 'xxxhdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'res/icon.png', 'qualifier' => '', 'width' => '', 'height' => '' ),
+				array( 'src' => 'res/android/icons/icon-wp-appkit-ldpi.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'res/android/icons/icon-wp-appkit-mdpi.png', 'qualifier' => 'mdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'res/android/icons/icon-wp-appkit-hdpi.png', 'qualifier' => 'hdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'res/android/icons/icon-wp-appkit-xhdpi.png', 'qualifier' => 'xhdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'res/android/icons/icon-wp-appkit-xxhdpi.png', 'qualifier' => 'xxhdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'res/android/icons/icon-wp-appkit-xxxhdpi.png', 'qualifier' => 'xxxhdpi', 'width' => '', 'height' => ''  ),
 			),
 			'android' => array (
 				array( 'src' => 'icon.png', 'qualifier' => '', 'width' => '', 'height' => '' ),
@@ -290,12 +290,12 @@ define( function ( require ) {
 
 		$default_splashscreens = array(
 			'android-cordova' => array (
-				array( 'src' => 'splashscreens/splashscreen-wp-appkit-ldpi.9.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => '' ),
-				array( 'src' => 'splashscreens/splashscreen-wp-appkit-mdpi.9.png', 'qualifier' => 'mdpi', 'width' => '', 'height' => '' ),
-				array( 'src' => 'splashscreens/splashscreen-wp-appkit-hdpi.9.png', 'qualifier' => 'hdpi', 'width' => '', 'height' => '' ),
-				array( 'src' => 'splashscreens/splashscreen-wp-appkit-xhdpi.9.png', 'qualifier' => 'xhdpi', 'width' => '', 'height' => '' ),
-				array( 'src' => 'splashscreens/splashscreen-wp-appkit-xxhdpi.9.png', 'qualifier' => 'xxhdpi', 'width' => '', 'height' => '' ),
-				array( 'src' => 'splashscreens/splashscreen-wp-appkit-xxxhdpi.9.png', 'qualifier' => 'xxxhdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-ldpi.9.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-mdpi.9.png', 'qualifier' => 'mdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-hdpi.9.png', 'qualifier' => 'hdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-xhdpi.9.png', 'qualifier' => 'xhdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-xxhdpi.9.png', 'qualifier' => 'xxhdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-xxxhdpi.9.png', 'qualifier' => 'xxxhdpi', 'width' => '', 'height' => '' ),
 			),
 			'android' => array (
 				array( 'src' => 'splash.9.png', 'qualifier' => '', 'width' => '', 'height' => '' ),
