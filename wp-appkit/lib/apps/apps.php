@@ -664,44 +664,44 @@ class WpakApps {
 				<legend><?php _e( 'Application', WpAppKit::i18n_domain ); ?></legend>
 				<div class="field-group">
 					<label><?php _e( 'Name', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_name" value="<?php echo esc_attr( $main_infos['name'] ) ?>" id="wpak_app_cordova_name" />
+					<input type="text" name="wpak_app_name_cordova" value="<?php echo esc_attr( $main_infos['name'] ) ?>" id="wpak_app_cordova_name" />
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Description', WpAppKit::i18n_domain ) ?></label>
-					<textarea name="wpak_app_desc" id="wpak_app_desc"><?php echo esc_textarea( $main_infos['desc'] ) ?></textarea>
+					<textarea name="wpak_app_desc_cordova" id="wpak_app_desc"><?php echo esc_textarea( $main_infos['desc'] ) ?></textarea>
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'ID', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_phonegap_id" value="<?php echo esc_attr( $main_infos['app_phonegap_id'] ) ?>" id="wpak_app_cordova_app_phonegap_id" />
+					<input type="text" name="wpak_app_phonegap_id_cordova" value="<?php echo esc_attr( $main_infos['app_phonegap_id'] ) ?>" id="wpak_app_cordova_app_phonegap_id" />
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Version', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_version" value="<?php echo esc_attr( $main_infos['version'] ) ?>" id="wpak_app_cordova_version" />
+					<input type="text" name="wpak_app_version_cordova" value="<?php echo esc_attr( $main_infos['version'] ) ?>" id="wpak_app_cordova_version" />
 				</div>
 				<div class="field-group platform-specific android-cordova">
 					<label><?php _e( 'VersionCode (Android only)', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_version_code" value="<?php echo esc_attr( $main_infos['version_code'] ) ?>" id="wpak_app_cordova_version_code" />
+					<input type="text" name="wpak_app_version_code_cordova" value="<?php echo esc_attr( $main_infos['version_code'] ) ?>" id="wpak_app_cordova_version_code" />
 				</div>
 				<div class="field-group platform-specific android-cordova">
 					<label><?php _e( 'Target Architecture (Android only)', WpAppKit::i18n_domain ) ?></label><br>
-					<select name="wpak_app_target_architecture">
+					<select name="wpak_app_target_architecture_cordova">
 						<option value="arm" <?php selected( $main_infos['target_architecture'], 'gradle' ) ?>><?php echo esc_html( __( 'ARM' ), WpAppKit::i18n_domain ) ?></option>
 						<option value="x86" <?php selected( $main_infos['target_architecture'], 'x86' ) ?>><?php echo esc_html( __( 'x86' ), WpAppKit::i18n_domain ) ?></option>
 					</select>
 				</div>
 				<div class="field-group platform-specific android-cordova">
 					<label><?php _e( 'Build Tool (Android only)', WpAppKit::i18n_domain ) ?></label><br>
-					<select name="wpak_app_build_tool">
+					<select name="wpak_app_build_tool_cordova">
 						<option value="gradle" <?php selected( $main_infos['build_tool'], 'gradle' ) ?>><?php echo esc_html( __( 'Gradle' ), WpAppKit::i18n_domain ) ?></option>
 						<option value="ant" <?php selected( $main_infos['build_tool'], 'ant' ) ?>><?php echo esc_html( __( 'Ant' ), WpAppKit::i18n_domain ) ?></option>
 					</select>
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
-					<textarea name="wpak_app_icons" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
+					<textarea name="wpak_app_icons_cordova" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
 					<span class="description"><?php printf( __( 'Add here the tags defining where are the app icons and splashscreens.<br/>Example: %s', WpAppKit::i18n_domain ), '&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;' ) ?><br><br></span>
 					<br>
-					<input type="checkbox" id="wpak_use_default_icons_and_splash" name="wpak_use_default_icons_and_splash" <?php checked( $main_infos['use_default_icons_and_splash'] ) ?> />
+					<input type="checkbox" id="wpak_use_default_icons_and_splash" name="wpak_use_default_icons_and_splash_cordova" <?php checked( $main_infos['use_default_icons_and_splash'] ) ?> />
 					<label for="wpak_use_default_icons_and_splash"><?php _e( 'Use default WP-AppKit Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
 					<span class="description"><?php _e( 'If checked and "Icons and Splashscreens" is empty, the app export will embed the default WP-AppKit Icons and Splashscreens.', WpAppKit::i18n_domain )?></span>
 				</div>
@@ -710,26 +710,26 @@ class WpakApps {
 				<legend><?php _e( 'Author', WpAppKit::i18n_domain ) ?></legend>
 				<div class="field-group">
 					<label><?php _e( 'Name', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_author" value="<?php echo esc_attr( $main_infos['author'] ) ?>" id="wpak_app_cordova_author" />
+					<input type="text" name="wpak_app_author_cordova" value="<?php echo esc_attr( $main_infos['author'] ) ?>" id="wpak_app_cordova_author" />
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Website', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_author_website" value="<?php echo esc_attr( $main_infos['author_website'] ) ?>" id="wpak_app_cordova_author_website" />
+					<input type="text" name="wpak_app_author_website_cordova" value="<?php echo esc_attr( $main_infos['author_website'] ) ?>" id="wpak_app_cordova_author_website" />
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Email', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_author_email" value="<?php echo esc_attr( $main_infos['author_email'] ) ?>" id="wpak_app_cordova_author_email" />
+					<input type="text" name="wpak_app_author_email_cordova" value="<?php echo esc_attr( $main_infos['author_email'] ) ?>" id="wpak_app_cordova_author_email" />
 				</div>
 			</fieldset>
 			<fieldset>
 				<legend><?php _e( 'Cordova', WpAppKit::i18n_domain ) ?></legend>
 				<div class="field-group">
 					<label><?php _e( 'Version', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_phonegap_version" value="<?php echo esc_attr( $main_infos['phonegap_version'] ) ?>" id="wpak_app_cordova_phonegap_version" />
+					<input type="text" name="wpak_app_phonegap_version_cordova" value="<?php echo esc_attr( $main_infos['phonegap_version'] ) ?>" id="wpak_app_cordova_phonegap_version" />
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Plugins', WpAppKit::i18n_domain ) ?></label>
-					<textarea name="wpak_app_phonegap_plugins" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
+					<textarea name="wpak_app_phonegap_plugins_cordova" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
 					<span class="description"><?php __( 'Add here the tags defining the plugins you want to include in your app. Before adding a plugin, check which one is included by default.', WpAppKit::i18n_domain ) ?></span>
 				</div>
 			</fieldset>
@@ -752,44 +752,44 @@ class WpakApps {
 				<legend><?php _e( 'Application', WpAppKit::i18n_domain ); ?></legend>
 				<div class="field-group">
 					<label><?php _e( 'Name', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_name" value="<?php echo esc_attr( $main_infos['name'] ) ?>" id="wpak_app_voltbuilder_name" />
+					<input type="text" name="wpak_app_name_voltbuilder" value="<?php echo esc_attr( $main_infos['name'] ) ?>" id="wpak_app_voltbuilder_name" />
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Description', WpAppKit::i18n_domain ) ?></label>
-					<textarea name="wpak_app_desc" id="wpak_app_desc"><?php echo esc_textarea( $main_infos['desc'] ) ?></textarea>
+					<textarea name="wpak_app_desc_voltbuilder" id="wpak_app_desc"><?php echo esc_textarea( $main_infos['desc'] ) ?></textarea>
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'ID', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_phonegap_id" value="<?php echo esc_attr( $main_infos['app_phonegap_id'] ) ?>" id="wpak_app_voltbuilder_app_phonegap_id" />
+					<input type="text" name="wpak_app_phonegap_id_voltbuilder" value="<?php echo esc_attr( $main_infos['app_phonegap_id'] ) ?>" id="wpak_app_voltbuilder_app_phonegap_id" />
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Version', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_version" value="<?php echo esc_attr( $main_infos['version'] ) ?>" id="wpak_app_voltbuilder_version" />
+					<input type="text" name="wpak_app_version_voltbuilder" value="<?php echo esc_attr( $main_infos['version'] ) ?>" id="wpak_app_voltbuilder_version" />
 				</div>
 				<div class="field-group platform-specific android-voltbuilder">
 					<label><?php _e( 'VersionCode (Android only)', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_version_code" value="<?php echo esc_attr( $main_infos['version_code'] ) ?>" id="wpak_app_voltbuilder_version_code" />
+					<input type="text" name="wpak_app_version_code_voltbuilder" value="<?php echo esc_attr( $main_infos['version_code'] ) ?>" id="wpak_app_voltbuilder_version_code" />
 				</div>
 				<div class="field-group platform-specific android-voltbuilder">
 					<label><?php _e( 'Target Architecture (Android only)', WpAppKit::i18n_domain ) ?></label><br>
-					<select name="wpak_app_target_architecture">
+					<select name="wpak_app_target_architecture_voltbuilder">
 						<option value="arm" <?php selected( $main_infos['target_architecture'], 'gradle' ) ?>><?php echo esc_html( __( 'ARM' ), WpAppKit::i18n_domain ) ?></option>
 						<option value="x86" <?php selected( $main_infos['target_architecture'], 'x86' ) ?>><?php echo esc_html( __( 'x86' ), WpAppKit::i18n_domain ) ?></option>
 					</select>
 				</div>
 				<div class="field-group platform-specific android-voltbuilder">
 					<label><?php _e( 'Build Tool (Android only)', WpAppKit::i18n_domain ) ?></label><br>
-					<select name="wpak_app_build_tool">
+					<select name="wpak_app_build_tool_voltbuilder">
 						<option value="gradle" <?php selected( $main_infos['build_tool'], 'gradle' ) ?>><?php echo esc_html( __( 'Gradle' ), WpAppKit::i18n_domain ) ?></option>
 						<option value="ant" <?php selected( $main_infos['build_tool'], 'ant' ) ?>><?php echo esc_html( __( 'Ant' ), WpAppKit::i18n_domain ) ?></option>
 					</select>
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
-					<textarea name="wpak_app_icons" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
+					<textarea name="wpak_app_icons_voltbuilder" id="wpak_app_icons"><?php echo esc_textarea( $main_infos['icons'] ) ?></textarea>
 					<span class="description"><?php printf( __( 'Add here the tags defining where are the app icons and splashscreens.<br/>Example: %s', WpAppKit::i18n_domain ), '&lt;icon src="icons/ldpi.png" gap:platform="android" gap:qualifier="ldpi" /&gt;' ) ?><br><br></span>
 					<br>
-					<input type="checkbox" id="wpak_use_default_icons_and_splash" name="wpak_use_default_icons_and_splash" <?php checked( $main_infos['use_default_icons_and_splash'] ) ?> />
+					<input type="checkbox" id="wpak_use_default_icons_and_splash" name="wpak_use_default_icons_and_splash_voltbuilder" <?php checked( $main_infos['use_default_icons_and_splash'] ) ?> />
 					<label for="wpak_use_default_icons_and_splash"><?php _e( 'Use default WP-AppKit Icons and Splashscreens', WpAppKit::i18n_domain ) ?></label>
 					<span class="description"><?php _e( 'If checked and "Icons and Splashscreens" is empty, the app export will embed the default WP-AppKit Icons and Splashscreens.', WpAppKit::i18n_domain )?></span>
 				</div>
@@ -798,26 +798,26 @@ class WpakApps {
 				<legend><?php _e( 'Author', WpAppKit::i18n_domain ) ?></legend>
 				<div class="field-group">
 					<label><?php _e( 'Name', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_author" value="<?php echo esc_attr( $main_infos['author'] ) ?>" id="wpak_app_voltbuilder_author" />
+					<input type="text" name="wpak_app_author_voltbuilder" value="<?php echo esc_attr( $main_infos['author'] ) ?>" id="wpak_app_voltbuilder_author" />
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Website', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_author_website" value="<?php echo esc_attr( $main_infos['author_website'] ) ?>" id="wpak_app_voltbuilder_author_website" />
+					<input type="text" name="wpak_app_author_website_voltbuilder" value="<?php echo esc_attr( $main_infos['author_website'] ) ?>" id="wpak_app_voltbuilder_author_website" />
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Email', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_author_email" value="<?php echo esc_attr( $main_infos['author_email'] ) ?>" id="wpak_app_voltbuilder_author_email" />
+					<input type="text" name="wpak_app_author_email_voltbuilder" value="<?php echo esc_attr( $main_infos['author_email'] ) ?>" id="wpak_app_voltbuilder_author_email" />
 				</div>
 			</fieldset>
 			<fieldset>
 				<legend><?php _e( 'Cordova', WpAppKit::i18n_domain ) ?></legend>
 				<div class="field-group">
 					<label><?php _e( 'Version', WpAppKit::i18n_domain ) ?></label>
-					<input type="text" name="wpak_app_phonegap_version" value="<?php echo esc_attr( $main_infos['phonegap_version'] ) ?>" id="wpak_app_voltbuilder_phonegap_version" />
+					<input type="text" name="wpak_app_phonegap_version_voltbuilder" value="<?php echo esc_attr( $main_infos['phonegap_version'] ) ?>" id="wpak_app_voltbuilder_phonegap_version" />
 				</div>
 				<div class="field-group">
 					<label><?php _e( 'Plugins', WpAppKit::i18n_domain ) ?></label>
-					<textarea name="wpak_app_phonegap_plugins" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
+					<textarea name="wpak_app_phonegap_plugins_voltbuilder" id="wpak_app_phonegap_plugins"><?php echo esc_textarea( $main_infos['phonegap_plugins'] ) ?></textarea>
 					<span class="description"><?php __( 'Add here the tags defining the plugins you want to include in your app. Before adding a plugin, check which one is included by default.', WpAppKit::i18n_domain ) ?></span>
 				</div>
 			</fieldset>
@@ -976,62 +976,78 @@ class WpakApps {
 			return;
 		}
 
-		if ( isset( $_POST['wpak_app_name'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_name', sanitize_text_field( $_POST['wpak_app_name'] ) );
-		}
-
-		if ( isset( $_POST['wpak_app_phonegap_id'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_phonegap_id', sanitize_text_field( $_POST['wpak_app_phonegap_id'] ) );
-		}
-
-		if ( isset( $_POST['wpak_app_desc'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_desc', sanitize_text_field( $_POST['wpak_app_desc'] ) );
-		}
-
-		if ( isset( $_POST['wpak_app_version'] ) ) {
-			$app_version = self::sanitize_app_version( $_POST['wpak_app_version'] );
-			update_post_meta( $post_id, '_wpak_app_version', $app_version );
-		}
-
-		if ( isset( $_POST['wpak_app_version_code'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_version_code', sanitize_text_field( $_POST['wpak_app_version_code'] ) );
-		}
-
-		if ( isset( $_POST['wpak_app_target_architecture'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_target_architecture', sanitize_text_field( $_POST['wpak_app_target_architecture'] ) );
-		}
-
-		if ( isset( $_POST['wpak_app_build_tool'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_build_tool', sanitize_text_field( $_POST['wpak_app_build_tool'] ) );
-		}
-
-		if ( isset( $_POST['wpak_app_phonegap_version'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_phonegap_version', sanitize_text_field( $_POST['wpak_app_phonegap_version'] ) );
-		}
-
+		$platform = '';
 		if ( isset( $_POST['wpak_app_platform'] ) ) {
+			$platform = $_POST['wpak_app_platform'];
 			update_post_meta( $post_id, '_wpak_app_platform', sanitize_text_field( $_POST['wpak_app_platform'] ) );
 		}
 
-		if ( isset( $_POST['wpak_app_author'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_author', sanitize_text_field( $_POST['wpak_app_author'] ) );
+		if ( empty( $platform ) ) {
+			return;
 		}
 
-		if ( isset( $_POST['wpak_app_author_website'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_author_website', sanitize_text_field( $_POST['wpak_app_author_website'] ) );
+		$suffix = '';
+		switch ( $platform ) {
+			case 'android-cordova':
+				$suffix = '_cordova';
+				break;
+			case 'android-voltbuilder':
+				$suffix = '_voltbuilder';
+				break;
 		}
 
-		if ( isset( $_POST['wpak_app_author_email'] ) ) {
-			update_post_meta( $post_id, '_wpak_app_author_email', sanitize_text_field( $_POST['wpak_app_author_email'] ) );
+		if ( isset( $_POST['wpak_app_name' . $suffix] ) ) {
+			update_post_meta( $post_id, '_wpak_app_name', sanitize_text_field( $_POST['wpak_app_name'. $suffix] ) );
 		}
 
-		if ( isset( $_POST['wpak_app_phonegap_plugins'] ) ) {
-			$phonegap_plugins = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $_POST['wpak_app_phonegap_plugins'] );
+		if ( isset( $_POST['wpak_app_phonegap_id' . $suffix] ) ) {
+			update_post_meta( $post_id, '_wpak_app_phonegap_id', sanitize_text_field( $_POST['wpak_app_phonegap_id'. $suffix] ) );
+		}
+
+		if ( isset( $_POST['wpak_app_desc' . $suffix] ) ) {
+			update_post_meta( $post_id, '_wpak_app_desc', sanitize_text_field( $_POST['wpak_app_desc'. $suffix] ) );
+		}
+
+		if ( isset( $_POST['wpak_app_version' . $suffix] ) ) {
+			$app_version = self::sanitize_app_version( $_POST['wpak_app_version'. $suffix] );
+			update_post_meta( $post_id, '_wpak_app_version', $app_version );
+		}
+
+		if ( isset( $_POST['wpak_app_version_code' . $suffix] ) ) {
+			update_post_meta( $post_id, '_wpak_app_version_code', sanitize_text_field( $_POST['wpak_app_version_code'. $suffix] ) );
+		}
+
+		if ( isset( $_POST['wpak_app_target_architecture' . $suffix] ) ) {
+			update_post_meta( $post_id, '_wpak_app_target_architecture', sanitize_text_field( $_POST['wpak_app_target_architecture'. $suffix] ) );
+		}
+
+		if ( isset( $_POST['wpak_app_build_tool' . $suffix] ) ) {
+			update_post_meta( $post_id, '_wpak_app_build_tool', sanitize_text_field( $_POST['wpak_app_build_tool'. $suffix] ) );
+		}
+
+		if ( isset( $_POST['wpak_app_phonegap_version' . $suffix] ) ) {
+			update_post_meta( $post_id, '_wpak_app_phonegap_version', sanitize_text_field( $_POST['wpak_app_phonegap_version'. $suffix] ) );
+		}
+
+		if ( isset( $_POST['wpak_app_author' . $suffix] ) ) {
+			update_post_meta( $post_id, '_wpak_app_author', sanitize_text_field( $_POST['wpak_app_author'. $suffix] ) );
+		}
+
+		if ( isset( $_POST['wpak_app_author_website' . $suffix] ) ) {
+			update_post_meta( $post_id, '_wpak_app_author_website', sanitize_text_field( $_POST['wpak_app_author_website'. $suffix] ) );
+		}
+
+		if ( isset( $_POST['wpak_app_author_email' . $suffix] ) ) {
+			update_post_meta( $post_id, '_wpak_app_author_email', sanitize_text_field( $_POST['wpak_app_author_email'. $suffix] ) );
+		}
+
+		if ( isset( $_POST['wpak_app_phonegap_plugins' . $suffix] ) ) {
+			$phonegap_plugins = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $_POST['wpak_app_phonegap_plugins'. $suffix] );
 			update_post_meta( $post_id, '_wpak_app_phonegap_plugins', trim( $phonegap_plugins ) );
 		}
 
-		if ( isset( $_POST['wpak_app_icons'] ) ) {
-			$app_icons = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $_POST['wpak_app_icons'] );
+		if ( isset( $_POST['wpak_app_icons' . $suffix] ) ) {
+			$app_icons = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $_POST['wpak_app_icons'. $suffix] );
 			$app_icons = trim( $app_icons );
 			update_post_meta( $post_id, '_wpak_app_icons', $app_icons );
 
@@ -1040,7 +1056,7 @@ class WpakApps {
 				//App that have no existent '_wpak_use_default_icons_and_splash' meta must
 				//be considered as using the default icons and splash. So it is important
 				//that we set it to 'off' and not delete the meta.
-				$use_default = !empty( $_POST['wpak_use_default_icons_and_splash'] ) ? 'on' : 'off';
+				$use_default = !empty( $_POST['wpak_use_default_icons_and_splash' . $suffix] ) ? 'on' : 'off';
 				update_post_meta( $post_id, '_wpak_use_default_icons_and_splash', $use_default );
 			} else {
 				update_post_meta( $post_id, '_wpak_use_default_icons_and_splash', 'off' );
