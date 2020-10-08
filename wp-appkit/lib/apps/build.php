@@ -99,6 +99,7 @@ class WpakBuild {
 	public static function get_allowed_export_types() {
 		$allowed_export_types = array(
 			'cordova-template' => __( 'Cordova', WpAppKit::i18n_domain ),
+			'voltbuilder' => __( 'VoltBuilder', WpAppKit::i18n_domain ),
 			'phonegap-build' => __( 'PhoneGap Build', WpAppKit::i18n_domain ),
 			'phonegap-cli' => __( 'PhoneGap CLI', WpAppKit::i18n_domain ),
 			'webapp' => __( 'WebApp', WpAppKit::i18n_domain ),
@@ -434,7 +435,7 @@ class WpakBuild {
 			$source_root = '';
 			$sw_cache_file_data = array();
 
-			if ( $export_type === 'phonegap-cli' ) {
+			if ( $export_type === 'phonegap-cli' || $export_type === 'voltbuilder' ) {
 				//PhoneGap CLI export is made in www subdirectory
 				//( only config.xml stays at zip root )
 				$source_root = 'www';
@@ -671,7 +672,17 @@ class WpakBuild {
 				 && array_key_exists( 'splashscreens', $icons_and_splashscreens )
 				) {
 
-				$icons_and_splashscreens_root = $export_type === 'cordova-template' ? 'template_src/' : $source_root;
+				switch( $export_type ) {
+					case 'cordova-template':
+						$icons_and_splashscreens_root = 'template_src/';
+						break;
+					case 'voltbuilder':
+						$icons_and_splashscreens_root = '';
+						break;
+					default:
+						$icons_and_splashscreens_root = $source_root;
+						break;
+				}
 
 				$icons = $icons_and_splashscreens['icons'];
 				foreach ( $icons as $icon ) {

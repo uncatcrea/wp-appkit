@@ -1094,7 +1094,7 @@ a.list-group-item-danger.active:focus {
     line-height:28px;
 }
 
-.wpak_phonegap_export, .wpak_cordova_template_export {
+.wpak_phonegap_export, .wpak_cordova_template_export, .wpak_voltbuilder_export {
     float:right;
 }
 

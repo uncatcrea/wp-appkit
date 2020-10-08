@@ -47,6 +47,7 @@ jQuery().ready(function(){
         wizard_navigation = $( '#wpak_app_wizard_navigation' ),
         wizard_phonegap = $( '#wpak_app_wizard_phonegap' ),
         wizard_cordova = $( '#wpak_app_wizard_cordova' ),
+        wizard_voltbuilder = $( '#wpak_app_wizard_voltbuilder' ),
         wizard_save = $( '#wpak_app_wizard_save' ),
         title = $( '#title' ),
         app_title = $( '#wpak_app_title' ),
@@ -104,6 +105,19 @@ jQuery().ready(function(){
         return ret;
     }
 
+    function voltbuilder_ok() {
+        var ret = true;
+        Apps.voltbuilder_mandatory.map( function( key ) {
+            var input = $( '#wpak_app_voltbuilder_' + key );
+            if( input.length && !input.val().length ) {
+                ret = false;
+                return;
+            }
+        });
+
+        return ret;
+    }
+
     var wizard_phonegap_observer = {
         update: function() {
             var uncheck = !phonegap_ok();
@@ -118,12 +132,20 @@ jQuery().ready(function(){
         }
     };
 
+    var wizard_voltbuilder_observer = {
+        update: function() {
+            var uncheck = !voltbuilder_ok();
+            wizard_update.apply( wizard_voltbuilder, [uncheck] );
+        }
+    };
+
     WpakComponents.addObserver( wizard_components_observer );
     WpakNavigation.addObserver( wizard_navigation_observer );
     app_title.on( 'keyup', wizard_navigation_observer.update )
     title.on( 'keyup', wizard_title_observer.update );
     $( 'input, textarea', '#wpak_app_phonegap_data' ).on( 'keyup', wizard_phonegap_observer.update );
     $( 'input, textarea', '#wpak_app_cordova_data' ).on( 'keyup', wizard_cordova_observer.update );
+    $( 'input, textarea', '#wpak_app_voltbuilder_data' ).on( 'keyup', wizard_voltbuilder_observer.update );
 
     $( '#poststuff' ).on( 'click', '.wpak_help', function( e ) {
         e.preventDefault();

@@ -259,6 +259,15 @@ define( function ( require ) {
 				array( 'src' => 'res/android/icons/icon-wp-appkit-xxhdpi.png', 'qualifier' => 'xxhdpi', 'width' => '', 'height' => ''  ),
 				array( 'src' => 'res/android/icons/icon-wp-appkit-xxxhdpi.png', 'qualifier' => 'xxxhdpi', 'width' => '', 'height' => ''  ),
 			),
+			'android-voltbuilder' => array (
+				array( 'src' => 'res/icon.png', 'qualifier' => '', 'width' => '', 'height' => '' ),
+				array( 'src' => 'res/android/icons/icon-wp-appkit-ldpi.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'res/android/icons/icon-wp-appkit-mdpi.png', 'qualifier' => 'mdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'res/android/icons/icon-wp-appkit-hdpi.png', 'qualifier' => 'hdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'res/android/icons/icon-wp-appkit-xhdpi.png', 'qualifier' => 'xhdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'res/android/icons/icon-wp-appkit-xxhdpi.png', 'qualifier' => 'xxhdpi', 'width' => '', 'height' => ''  ),
+				array( 'src' => 'res/android/icons/icon-wp-appkit-xxxhdpi.png', 'qualifier' => 'xxxhdpi', 'width' => '', 'height' => ''  ),
+			),
 			'android' => array (
 				array( 'src' => 'icon.png', 'qualifier' => '', 'width' => '', 'height' => '' ),
 				array( 'src' => 'icons/icon-wp-appkit-ldpi.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => ''  ),
@@ -290,6 +299,14 @@ define( function ( require ) {
 
 		$default_splashscreens = array(
 			'android-cordova' => array (
+				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-ldpi.9.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-mdpi.9.png', 'qualifier' => 'mdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-hdpi.9.png', 'qualifier' => 'hdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-xhdpi.9.png', 'qualifier' => 'xhdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-xxhdpi.9.png', 'qualifier' => 'xxhdpi', 'width' => '', 'height' => '' ),
+				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-xxxhdpi.9.png', 'qualifier' => 'xxxhdpi', 'width' => '', 'height' => '' ),
+			),
+			'android-voltbuilder' => array (
 				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-ldpi.9.png', 'qualifier' => 'ldpi', 'width' => '', 'height' => '' ),
 				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-mdpi.9.png', 'qualifier' => 'mdpi', 'width' => '', 'height' => '' ),
 				array( 'src' => 'res/android/splashscreens/splashscreen-wp-appkit-hdpi.9.png', 'qualifier' => 'hdpi', 'width' => '', 'height' => '' ),
@@ -552,7 +569,7 @@ define( function ( require ) {
 <widget xmlns       = "http://www.w3.org/ns/widgets"
 <?php if ( $export_type === "phonegap-build" ): ?>
         xmlns:gap   = "http://phonegap.com/ns/1.0"
-<?php elseif ( $export_type === "cordova-template" ): ?>
+<?php elseif ( in_array($export_type, ["cordova-template","voltbuilder"] ) ): ?>
         xmlns:cdv="http://cordova.apache.org/ns/1.0"
 <?php endif; ?>
         id          = "<?php echo esc_attr( $app_phonegap_id ); ?>"
@@ -565,7 +582,7 @@ define( function ( require ) {
 
 	<author href="<?php echo esc_url( $app_author_website ) ?>" email="<?php echo esc_attr( $app_author_email ) ?>"><?php echo ent2ncr( htmlentities( $app_author, ENT_QUOTES, 'UTF-8', false ) ); ?></author>
 
-<?php $platform_name = $app_platform === 'android-cordova' ? 'android' : $app_platform; ?>
+<?php $platform_name = in_array($app_platform, ['android-cordova','android-voltbuilder']) ? 'android' : $app_platform; ?>
 <?php if( !empty( $app_platform_attributes ) ): ?>
 	<platform name="<?php echo esc_attr( $platform_name ); ?>">
 	    <?php echo $app_platform_attributes; ?>
@@ -575,7 +592,7 @@ define( function ( require ) {
 <?php endif; ?>
 
 	<!-- General preferences -->
-<?php if( !empty( $target_sdk_version ) && in_array($app_platform, ['android','android-cordova']) ): ?>
+<?php if( !empty( $target_sdk_version ) && in_array($app_platform, ['android','android-cordova','android-voltbuilder']) ): ?>
 	<preference name="android-targetSdkVersion" value="<?php echo esc_attr( $target_sdk_version ); ?>" />
 <?php endif; ?>
 <?php if( !empty( $app_target_architecture ) && $app_platform == 'android' ): ?>
