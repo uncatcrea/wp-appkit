@@ -720,7 +720,8 @@ class WpakBuild {
 	         */
 			$custom_files = apply_filters( 'wpak_export_custom_files', [], $export_type, $app_id );
 			foreach( $custom_files as $custom_file ) {
-				$file = $source_root . $custom_file['name'];
+				$root = isset($custom_file['root']) ? $custom_file['root'] .'/' : $source_root;
+				$file = $root . $custom_file['name'];
 				$file_content = $custom_file['content'];
 	            $minify_file = self::is_file_to_minify( $file, $export_type, $app_id );
 	            if ( $minify_file ) {

@@ -1388,7 +1388,9 @@ class WpakApps {
 		}
 
 		// Activate Deep Linking if a Custom URL Scheme is present
-		if( !empty( $app_main_infos['url_scheme'] ) ) {
+		// When building with Cordova, adding 'cordova-plugin-customurlscheme' by config.xml does not work:
+		// we must add it manually with: cordova plugin add cordova-plugin-customurlscheme --variable URL_SCHEME=[YOUR_URL_SCHEME]
+		if( !empty( $app_main_infos['url_scheme'] ) && $app_main_infos['platform'] !== 'android-cordova' ) {
 			$default_plugins['cordova-plugin-customurlscheme'] = array(
 				'spec' => '4.4.0',
 				'params' => array(
