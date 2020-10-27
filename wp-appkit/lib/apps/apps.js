@@ -46,12 +46,12 @@ jQuery().ready(function(){
         wizard_components = $( '#wpak_app_wizard_components' ),
         wizard_navigation = $( '#wpak_app_wizard_navigation' ),
         wizard_phonegap = $( '#wpak_app_wizard_phonegap' ),
+        wizard_cordova = $( '#wpak_app_wizard_cordova' ),
+        wizard_voltbuilder = $( '#wpak_app_wizard_voltbuilder' ),
         wizard_save = $( '#wpak_app_wizard_save' ),
         title = $( '#title' ),
         app_title = $( '#wpak_app_title' ),
         platform_select = $( '#wpak_app_platform' ),
-		export_select = $( '#wpak_export_type' ),
-		export_link = $( '#wpak_export_link' ),
 		app_icons = $( '#wpak_app_icons' ),
 		use_default_icons_checkbox = $( '#wpak_use_default_icons_and_splash' );
 
@@ -92,11 +92,50 @@ jQuery().ready(function(){
         return ret;
     }
 
+    function cordova_ok() {
+        var ret = true;
+        Apps.cordova_mandatory.map( function( key ) {
+            var input = $( '#wpak_app_cordova_' + key );
+            if( input.length && !input.val().length ) {
+                ret = false;
+                return;
+            }
+        });
+
+        return ret;
+    }
+
+    function voltbuilder_ok() {
+        var ret = true;
+        Apps.voltbuilder_mandatory.map( function( key ) {
+            var input = $( '#wpak_app_voltbuilder_' + key );
+            if( input.length && !input.val().length ) {
+                ret = false;
+                return;
+            }
+        });
+
+        return ret;
+    }
+
     var wizard_phonegap_observer = {
         update: function() {
             var uncheck = !phonegap_ok();
-
             wizard_update.apply( wizard_phonegap, [uncheck] );
+        }
+    };
+
+    var wizard_cordova_observer = {
+        update: function() {
+            var uncheck = !cordova_ok();
+            wizard_update.apply( wizard_cordova, [uncheck] );
+        }
+    };
+
+    var wizard_voltbuilder_observer = {
+        update: function() {
+            var uncheck = !voltbuilder_ok();
+            wizard_update.apply( wizard_voltbuilder, [uncheck] );
         }
     };
 
@@ -105,6 +144,8 @@ jQuery().ready(function(){
     app_title.on( 'keyup', wizard_navigation_observer.update )
     title.on( 'keyup', wizard_title_observer.update );
     $( 'input, textarea', '#wpak_app_phonegap_data' ).on( 'keyup', wizard_phonegap_observer.update );
+    $( 'input, textarea', '#wpak_app_cordova_data' ).on( 'keyup', wizard_cordova_observer.update );
+    $( 'input, textarea', '#wpak_app_voltbuilder_data' ).on( 'keyup', wizard_voltbuilder_observer.update );
 
     $( '#poststuff' ).on( 'click', '.wpak_help', function( e ) {
         e.preventDefault();
@@ -124,10 +165,6 @@ jQuery().ready(function(){
         $( '.platform-specific' ).hide();
         $( '.platform-specific.' + platform_select.val() ).show();
     }).change();
-	
-	export_select.on( 'change', function() {
-		export_link.attr( 'href', export_link.attr( 'href' ).replace( /&export_type=[a-z\-_]+/, '&export_type='+ $( this ).val() ) );
-	} );
 
 	/**
 	 * Handle Icons and Splashscreens textarea and checkbox logig:
@@ -135,13 +172,13 @@ jQuery().ready(function(){
 	var icons_memory = '';
 	app_icons.on( 'keyup', function() {
 		if ( $( this ).val().length ) {
-			use_default_icons_checkbox.removeAttr( 'checked' );	
+			use_default_icons_checkbox.removeAttr( 'checked' );
 		} else {
-			use_default_icons_checkbox.attr( 'checked', 'checked' );	
+			use_default_icons_checkbox.attr( 'checked', 'checked' );
 		}
 		icons_memory = '';
 	} );
-	
+
 	use_default_icons_checkbox.on( 'change', function() {
 		if ( $( this ).attr( 'checked' ) === 'checked' ) {
 			icons_memory = app_icons.val();
@@ -151,5 +188,5 @@ jQuery().ready(function(){
 			icons_memory = '';
 		}
 	} );
-	
+
 });

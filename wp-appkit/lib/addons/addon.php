@@ -17,7 +17,7 @@ class WpakAddon {
 	protected $app_dynamic_data_callback = null;
 	protected $app_dynamic_data = null;
 
-	public function __construct( $name, $slug = '', $platforms = ['ios','android'] ) {
+	public function __construct( $name, $slug = '', $platforms = ['ios','android','android-cordova','android-voltbuilder'] ) {
 		$this->name = $name;
 		$this->slug = sanitize_title_with_dashes( remove_accents( empty($slug) ? $name : $slug ) );
 		$this->platforms = is_array( $platforms ) ? $platforms : [];
@@ -36,18 +36,18 @@ class WpakAddon {
 	}
 
 	public function add_js( $js_file, $type = 'module', $position = '', $platforms = [] ) {
-		
+
 		$file_type = pathinfo( $js_file, PATHINFO_EXTENSION );
 		if( $file_type !== 'js' ){
 			return;
 		}
-		
+
 		$full_js_file = '';
-		
+
 		if( $type == 'theme' && $position === '' ){
 			$position = 'after';
 		}
-		
+
 		if( $type == 'init' ){
 			$position = 'before'; //for now, only init+before is handled
 		}
@@ -62,11 +62,11 @@ class WpakAddon {
 
 		if ( file_exists( $full_js_file ) ) {
 			if ( !in_array( $js_file, $this->js_files ) ) {
-				$this->js_files[] = array( 
-					'file' => $js_file, 
-					'type' => $type, 
+				$this->js_files[] = array(
+					'file' => $js_file,
+					'type' => $type,
 					'position' => $position,
-					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : ['android', 'ios', 'pwa']
+					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : $this->platforms
 				);
 			}
 		}
@@ -78,7 +78,7 @@ class WpakAddon {
 		if( $file_type !== 'css' ){
 			return;
 		}
-		
+
 		$full_css_file = '';
 
 		if ( strpos( $css_file, $this->directory ) !== false ) {
@@ -91,23 +91,23 @@ class WpakAddon {
 
 		if ( file_exists( $full_css_file ) ) {
 			if ( !in_array( $css_file, $this->css_files ) ) {
-				$this->css_files[] = array( 
-					'file' => $css_file, 
+				$this->css_files[] = array(
+					'file' => $css_file,
 					'type' => 'theme',
 					'position' => $position,
-					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : ['android', 'ios', 'pwa']
+					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : $this->platforms
 				);
 			}
 		}
 	}
-	
+
 	public function add_html( $html_file, $type = 'layout', $position = 'after', $data = array(), $platforms = [] ) {
 
 		$file_type = pathinfo( $html_file, PATHINFO_EXTENSION );
 		if( $file_type !== 'html' ){
 			return;
 		}
-		
+
 		$full_html_file = '';
 
 		if ( strpos( $html_file, $this->directory ) !== false ) {
@@ -120,24 +120,24 @@ class WpakAddon {
 
 		if ( file_exists( $full_html_file ) ) {
 			if ( !in_array( $html_file, $this->html_files ) ) {
-				$this->html_files[] = array( 
-					'file' => $html_file, 
+				$this->html_files[] = array(
+					'file' => $html_file,
 					'type' => $type ,
 					'position' => $position,
 					'data' => $data,
-					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : ['android', 'ios', 'pwa']
+					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : $this->platforms
 				);
 			}
 		}
 	}
-	
+
 	public function add_template( $template_file, $platforms = [] ) {
 
 		$file_type = pathinfo( $template_file, PATHINFO_EXTENSION );
 		if( $file_type !== 'html' ){
 			return;
 		}
-		
+
 		$full_template_file = '';
 
 		if ( strpos( $template_file, $this->directory ) !== false ) {
@@ -150,14 +150,14 @@ class WpakAddon {
 
 		if ( file_exists( $full_template_file ) ) {
 			if ( !in_array( $template_file, $this->template_files ) ) {
-				$this->template_files[] = array( 
+				$this->template_files[] = array(
 					'file' => $template_file,
-					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : ['android', 'ios', 'pwa']
+					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : $this->platforms
 				);
 			}
 		}
 	}
-	
+
 	/**
 	 * PHP files that are included only if the addon is activated
 	 * for a given app.
@@ -167,7 +167,7 @@ class WpakAddon {
 		if( $file_type !== 'php' ){
 			return;
 		}
-		
+
 		$full_php_file = '';
 
 		if ( strpos( $php_file, $this->directory ) !== false ) {
@@ -177,17 +177,17 @@ class WpakAddon {
 			$php_file = ltrim( $php_file, '/\\' );
 			$full_php_file = $this->directory . '/' . $php_file;
 		}
-		
+
 		if ( file_exists( $full_php_file ) ) {
 			if ( !in_array( $php_file, $this->php_files ) ) {
-				$this->php_files[] = array( 
+				$this->php_files[] = array(
 					'file' => $php_file,
-					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : ['android', 'ios', 'pwa']
+					'platforms' => !empty( $platforms ) && is_array( $platforms ) ? $platforms : $this->platforms
 				);
 			}
 		}
 	}
-	
+
 	public function require_php_files( $app_id ) {
 		$app_platform = WpakApps::get_app_info( $app_id, 'platform' );
 		foreach ( $this->php_files as $php_file ) {
@@ -202,14 +202,14 @@ class WpakAddon {
 	}
 
 	/**
-	 * Set the addon callback that will retrieve additionnal addon static data 
+	 * Set the addon callback that will retrieve additionnal addon static data
 	 * (added to config.js) specific to a given app.
 	 * @param type $callback Should be a function that takes $app_id as argument and returns an associative array
 	 */
 	public function add_app_static_data( $callback ){
 		$this->app_static_data_callback = $callback;
 	}
-	
+
 	public function set_app_static_data( $app_id ){
 		if( $this->app_static_data_callback !== null && is_callable($this->app_static_data_callback) ){
 			$app_data = call_user_func( $this->app_static_data_callback, $app_id );
@@ -218,16 +218,16 @@ class WpakAddon {
 			}
 		}
 	}
-	
+
 	/**
-	 * Set the addon callback that will retrieve additionnal addon dynamic data 
+	 * Set the addon callback that will retrieve additionnal addon dynamic data
 	 * (added to the synchronization web service) specific to a given app.
 	 * @param type $callback Should be a function that takes $app_id as argument and returns an associative array
 	 */
 	public function add_app_dynamic_data( $callback ){
 		$this->app_dynamic_data_callback = $callback;
 	}
-	
+
 	public function set_app_dynamic_data( $app_id ){
 		if( $this->app_dynamic_data_callback !== null && is_callable($this->app_dynamic_data_callback) ){
 			$app_data = call_user_func( $this->app_dynamic_data_callback, $app_id );
@@ -240,7 +240,7 @@ class WpakAddon {
 	public function get_asset_file( $file_relative_to_addon ) {
 
 		$found = false;
-				
+
 		$file_type = pathinfo( $file_relative_to_addon, PATHINFO_EXTENSION );
 		if ( isset( $this->{$file_type . '_files'} ) ) {
 			foreach ( $this->{$file_type . '_files'} as $file ) {
@@ -260,7 +260,7 @@ class WpakAddon {
 				}
 			}
 		}
-		
+
 		$file_full_path = $this->directory . '/' . $file_relative_to_addon;
 
 		return $found && file_exists( $file_full_path ) ? $file_full_path : false;
@@ -299,7 +299,7 @@ class WpakAddon {
 
 		return $filtered_files;
 	}
-	
+
 	public function get_all_files( $app_id, $indexed_by_type = false ) {
 		$all_files = array();
 

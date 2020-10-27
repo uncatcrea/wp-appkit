@@ -21,17 +21,17 @@ abstract class WpakComponentType {
 		$this->data['specific']['label'] = $component->label;
 		$this->data['specific']['type'] = $component->type;
 		$this->data['specific']['slug'] = $component->slug;
-		
+
 		/**
 		* Filter component's options before data is retrieved for the component.
 		* Can be used for example to change post list components' queries, page components' ids etc...
-		* 
+		*
 		* @param array    $options               Component option that can be customized, coming from options set in Back Office for the component
 		* @param object   $component             Component we're going to retrieved data for
 		* @param array    $args                  Arguments comming from the request
 		*/
 		$options = apply_filters( 'wpak_component_options', $component->options, $component, $args );
-		
+
 		$this->compute_data( $component, $options, $args );
 		return $this->data;
 	}
@@ -81,11 +81,11 @@ class WpakComponentsTypes {
 		$data = null;
 		if ( self::component_type_exists( $component->type ) ) {
 			$data = self::factory( $component->type )->get_data( $component, $component_globals, $args );
-			
+
 			/**
 			 * Filter component's data before it is returned by webservice.
 			 * Can be used for example to change component's label.
-			 * 
+			 *
 			 * @param array    $data                  Component data that can be customized
 			 * @param object   $component             Component we retrieved data for
 			 * @param int      $app_id                Id of the app the component belongs to
@@ -93,7 +93,7 @@ class WpakComponentsTypes {
 			 * @param array    $args                  Arguments comming from the request
 			 */
 			$data = apply_filters( 'wpak_component_data', $data, $component, wpak_get_current_app_id(), $component_globals, $args );
-			
+
 		}
 		return $data;
 	}

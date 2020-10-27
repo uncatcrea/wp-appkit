@@ -2,8 +2,8 @@
 Contributors: uncategorized-creations, benjaminlupu, lpointet, mleroi
 Tags: pwa, mobile app, android, ios, progressive web app, phonegap build
 Requires at least: 4.0
-Tested up to: 5.4.1
-Stable tag: 1.5.6
+Tested up to:  5.5.1
+Stable tag: 1.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,13 +17,15 @@ A great way to build progressive web apps (PWA) and mobile apps for your WordPre
 
 Progressive web apps (PWA) and mobile applications are a great way to offer an outstanding mobile experience for your users. Using push notifications, letting users read offline, using saved accounts to share content are among many wonderful things you can do with mobile applications.
 
+**Build with Cordova or VoltBuilder**: Since October 2020, Adobe has discontinued PhoneGap Build and ended investment in PhoneGap, so PhoneGap Build cannot be used to build WP-AppKit apps anymore. But as of version 1.6.0, WP-AppKit allows to build apps with raw Cordova tools or VoltBuilder online service.
+
 = The Toolkit You Need to Build Your App =
 
 * **Native support of WordPress**: custom post types, custom fields, custom taxonomies, comments, secured authentication
 * **Full support of progressive web apps (PWA)**
 * **Android support**
-* **PhoneGap/Cordova**: use JavaScript, HTML and CSS to build apps
-* **PhoneGap Build**: Easy online compilation
+* **Cordova**: use JavaScript, HTML and CSS to build apps
+* **VoltBuilder**: Easy online compilation
 * **Themes**: create app themes
 * **Customizable**: hook into our API to add the features you need
 
@@ -98,7 +100,7 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 
 = Do you compile native applications for me? =
 
-**No.** You can use PhoneGap Build, an easy to use Adobe’s cloud compilation service or the classic Cordova CLI.
+**No.** You can use Cordova or VoltBuilder, an easy to use cloud compilation service.
 
 = Do you deploy progressive web apps for me? =
 
@@ -121,6 +123,12 @@ You can display WooCommerce content (ie. products) in your themes as any other W
 == Changelog ==
 
 Also see [changelog on github](https://github.com/uncatcrea/wp-appkit/blob/master/CHANGELOG.md) for full details.
+
+= 1.6.0 (2020-10-27) =
+
+*Features*
+
+- End of PhoneGap Build: allow to build apps with raw Cordova tools or VoltBuilder online service
 
 = 1.5.6 (2020-05-05) =
 

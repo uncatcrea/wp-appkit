@@ -24,7 +24,7 @@
     vertical-align:middle;
 }
 
-#wpak_export_link, .wpak_export_link_pwa {
+.button.wpak_export_link, .wpak_export_link_pwa {
     margin-left:10px;
     vertical-align:middle;
 }
@@ -1094,7 +1094,7 @@ a.list-group-item-danger.active:focus {
     line-height:28px;
 }
 
-.wpak_phonegap_export {
+.wpak_phonegap_export, .wpak_cordova_template_export, .wpak_voltbuilder_export {
     float:right;
 }
 

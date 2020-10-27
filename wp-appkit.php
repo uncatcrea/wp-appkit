@@ -3,7 +3,7 @@
 Plugin Name: WP-AppKit
 Plugin URI:  https://github.com/uncatcrea/wp-appkit
 Description: Build mobile apps and PWA based on your WordPress content.
-Version:     1.5.6
+Version:     1.6.0
 Author:      Uncategorized Creations
 Author URI:  http://getwpappkit.com
 Text Domain: wp-appkit

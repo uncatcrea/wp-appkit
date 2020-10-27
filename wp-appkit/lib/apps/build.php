@@ -98,6 +98,8 @@ class WpakBuild {
 
 	public static function get_allowed_export_types() {
 		$allowed_export_types = array(
+			'cordova-template' => __( 'Cordova', WpAppKit::i18n_domain ),
+			'voltbuilder' => __( 'VoltBuilder', WpAppKit::i18n_domain ),
 			'phonegap-build' => __( 'PhoneGap Build', WpAppKit::i18n_domain ),
 			'phonegap-cli' => __( 'PhoneGap CLI', WpAppKit::i18n_domain ),
 			'webapp' => __( 'WebApp', WpAppKit::i18n_domain ),
@@ -124,7 +126,7 @@ class WpakBuild {
 			return;
 		}
 
-		$export_type = isset( $_GET['export_type'] ) && self::is_allowed_export_type( $_GET['export_type'] ) ? $_GET['export_type'] : 'phonegap-build';
+		$export_type = isset( $_GET['export_type'] ) && self::is_allowed_export_type( $_GET['export_type'] ) ? $_GET['export_type'] : 'cordova-template';
 
 		// Re-build sources
 		$answer = self::build_app_sources ($app_id, $export_type );
@@ -433,10 +435,18 @@ class WpakBuild {
 			$source_root = '';
 			$sw_cache_file_data = array();
 
-			if ( $export_type === 'phonegap-cli' ) {
+			if ( $export_type === 'phonegap-cli' || $export_type === 'voltbuilder' ) {
 				//PhoneGap CLI export is made in www subdirectory
 				//( only config.xml stays at zip root )
 				$source_root = 'www';
+				if ( !$zip->addEmptyDir( $source_root ) ) {
+					$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $source_root );
+					$answer['ok'] = 0;
+					return $answer;
+				}
+			}
+			else if ( $export_type === 'cordova-template' ) {
+				$source_root = 'template_src/www';
 				if ( !$zip->addEmptyDir( $source_root ) ) {
 					$answer['msg'] = sprintf( __( 'Could not add directory [%s] to zip archive', WpAppKit::i18n_domain ), $source_root );
 					$answer['ok'] = 0;
@@ -662,16 +672,28 @@ class WpakBuild {
 				 && array_key_exists( 'splashscreens', $icons_and_splashscreens )
 				) {
 
+				switch( $export_type ) {
+					case 'cordova-template':
+						$icons_and_splashscreens_root = 'template_src/';
+						break;
+					case 'voltbuilder':
+						$icons_and_splashscreens_root = '';
+						break;
+					default:
+						$icons_and_splashscreens_root = $source_root;
+						break;
+				}
+
 				$icons = $icons_and_splashscreens['icons'];
 				foreach ( $icons as $icon ) {
-					$zip_filename = $source_root . $icon['src'];
+					$zip_filename = $icons_and_splashscreens_root . $icon['src'];
 					$zip->addFile( $icon['full_path'], $zip_filename );
 				}
 
 				if ( $export_type !== 'pwa' ) { //Don't need splashscreens for progressive web apps
 					$splashscreens = $icons_and_splashscreens['splashscreens'];
 					foreach ( $splashscreens as $splashscreen ) {
-						$zip_filename = $source_root . $splashscreen['src'];
+						$zip_filename = $icons_and_splashscreens_root . $splashscreen['src'];
 						$zip->addFile( $splashscreen['full_path'], $zip_filename );
 					}
 				}
@@ -698,7 +720,8 @@ class WpakBuild {
 	         */
 			$custom_files = apply_filters( 'wpak_export_custom_files', [], $export_type, $app_id );
 			foreach( $custom_files as $custom_file ) {
-				$file = $source_root . $custom_file['name'];
+				$root = isset($custom_file['root']) ? $custom_file['root'] .'/' : $source_root;
+				$file = $root . $custom_file['name'];
 				$file_content = $custom_file['content'];
 	            $minify_file = self::is_file_to_minify( $file, $export_type, $app_id );
 	            if ( $minify_file ) {
@@ -712,8 +735,15 @@ class WpakBuild {
 			}
 
 			if ( !in_array( $export_type, array( 'webapp', 'webapp-appcache', 'pwa' ) ) ) {
-				//Create config.xml file (stays at zip root) :
-				$zip->addFromString( 'config.xml', WpakConfigFile::get_config_xml( $app_id, false, $export_type ) );
+				//Create config.xml file (stays at zip root for PhoneGap, inside template_src for cordova-template) :
+				$config_xml_root = $export_type === 'cordova-template' ? 'template_src/' : '';
+				$zip->addFromString( $config_xml_root .'config.xml', WpakConfigFile::get_config_xml( $app_id, false, $export_type ) );
+			}
+
+			if ( $export_type === 'cordova-template' ) {
+				//Create index.js file at cordova template's root
+				// https://cordova.apache.org/docs/en/9.x/guide/cli/template.html
+				$zip->addFromString( 'index.js', self::get_cordova_template_index_js() );
 			}
 
 			if ( $export_type === 'webapp-appcache' ) {
@@ -1106,6 +1136,20 @@ class WpakBuild {
 		}
 
 		return $cache_manifest;
+	}
+
+	private static function get_cordova_template_index_js() {
+		ob_start();
+?>
+const path = require('path');
+
+module.exports = {
+    dirname: path.join(__dirname, 'template_src')
+};
+<?php
+		$content = ob_get_contents();
+		ob_end_clean();
+		return $content;
 	}
 
 }

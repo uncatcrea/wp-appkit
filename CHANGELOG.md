@@ -1,3 +1,8 @@
+## 1.6.0 (2020-10-27)
+
+### Fixes
+- End of PhoneGap Build: allow to build apps with raw Cordova tools or VoltBuilder online service ([@mleroi](https://github.com/mleroi))
+
 ## 1.5.6 (2020-05-05)
 
 ### Fixes
