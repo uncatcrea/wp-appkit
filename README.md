@@ -33,7 +33,7 @@ WP-AppKit adds a menu to the WordPress admin.
 * Use Chrome to simulate your app in the browser
 * Set your secure key to support WordPress authentication in your app
 * Set the custom URL scheme for deeplinks
-* Export the app's sources ready to be compiled with [PhoneGap Build](https://build.phonegap.com/)
+* Export app's sources ready to be compiled with raw Cordova tools or VoltBuilder online service
 
 ![WP-AppKit Edit Application Panel](https://cloud.githubusercontent.com/assets/6179747/16171841/36a01202-357a-11e6-888e-e38f046fdf39.jpg)
 
@@ -51,7 +51,7 @@ Developing app themes are at the heart of the WP-AppKit project. If you're ready
 ![Edit WP-AppKit Theme in Bracket](https://cloud.githubusercontent.com/assets/6179747/16171843/3d4ea686-357a-11e6-91de-2f2ea82a513b.jpg)
 
 ## Who's Behind This Project?
-This project is done the [Uncategorized Creations](http://uncategorized-creations.com/) team. UncatCrea is a group of web professionals working with WordPress and Cordova/PhoneGap. facing the challenges to build content based mobile apps connected to WordPress, we've decided to create WP-AppKit.
+This project is done the [Uncategorized Creations](http://uncategorized-creations.com/) team. UncatCrea is a group of web professionals working with WordPress and Cordova. facing the challenges to build content based mobile apps connected to WordPress, we've decided to create WP-AppKit.
 
 ### Meet the team
 * Mathieu Le Roi: _Quiet and mystic_ developer
